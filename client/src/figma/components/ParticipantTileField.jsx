@@ -11,8 +11,8 @@ export function ParticipantTileField({
   if (variant === "기본") return <div data-figma="종류=기본" data-node="1405:50271" className={cx("w-[165px] h-[147px] [border-radius:16px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Frame 2147249132" data-node="1405:50266" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1405:50267" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091459" data-node="1405:50268" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+        <div data-figma="image 1208091459" data-node="1405:50268" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
       }} />
       </div>
       <div data-figma="name" data-node="1405:50269" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:var(--bg-base,_#000)] absolute left-[31px] top-[103px] w-[95px] h-[21px] overflow-hidden">
@@ -24,8 +24,8 @@ export function ParticipantTileField({
   if (variant === "종류 2") return <div data-figma="종류=종류 2" data-node="1405:50283" className={cx("w-[165px] h-[147px] [border-radius:16px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Frame 2147249134" data-node="1405:50273" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1405:50274" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091458" data-node="1405:50275" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+        <div data-figma="image 1208091458" data-node="1405:50275" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
       }} />
       </div>
       <div data-figma="name" data-node="1405:50276" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:var(--bg-base,_#000)] absolute left-[35px] top-[103px] w-[95px] h-[21px] overflow-hidden">
@@ -50,8 +50,8 @@ export function ParticipantTileField({
   if (variant === "종류 3") return <div data-figma="종류=종류 3" data-node="1405:50290" className={cx("flex w-[165px] h-[147px] [padding:18px_27px_23px_26px] [flex-direction:column] [align-items:center] gap-[13px] [border-radius:16px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Frame 2147249135" data-node="1405:50285" className="w-[72px] h-[72px] shrink-0 [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1405:50286" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091458" data-node="1405:50287" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
-        "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 2.644px 2.644px / 92.106% 92.106% no-repeat"
+        <div data-figma="image 1208091458" data-node="1405:50287" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
+        "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 2.644px 2.644px / 92.106% 92.106% no-repeat"
       }} />
       </div>
       <div data-figma="name" data-node="1405:50288" className="flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:var(--bg-base,_#000)] absolute left-[26px] top-[103px] w-[112px] h-[21px] overflow-hidden">
@@ -76,7 +76,7 @@ export function ParticipantTileField({
     }} />
       <div data-figma="Frame 2147249132" data-node="1405:50299" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1405:50300" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <img data-figma="image 1208091460" data-node="1405:50301" data-px="" data-hires="" alt="" src="./assets/raster/1405-50301.png" className="w-[65px] h-[65px] absolute left-[3.5px] top-[3px] block" />
+        <img data-figma="image 1208091460" data-node="1405:50301" data-px="" data-hires="" alt="" src="./assets/raster/1405-50301.webp" className="w-[65px] h-[65px] absolute left-[3.5px] top-[3px] block" />
       </div>
       <div data-figma="name" data-node="1405:50302" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:var(--bg-base,_#000)] absolute left-[38px] top-[103px] w-[89px] h-[21px] overflow-hidden">
         <p data-figma="새벽2시 택배상자" data-node="1405:50303" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:15px] [letter-spacing:-0.44px] shrink-0 w-[73px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.496px] left-[0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -92,8 +92,8 @@ export function ParticipantTileField({
   if (variant === "종류 6") return <div data-figma="종류=종류 6" data-node="1405:50316" className={cx("w-[165px] h-[147px] [border-radius:16px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Frame 2147249133" data-node="1405:50311" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1405:50312" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091459" data-node="1405:50313" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+        <div data-figma="image 1208091459" data-node="1405:50313" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
       }} />
       </div>
       <div data-figma="name" data-node="1405:50314" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:var(--bg-base,_#000)] absolute left-[31px] top-[103px] w-[95px] h-[21px] overflow-hidden">

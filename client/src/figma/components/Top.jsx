@@ -20,8 +20,8 @@ export function Top({
   if (type === "종류 2") return <div data-figma="type=종류 2" data-node="1405:47088" className={cx("flex w-[310px] [align-items:center] [gap:var(--spacing-7,_8px)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Thumb" data-node="1405:47085" className="flex w-[24px] [padding:2px_1px_0_1px] [justify-content:center] [align-items:center] shrink-0 [border-radius:999px] [background:var(--bg-surface,_#121415)] h-[24px] relative overflow-hidden">
         <div data-figma="Chair" data-node="1405:47086" data-instance-of="Chair Illustration" className="flex w-[22px] h-[22px] [justify-content:center] [align-items:center] shrink-0 absolute left-[1px] top-[2px]">
-          <div data-figma="box" data-node="I1405:47086;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[22px] h-[22px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+          <div data-figma="box" data-node="I1405:47086;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[22px] h-[22px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -32,8 +32,8 @@ export function Top({
   if (type === "종류 3") return <div data-figma="type=종류 3" data-node="1405:47093" className={cx("flex w-[310px] [align-items:center] [gap:var(--spacing-7,_8px)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Thumb" data-node="1405:47090" className="flex w-[24px] [padding:2px_1px_0_1px] [justify-content:center] [align-items:center] shrink-0 [border-radius:999px] [background:var(--bg-surface,_#121415)] h-[24px] relative overflow-hidden">
         <div data-figma="Chair" data-node="1405:47091" data-instance-of="Chair Illustration" className="flex w-[22px] h-[22px] [justify-content:center] [align-items:center] shrink-0 absolute left-[1px] top-[2px]">
-          <div data-figma="stool" data-node="I1405:47091;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[22px] h-[22px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 50% / cover no-repeat"
+          <div data-figma="stool" data-node="I1405:47091;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[22px] h-[22px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>

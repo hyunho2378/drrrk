@@ -8,13 +8,13 @@ export function ReactionButton({
   className
 }) {
   if (type === "공감") return <div data-figma="type=공감" data-node="1204:85333" className={cx("flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1204:85332" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[37.274px] h-[32.294px] shrink-0 [aspect-ratio:37.27/32.29]" style={{
-      "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png) -20.793px -10.782px / 211.57% 162.798% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1204:85332" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[37.274px] h-[32.294px] shrink-0 [aspect-ratio:37.27/32.29]" style={{
+      "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp) -20.793px -10.782px / 211.57% 162.798% no-repeat"
     }} />
     </div>;
   if (type === "응원") return <div data-figma="type=응원" data-node="1204:85336" className={cx("flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1204:85335" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[33.219px] h-[32.119px] shrink-0 [aspect-ratio:33.22/32.12]" style={{
-      "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png) -17.115px -5.368px / 203.444% 140.274% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1204:85335" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[33.219px] h-[32.119px] shrink-0 [aspect-ratio:33.22/32.12]" style={{
+      "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp) -17.115px -5.368px / 203.444% 140.274% no-repeat"
     }} />
     </div>;
   if (type === "토닥") return <div data-figma="type=토닥" data-node="1204:85341" className={cx("flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [border:1.723px_solid_transparent] relative overflow-hidden [isolation:isolate]", className)} style={style}>
@@ -25,17 +25,17 @@ export function ReactionButton({
       "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2234.39%22%20height%3D%2242.66%22%20viewBox%3D%220%200%2034.39%2042.66%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M21.2116%209.7395%20L21.8942%202.94023%20L21.8942%200%20L14.3599%202.94023%20L9.31947%209.7395%20L0%2011.3409%20L0%2042.6595%20L34.3902%2042.6595%20L34.3902%2022.183%20L30.5574%2014.0448%20L26.9871%2014.8849%20L24.8607%2015.3312%20L21.2116%209.7395%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
       "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2234.39%22%20height%3D%2242.66%22%20viewBox%3D%220%200%2034.39%2042.66%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M21.2116%209.7395%20L21.8942%202.94023%20L21.8942%200%20L14.3599%202.94023%20L9.31947%209.7395%20L0%2011.3409%20L0%2042.6595%20L34.3902%2042.6595%20L34.3902%2022.183%20L30.5574%2014.0448%20L26.9871%2014.8849%20L24.8607%2015.3312%20L21.2116%209.7395%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
     }}>
-        <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1204:85340" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[80.646px] h-[53.764px] [aspect-ratio:3/2] absolute left-[-23.03px] top-[-4.41px]" style={{
-        "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+        <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1204:85340" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[80.646px] h-[53.764px] [aspect-ratio:3/2] absolute left-[-23.03px] top-[-4.41px]" style={{
+        "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
       }} />
       </div>
     </div>;
   if (type === "웃김") return <div data-figma="type=웃김" data-node="1204:85344" className={cx("flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <img data-figma="p_OPENAI_IMAGE_01M5KEW4TMYAQK0B4VR0M0Y1J1 1" data-node="1204:85343" data-px="" data-hires="" alt="" src="./assets/raster/1204-85343.png" className="w-[37.33px] h-[32.24px] shrink-0 block" />
+      <img data-figma="p_OPENAI_IMAGE_01M5KEW4TMYAQK0B4VR0M0Y1J1 1" data-node="1204:85343" data-px="" data-hires="" alt="" src="./assets/raster/1204-85343.webp" className="w-[37.33px] h-[32.24px] shrink-0 block" />
     </div>;
   if (type === "웃김 56") return <div data-figma="type=웃김 56" data-node="1204:85347" className={cx("flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1204:85346" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[29.292px] h-[41.467px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:29.29/41.47]" style={{
-      "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -23.725px -4.788px / 272.824% 128.482% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1204:85346" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[29.292px] h-[41.467px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:29.29/41.47]" style={{
+      "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -23.725px -4.788px / 272.824% 128.482% no-repeat"
     }} />
     </div>;
   if (type === "토닥 36") return <div data-figma="type=토닥 36" data-node="1204:85352" className={cx("flex w-[36px] h-[36px] [justify-content:center] [align-items:center] [border-radius:32.727px] [border:1.108px_solid_transparent] relative overflow-hidden [isolation:isolate]", className)} style={style}>
@@ -46,24 +46,24 @@ export function ReactionButton({
       "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222.11%22%20height%3D%2227.42%22%20viewBox%3D%220%200%2022.11%2027.42%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M13.6361%206.26111%20L14.0748%201.89015%20L14.0748%200%20L9.23134%201.89015%20L5.99109%206.26111%20L0%207.29056%20L0%2027.424%20L22.108%2027.424%20L22.108%2014.2605%20L19.644%209.02882%20L17.3488%209.56886%20L15.9819%209.85576%20L13.6361%206.26111%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
       "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222.11%22%20height%3D%2227.42%22%20viewBox%3D%220%200%2022.11%2027.42%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M13.6361%206.26111%20L14.0748%201.89015%20L14.0748%200%20L9.23134%201.89015%20L5.99109%206.26111%20L0%207.29056%20L0%2027.424%20L22.108%2027.424%20L22.108%2014.2605%20L19.644%209.02882%20L17.3488%209.56886%20L15.9819%209.85576%20L13.6361%206.26111%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
     }}>
-        <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1204:85351" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[51.844px] h-[34.563px] [aspect-ratio:3/2] absolute left-[-14.81px] top-[-2.84px]" style={{
-        "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+        <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1204:85351" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[51.844px] h-[34.563px] [aspect-ratio:3/2] absolute left-[-14.81px] top-[-2.84px]" style={{
+        "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
       }} />
       </div>
     </div>;
   if (type === "웃김 36") return <div data-figma="type=웃김 36" data-node="1204:85355" className={cx("flex w-[36px] h-[36px] [justify-content:center] [align-items:center] [border-radius:32.727px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1204:85354" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[18.831px] h-[26.657px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:18.83/26.66]" style={{
-      "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -15.252px -3.078px / 272.824% 128.482% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1204:85354" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[18.831px] h-[26.657px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:18.83/26.66]" style={{
+      "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -15.252px -3.078px / 272.824% 128.482% no-repeat"
     }} />
     </div>;
   if (type === "공감 48") return <div data-figma="type=공감 48" data-node="1204:85358" className={cx("flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1204:85357" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[31.949px] h-[27.68px] shrink-0 [aspect-ratio:31.95/27.68]" style={{
-      "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png) -17.823px -9.241px / 211.57% 162.798% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1204:85357" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[31.949px] h-[27.68px] shrink-0 [aspect-ratio:31.95/27.68]" style={{
+      "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp) -17.823px -9.241px / 211.57% 162.798% no-repeat"
     }} />
     </div>;
   if (type === "응원 48") return <div data-figma="type=응원 48" data-node="1204:85361" className={cx("flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1204:85360" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[28.473px] h-[27.53px] shrink-0 [aspect-ratio:28.47/27.53]" style={{
-      "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png) -14.67px -4.601px / 203.444% 140.274% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1204:85360" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[28.473px] h-[27.53px] shrink-0 [aspect-ratio:28.47/27.53]" style={{
+      "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp) -14.67px -4.601px / 203.444% 140.274% no-repeat"
     }} />
     </div>;
   if (type === "토닥 48") return <div data-figma="type=토닥 48" data-node="1204:85366" className={cx("flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [border:1.477px_solid_transparent] relative overflow-hidden [isolation:isolate]", className)} style={style}>
@@ -74,14 +74,14 @@ export function ReactionButton({
       "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2229.48%22%20height%3D%2236.57%22%20viewBox%3D%220%200%2029.48%2036.57%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M18.1814%208.34814%20L18.7664%202.52019%20L18.7664%200%20L12.3084%202.52019%20L7.98812%208.34814%20L0%209.72075%20L0%2036.5653%20L29.4773%2036.5653%20L29.4773%2019.014%20L26.192%2012.0384%20L23.1318%2012.7585%20L21.3091%2013.141%20L18.1814%208.34814%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
       "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2229.48%22%20height%3D%2236.57%22%20viewBox%3D%220%200%2029.48%2036.57%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M18.1814%208.34814%20L18.7664%202.52019%20L18.7664%200%20L12.3084%202.52019%20L7.98812%208.34814%20L0%209.72075%20L0%2036.5653%20L29.4773%2036.5653%20L29.4773%2019.014%20L26.192%2012.0384%20L23.1318%2012.7585%20L21.3091%2013.141%20L18.1814%208.34814%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
     }}>
-        <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1204:85365" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[69.125px] h-[46.084px] [aspect-ratio:3/2] absolute left-[-19.73px] top-[-3.78px]" style={{
-        "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+        <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1204:85365" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[69.125px] h-[46.084px] [aspect-ratio:3/2] absolute left-[-19.73px] top-[-3.78px]" style={{
+        "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
       }} />
       </div>
     </div>;
   if (type === "웃김 48") return <div data-figma="type=웃김 48" data-node="1204:85369" className={cx("flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1204:85368" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[25.108px] h-[35.543px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:25.11/35.54]" style={{
-      "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -20.336px -4.104px / 272.824% 128.482% no-repeat"
+      <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1204:85368" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[25.108px] h-[35.543px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:25.11/35.54]" style={{
+      "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -20.336px -4.104px / 272.824% 128.482% no-repeat"
     }} />
     </div>;
   return null;

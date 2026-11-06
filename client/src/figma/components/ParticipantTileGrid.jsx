@@ -17,8 +17,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249132" data-node="1204:55430" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55431" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091460" data-node="1299:24941" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="box" data-node="I1299:24941;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+          <div data-figma="box" data-node="I1299:24941;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -37,8 +37,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249132" data-node="1204:55441" className="w-[72px] h-[72px] shrink-0 [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55442" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091459" data-node="1299:24943" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="image 1208091458" data-node="I1299:24943;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+          <div data-figma="image 1208091458" data-node="I1299:24943;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
         }} />
         </div>
       </div>
@@ -52,8 +52,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249134" data-node="1204:55447" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55448" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091458" data-node="1299:24945" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="stool" data-node="I1299:24945;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+          <div data-figma="stool" data-node="I1299:24945;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
         }} />
         </div>
       </div>
@@ -79,11 +79,11 @@ export function ParticipantTileGrid({
   if (chair === "푹신푹신 리클라이너17" && state === "default" && badge === "default") return <div data-figma="chair=푹신푹신 리클라이너17, state=default, badge=default" data-node="1204:55457" className={cx("flex w-[165px] h-[147px] [padding:18px_26px_23px_27px] [flex-direction:column] [align-items:center] gap-[13px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Frame 2147249135" data-node="1204:55458" className="w-[72px] h-[72px] shrink-0 [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55459" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091458" data-node="1299:24947" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} data-instance-of="Chair Illustration" className="flex w-[67px] h-[67px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[2.5px] top-[3px]" style={{
-        "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 2.644px 2.644px / 92.106% 92.106% no-repeat"
+        <div data-figma="image 1208091458" data-node="1299:24947" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} data-instance-of="Chair Illustration" className="flex w-[67px] h-[67px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[2.5px] top-[3px]" style={{
+        "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 2.644px 2.644px / 92.106% 92.106% no-repeat"
       }}>
-          <div data-figma="image 1208091460" data-node="I1299:24947;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[67px] h-[67px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091460" data-node="I1299:24947;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[67px] h-[67px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -100,8 +100,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249133" data-node="1204:55464" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55465" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091459" data-node="1299:24949" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="image 1208091458" data-node="I1299:24949;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+          <div data-figma="image 1208091458" data-node="I1299:24949;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
         }} />
         </div>
       </div>
@@ -122,11 +122,11 @@ export function ParticipantTileGrid({
   if (chair === "새벽2시 택배상자" && state === "default" && badge === "default") return <div data-figma="chair=새벽2시 택배상자, state=default, badge=default" data-node="1204:55474" className={cx("flex w-[165px] h-[147px] [padding:18px_38px_23px_38px] [flex-direction:column] [align-items:center] gap-[13px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
       <div data-figma="Frame 2147249132" data-node="1204:55475" className="w-[72px] h-[72px] shrink-0 [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55476" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091459" data-node="1299:24951" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+        <div data-figma="image 1208091459" data-node="1299:24951" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
       }}>
-          <div data-figma="box" data-node="I1299:24951;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+          <div data-figma="box" data-node="I1299:24951;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -140,8 +140,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249134" data-node="1204:55499" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:55500" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091458" data-node="1299:24957" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="stool" data-node="I1299:24957;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+          <div data-figma="stool" data-node="I1299:24957;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
         }} />
         </div>
       </div>
@@ -168,8 +168,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249134" data-node="1204:86624" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:86625" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091458" data-node="1299:24965" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="stool" data-node="I1299:24965;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+          <div data-figma="stool" data-node="I1299:24965;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
         }} />
         </div>
       </div>
@@ -194,8 +194,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249132" data-node="1204:86635" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:86636" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091459" data-node="1299:24967" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-          <div data-figma="image 1208091458" data-node="I1299:24967;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091458" data-node="I1299:24967;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -209,8 +209,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249135" data-node="1204:86642" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:86643" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091458" data-node="1299:24969" data-instance-of="Chair Illustration" className="flex w-[67px] h-[67px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[2.5px] top-[3px]">
-          <div data-figma="image 1208091460" data-node="I1299:24969;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[67px] h-[67px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091460" data-node="I1299:24969;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[67px] h-[67px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -224,7 +224,7 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249132" data-node="1204:86649" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[46.5px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:86650" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091460" data-node="1299:24971" data-instance-of="Chair Illustration" className="flex w-[65px] h-[65px] [justify-content:center] [align-items:center] absolute left-[3.5px] top-[3px]">
-          <img data-figma="box" data-node="I1299:24971;1204:89691" data-px="" data-hires="" alt="" src="./assets/raster/I1299-24971-1204-89691.png" className="w-[65px] h-[65px] shrink-0 absolute left-[0px] top-[0px] block" />
+          <img data-figma="box" data-node="I1299:24971;1204:89691" data-px="" data-hires="" alt="" src="./assets/raster/I1299-24971-1204-89691.webp" className="w-[65px] h-[65px] shrink-0 absolute left-[0px] top-[0px] block" />
         </div>
       </div>
       <div data-figma="name" data-node="1204:86652" className="inline-flex [padding:var(--spacing-2,_3px)_var(--spacing-7,_8px)] [justify-content:center] [align-items:center] [gap:var(--spacing-4,_5px)] [border-radius:var(--radius-2xl,_8px)] [background:var(--bg-base,_#000)] absolute left-[38px] top-[103px] w-[89px] h-[21px] overflow-hidden">
@@ -242,8 +242,8 @@ export function ParticipantTileGrid({
       <div data-figma="Frame 2147249136" data-node="1204:86668" className="w-[72px] h-[72px] [border-radius:var(--radius-19xl,_600px)] absolute left-[41px] top-[18px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1204:86669" className="w-[72px] h-[72px] [background:var(--bg-surface,_#121415)] absolute left-[0px] top-[0px]" />
         <div data-figma="image 1208091458" data-node="1299:24975" data-instance-of="Chair Illustration" className="flex w-[67px] h-[67px] [transform:scaleX(-1)] [justify-content:center] [align-items:center] absolute left-[2.5px] top-[3px]">
-          <div data-figma="image 1208091460" data-node="I1299:24975;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[67px] h-[67px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091460" data-node="I1299:24975;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[67px] h-[67px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
