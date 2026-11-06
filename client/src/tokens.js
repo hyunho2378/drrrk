@@ -46,6 +46,31 @@ export const layout = { screenWidth: 390, screenHeight: 844, touchMin: 44, listW
 
 export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lineHeight: '1.4' }] };
 
+// 화면 위에서 실제로 움직이는 것들의 값(live.js).
+export const live = {
+  screenW: 390,
+  timeScale: 15,
+  defaultLeft: 312,
+  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 12초에 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35). C 혼자 드르륵: 0에 매칭 발견(42).
+  rooms: { A: [{ at: 72, to: 40 }, { at: 0, to: 2 }], B: [{ at: 0, to: 35 }], C: [{ at: 0, to: 42 }] },
+  chatFirst: 350,
+  chatGap: 900,
+  chatSpacing: 12,
+  chatTop: 470,
+  bubbleMax: 260,
+  afterSend: { 44: 43, 46: 41, 43: 41 },
+  afterSendMs: 900,
+  myName: '나',
+  justNow: '방금 전',
+  analysisScreen: 26,
+  analysisMs: 2400,
+  stepDim: 0.4,
+  ringColor: 'var(--brand-primary)',
+  // 상태바 시간: 피그마 Status Bar의 9:41 글자 값(SF Pro Text Semibold 17.075px, 행간 22.767px, 자간 -0.569px).
+  clockStyle: { display: 'block', width: '100%', height: '100%', textAlign: 'center', fontFamily: '-apple-system, "SF Pro Text", system-ui, sans-serif', fontSize: '17.075px', fontWeight: '600', lineHeight: '22.767px', letterSpacing: '-0.569px', color: 'var(--white)', transform: 'translateY(-0.5px)', whiteSpace: 'pre' },
+  inputStyle: { position: 'absolute', inset: '0', width: '100%', height: '100%', border: '0', outline: 'none', background: 'transparent', color: 'var(--text-primary)', caretColor: 'var(--brand-primary)', padding: '0', margin: '0' },
+};
+
 export const zIndex = { hotspot: 50, bar: 60, splash: 100 };
 
 export const theme = {

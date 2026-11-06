@@ -1,0 +1,262 @@
+// 화면 위에서 실제로 움직이는 것들. 피그마 생성물(src/figma)은 고치지 않고, 그려진 화면의 요소를 이름(data-figma)으로 찾아 덧붙인다.
+// 1) 상태바 시계: 왼쪽 시간을 실제 시각으로(강릉페이 리뉴얼과 같은 방식, 오른쪽 아이콘은 그대로).
+// 2) 방 시계: 해 뜨기까지 남은 시간을 15배 빠르게 줄이고, 1분 전과 0에서 다음 화면으로 넘긴다.
+// 3) 채팅: 방에 처음 들어가면 대화가 하나씩 올라온다.
+// 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
+// 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
+import { motion, live as LIVE } from '../tokens.js';
+
+export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23, 40], B: [29, 28, 30, 31, 32, 33, 35], C: [44, 46, 43, 41, 42] };
+export const sceneOf = (n) => Object.keys(ROOMS).find((k) => ROOMS[k].includes(n)) || null;
+
+const q = (root, sel) => Array.from(root.querySelectorAll(sel));
+const rootOf = (layer) => layer.querySelector('[data-node]');
+const scaleOf = (root) => root.getBoundingClientRect().width / LIVE.screenW || 1;
+const relRect = (root, el) => {
+  const s = scaleOf(root), a = root.getBoundingClientRect(), b = el.getBoundingClientRect();
+  return { x: (b.left - a.left) / s, y: (b.top - a.top) / s, w: b.width / s, h: b.height / s };
+};
+
+// 윤곽으로 그린 글자(p[data-outline])를 실제 글자로 바꾼다. 글꼴, 크기, 색은 피그마 값(클래스) 그대로다.
+export function setText(p, text) {
+  if (!p) return;
+  const overlay = p.querySelector(':scope > span[aria-hidden]');
+  if (overlay) overlay.remove();
+  const span = p.querySelector(':scope > span') || p;
+  span.textContent = text;
+  p.style.webkitTextFillColor = 'currentColor';
+}
+
+// ---------- 1) 상태바 시계 ----------
+const fmtClock = (d) => (d.getHours() % 12 || 12) + ':' + String(d.getMinutes()).padStart(2, '0');
+function applyClock(root) {
+  q(root, '[data-figma="9:41"]').forEach((el) => {
+    if (el.dataset.live) return;
+    el.dataset.live = 'clock';
+    el.innerHTML = '';
+    const s = document.createElement('span');
+    s.className = 'live-clock';
+    Object.assign(s.style, LIVE.clockStyle);
+    s.textContent = fmtClock(new Date());
+    el.appendChild(s);
+  });
+}
+function tickClock() {
+  const t = fmtClock(new Date());
+  document.querySelectorAll('.live-clock').forEach((s) => {
+    if (s.textContent !== t) s.textContent = t;
+  });
+}
+
+// ---------- 2) 방 시계 ----------
+const room = { scene: null, left: 0, at: 0, chatDone: false, fired: {} };
+const parseMMSS = (s) => {
+  const m = /(\d{1,2}):(\d{2})/.exec(s || '');
+  return m ? +m[1] * 60 + +m[2] : null;
+};
+const fmtMMSS = (sec) => {
+  const v = Math.max(0, Math.ceil(sec));
+  return String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0');
+};
+const timerTexts = (root) => q(root, '[data-figma^="Timer Pill"] [data-figma="time"], [data-figma^="Timer Badge"] p[data-outline], [data-figma^="해 뜨기까지"] [data-figma="time"]').filter((p) => /\d:\d\d/.test(p.textContent));
+const remaining = () => room.left - ((performance.now() - room.at) / 1000) * LIVE.timeScale;
+
+// ---------- 3) 채팅이 하나씩 ----------
+const CHAT_SEL = '[data-figma^="row ·"], [data-figma^="내 채팅"], [data-figma^="Chat Bubble"]';
+function staggerChat(root) {
+  const items = q(root, CHAT_SEL).filter((el) => !el.closest('[data-figma^="input"]'));
+  items.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+  items.forEach((el) => (el.style.opacity = '0'));
+  items.forEach((el, i) => {
+    window.setTimeout(() => {
+      el.style.opacity = '';
+      el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+    }, LIVE.chatFirst + i * LIVE.chatGap);
+  });
+}
+
+// ---------- 4) 입력 ----------
+function postRoomChat(root, text) {
+  const mine = q(root, '[data-figma^="내 채팅"], [data-figma^="Chat Bubble · 나"]').filter((el) => el.style.display !== 'none');
+  const tpl = mine.sort((a, b) => b.getBoundingClientRect().top - a.getBoundingClientRect().top)[0];
+  if (!tpl) return;
+  const r = relRect(root, tpl);
+  const node = tpl.cloneNode(true);
+  node.removeAttribute('data-node');
+  const p = node.querySelector('p[data-outline]');
+  setText(p, text);
+  if (p) Object.assign(p.style, { width: 'auto', maxWidth: LIVE.bubbleMax + 'px', whiteSpace: 'pre-wrap', wordBreak: 'keep-all' });
+  Object.assign(node.style, { width: 'auto', height: 'auto', left: 'auto', right: LIVE.screenW - (r.x + r.w) + 'px', top: r.y + r.h + 'px', opacity: '' });
+  tpl.parentElement.appendChild(node);
+  const h = node.getBoundingClientRect().height / scaleOf(root);
+  const shift = h + LIVE.chatSpacing;
+  node.style.top = r.y + r.h - h + 'px';
+  q(root, CHAT_SEL).filter((el) => el !== node && !el.closest('[data-figma^="input"]')).forEach((el) => {
+    const cur = parseFloat(el.dataset.shift || '0') + shift;
+    el.dataset.shift = String(cur);
+    const top = relRect(root, el).y;
+    el.animate([{ transform: 'translateY(' + -(cur - shift) + 'px)' }, { transform: 'translateY(' + -cur + 'px)' }], { duration: motion.stateIn + 100, easing: motion.standard, fill: 'forwards' });
+    if (top - shift < LIVE.chatTop) el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: motion.stateIn, fill: 'forwards' });
+  });
+  node.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+}
+
+function postLiveComment(root, text) {
+  const box = root.querySelector('[data-figma="댓글 (라이브 채팅)"]');
+  const tpl = box && box.querySelector('[data-figma="내 댓글"]');
+  if (!tpl) return;
+  const node = tpl.cloneNode(true);
+  node.removeAttribute('data-node');
+  setText(node.querySelector('p[data-outline]'), text);
+  q(node, '[data-figma="bubble"], p[data-outline]').forEach((el) => Object.assign(el.style, { width: 'auto' }));
+  Object.assign(box.style, { justifyContent: 'flex-end', overflow: 'hidden' });
+  box.appendChild(node);
+  node.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+}
+
+function postPostComment(root, text) {
+  const items = q(root, '[data-figma="Community / Comment Item"]');
+  const tpl = items[0];
+  if (!tpl) return;
+  const node = tpl.cloneNode(true);
+  node.removeAttribute('data-node');
+  const ps = q(node, 'p[data-outline]');
+  const body = ps.slice().sort((a, b) => b.textContent.length - a.textContent.length)[0];
+  ps.forEach((p, i) => {
+    if (p === body) setText(p, text);
+    else if (i === 0) setText(p, LIVE.myName);
+    else if (/전|방금/.test(p.textContent)) setText(p, LIVE.justNow);
+  });
+  if (body) Object.assign(body.style, { whiteSpace: 'pre-wrap', wordBreak: 'keep-all', height: 'auto' });
+  tpl.parentElement.insertBefore(node, tpl);
+  node.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+  q(root, 'p[data-outline]').filter((p) => /^댓글 \d+$/.test(p.textContent.trim())).forEach((p) => setText(p, '댓글 ' + (parseInt(p.textContent.replace(/\D/g, ''), 10) + 1)));
+}
+
+function attachInputs(root, n, go) {
+  q(root, '[data-figma="채팅 입력"]').forEach((field) => {
+    if (field.dataset.live) return;
+    field.dataset.live = 'input';
+    const ph = field.querySelector('p[data-outline]');
+    const cs = ph ? getComputedStyle(ph) : null;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.enterKeyHint = 'send';
+    input.setAttribute('aria-label', ph ? ph.textContent : '입력');
+    input.className = 'live-input';
+    Object.assign(input.style, LIVE.inputStyle, cs ? { fontFamily: cs.fontFamily, fontSize: cs.fontSize, letterSpacing: cs.letterSpacing } : {});
+    if (getComputedStyle(field).position === 'static') field.style.position = 'relative';
+    field.appendChild(input);
+    input.addEventListener('input', () => { if (ph) ph.style.opacity = input.value ? '0' : ''; });
+    const send = () => {
+      const v = input.value.trim();
+      if (!v) return;
+      input.value = '';
+      if (ph) ph.style.opacity = '';
+      if (root.querySelector('[data-figma="Community / Comment Item"]')) postPostComment(root, v);
+      else if (root.querySelector('[data-figma="댓글 (라이브 채팅)"]')) postLiveComment(root, v);
+      else postRoomChat(root, v);
+      const next = LIVE.afterSend[n];
+      if (next) window.setTimeout(() => go({ to: next, t: 'fade' }), LIVE.afterSendMs);
+    };
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); send(); } });
+    const btn = field.parentElement && field.parentElement.querySelector('[data-figma^="btn_전송"]');
+    if (btn) { btn.style.cursor = 'pointer'; btn.addEventListener('click', send); }
+  });
+}
+
+// ---------- 5) 고민 분석 ----------
+function halfRing(side) {
+  const R = 100, r = 95;
+  const d = side === 'left'
+    ? 'M100 0 A100 100 0 0 0 100 200 L100 195 A95 95 0 0 1 100 5 Z'
+    : 'M100 0 A100 100 0 0 1 100 200 L100 195 A95 95 0 0 0 100 5 Z';
+  return '<svg width="200" height="200" viewBox="0 0 200 200" style="display:block"><path d="' + d + '" fill="' + LIVE.ringColor + '"/></svg>' + (R && r ? '' : '');
+}
+function runAnalysis(root, ms) {
+  const ring = root.querySelector('[data-figma^="ring progress"]');
+  if (ring && !ring.dataset.live) {
+    ring.dataset.live = 'ring';
+    ring.innerHTML = '';
+    Object.assign(ring.style, { overflow: 'visible' });
+    const mk = (left) => {
+      const clip = document.createElement('div');
+      Object.assign(clip.style, { position: 'absolute', top: '0', left: left ? '0' : '100px', width: '100px', height: '200px', overflow: 'hidden' });
+      const rot = document.createElement('div');
+      rot.innerHTML = halfRing(left ? 'right' : 'left');
+      Object.assign(rot.style, { position: 'absolute', top: '0', left: left ? '0' : '-100px', width: '200px', height: '200px', transformOrigin: '100px 100px', transform: 'rotate(0deg)' });
+      clip.appendChild(rot);
+      ring.appendChild(clip);
+      return rot;
+    };
+    const first = mk(false), second = mk(true);
+    const half = ms / 2;
+    first.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, easing: 'linear', fill: 'forwards' });
+    second.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, delay: half, easing: 'linear', fill: 'forwards' });
+  }
+  const steps = q(root, '[data-figma^="step ·"]');
+  const checkTpl = root.querySelector('[data-figma^="step ·"] [data-figma="check"]');
+  steps.forEach((st, i) => {
+    const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
+    const label = st.querySelector('p[data-outline]');
+    if (icon) icon.style.opacity = '0';
+    if (label) label.style.opacity = String(LIVE.stepDim);
+    window.setTimeout(() => {
+      let ic = icon;
+      if (icon && icon.getAttribute('data-figma') === 'spinner' && checkTpl) {
+        ic = checkTpl.cloneNode(true);
+        icon.replaceWith(ic);
+      }
+      if (ic) { ic.style.opacity = ''; ic.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
+      if (label) { label.style.opacity = ''; label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn }); }
+    }, ((i + 1) * ms) / (steps.length + 0.4));
+  });
+}
+
+// ---------- 붙이기 ----------
+let ticker = 0;
+let current = { n: 0, go: null, layer: null };
+export function attach(layer, n, go, prevN) {
+  const root = rootOf(layer);
+  if (!root) return;
+  current = { n, go, layer };
+  applyClock(root);
+  attachInputs(root, n, go);
+  const sc = sceneOf(n);
+  if (sc) {
+    if (room.scene !== sc) {
+      const t = timerTexts(root)[0];
+      room.scene = sc;
+      room.left = parseMMSS(t && t.textContent) ?? LIVE.defaultLeft;
+      room.at = performance.now();
+      room.fired = {};
+      room.chatDone = false;
+    }
+    if (!room.chatDone) {
+      room.chatDone = true;
+      staggerChat(root);
+    }
+  } else room.scene = null;
+  if (n === LIVE.analysisScreen) runAnalysis(root, LIVE.analysisMs);
+  if (!ticker) ticker = window.setInterval(tick, 250);
+  tick();
+}
+
+function tick() {
+  tickClock();
+  if (!room.scene || !current.layer) return;
+  const root = rootOf(current.layer);
+  if (!root) return;
+  const left = remaining();
+  const txt = fmtMMSS(left);
+  timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
+  const rule = LIVE.rooms[room.scene];
+  if (!rule || !current.go) return;
+  for (const step of rule) {
+    if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
+      room.fired[step.at] = true;
+      current.go({ to: step.to, t: 'fade' });
+      break;
+    }
+  }
+}

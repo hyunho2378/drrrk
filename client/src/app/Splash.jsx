@@ -5,12 +5,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from '../tokens.js';
 import { useReducedMotion } from './useReducedMotion.js';
+import { useFitScale } from './useFitScale.js';
 
 const BASE = import.meta.env.BASE_URL;
 
 export default function Splash({ onDone }) {
   const video = useRef(null);
   const reduced = useReducedMotion();
+  const scale = useFitScale();
   const [leaving, setLeaving] = useState(false);
   const done = useRef(false);
 
@@ -49,7 +51,7 @@ export default function Splash({ onDone }) {
       aria-label="DRRRK"
       role="img"
     >
-      <div className="relative h-screen-app w-screen overflow-hidden bg-surface">
+      <div className="relative h-screen-app w-screen shrink-0 origin-top overflow-hidden bg-surface" style={{ transform: 'scale(' + scale + ')' }}>
         {reduced ? (
           <img src={BASE + 'logo.svg'} alt="" className="absolute left-1/2 top-1/2 w-logo -translate-x-1/2 -translate-y-1/2" />
         ) : (

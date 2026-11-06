@@ -623,8 +623,8 @@ export function useFigmaSubpixel(ref) {
       const t = {};
       let t0 = performance.now();
       fixSubpixel(el);
-      if (FIGMA_EXACT) {
-        if (document.fonts) await document.fonts.ready;
+      if (FIGMA_EXACT && window.__figmaExact !== false) {
+        /* 앱은 window.__figmaExact = false로 16점 다시 그리기를 끈다(대조 도구에서만 켠다). */if (document.fonts) await document.fonts.ready;
         if (window.__figmaHold) await window.__figmaHold; /* 앱이 화면 전환 중이면 끝날 때까지 기다린다(전환 중 캔버스가 끼어들지 않게). */
         if (my !== seq) return;
         t0 = performance.now();

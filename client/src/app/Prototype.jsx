@@ -6,6 +6,9 @@ import { motion } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
 import { useReducedMotion } from './useReducedMotion.js';
 import { morph } from './morph.js';
+import { useFitScale } from './useFitScale.js';
+import { attach } from './live.js';
+import { SCREEN_ASSETS } from './screenAssets.js';
 
 // 화면 하나를 그리는 칸. 새 화면은 투명하게 먼저 그리고, 피그마 마무리 단계(그림과 글자 다시 그리기)가 끝나면 알린다.
 function Layer({ layer, hidden, active, onReady, onPress, setNode }) {
@@ -75,6 +78,7 @@ export default function Prototype() {
   const navType = useNavigationType();
   const location = useLocation();
   const reduced = useReducedMotion();
+  const scale = useFitScale();
   const [layers, setLayers] = useState([]);
   const nodes = useRef(new Map());
   const busy = useRef(false);
@@ -131,10 +135,20 @@ export default function Prototype() {
       setLayers((prev) => prev.filter((l) => l.key === key).map((l) => ({ ...l, z: undefined })));
       busy.current = false;
       release();
+      const el = nodes.current.get(key);
+      if (el) attach(el, n, (l) => go(l));
       window.scrollTo(0, 0);
       // 이 화면에서 갈 수 있는 화면의 코드를 미리 받아 둔다(다음 누름의 대기를 줄인다).
       const idle = window.requestIdleCallback || ((f) => window.setTimeout(f, 200));
-      idle(() => [...new Set(LINKS.filter((l) => l.from === n).map((l) => l.to))].forEach((to) => loadScreen(to)));
+      idle(() =>
+        [...new Set(LINKS.filter((l) => l.from === n).map((l) => l.to))].forEach((to) => {
+          loadScreen(to);
+          (SCREEN_ASSETS[to] || []).forEach((u) => {
+            const i = new Image();
+            i.src = import.meta.env.BASE_URL + u;
+          });
+        }),
+      );
       const s = SCREENS[n - 1];
       const au = AUTO[s && s.n];
       if (au) autoTimer.current = window.setTimeout(() => go({ to: au.to, t: au.t }), au.ms);
@@ -233,8 +247,9 @@ export default function Prototype() {
   const top = layers[layers.length - 1];
   const stageH = layers.reduce((m, l) => Math.max(m, l.h), 0);
   return (
-    <div className="min-h-screen bg-outside font-suit">
-      <div className="relative mx-auto w-screen overflow-hidden bg-base" style={{ height: stageH }}>
+    <div className="min-h-screen overflow-hidden bg-outside font-suit">
+      <div className="mx-auto" style={{ width: 390 * scale, height: stageH * scale }}>
+      <div className="relative w-screen origin-top-left overflow-hidden bg-base" style={{ height: stageH, transform: 'scale(' + scale + ')' }}>
         {layers.map((l) => (
           <Layer
             key={l.key}
@@ -246,6 +261,7 @@ export default function Prototype() {
             setNode={setNode}
           />
         ))}
+      </div>
       </div>
     </div>
   );
