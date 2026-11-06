@@ -29,8 +29,8 @@ export function BottomSheet({
         "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2234.39%22%20height%3D%2242.66%22%20viewBox%3D%220%200%2034.39%2042.66%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M21.2116%209.7395%20L21.8942%202.94023%20L21.8942%200%20L14.3599%202.94023%20L9.31947%209.7395%20L0%2011.3409%20L0%2042.6595%20L34.3902%2042.6595%20L34.3902%2022.183%20L30.5574%2014.0448%20L26.9871%2014.8849%20L24.8607%2015.3312%20L21.2116%209.7395%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
         "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2234.39%22%20height%3D%2242.66%22%20viewBox%3D%220%200%2034.39%2042.66%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M21.2116%209.7395%20L21.8942%202.94023%20L21.8942%200%20L14.3599%202.94023%20L9.31947%209.7395%20L0%2011.3409%20L0%2042.6595%20L34.3902%2042.6595%20L34.3902%2022.183%20L30.5574%2014.0448%20L26.9871%2014.8849%20L24.8607%2015.3312%20L21.2116%209.7395%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
       }}>
-          <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="I1204:87958;1204:85340" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[80.646px] h-[53.764px] [aspect-ratio:3/2] absolute left-[-23.03px] top-[-4.41px]" style={{
-          "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+          <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="I1204:87958;1204:85340" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[80.646px] h-[53.764px] [aspect-ratio:3/2] absolute left-[-23.03px] top-[-4.41px]" style={{
+          "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>

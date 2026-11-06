@@ -161,8 +161,8 @@ export function V2({
                   __html: svg["1647:29375"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29376" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
-              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
+              <div data-figma="Thumb" data-node="1647:29376" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="Meta" data-node="1647:29377" className="flex h-[24px] [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">
@@ -197,8 +197,8 @@ export function V2({
                   __html: svg["1647:29391"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29392" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
-              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
+              <div data-figma="Thumb" data-node="1647:29392" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="Meta" data-node="1647:29393" className="flex h-[24px] [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">
@@ -233,8 +233,8 @@ export function V2({
                   __html: svg["1647:29407"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29408" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
-              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
+              <div data-figma="Thumb" data-node="1647:29408" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="Meta" data-node="1647:29409" className="flex h-[24px] [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">
@@ -321,7 +321,7 @@ export function V2({
         </div>
       </div>
       <div data-figma="Group 2147229009" data-node="1647:28789" className="w-[27px] h-[28px] absolute left-[339px] top-[67px]">
-        <img data-figma="bell" data-node="1647:28790" data-px="" data-hires="" alt="" src="./assets/raster/1647-28790.png" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
+        <img data-figma="bell" data-node="1647:28790" data-px="" data-hires="" alt="" src="./assets/raster/1647-28790.webp" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
         <span data-figma="badge" data-node="1647:28791" className="w-[8px] h-[8px] absolute left-[19px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:28791"]
       }} />

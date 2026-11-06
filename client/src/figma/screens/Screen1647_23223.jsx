@@ -55,8 +55,8 @@ export function Screen1647_23223({
         __html: svg["1647:23231"]
       }} />
         <div data-figma="Chair Skin · 의자 스킨" data-node="1647:23232" data-instance-of="Chair Skin · 의자 스킨" className="flex w-[190px] h-[190px] [justify-content:center] [align-items:center] absolute left-[76px] top-[14px]">
-          <div data-figma="image" data-node="I1647:23232;1296:15785" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[190px] h-[190px] shrink-0 absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / contain no-repeat"
+          <div data-figma="image" data-node="I1647:23232;1296:15785" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[190px] h-[190px] shrink-0 absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / contain no-repeat"
         }} />
         </div>
         <p data-figma="푹신한 가죽 소파" data-node="1647:23233" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:19px] [font-style:normal] [font-weight:700] [line-height:27px] [letter-spacing:-0.38px] absolute left-[107px] top-[224px] w-[122px] h-[27px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.416px] left-[0px]">{"푹신한 가죽 소파"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -79,8 +79,8 @@ export function Screen1647_23223({
         <div data-figma="의자 / 택배 박스" data-node="1670:23857" className="flex w-[62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] gap-[2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] shrink-0 overflow-hidden">
           <div data-figma="Frame" data-node="1670:23858" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 relative overflow-hidden">
             <div data-figma="Chair Illustration" data-node="1670:23859" data-instance-of="Chair Illustration" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-              <div data-figma="box" data-node="I1670:23859;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+              <div data-figma="box" data-node="I1670:23859;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
             }} />
             </div>
           </div>
@@ -88,8 +88,8 @@ export function Screen1647_23223({
         <div data-figma="의자 / 나무 스툴" data-node="1670:23862" className="flex w-[62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] gap-[2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] shrink-0 overflow-hidden">
           <div data-figma="Frame" data-node="1670:23863" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 relative overflow-hidden">
             <div data-figma="Chair Illustration" data-node="1670:23864" data-instance-of="Chair Illustration" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-              <div data-figma="stool" data-node="I1670:23864;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 50% / cover no-repeat"
+              <div data-figma="stool" data-node="I1670:23864;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 50% / cover no-repeat"
             }} />
             </div>
           </div>
@@ -97,8 +97,8 @@ export function Screen1647_23223({
         <div data-figma="의자 / 편의점 의자" data-node="1670:23867" className="flex w-[62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] gap-[2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] shrink-0 overflow-hidden">
           <div data-figma="Frame" data-node="1670:23868" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 relative overflow-hidden">
             <div data-figma="Chair Illustration" data-node="1670:23869" data-instance-of="Chair Illustration" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-              <div data-figma="chair" data-node="I1670:23869;1204:89685" data-img={"{\"src\":\"./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.png) 50% / cover no-repeat"
+              <div data-figma="chair" data-node="I1670:23869;1204:89685" data-img={"{\"src\":\"./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp) 50% / cover no-repeat"
             }} />
             </div>
           </div>
@@ -109,8 +109,8 @@ export function Screen1647_23223({
         }} />
           <div data-figma="Frame" data-node="1670:23873" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 relative overflow-hidden">
             <div data-figma="Chair Illustration" data-node="1670:23874" data-instance-of="Chair Illustration" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-              <div data-figma="image 1208091458" data-node="I1670:23874;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / cover no-repeat"
+              <div data-figma="image 1208091458" data-node="I1670:23874;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
             }} />
             </div>
           </div>
@@ -118,8 +118,8 @@ export function Screen1647_23223({
         <div data-figma="의자 / 리클라이너" data-node="1670:23877" className="flex w-[62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] gap-[2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] shrink-0 overflow-hidden">
           <div data-figma="Frame" data-node="1670:23878" className="w-[46px] h-[46px] shrink-0 relative overflow-hidden">
             <div data-figma="Chair Illustration" data-node="1670:23879" data-instance-of="Chair Illustration" className="flex w-[46px] h-[46px] [justify-content:center] [align-items:center] [opacity:0.3] absolute left-[0px] top-[0px]">
-              <div data-figma="image 1208091460" data-node="I1670:23879;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 50% / cover no-repeat"
+              <div data-figma="image 1208091460" data-node="I1670:23879;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[46px] h-[46px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="icon/lock" data-node="1670:23880" data-instance-of="Icon / Line" className="flex w-[16px] h-[16px] [justify-content:center] [align-items:center] absolute left-[15px] top-[15px]">
@@ -137,8 +137,8 @@ export function Screen1647_23223({
           __html: "<svg data-px=\"\" data-box=\"\" width=\"108\" height=\"116\" viewBox=\"0 0 108 116\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"108\" height=\"116\" rx=\"16\" style=\"fill:var(--brand-subtle, #06303C)\"/><defs><clipPath id=\"cI1670_23884_1204_88441\"><rect width=\"108\" height=\"116\" rx=\"16\"/></clipPath></defs><g clip-path=\"url(#cI1670_23884_1204_88441)\"><path d=\"M16 0 L16 2 L92 2 L92 0 L92 -2 L16 -2 L16 0 Z M108 16 L106 16 L106 100 L108 100 L110 100 L110 16 L108 16 Z M92 116 L92 114 L16 114 L16 116 L16 118 L92 118 L92 116 Z M0 100 L2 100 L2 16 L0 16 L-2 16 L-2 100 L0 100 Z M16 116 L16 114 C8.26801 114 2 107.732 2 100 L0 100 L-2 100 C-2 109.941 6.05887 118 16 118 L16 116 Z M108 100 L106 100 C106 107.732 99.732 114 92 114 L92 116 L92 118 C101.941 118 110 109.941 110 100 L108 100 Z M92 0 L92 2 C99.732 2 106 8.26801 106 16 L108 16 L110 16 C110 6.05888 101.941 -2 92 -2 L92 0 Z M16 0 L16 -2 C6.05887 -2 -2 6.05888 -2 16 L0 16 L2 16 C2 8.26801 8.26801 2 16 2 L16 0 Z\" fill-rule=\"nonzero\" style=\"fill:var(--brand-primary, #36D2FF)\"/></g></svg>"
         }} />
           <div data-figma="Chair Illustration" data-node="I1670:23884;1204:88441;1204:85574" data-instance-of="Chair Illustration" className="flex w-[76px] h-[76px] [justify-content:center] [align-items:center] shrink-0 absolute left-[16px] top-[8px]">
-            <div data-figma="image 1208091458" data-node="I1670:23884;1204:88441;1204:85574;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[76px] h-[76px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / cover no-repeat"
+            <div data-figma="image 1208091458" data-node="I1670:23884;1204:88441;1204:85574;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[76px] h-[76px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
           }} />
           </div>
           <p data-figma="브라운" data-node="I1670:23884;1204:88441;1204:85575" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] absolute left-[26.5px] top-[88px] w-[53px] h-[17px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[0.132px] left-[-0.24px]">{"브라운 레더"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -147,8 +147,8 @@ export function Screen1647_23223({
         </div>
         <div data-figma="색" data-node="I1670:23884;1204:88442" data-instance-of="색" className="flex w-[108px] h-[116px] [padding:8px_16px_11px_16px] [flex-direction:column] [justify-content:center] [align-items:center] gap-[4px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] shrink-0 relative overflow-hidden">
           <div data-figma="Chair Illustration" data-node="I1670:23884;1204:88442;1204:85580" data-instance-of="Chair Illustration" className="flex w-[76px] h-[76px] [justify-content:center] [align-items:center] shrink-0 absolute left-[16px] top-[8px]">
-            <div data-figma="sofa-1" data-node="I1670:23884;1204:88442;1204:85580;1204:89709" data-img={"{\"src\":\"./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[76px] h-[76px] shrink-0 absolute left-[0px] top-[0px]" style={{
-            "background": "url(./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.png) 50% / contain no-repeat"
+            <div data-figma="sofa-1" data-node="I1670:23884;1204:88442;1204:85580;1204:89709" data-img={"{\"src\":\"./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[76px] h-[76px] shrink-0 absolute left-[0px] top-[0px]" style={{
+            "background": "url(./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.webp) 50% / contain no-repeat"
           }} />
           </div>
           <p data-figma="그린" data-node="I1670:23884;1204:88442;1204:85581" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.48px] absolute left-[27px] top-[88px] w-[53px] h-[17px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[0.132px] left-[-0.24px]">{"세이지 그린"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -157,8 +157,8 @@ export function Screen1647_23223({
         </div>
         <div data-figma="색" data-node="I1670:23884;1204:88443" data-instance-of="색" className="flex w-[108px] h-[116px] [padding:8px_16px_11px_16px] [flex-direction:column] [justify-content:center] [align-items:center] gap-[4px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] shrink-0 relative overflow-hidden">
           <div data-figma="Chair Illustration" data-node="I1670:23884;1204:88443;1204:85584" data-instance-of="Chair Illustration" className="flex w-[76px] h-[76px] [justify-content:center] [align-items:center] shrink-0 absolute left-[16px] top-[8px]">
-            <div data-figma="image 1208091458" data-node="I1670:23884;1204:88443;1204:85584;1204:89711" data-img={"{\"src\":\"./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[76px] h-[76px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-            "background": "url(./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.png) 50% / cover no-repeat"
+            <div data-figma="image 1208091458" data-node="I1670:23884;1204:88443;1204:85584;1204:89711" data-img={"{\"src\":\"./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[76px] h-[76px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+            "background": "url(./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.webp) 50% / cover no-repeat"
           }} />
           </div>
           <p data-figma="아이보리" data-node="I1670:23884;1204:88443;1204:85585" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.48px] absolute left-[26px] top-[88px] w-[53px] h-[17px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[0.132px] left-[-0.24px]">{"플러피 쿠션"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{

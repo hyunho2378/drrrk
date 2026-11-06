@@ -9,13 +9,13 @@ export function AppIcon({
   className
 }) {
   if (option === "시안 1") return <div data-figma="option=시안 1" data-node="1204:89738" className={cx("flex w-[420px] h-[420px] [justify-content:center] [align-items:center] [border-radius:92px] [background:var(--brand-tint,_#E9F6FA)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="character" data-node="1204:89737" data-img={"{\"src\":\"./assets/images/e77bf213500fcaf389f7972e53ab25cfcfc13bb3.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[480px] h-[480px] shrink-0 absolute left-[-30px] top-[0px]" style={{
-      "background": "url(./assets/images/e77bf213500fcaf389f7972e53ab25cfcfc13bb3.png) 50% / contain no-repeat"
+      <div data-figma="character" data-node="1204:89737" data-img={"{\"src\":\"./assets/images/e77bf213500fcaf389f7972e53ab25cfcfc13bb3.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[480px] h-[480px] shrink-0 absolute left-[-30px] top-[0px]" style={{
+      "background": "url(./assets/images/e77bf213500fcaf389f7972e53ab25cfcfc13bb3.webp) 50% / contain no-repeat"
     }} />
     </div>;
   if (option === "시안 2") return <div data-figma="option=시안 2" data-node="1204:89747" className={cx("w-[420px] h-[420px] [border-radius:92px] [background:var(--bg-surface,_#121415)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="character" data-node="1204:89740" data-img={"{\"src\":\"./assets/images/e0676e89b743bbc0ef99f72ebde52a4949aaf5c6.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[380px] h-[380px] absolute left-[20px] top-[160px]" style={{
-      "background": "url(./assets/images/e0676e89b743bbc0ef99f72ebde52a4949aaf5c6.png) 50% / cover no-repeat"
+      <div data-figma="character" data-node="1204:89740" data-img={"{\"src\":\"./assets/images/e0676e89b743bbc0ef99f72ebde52a4949aaf5c6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[380px] h-[380px] absolute left-[20px] top-[160px]" style={{
+      "background": "url(./assets/images/e0676e89b743bbc0ef99f72ebde52a4949aaf5c6.webp) 50% / cover no-repeat"
     }} />
       <div data-figma="logo" data-node="1204:89741" className="w-[372.21px] h-[140.41px] [aspect-ratio:167/63] absolute left-[24px] top-[29px]">
         <span data-figma="shape" data-node="1204:89742" className="w-[126.18px] h-[130.12px] absolute left-[0px] top-[10.29px] [line-height:0]" dangerouslySetInnerHTML={{
@@ -36,15 +36,15 @@ export function AppIcon({
       </div>
     </div>;
   if (option === "시안 3") return <div data-figma="option=시안 3" data-node="1204:89751" className={cx("w-[420px] h-[420px] [border-radius:92px] [background:var(--brand-subtle,_#06303C)] relative overflow-hidden", className)} style={style}>
-      <img data-figma="character" data-node="1204:89749" data-px="" data-hires="" alt="" src="./assets/raster/1204-89749.png" className="w-[420px] h-[291px] [mix-blend-mode:luminosity] absolute left-[0px] top-[-7px] block" />
-      <div data-figma="character" data-node="1204:89750" data-img={"{\"src\":\"./assets/images/29cd2712f0d360d08f04e3ae80889957fd849651.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[460px] h-[460px] absolute left-[-20px] top-[10px]" style={{
-      "background": "url(./assets/images/29cd2712f0d360d08f04e3ae80889957fd849651.png) 50% / contain no-repeat"
+      <img data-figma="character" data-node="1204:89749" data-px="" data-hires="" alt="" src="./assets/raster/1204-89749.webp" className="w-[420px] h-[291px] [mix-blend-mode:luminosity] absolute left-[0px] top-[-7px] block" />
+      <div data-figma="character" data-node="1204:89750" data-img={"{\"src\":\"./assets/images/29cd2712f0d360d08f04e3ae80889957fd849651.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[460px] h-[460px] absolute left-[-20px] top-[10px]" style={{
+      "background": "url(./assets/images/29cd2712f0d360d08f04e3ae80889957fd849651.webp) 50% / contain no-repeat"
     }} />
     </div>;
   if (option === "시안 4") return <div data-figma="option=시안 4" data-node="1204:89757" className={cx("w-[420px] h-[420px] [border-radius:92px] [background:linear-gradient(180deg,_#121415_0%,_#06303C_100%)] relative overflow-hidden", className)} style={style}>
-      <img data-figma="character" data-node="1204:89753" data-px="" data-hires="" alt="" src="./assets/raster/1204-89753.png" className="w-[420px] h-[291px] [mix-blend-mode:luminosity] absolute left-[0px] top-[-7px] block" />
-      <div data-figma="character" data-node="1204:89754" data-img={"{\"src\":\"./assets/images/8eb8b6672369c82ebd2864a43ec7628e745aa3c4.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[470px] h-[470px] absolute left-[-25px] top-[80px]" style={{
-      "background": "url(./assets/images/8eb8b6672369c82ebd2864a43ec7628e745aa3c4.png) 50% / contain no-repeat"
+      <img data-figma="character" data-node="1204:89753" data-px="" data-hires="" alt="" src="./assets/raster/1204-89753.webp" className="w-[420px] h-[291px] [mix-blend-mode:luminosity] absolute left-[0px] top-[-7px] block" />
+      <div data-figma="character" data-node="1204:89754" data-img={"{\"src\":\"./assets/images/8eb8b6672369c82ebd2864a43ec7628e745aa3c4.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[470px] h-[470px] absolute left-[-25px] top-[80px]" style={{
+      "background": "url(./assets/images/8eb8b6672369c82ebd2864a43ec7628e745aa3c4.webp) 50% / contain no-repeat"
     }} />
       <span data-figma="moon" data-node="1204:89755" className="w-[32.99px] h-[44px] absolute left-[330px] top-[42px] [line-height:0]" dangerouslySetInnerHTML={{
       __html: svg["1204:89755"]

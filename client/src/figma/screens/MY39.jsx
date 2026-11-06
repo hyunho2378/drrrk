@@ -12,7 +12,7 @@ export function MY39({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="MY · 스킨 획득 팝업 (엉따 39°)" data-node="1647:23143" className={cx("w-[390px] h-[844px] [background:linear-gradient(180deg,_#121415_22.87%,_#06303C_69.73%)] relative overflow-hidden", className)} style={style}>
-      <img data-figma="image 1208091455" data-node="1647:23144" data-px="" data-hires="" alt="" src="./assets/raster/1647-23144.png" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
+      <img data-figma="image 1208091455" data-node="1647:23144" data-px="" data-hires="" alt="" src="./assets/raster/1647-23144.webp" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
       <div data-figma="Status Bar" data-node="1647:23145" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1647:23145;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
           <div data-figma="Right Side" data-node="I1647:23145;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">
@@ -60,8 +60,8 @@ export function MY39({
       __html: svg["1647:23156"]
     }} />
       <div data-figma="현재 의자" data-node="1647:23157" data-instance-of="Chair Skin · 의자 스킨" className="flex w-[170px] h-[170px] [justify-content:center] [align-items:center] absolute left-[110px] top-[110px]">
-        <div data-figma="image" data-node="I1647:23157;1296:15773" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[170px] h-[170px] shrink-0 absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 50% / contain no-repeat"
+        <div data-figma="image" data-node="I1647:23157;1296:15773" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[170px] h-[170px] shrink-0 absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 50% / contain no-repeat"
       }} />
       </div>
       <div data-figma="이름" data-node="1647:23158" className="flex w-[390px] [flex-direction:column] [align-items:center] gap-[4px] absolute left-[0px] top-[300px] h-[94px] overflow-hidden">
@@ -133,8 +133,8 @@ export function MY39({
         </div>
         <div data-figma="다음 의자" data-node="1647:23184" className="flex [align-items:center] gap-[6px] shrink-0 overflow-hidden">
           <div data-figma="Chair Skin · 의자 스킨" data-node="1647:23185" data-instance-of="Chair Skin · 의자 스킨" className="flex w-[24px] h-[24px] [justify-content:center] [align-items:center] [opacity:0.5] shrink-0 relative">
-            <div data-figma="image" data-node="I1647:23185;1296:15791" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 absolute left-[0px] top-[0px]" style={{
-            "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 50% / contain no-repeat"
+            <div data-figma="image" data-node="I1647:23185;1296:15791" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 absolute left-[0px] top-[0px]" style={{
+            "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / contain no-repeat"
           }} />
           </div>
           <p data-figma="0.8° 더 따뜻해지면 꿀잠 솔솔 리클라이너가 열려요" data-node="1647:23186" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:400] [line-height:17px] [letter-spacing:-0.24px] shrink-0 w-[233px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.132px] left-[0px]">{"0.8° 더 따뜻해지면 꿀잠 솔솔 리클라이너가 열려요"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -148,13 +148,13 @@ export function MY39({
           __html: svg["1647:23189"]
         }} /></p>
         <div data-figma="reaction · 공감" data-node="1647:23190" className="flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:#06303C] absolute left-[24px] top-[70px] overflow-hidden">
-          <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1647:23191" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[37.274px] h-[32.294px] shrink-0 [aspect-ratio:37.27/32.29]" style={{
-          "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png) -20.793px -10.782px / 211.57% 162.798% no-repeat"
+          <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1647:23191" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[37.274px] h-[32.294px] shrink-0 [aspect-ratio:37.27/32.29]" style={{
+          "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp) -20.793px -10.782px / 211.57% 162.798% no-repeat"
         }} />
         </div>
         <div data-figma="reaction · 응원" data-node="1647:23192" className="flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:#06303C] absolute left-[96px] top-[70px] overflow-hidden">
-          <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1647:23193" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[33.219px] h-[32.119px] shrink-0 [aspect-ratio:33.22/32.12]" style={{
-          "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png) -17.115px -5.368px / 203.444% 140.274% no-repeat"
+          <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1647:23193" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[33.219px] h-[32.119px] shrink-0 [aspect-ratio:33.22/32.12]" style={{
+          "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp) -17.115px -5.368px / 203.444% 140.274% no-repeat"
         }} />
         </div>
         <div data-figma="reaction · 토닥" data-node="1647:23194" className="flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [border:1.723px_solid_transparent] absolute left-[168px] top-[70px] overflow-hidden [isolation:isolate]">
@@ -165,17 +165,17 @@ export function MY39({
           "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2234.39%22%20height%3D%2242.66%22%20viewBox%3D%220%200%2034.39%2042.66%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M21.2116%209.7395%20L21.8942%202.94023%20L21.8942%200%20L14.3599%202.94023%20L9.31947%209.7395%20L0%2011.3409%20L0%2042.6595%20L34.3902%2042.6595%20L34.3902%2022.183%20L30.5574%2014.0448%20L26.9871%2014.8849%20L24.8607%2015.3312%20L21.2116%209.7395%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
           "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2234.39%22%20height%3D%2242.66%22%20viewBox%3D%220%200%2034.39%2042.66%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M21.2116%209.7395%20L21.8942%202.94023%20L21.8942%200%20L14.3599%202.94023%20L9.31947%209.7395%20L0%2011.3409%20L0%2042.6595%20L34.3902%2042.6595%20L34.3902%2022.183%20L30.5574%2014.0448%20L26.9871%2014.8849%20L24.8607%2015.3312%20L21.2116%209.7395%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
         }}>
-            <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:23197" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[80.646px] h-[53.764px] [aspect-ratio:3/2] absolute left-[-22.8px] top-[-4.67px]" style={{
-            "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+            <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:23197" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[80.646px] h-[53.764px] [aspect-ratio:3/2] absolute left-[-22.8px] top-[-4.67px]" style={{
+            "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
           }} />
           </div>
         </div>
         <div data-figma="reaction · 웃김" data-node="1647:23198" className="flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:#222628] absolute left-[240px] top-[70px] overflow-hidden">
-          <img data-figma="p_OPENAI_IMAGE_01M5KEW4TMYAQK0B4VR0M0Y1J1 1" data-node="1647:23199" data-px="" data-hires="" alt="" src="./assets/raster/1647-23199.png" className="w-[37.33px] h-[32.24px] shrink-0 block" />
+          <img data-figma="p_OPENAI_IMAGE_01M5KEW4TMYAQK0B4VR0M0Y1J1 1" data-node="1647:23199" data-px="" data-hires="" alt="" src="./assets/raster/1647-23199.webp" className="w-[37.33px] h-[32.24px] shrink-0 block" />
         </div>
         <div data-figma="reaction · 웃김" data-node="1647:23200" className="flex w-[56px] h-[56px] [justify-content:center] [align-items:center] [border-radius:50.909px] [background:#06303C] absolute left-[312px] top-[70px] overflow-hidden">
-          <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:23201" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[29.292px] h-[41.467px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:29.29/41.47]" style={{
-          "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -23.725px -4.788px / 272.824% 128.482% no-repeat"
+          <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:23201" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[29.292px] h-[41.467px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:29.29/41.47]" style={{
+          "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -23.725px -4.788px / 272.824% 128.482% no-repeat"
         }} />
         </div>
         <p data-figma="불꽃 드륵" data-node="1647:23202" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [letter-spacing:-0.32px] absolute left-[164px] top-[142px] w-[59px] h-[22px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[0.176px] left-[0px]">{"불꽃 드륵"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -257,8 +257,8 @@ export function MY39({
               }} /></p>
             </div>
             <div data-figma="Chair Illustration" data-node="1646:23841" data-instance-of="Chair Illustration" className="flex w-[170px] h-[170px] [justify-content:center] [align-items:center] shrink-0 relative">
-              <div data-figma="image 1208091458" data-node="I1646:23841;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[170px] h-[170px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / contain no-repeat"
+              <div data-figma="image 1208091458" data-node="I1646:23841;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[170px] h-[170px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / contain no-repeat"
             }} />
             </div>
           </div>

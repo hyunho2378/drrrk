@@ -11,7 +11,7 @@ export function DRRRKDark2({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 홈 (Dark)" data-node="1647:23475" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Rectangle 1954141366" data-node="1647:23476" className="absolute w-[390px] h-[761px] left-[0px] top-[0px] block overflow-visible"><img data-px="" data-hires="" alt="" src="./assets/raster/1647-23476.png" className="absolute left-[0px] top-[0px] w-[390px] h-[762px] block [max-width:none]" /></div>
+      <div data-figma="Rectangle 1954141366" data-node="1647:23476" className="absolute w-[390px] h-[761px] left-[0px] top-[0px] block overflow-visible"><img data-px="" data-hires="" alt="" src="./assets/raster/1647-23476.webp" className="absolute left-[0px] top-[0px] w-[390px] h-[762px] block [max-width:none]" /></div>
       <div data-figma="Group 2147229020" data-node="1647:23477" className="w-[390px] h-[326px] absolute left-[0px] top-[717px]">
         <div data-figma="Rectangle 1954141365" data-node="1647:23478" className="w-[390px] h-[326px] [border-radius:20px_20px_0_0] [background:#000] absolute left-[0px] top-[0px]" />
         <p data-figma="유난히 잠 못드는 밤 혹시 무슨 일 있어?" data-node="1647:23479" data-outline="" className="w-[342px] [color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:28px] [font-style:normal] [font-weight:700] [line-height:39px] [letter-spacing:-1.12px] absolute left-[24px] top-[38px] h-[78px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[0.308px] left-[0px]">{"유난히 잠 못드는 밤\n혹시 무슨 일 있어?"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -39,7 +39,7 @@ export function DRRRKDark2({
         </div>
         <div data-figma="drawer handle" data-node="1647:23488" className="w-[40px] h-[4px] [border-radius:3px] [background:#6E767C] absolute left-[175px] top-[12px]" />
       </div>
-      <img data-figma="image 1208091455" data-node="1647:23489" data-px="" data-hires="" alt="" src="./assets/raster/1647-23489.png" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
+      <img data-figma="image 1208091455" data-node="1647:23489" data-px="" data-hires="" alt="" src="./assets/raster/1647-23489.webp" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
       <div data-figma="bottom_navigation" data-node="1620:43312" data-instance-of="bottom_navigation" className="w-[390px] h-[84px] [background:#121415] absolute left-[0px] top-[760px]">
         <div data-figma="top line" data-node="I1620:43312;1647:27183" className="w-[392px] h-[1px] [background:#222628] absolute left-[0px] top-[0px]" />
         <div data-figma="tab/홈" data-node="I1620:43312;1647:27184" className="flex w-[56px] h-[52px] [flex-direction:column] [justify-content:center] [align-items:center] gap-[4px] absolute left-[20px] top-[12px] overflow-hidden">
@@ -126,7 +126,7 @@ export function DRRRKDark2({
         }} />
         </div>
       </div>
-      <img data-figma="Rectangle 1954141366" data-node="1647:23502" data-px="" data-hires="" alt="" src="./assets/raster/1647-23502.png" className="w-[168px] h-[192px] absolute left-[193px] top-[305px] block" />
+      <img data-figma="Rectangle 1954141366" data-node="1647:23502" data-px="" data-hires="" alt="" src="./assets/raster/1647-23502.webp" className="w-[168px] h-[192px] absolute left-[193px] top-[305px] block" />
       <div data-figma="Group 2147229002" data-node="1647:23503" className="w-[90.13px] h-[34px] [aspect-ratio:90.13/34.00] absolute left-[24px] top-[64px]">
         <span data-figma="Vector" data-node="1647:23504" className="w-[30.55px] h-[31.51px] absolute left-[0px] top-[2.49px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:23504"]
@@ -153,7 +153,7 @@ export function DRRRKDark2({
         }} /></p>
       </div>
       <div data-figma="Group 2147229009" data-node="1647:23512" className="w-[27px] h-[28px] absolute left-[339px] top-[67px]">
-        <img data-figma="bell" data-node="1647:23513" data-px="" data-hires="" alt="" src="./assets/raster/1647-23513.png" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
+        <img data-figma="bell" data-node="1647:23513" data-px="" data-hires="" alt="" src="./assets/raster/1647-23513.webp" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
         <span data-figma="badge" data-node="1647:23514" className="w-[8px] h-[8px] absolute left-[19px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:23514"]
       }} />

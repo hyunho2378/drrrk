@@ -102,8 +102,8 @@ export function Screen1647_27027({
                   <div data-figma="Frame 2147249205" data-node="1647:27067" className="flex h-[24px] [align-items:center] gap-[8px] [flex:1_0_0]">
                     <div data-figma="Thumb" data-node="1647:27068" className="flex w-[24px] [padding-top:4px] [justify-content:center] [align-items:center] [border-radius:1000px] shrink-0 h-[24px] relative overflow-hidden">
                       <div data-figma="Chair" data-node="1647:27069" className="flex w-[24px] h-[24px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[4px]">
-                        <div data-figma="image 1208091458" data-node="1647:27070" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / cover no-repeat"
+                        <div data-figma="image 1208091458" data-node="1647:27070" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
                         }} />
                       </div>
                     </div>
@@ -122,8 +122,8 @@ export function Screen1647_27027({
                 <div data-figma="Top" data-node="1647:27080" className="flex h-[24px] [align-items:center] [gap:var(--spacing-7,_8px)] shrink-0 [align-self:stretch] overflow-hidden">
                   <div data-figma="Thumb" data-node="1647:27083" className="flex w-[24px] [padding-top:4px] [justify-content:center] [align-items:center] [border-radius:1000px] [background:#121415] shrink-0 h-[24px] relative overflow-hidden">
                     <div data-figma="Chair" data-node="1647:27084" className="flex w-[24px] h-[24px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[4px]">
-                      <div data-figma="box" data-node="1647:27085" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+                      <div data-figma="box" data-node="1647:27085" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
                       }} />
                     </div>
                   </div>
@@ -141,8 +141,8 @@ export function Screen1647_27027({
                 <div data-figma="Top" data-node="1647:27095" className="flex h-[24px] [align-items:center] [gap:var(--spacing-7,_8px)] shrink-0 [align-self:stretch] overflow-hidden">
                   <div data-figma="Thumb" data-node="1647:27096" className="flex w-[24px] [padding-top:4px] [justify-content:center] [align-items:center] [border-radius:1000px] [background:#121415] shrink-0 h-[24px] relative overflow-hidden">
                     <div data-figma="Chair" data-node="1647:27097" className="flex w-[24px] h-[24px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[4px]">
-                      <div data-figma="stool" data-node="1647:27098" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 50% / cover no-repeat"
+                      <div data-figma="stool" data-node="1647:27098" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[24px] h-[24px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 50% / cover no-repeat"
                       }} />
                     </div>
                   </div>
@@ -204,8 +204,8 @@ export function Screen1647_27027({
                       <div data-figma="cell / box" data-node="1647:27123" className="flex w-[80px] h-[136px] [flex-direction:column] [align-items:center] gap-[8px] shrink-0">
                         <div data-figma="face" data-node="1647:27124" className="flex h-[84px] [flex-direction:column] [justify-content:center] [align-items:center] shrink-0 [border-radius:1140px] [background:#121415] w-[80px] relative overflow-hidden">
                           <div data-figma="chair / box" data-node="1647:27125" className="flex w-[84px] h-[84px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-                            <div data-figma="box" data-node="1647:27126" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[84px] h-[84px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                              "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+                            <div data-figma="box" data-node="1647:27126" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[84px] h-[84px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                              "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
                             }} />
                           </div>
                         </div>
@@ -216,8 +216,8 @@ export function Screen1647_27027({
                       <div data-figma="cell / sofa" data-node="1647:27128" className="flex w-[80px] h-[132px] [flex-direction:column] [align-items:center] gap-[8px] shrink-0">
                         <div data-figma="face" data-node="1647:27129" className="flex [justify-content:flex-end] [align-items:center] [border-radius:1140px] [background:#121415] shrink-0 w-[80px] h-[80px] relative overflow-hidden">
                           <div data-figma="chair / sofa" data-node="1647:27130" className="flex w-[84px] h-[84px] [justify-content:center] [align-items:center] absolute left-[0px] top-[0px]">
-                            <div data-figma="image 1208091458" data-node="1647:27131" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[84px] h-[84px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                              "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 6.755px 7px / 83.916% 83.916% no-repeat"
+                            <div data-figma="image 1208091458" data-node="1647:27131" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[84px] h-[84px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                              "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 6.755px 7px / 83.916% 83.916% no-repeat"
                             }} />
                           </div>
                         </div>
@@ -228,8 +228,8 @@ export function Screen1647_27027({
                       <div data-figma="cell / stool" data-node="1647:27133" className="flex w-[80px] h-[136px] [flex-direction:column] [align-items:center] gap-[8px] shrink-0">
                         <div data-figma="face" data-node="1647:27134" className="flex h-[84px] [flex-direction:column] [justify-content:center] [align-items:center] shrink-0 [border-radius:1140px] [background:#121415] w-[80px] relative overflow-hidden">
                           <div data-figma="chair / stool" data-node="1647:27135" className="flex w-[84px] h-[84px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-                            <div data-figma="stool" data-node="1647:27136" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[84px] h-[84px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                              "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 3.328px 3.5px / 92.077% 92.077% no-repeat"
+                            <div data-figma="stool" data-node="1647:27136" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[84px] h-[84px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                              "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 3.328px 3.5px / 92.077% 92.077% no-repeat"
                             }} />
                           </div>
                         </div>

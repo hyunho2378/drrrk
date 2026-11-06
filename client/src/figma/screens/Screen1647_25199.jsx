@@ -13,7 +13,7 @@ export function Screen1647_25199({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="영상" data-node="1647:25199" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:25200" className="w-[390px] h-[844px] [opacity:0.35] [background:#000] absolute left-[0px] top-[0px]" />
-      <video data-figma="image 1208091463" data-node="1647:25201" src="./assets/video/54127ca4db7d1a0149c9da7714ee59fa808a990a.mp4" poster="./assets/raster/1647-25201.jpg" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
+      <video data-figma="image 1208091463" data-node="1647:25201" src="./assets/video/54127ca4db7d1a0149c9da7714ee59fa808a990a.mp4" poster="./assets/raster/1647-25201.webp" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
       <div data-figma="Status Bar" data-node="1712:25366" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25366;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
           <div data-figma="Right Side" data-node="I1712:25366;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">

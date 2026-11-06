@@ -12,7 +12,7 @@ export function Screen1647_24788({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="영상" data-node="1647:24788" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <video data-figma="image 1208091463" data-node="1647:24790" src="./assets/video/372b5690226dae63783f0d4e3a08f1d3961d8e0e.mp4" poster="./assets/raster/1647-24790.png" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
+      <video data-figma="image 1208091463" data-node="1647:24790" src="./assets/video/372b5690226dae63783f0d4e3a08f1d3961d8e0e.mp4" poster="./assets/raster/1647-24790.webp" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
       <div data-figma="Status Bar" data-node="1712:25306" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25306;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
           <div data-figma="Right Side" data-node="I1712:25306;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">
