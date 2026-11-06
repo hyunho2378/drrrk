@@ -87,6 +87,8 @@ export default function Prototype() {
   const autoTimer = useRef(0);
   const shown = useRef(false);
   const holdDone = useRef(null);
+  // 칸 번호(key)마다 어느 화면인지 적어 둔다. 전환이 겹쳐도 끝난 칸이 어느 화면인지 정확히 안다.
+  const keyN = useRef(new Map());
   // 전환 중에는 피그마 마무리 단계를 멈춰 둔다(window.__figmaHold). 전환이 끝나면 푼다.
   const hold = () => {
     if (holdDone.current) return;
@@ -121,7 +123,9 @@ export default function Prototype() {
       const s = SCREENS[n - 1];
       const key = ++seq;
       pending.current = { key, t };
-      setLayers((prev) => [...prev.slice(-1), { key, n, Comp, h: s.h, ready: false }]);
+      keyN.current.set(key, n);
+      // 지금 보이는 칸(준비 끝난 칸) 하나만 남기고 새 칸을 얹는다. 준비 중이던 칸은 버린다(빠르게 두 번 누르면 화면이 비던 문제).
+      setLayers((prev) => [...prev.filter((l) => l.ready).slice(-1), { key, n, Comp, h: s.h, ready: false }]);
       document.title = s.name;
     });
     return () => {
@@ -132,16 +136,26 @@ export default function Prototype() {
 
   const finish = useCallback(
     (key) => {
-      setLayers((prev) => prev.filter((l) => l.key === key).map((l) => ({ ...l, z: undefined })));
+      // 끝난 칸과 그보다 늦게 만든 칸은 남긴다. 늦은 칸이 아직 준비 중이면 그 칸이 이어서 들어온다.
+      setLayers((prev) => prev.filter((l) => l.key >= key));
+      if (pending.current && pending.current.key > key) return;
       busy.current = false;
       release();
+      const shownN = keyN.current.get(key);
+      [...keyN.current.keys()].forEach((k) => k < key && keyN.current.delete(k));
+      // 주소와 화면이 다르면(전환 중에 뒤로 가기를 여러 번 누른 경우) 주소의 화면으로 다시 맞춘다.
+      const want = Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
+      if (want && shownN && want !== shownN) {
+        navigate('/s/' + want, { replace: true, state: { t: 'fade' } });
+        return;
+      }
       const el = nodes.current.get(key);
-      if (el) attach(el, n, (l) => go(l));
+      if (el) attach(el, shownN || n, (l) => go(l));
       window.scrollTo(0, 0);
       // 이 화면에서 갈 수 있는 화면의 코드를 미리 받아 둔다(다음 누름의 대기를 줄인다).
       const idle = window.requestIdleCallback || ((f) => window.setTimeout(f, 200));
       idle(() =>
-        [...new Set(LINKS.filter((l) => l.from === n).map((l) => l.to))].forEach((to) => {
+        [...new Set(LINKS.filter((l) => l.from === (shownN || n)).map((l) => l.to))].forEach((to) => {
           loadScreen(to);
           (SCREEN_ASSETS[to] || []).forEach((u) => {
             const i = new Image();
@@ -149,7 +163,7 @@ export default function Prototype() {
           });
         }),
       );
-      const s = SCREENS[n - 1];
+      const s = SCREENS[(shownN || n) - 1];
       const au = AUTO[s && s.n];
       if (au) autoTimer.current = window.setTimeout(() => go({ to: au.to, t: au.t }), au.ms);
       if (queued.current) {
@@ -168,7 +182,8 @@ export default function Prototype() {
       if (!p || p.key !== key) return;
       pending.current = null;
       const next = nodes.current.get(key);
-      const prevKey = [...nodes.current.keys()].find((k) => k !== key);
+      // 앞 칸은 이 칸보다 먼저 만든 칸 중 가장 늦은 것이다.
+      const prevKey = [...nodes.current.keys()].filter((k) => k < key).sort((a, b) => b - a)[0];
       const prev = prevKey ? nodes.current.get(prevKey) : null;
       setLayers((ls) => ls.map((l) => (l.key === key ? { ...l, ready: true } : l)));
       if (next) next.style.opacity = '1';

@@ -6,11 +6,13 @@
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
 import { motion, live as LIVE } from '../tokens.js';
 
-export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23, 40], B: [29, 28, 30, 31, 32, 33, 35], C: [44, 46, 43, 41, 42] };
+// 방마다 묶은 화면. W는 라운지에서 구경하는 방(시계만 흐르고 화면은 넘기지 않는다).
+export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23, 40], B: [29, 28, 30, 31, 32, 33, 35], C: [44, 46, 43, 41, 42], W: [11, 37] };
 export const sceneOf = (n) => Object.keys(ROOMS).find((k) => ROOMS[k].includes(n)) || null;
 
 const q = (root, sel) => Array.from(root.querySelectorAll(sel));
 const rootOf = (layer) => layer.querySelector('[data-node]');
+const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
 const scaleOf = (root) => root.getBoundingClientRect().width / LIVE.screenW || 1;
 const relRect = (root, el) => {
   const s = scaleOf(root), a = root.getBoundingClientRect(), b = el.getBoundingClientRect();
@@ -126,6 +128,9 @@ function postPostComment(root, text) {
     if (p === body) setText(p, text);
     else if (i === 0) setText(p, LIVE.myName);
     else if (/전|방금/.test(p.textContent)) setText(p, LIVE.justNow);
+    else return;
+    // 글이 짧아지면 피그마 고정 폭 때문에 옆 글자와 벌어진다. 바꾼 글자만 내용 폭으로 줄인다.
+    if (p !== body) Object.assign(p.style, { width: 'auto', flex: '0 0 auto' });
   });
   if (body) Object.assign(body.style, { whiteSpace: 'pre-wrap', wordBreak: 'keep-all', height: 'auto' });
   tpl.parentElement.insertBefore(node, tpl);
@@ -136,13 +141,19 @@ function postPostComment(root, text) {
 function attachInputs(root, n, go) {
   q(root, '[data-figma="채팅 입력"]').forEach((field) => {
     if (field.dataset.live) return;
+    // 진짜 입력칸만 살린다. 안내 글 한 줄(placeholder)만 있어야 하고, 그 자리가 다른 것(시트, 덮개, 누르는 자리)에 가려지지 않아야 한다.
+    const ps = q(field, 'p[data-outline]');
+    if (ps.length !== 1 || !LIVE.inputHint.test(ps[0].textContent)) return;
+    const fb = field.getBoundingClientRect();
+    const hit = document.elementFromPoint(fb.left + fb.width / 2, fb.top + fb.height / 2);
+    if (hit && !field.contains(hit) && fb.top >= 0 && fb.bottom <= window.innerHeight) return;
     field.dataset.live = 'input';
-    const ph = field.querySelector('p[data-outline]');
+    const ph = ps[0];
     const cs = ph ? getComputedStyle(ph) : null;
     const input = document.createElement('input');
     input.type = 'text';
     input.enterKeyHint = 'send';
-    input.setAttribute('aria-label', ph ? ph.textContent : '입력');
+    input.setAttribute('aria-label', ph ? ph.textContent.trim() : '입력');
     input.className = 'live-input';
     Object.assign(input.style, LIVE.inputStyle, cs ? { fontFamily: cs.fontFamily, fontSize: cs.fontSize, letterSpacing: cs.letterSpacing } : {});
     if (getComputedStyle(field).position === 'static') field.style.position = 'relative';
@@ -213,6 +224,57 @@ function runAnalysis(root, ms) {
   });
 }
 
+// ---------- 6) 가로 카드 넘기기 ----------
+// 라운지 맨 위 카드 줄(Carousel / 1, 2)을 손가락이나 마우스로 끌어 넘긴다. 놓으면 가까운 카드에 맞춘다. 누르는 자리도 같이 움직인다.
+function attachCarousel(layer, root) {
+  const cards = q(root, ':scope > [data-figma^="Carousel /"]');
+  if (cards.length < 2 || root.dataset.carousel) return;
+  root.dataset.carousel = '1';
+  const r0 = relRect(root, cards[0]);
+  const stops = cards.map((c) => r0.x - relRect(root, c).x);
+  const min = Math.min(...stops);
+  const hot = q(layer, '[data-hotspot]').filter((b) => Math.abs(parseFloat(b.style.top) - r0.y) < 1 && Math.abs(parseFloat(b.style.height) - r0.h) < 1);
+  const moving = cards.concat(hot);
+  let x = 0, start = null, moved = false;
+  const set = (v, ms) => moving.forEach((el) => {
+    el.style.transition = ms ? 'transform ' + ms + 'ms ' + motion.emphasizedDecel : 'none';
+    el.style.transform = 'translateX(' + v + 'px)';
+  });
+  const inBand = (e) => {
+    const s = scaleOf(root), b = root.getBoundingClientRect();
+    const y = (e.clientY - b.top) / s;
+    return y >= r0.y && y <= r0.y + r0.h;
+  };
+  layer.addEventListener('pointerdown', (e) => {
+    if (!inBand(e)) return;
+    start = { x: e.clientX, base: x };
+    moved = false;
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!start) return;
+    const dx = (e.clientX - start.x) / scaleOf(root);
+    if (Math.abs(dx) > 6) moved = true;
+    if (moved) set(Math.max(min - 40, Math.min(40, start.base + dx)), 0);
+  });
+  window.addEventListener('pointerup', (e) => {
+    if (!start) return;
+    const dx = (e.clientX - start.x) / scaleOf(root);
+    const want = start.base + dx;
+    start = null;
+    if (!moved) return;
+    const i = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
+    const dir = dx < -LIVE.swipeMin ? 1 : dx > LIVE.swipeMin ? -1 : 0;
+    const cur = stops.indexOf(x);
+    const j = dir && cur >= 0 ? Math.max(0, Math.min(stops.length - 1, cur + dir)) : i;
+    x = stops[j];
+    set(x, motion.stateIn + 150);
+  });
+  // 끌어서 넘긴 직후의 누름은 화면 이동으로 보지 않는다.
+  layer.addEventListener('click', (e) => {
+    if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
+  }, true);
+}
+
 // ---------- 붙이기 ----------
 let ticker = 0;
 let current = { n: 0, go: null, layer: null };
@@ -222,6 +284,7 @@ export function attach(layer, n, go, prevN) {
   current = { n, go, layer };
   applyClock(root);
   attachInputs(root, n, go);
+  attachCarousel(layer, root);
   const sc = sceneOf(n);
   if (sc) {
     if (room.scene !== sc) {
@@ -245,6 +308,8 @@ export function attach(layer, n, go, prevN) {
 function tick() {
   tickClock();
   if (!room.scene || !current.layer) return;
+  // 화면을 옮기는 중(주소가 이미 다음 화면)이면 이전 방 시계로 화면을 넘기지 않는다.
+  if (hashN() !== current.n) return;
   const root = rootOf(current.layer);
   if (!root) return;
   const left = remaining();
