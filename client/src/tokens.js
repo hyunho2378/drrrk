@@ -36,19 +36,22 @@ export const motion = {
   pushShift: '-28%',
   pushDim: 0.7,
   pressOpacity: 0.1,
+  splashOut: 400,
+  splashStill: 1200,
 };
 
-export const layout = { screenWidth: 390, touchMin: 44, listWidth: 560 };
+export const layout = { screenWidth: 390, screenHeight: 844, touchMin: 44, listWidth: 560, logoWidth: 180 };
 
 export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lineHeight: '1.4' }] };
 
-export const zIndex = { hotspot: 50, bar: 60 };
+export const zIndex = { hotspot: 50, bar: 60, splash: 100 };
 
 export const theme = {
   colors: color,
   fontFamily: { suit: ["'SUIT'", 'system-ui', 'sans-serif'] },
-  zIndex: { hot: String(zIndex.hotspot), bar: String(zIndex.bar) },
-  width: { screen: layout.screenWidth + 'px' },
+  zIndex: { hot: String(zIndex.hotspot), bar: String(zIndex.bar), splash: String(zIndex.splash) },
+  width: { screen: layout.screenWidth + 'px', logo: layout.logoWidth + 'px' },
+  height: { 'screen-app': layout.screenHeight + 'px' },
   minHeight: { touch: layout.touchMin + 'px' },
   transitionDuration: { press: motion.press + 'ms', hint: motion.hint + 'ms' },
   maxWidth: { list: layout.listWidth + 'px' },
