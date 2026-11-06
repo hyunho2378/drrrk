@@ -284,8 +284,14 @@ function attachCarousel(layer, root) {
     const dots = root.querySelector('[data-figma="Page Dots"]');
     const act = dots && dots.querySelector(':scope > [data-figma="Dot / active"]');
     if (act) {
-      const rest = [...dots.children].filter((d) => d !== act);
-      dots.insertBefore(act, rest[j] || null);
+      // 점은 절대 위치로 놓여 있다. 왼쪽부터 폭과 사이 간격(피그마 값 6px)을 더해 다시 놓는다.
+      const rest = [...dots.children].filter((d) => d !== act).sort((p, q2) => parseFloat(getComputedStyle(p).left) - parseFloat(getComputedStyle(q2).left));
+      const order = rest.slice(0, j).concat([act], rest.slice(j));
+      let left = 0;
+      order.forEach((d) => {
+        d.style.left = left + 'px';
+        left += d.getBoundingClientRect().width / scaleOf(root) + LIVE.dotGap;
+      });
     }
   });
   // 끌어서 넘긴 직후의 누름은 화면 이동으로 보지 않는다.
