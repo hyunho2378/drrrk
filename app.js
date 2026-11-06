@@ -57076,6 +57076,26 @@ function Screen1647_26876({
       },
       ...style
     }
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    "data-scroll": "",
+    style: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      width: '100%',
+      height: '100%',
+      overflowX: 'hidden',
+      overflowY: 'auto',
+      overscrollBehavior: 'none',
+      scrollbarWidth: 'none'
+    }
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    "data-scroll-content": "",
+    style: {
+      position: 'relative',
+      width: '390px',
+      height: '1616px'
+    }
   }, /*#__PURE__*/_react.default.createElement("p", {
     "data-figma": "\uC544\uCE68\uC774 \uBC1D\uC544 \uB300\uD654\uAC00 \uC885\uB8CC\uB418\uC5C8\uC5B4\uC694",
     "data-node": "1647:26877",
@@ -59752,7 +59772,7 @@ function Screen1647_26876({
       "top": "0px",
       "display": "block"
     }
-  })), /*#__PURE__*/_react.default.createElement("div", {
+  })))), /*#__PURE__*/_react.default.createElement("div", {
     "data-figma": "Status Bar",
     "data-node": "1712:25026",
     "data-instance-of": "Status Bar",
@@ -60051,6 +60071,26 @@ function Screen1647_27027({
         "overflow": "hidden"
       },
       ...style
+    }
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    "data-scroll": "",
+    style: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      width: '100%',
+      height: '100%',
+      overflowX: 'hidden',
+      overflowY: 'auto',
+      overscrollBehavior: 'none',
+      scrollbarWidth: 'none'
+    }
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    "data-scroll-content": "",
+    style: {
+      position: 'relative',
+      width: '390px',
+      height: '1096px'
     }
   }, /*#__PURE__*/_react.default.createElement("div", {
     "data-figma": "Report",
@@ -62187,7 +62227,7 @@ function Screen1647_27027({
     dangerouslySetInnerHTML: {
       __html: _svgMap.default["1647:27141"]
     }
-  })))))))))), /*#__PURE__*/_react.default.createElement("div", {
+  })))))))))))), /*#__PURE__*/_react.default.createElement("div", {
     "data-figma": "Status Bar",
     "data-node": "1712:25036",
     "data-instance-of": "Status Bar",
@@ -135246,12 +135286,24 @@ function useFigmaSubpixel(ref) {
 var SCREENS=[{"id":"1647:26726","name":"종료","mod":"screens/Screen1647_26726","h":1708},{"id":"1647:26876","name":"DRRRK 아침","mod":"screens/Screen1647_26876","h":844},{"id":"1647:27027","name":"DRRRK 오늘 나눈 대화","mod":"screens/Screen1647_27027","h":844},{"id":"1647:21843","name":"DRRRK 라운지 방 상세 (탭 후)","mod":"screens/DRRRK","h":844},{"id":"1647:21896","name":"CHAT-01 참여자 미니 프로필","mod":"screens/CHAT01","h":844},{"id":"1647:21995","name":"CHAT-01 참여자 미니 프로필","mod":"screens/CHAT012","h":844},{"id":"1647:22101","name":"CHAT-03 신고 사유 선택","mod":"screens/CHAT03","h":844},{"id":"1647:22209","name":"CHAT-04 차단 확인","mod":"screens/CHAT04","h":844},{"id":"1647:22319","name":"CHAT-00 캐릭터 탭 → 이름 표시","mod":"screens/CHAT00","h":844},{"id":"1647:22396","name":"DRRRK 라운지 5안 (지금 들어갈 수 있는 방)","mod":"screens/DRRRK5","h":844},{"id":"1647:22677","name":"DRRRK 라운지 5안 방 구경 (라이브 + 댓글)","mod":"screens/DRRRK52","h":844},{"id":"1647:22751","name":"DRRRK 온보딩 함께 드르륵 9","mod":"screens/DRRRK9","h":844},{"id":"1647:22812","name":"DRRRK 온보딩 함께 드르륵 10","mod":"screens/DRRRK10","h":844},{"id":"1647:22869","name":"DRRRK 온보딩 함께 드르륵 11","mod":"screens/DRRRK11","h":844},{"id":"1647:22921","name":"DRRRK 온보딩 함께 드르륵 12","mod":"screens/DRRRK12","h":844},{"id":"1647:22976","name":"DRRRK 온보딩 혼자 드르륵 5","mod":"screens/DRRRK53","h":844},{"id":"1647:23028","name":"DRRRK 온보딩 혼자 드르륵 6","mod":"screens/DRRRK6","h":844},{"id":"1647:23081","name":"MY 메인 (엉따 온도 + 꾸미기)","mod":"screens/MY","h":844},{"id":"1647:23143","name":"MY 스킨 획득 팝업 (엉따 39°)","mod":"screens/MY39","h":844},{"id":"1647:23223","name":"의자 꾸미기 소파 선택","mod":"screens/Screen1647_23223","h":844},{"id":"1647:23282","name":"의자 꾸미기 잠긴 의자 선택","mod":"screens/Screen1647_23282","h":844},{"id":"1647:23371","name":"DRRRK 드르륵 일반 모드 이름 탭 가능","mod":"screens/DRRRK2","h":844},{"id":"1647:23388","name":"DRRRK 드르륵 일반 모드 이름 탭 가능","mod":"screens/DRRRK3","h":844},{"id":"1647:23436","name":"DRRRK 홈 (Dark)","mod":"screens/DRRRKDark","h":844},{"id":"1647:23475","name":"DRRRK 홈 (Dark)","mod":"screens/DRRRKDark2","h":844},{"id":"1647:23515","name":"DRRRK 고민 분석","mod":"screens/DRRRK4","h":844},{"id":"1671:45285","name":"DRRRK 추천 드르륵","mod":"screens/DRRRK7","h":844},{"id":"1647:23612","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK8","h":844},{"id":"1647:23694","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK13","h":844},{"id":"1647:23761","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK14","h":844},{"id":"1647:23840","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK15","h":844},{"id":"1647:23954","name":"DRRRK 드르륵 일반 모드","mod":"screens/DRRRK16","h":844},{"id":"1647:24030","name":"DRRRK 드르륵 일반 모드","mod":"screens/DRRRK17","h":844},{"id":"1647:24143","name":"DRRRK 홈 (Dark)","mod":"screens/DRRRKDark3","h":844},{"id":"1647:24283","name":"DRRRK 드르륵 해 뜬 순간","mod":"screens/DRRRK18","h":844},{"id":"1647:24317","name":"MY 메인 (엉따 온도 + 꾸미기)","mod":"screens/MY2","h":844},{"id":"1647:24531","name":"DRRRK 라운지 5안 방 구경 (라이브 + 댓글)","mod":"screens/DRRRK54","h":844},{"id":"1647:24619","name":"커뮤니티 글 상세 (v3 단순화)","mod":"screens/V3","h":844},{"id":"1647:24679","name":"커뮤니티 목록 (v2)","mod":"screens/V2","h":844},{"id":"1647:24788","name":"영상","mod":"screens/Screen1647_24788","h":844},{"id":"1647:24874","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK19","h":844},{"id":"1647:24954","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK20","h":844},{"id":"1647:25052","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK21","h":844},{"id":"1647:25113","name":"DRRRK 드르륵 현장 모드","mod":"screens/DRRRK22","h":844},{"id":"1647:25167","name":"DRRRK 추천 드르륵","mod":"screens/DRRRK23","h":844},{"id":"1647:25199","name":"영상","mod":"screens/Screen1647_25199","h":844},{"id":"1647:22527","name":"DRRRK 라운지 5안 (지금 들어갈 수 있는 방)-1","mod":"screens/DRRRK51","h":844}];
 var cache={};
 function norm(from,p){ if(p==='react') return 'react'; if(/assets\/svg-map$/.test(p)) return '__svgmap'; var base=from.split('/').slice(0,-1); p.split('/').forEach(function(s){ if(s==='.'||s==='') return; if(s==='..') base.pop(); else base.push(s); }); return base.join('/'); }
-function req(from){ return function(p){ var k=norm(from,p); if(k==='react') return window.React; if(k==='__svgmap') return {default:window.__SVGMAP,__esModule:true}; if(cache[k]) return cache[k].exports; var fn=DEFS[k]; if(!fn) throw new Error('모듈 없음 '+k+' ('+from+')'); var m={exports:{}}; cache[k]=m; fn(req(k),m,m.exports,window.React); return m.exports; }; }
-var root=null, mountEl=null;
+function req(from){ return function(p){ var k=norm(from,p); if(k==='react') return window.React; if(k==='__svgmap') return {default:window.__SVGMAP,__esModule:true}; if(cache[k]) return cache[k].exports; var fn=DEFS[k]; if(!fn) throw new Error('모듈 없음 '+k); var m={exports:{}}; cache[k]=m; fn(req(k),m,m.exports,window.React); return m.exports; }; }
 function loadImg(u){ return new Promise(function(r){ var i=new Image(); i.onload=i.onerror=function(){ r(); }; i.src=u; }); }
-async function settle(el){ var urls={}; el.querySelectorAll('[style],img').forEach(function(e){ var st=e.getAttribute('style')||''; (st.match(/url\(([^)]+)\)/g)||[]).forEach(function(u){ var v=u.slice(4,-1).replace(/["']/g,''); if(v.indexOf('./assets/')===0||v.indexOf('/assets/')===0) urls[v]=1; }); var s=e.getAttribute('src'); if(s&&s.indexOf('assets/')>=0) urls[s]=1; }); await Promise.all(Object.keys(urls).map(loadImg)); if(document.fonts) await document.fonts.ready; var d=el.querySelector('[data-raster-done]'); if(d) d.removeAttribute('data-raster-done'); window.dispatchEvent(new Event('figma-raster')); }
-function showList(){ if(root){ root.unmount(); root=null; } var app=document.getElementById('app'); app.innerHTML=''; var wrap=document.createElement('div'); wrap.className='list'; var h=document.createElement('h1'); h.textContent='DRRRK 화면'; wrap.appendChild(h); SCREENS.forEach(function(s,i){ var a=document.createElement('a'); a.href='#/'+(i+1); a.textContent=(i+1)+'  '+s.name; wrap.appendChild(a); }); app.appendChild(wrap); document.title='DRRRK'; }
-async function showScreen(n){ var s=SCREENS[n-1]; var app=document.getElementById('app'); if(!s){ location.hash='#/'; return; } if(root){ root.unmount(); root=null; } app.innerHTML=''; var bar=document.createElement('div'); bar.className='bar'; var back=document.createElement('a'); back.href='#/'; back.textContent='목록'; var prev=document.createElement('a'); prev.href='#/'+Math.max(1,n-1); prev.textContent='이전'; var next=document.createElement('a'); next.href='#/'+Math.min(SCREENS.length,n+1); next.textContent='다음'; var t=document.createElement('span'); t.textContent=n+' / '+SCREENS.length+'  '+s.name; bar.appendChild(back); bar.appendChild(prev); bar.appendChild(next); bar.appendChild(t); app.appendChild(bar); var stage=document.createElement('div'); stage.className='stage'; var mount=document.createElement('div'); mount.id='root'; mount.style.width='390px'; mount.style.height=s.h+'px'; stage.appendChild(mount); app.appendChild(stage); document.title=s.name; var E=req('')('./'+s.mod); var C=Object.values(E).find(function(v){ return typeof v==='function'; }); root=ReactDOM.createRoot(mount); ReactDOM.flushSync(function(){ root.render(React.createElement(C)); }); await settle(mount); }
-function route(){ var m=/^#\/(\d+)$/.exec(location.hash); if(m) showScreen(parseInt(m[1],10)); else showList(); window.scrollTo(0,0); }
+function urlsIn(el){ var urls={}; el.querySelectorAll('[style],img').forEach(function(e){ var st=e.getAttribute('style')||''; (st.match(/url\(([^)]+)\)/g)||[]).forEach(function(u){ var v=u.slice(4,-1).replace(/["']/g,''); if(v.indexOf('assets/')>=0&&!/\.mp4$/.test(v)) urls[v]=1; }); var s=e.getAttribute('src'); if(s&&s.indexOf('assets/')>=0&&!/\.mp4$/.test(s)) urls[s]=1; }); return Object.keys(urls); }
+function waitDone(el,ms){ return new Promise(function(r){ var t0=Date.now(); (function f(){ if(el.querySelector('[data-raster-done]')||Date.now()-t0>ms) r(); else setTimeout(f,40); })(); }); }
+var current=null, token=0;
+var app=document.getElementById('app');
+var bar=document.createElement('div'); bar.className='bar'; var bBack=document.createElement('a'); bBack.href='#/'; bBack.textContent='목록'; var bPrev=document.createElement('a'); bPrev.textContent='이전'; var bNext=document.createElement('a'); bNext.textContent='다음'; var bT=document.createElement('span'); bar.appendChild(bBack); bar.appendChild(bPrev); bar.appendChild(bNext); bar.appendChild(bT);
+var stage=document.createElement('div'); stage.className='stage';
+var list=document.createElement('div'); list.className='list'; var h=document.createElement('h1'); h.textContent='DRRRK 화면'; list.appendChild(h); SCREENS.forEach(function(s,i){ var a=document.createElement('a'); a.href='#/'+(i+1); a.textContent=(i+1)+'  '+s.name; list.appendChild(a); });
+app.appendChild(list); app.appendChild(bar); app.appendChild(stage);
+// 새 화면은 보이지 않는 칸에 먼저 그리고, 그림과 글자 마무리가 끝난 뒤 한 번에 바꾼다(깜빡임, 튐 방지).
+async function showScreen(n){ var s=SCREENS[n-1]; if(!s){ location.hash='#/'; return; } var my=++token; list.style.display='none'; bar.style.display='flex'; bPrev.href='#/'+Math.max(1,n-1); bNext.href='#/'+Math.min(SCREENS.length,n+1); bT.textContent=n+' / '+SCREENS.length+'  '+s.name; document.title=s.name;
+  var slot=document.createElement('div'); slot.className='slot'; slot.style.height=s.h+'px'; var mount=document.createElement('div'); mount.className='screen'; mount.style.height=s.h+'px'; slot.appendChild(mount); if(current){ slot.style.position='absolute'; slot.style.visibility='hidden'; } stage.appendChild(slot);
+  var E=req('')('./'+s.mod); var C=Object.values(E).find(function(v){ return typeof v==='function'; }); var root=ReactDOM.createRoot(mount); ReactDOM.flushSync(function(){ root.render(React.createElement(C)); });
+  await Promise.all(urlsIn(mount).map(loadImg)); if(document.fonts) await document.fonts.ready; var d=mount.querySelector('[data-raster-done]'); if(d) d.removeAttribute('data-raster-done'); window.dispatchEvent(new Event('figma-raster')); await waitDone(mount,8000);
+  if(my!==token){ root.unmount(); slot.remove(); return; }
+  var prev=current; slot.style.position=''; slot.style.visibility=''; current={slot:slot,root:root}; if(prev){ prev.root.unmount(); prev.slot.remove(); } window.scrollTo(0,0); }
+function showList(){ token++; if(current){ current.root.unmount(); current.slot.remove(); current=null; } bar.style.display='none'; list.style.display='flex'; document.title='DRRRK'; window.scrollTo(0,0); }
+function route(){ var m=/^#\/(\d+)$/.exec(location.hash); if(m) showScreen(parseInt(m[1],10)); else showList(); }
 window.addEventListener('hashchange',route); route();
 })();
