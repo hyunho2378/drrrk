@@ -13,8 +13,6 @@ export const color = {
   'press-dark': 'var(--bg-base)',
   'press-light': 'var(--text-primary)',
   'hint-fill': 'rgb(54 210 255 / 0.14)',
-  // 로고 모션 영상(Brand / Logo, type=모션)의 바탕색. 영상과 이어지게 스플래시 바탕에만 쓴다.
-  splash: 'rgb(21 21 21)',
   // 앱 화면(390) 바깥. 앱 바탕(검정)과 구분되게 팀 변수 gray/800을 쓴다.
   outside: 'var(--gray-800)',
 };
