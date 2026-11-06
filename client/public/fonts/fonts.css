@@ -1,0 +1,10 @@
+/* 자동 생성: figma-to-code. 피그마가 쓰는 글꼴 파일과 같은 파일(이 맥에 설치된 원본)을 웹 글꼴로 쓴다. CDN 판은 판이 달라 글자 폭과 기준선이 다를 수 있다. */
+@font-face{font-family:'SUIT';font-weight:100;font-style:normal;font-display:block;src:url(./SUIT-Thin.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:200;font-style:normal;font-display:block;src:url(./SUIT-ExtraLight.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:300;font-style:normal;font-display:block;src:url(./SUIT-Light.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:400;font-style:normal;font-display:block;src:url(./SUIT-Regular.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:500;font-style:normal;font-display:block;src:url(./SUIT-Medium.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:600;font-style:normal;font-display:block;src:url(./SUIT-SemiBold.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:700;font-style:normal;font-display:block;src:url(./SUIT-Bold.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:800;font-style:normal;font-display:block;src:url(./SUIT-ExtraBold.otf) format('opentype');}
+@font-face{font-family:'SUIT';font-weight:900;font-style:normal;font-display:block;src:url(./SUIT-Heavy.otf) format('opentype');}
