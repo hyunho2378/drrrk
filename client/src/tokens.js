@@ -58,6 +58,8 @@ export const live = {
   inputHint: /한마디|댓글|메시지/,
   // 카드를 이만큼(px) 넘게 끌면 다음 카드로 넘긴다.
   swipeMin: 40,
+  // 카드 아래 점 사이 간격(피그마 Page Dots 값).
+  dotGap: 6,
   chatFirst: 350,
   chatGap: 900,
   chatSpacing: 12,
