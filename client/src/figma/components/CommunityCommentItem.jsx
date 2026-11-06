@@ -23,7 +23,7 @@ export function CommunityCommentItem({
   className
 }) {
   if (type === "default") return <div data-figma="type=default" data-node="1299:19697" className={cx("flex w-[342px] [padding:14px_0] [justify-content:center] [align-items:flex-start] gap-[10px] relative overflow-hidden", className)} style={style}>
-      <img data-figma="Avatar" data-node="1299:19698" data-px="" data-hires="" alt="" src="./assets/raster/1299-19698.png" className="w-[32px] h-[32px] shrink-0 block" />
+      <img data-figma="Avatar" data-node="1299:19698" data-px="" data-hires="" alt="" src="./assets/raster/1299-19698.webp" className="w-[32px] h-[32px] shrink-0 block" />
       <div data-figma="Content" data-node="1299:19699" className="flex [flex-direction:column] [justify-content:center] [align-items:center] gap-[6px] [flex:1_0_0] overflow-hidden">
         <div data-figma="Header" data-node="1299:19700" className="flex [align-items:center] gap-[6px] [align-self:stretch] shrink-0 overflow-hidden">
           <AutoText data-figma="따뜻한 가죽소파29" data-node="1299:19701" width={nicknameWidth} className="relative [color:var(--text-primary-50,_rgba(248,_248,_248,_0.50))] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0" style={nicknameSvg && svg[nicknameSvg] ? {

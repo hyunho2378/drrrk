@@ -26,7 +26,7 @@ export function Logo({
     }} />
     </div>;
   if (type === "모션") return <div data-figma="type=모션" data-node="1204:89780" className={cx("flex w-[1920px] h-[1080px] [justify-content:center] [align-items:center] relative overflow-hidden", className)} style={style}>
-      <video data-figma="logo motion 1" data-node="1204:89779" src="./assets/video/bcefe2ea4f30096fe31ef0bb4939769a0340321e.mp4" poster="./assets/raster/1204-89779.jpg" autoPlay muted loop playsInline className="w-[1920px] h-[1080px] shrink-0 [aspect-ratio:16/9] absolute left-[0px] top-[0px] block [object-fit:cover]" />
+      <video data-figma="logo motion 1" data-node="1204:89779" src="./assets/video/bcefe2ea4f30096fe31ef0bb4939769a0340321e.mp4" poster="./assets/raster/1204-89779.webp" autoPlay muted loop playsInline className="w-[1920px] h-[1080px] shrink-0 [aspect-ratio:16/9] absolute left-[0px] top-[0px] block [object-fit:cover]" />
     </div>;
   return null;
 }

@@ -8,7 +8,7 @@ export function Illustration({
   className
 }) {
   if (name === "sun") return <div data-figma="name=sun" data-node="1405:44532" className={cx("flex w-[225px] h-[158px] [justify-content:center] [align-items:center] relative overflow-hidden", className)} style={style}>
-      <img data-figma="image 1208091468" data-node="1405:44531" data-px="" data-hires="" alt="" src="./assets/raster/1405-44531.png" className="w-[225px] h-[158px] shrink-0 absolute left-[0px] top-[0px] block" />
+      <img data-figma="image 1208091468" data-node="1405:44531" data-px="" data-hires="" alt="" src="./assets/raster/1405-44531.webp" className="w-[225px] h-[158px] shrink-0 absolute left-[0px] top-[0px] block" />
     </div>;
   return null;
 }

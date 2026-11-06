@@ -12,8 +12,8 @@ export function Face({
       __html: "<svg data-px=\"\" data-box=\"\" width=\"81\" height=\"83.13\" viewBox=\"0 0 81 83.13\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"81\" height=\"83.13\" rx=\"40.5\" style=\"fill:var(--bg-surface, #121415)\"/></svg>"
     }} />
       <div data-figma="chair / box" data-node="1405:47016" data-instance-of="Chair Illustration" className="flex w-[82.06px] h-[82.06px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-        <div data-figma="box" data-node="I1405:47016;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[82.06px] h-[82.06px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+        <div data-figma="box" data-node="I1405:47016;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[82.06px] h-[82.06px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
       }} />
       </div>
     </div>;
@@ -22,8 +22,8 @@ export function Face({
       __html: "<svg data-px=\"\" data-box=\"\" width=\"81\" height=\"83.13\" viewBox=\"0 0 81 83.13\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"81\" height=\"83.13\" rx=\"40.5\" style=\"fill:var(--bg-surface, #121415)\"/></svg>"
     }} />
       <div data-figma="chair / sofa" data-node="1405:47019" data-instance-of="Chair Illustration" className="flex w-[82.06px] h-[82.06px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-        <div data-figma="image 1208091458" data-node="I1405:47019;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[82.06px] h-[82.06px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 6.599px 6.838px / 83.916% 83.916% no-repeat"
+        <div data-figma="image 1208091458" data-node="I1405:47019;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[82.06px] h-[82.06px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 6.599px 6.838px / 83.916% 83.916% no-repeat"
       }} />
       </div>
     </div>;
@@ -32,8 +32,8 @@ export function Face({
       __html: "<svg data-px=\"\" data-box=\"\" width=\"81\" height=\"83.13\" viewBox=\"0 0 81 83.13\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"81\" height=\"83.13\" rx=\"40.5\" style=\"fill:var(--bg-surface, #121415)\"/></svg>"
     }} />
       <div data-figma="chair / stool" data-node="1405:47022" data-instance-of="Chair Illustration" className="flex w-[82.06px] h-[82.06px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-        <div data-figma="stool" data-node="I1405:47022;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[82.06px] h-[82.06px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 3.251px 3.419px / 92.077% 92.077% no-repeat"
+        <div data-figma="stool" data-node="I1405:47022;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[82.06px] h-[82.06px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 3.251px 3.419px / 92.077% 92.077% no-repeat"
       }} />
       </div>
     </div>;

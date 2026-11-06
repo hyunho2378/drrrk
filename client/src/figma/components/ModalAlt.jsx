@@ -30,8 +30,8 @@ export function ModalAlt({
         </div>
       </div>
       <div data-figma="Carousel / 2" data-node="1405:50440" className="w-[276px] h-[187px] [aspect-ratio:245/166] [border-radius:20px] [background:#222628] shrink-0 relative overflow-hidden">
-        <div data-figma="Scene" data-node="1405:50441" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[276px] h-[202px] absolute left-[0px] top-[-9px]" style={{
-        "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -174.529px / 100% 245.582% no-repeat"
+        <div data-figma="Scene" data-node="1405:50441" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[276px] h-[202px] absolute left-[0px] top-[-9px]" style={{
+        "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 0px -174.529px / 100% 245.582% no-repeat"
       }} />
         <div data-figma="Fade" data-node="1405:50442" className="w-[276px] h-[187px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
         <p data-figma="Carousel Title" data-node="1405:50443" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[122px] w-[109px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"부모님이 맨날\n내 앞에서 싸움"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{

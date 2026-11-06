@@ -321,8 +321,8 @@ export function Modal({
         __html: svg["1204:86853"]
       }} />
         <div data-figma="Chair Illustration" data-node="1204:86854" data-instance-of="Chair Illustration" className="flex w-[170px] h-[170px] [justify-content:center] [align-items:center] absolute left-[15px] top-[0px]">
-          <div data-figma="image 1208091458" data-node="I1204:86854;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[170px] h-[170px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091458" data-node="I1204:86854;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[170px] h-[170px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
         }} />
         </div>
       </div>
@@ -334,18 +334,18 @@ export function Modal({
       }} /></p>
       <div data-figma="포함된 색" data-node="1204:86857" className="flex [padding:var(--spacing-7,_8px)_var(--spacing-11,_12px)] [justify-content:center] [align-items:center] [gap:var(--spacing-7,_8px)] [border-radius:var(--radius-6xl,_14px)] [background:var(--bg-elevated,_#222628)] shrink-0 overflow-hidden">
         <div data-figma="Chair Illustration" data-node="1204:86858" data-instance-of="Chair Illustration" className="flex w-[36px] h-[36px] [justify-content:center] [align-items:center] shrink-0 relative">
-          <div data-figma="image 1208091458" data-node="I1204:86858;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[36px] h-[36px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091458" data-node="I1204:86858;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[36px] h-[36px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
         }} />
         </div>
         <div data-figma="Chair Illustration" data-node="1204:86859" data-instance-of="Chair Illustration" className="flex w-[36px] h-[36px] [justify-content:center] [align-items:center] shrink-0 relative">
-          <div data-figma="sofa-1" data-node="I1204:86859;1204:89709" data-img={"{\"src\":\"./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.png\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[36px] h-[36px] shrink-0 absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.png) 50% / contain no-repeat"
+          <div data-figma="sofa-1" data-node="I1204:86859;1204:89709" data-img={"{\"src\":\"./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.webp\",\"mode\":\"FIT\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[36px] h-[36px] shrink-0 absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/6e90eda49e343eb6829327dd7e13087ab82f8cc4.webp) 50% / contain no-repeat"
         }} />
         </div>
         <div data-figma="Chair Illustration" data-node="1204:86860" data-instance-of="Chair Illustration" className="flex w-[36px] h-[36px] [justify-content:center] [align-items:center] shrink-0 relative">
-          <div data-figma="image 1208091458" data-node="I1204:86860;1204:89711" data-img={"{\"src\":\"./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[36px] h-[36px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091458" data-node="I1204:86860;1204:89711" data-img={"{\"src\":\"./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[36px] h-[36px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/66dbe89daeb432881bb2caf2cfd9e219ed206076.webp) 50% / cover no-repeat"
         }} />
         </div>
         <p data-figma="색상 3종 포함" data-node="1204:86861" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.48px] shrink-0 w-[62px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.132px] left-[0px]">{"색상 3종 포함"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -509,8 +509,8 @@ export function Modal({
               <div data-figma="cell / box" data-node="1299:36251" className="flex w-[72px] [flex-direction:column] [justify-content:center] [align-items:center] gap-[8px] shrink-0">
                 <div data-figma="face" data-node="1299:36252" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] [border-radius:999px] [background:var(--bg-surface,_#121415)] shrink-0 relative overflow-hidden">
                   <div data-figma="chair / box" data-node="1398:36589" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-                    <div data-figma="box" data-node="I1398:36589;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                    "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+                    <div data-figma="box" data-node="I1398:36589;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                    "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
                   }} />
                   </div>
                 </div>
@@ -524,8 +524,8 @@ export function Modal({
                   __html: "<svg data-px=\"\" data-box=\"\" width=\"72\" height=\"72\" viewBox=\"0 0 72 72\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"72\" height=\"72\" rx=\"36\" style=\"fill:var(--bg-surface, #121415)\"/><defs><clipPath id=\"c1299_36256\"><rect width=\"72\" height=\"72\" rx=\"36\"/></clipPath></defs><g clip-path=\"url(#c1299_36256)\"><path d=\"M0 36 M72 36 M72 36 M0 36 M36 0 M72 36 M36 72 M0 36 M36 72 L36 70 C17.2223 70 2 54.7777 2 36 L0 36 L-2 36 C-2 56.9868 15.0132 74 36 74 L36 72 Z M72 36 L70 36 C70 54.7777 54.7777 70 36 70 L36 72 L36 74 C56.9868 74 74 56.9868 74 36 L72 36 Z M36 0 L36 2 C54.7777 2 70 17.2223 70 36 L72 36 L74 36 C74 15.0132 56.9868 -2 36 -2 L36 0 Z M36 0 L36 -2 C15.0132 -2 -2 15.0132 -2 36 L0 36 L2 36 C2 17.2223 17.2223 2 36 2 L36 0 Z\" fill-rule=\"nonzero\" style=\"fill:var(--brand-primary, #36D2FF)\"/></g></svg>"
                 }} />
                   <div data-figma="chair / sofa" data-node="1398:36591" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-                    <div data-figma="image 1208091458" data-node="I1398:36591;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                    "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+                    <div data-figma="image 1208091458" data-node="I1398:36591;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                    "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
                   }} />
                   </div>
                 </div>
@@ -536,8 +536,8 @@ export function Modal({
               <div data-figma="cell / stool" data-node="1299:36259" className="flex w-[72px] [flex-direction:column] [justify-content:center] [align-items:center] gap-[8px] shrink-0">
                 <div data-figma="face" data-node="1299:36260" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] [border-radius:999px] [background:var(--bg-surface,_#121415)] shrink-0 relative overflow-hidden">
                   <div data-figma="chair / stool" data-node="1398:36593" data-instance-of="Chair Illustration" className="flex w-[72px] h-[72px] [justify-content:center] [align-items:center] shrink-0 absolute left-[0px] top-[0px]">
-                    <div data-figma="stool" data-node="I1398:36593;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-                    "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+                    <div data-figma="stool" data-node="I1398:36593;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] shrink-0 [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+                    "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
                   }} />
                   </div>
                 </div>
