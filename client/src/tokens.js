@@ -13,6 +13,8 @@ export const color = {
   'press-dark': 'var(--bg-base)',
   'press-light': 'var(--text-primary)',
   'hint-fill': 'rgb(54 210 255 / 0.14)',
+  // 로고 모션 영상(Brand / Logo, type=모션)의 바탕색. 영상과 이어지게 스플래시 바탕에만 쓴다.
+  splash: 'rgb(21 21 21)',
 };
 
 // 수치 근거: Material Design 3 Easing and duration tokens(easing, short/medium 토큰), NN/g Executing UX Animations(100~500ms, 진입이 퇴장보다 조금 길게), Apple HIG Motion(짧고 정확하게).
