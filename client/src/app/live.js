@@ -1,6 +1,6 @@
 // 화면 위에서 실제로 움직이는 것들. 피그마 생성물(src/figma)은 고치지 않고, 그려진 화면의 요소를 이름(data-figma)으로 찾아 덧붙인다.
 // 1) 상태바 시계: 왼쪽 시간을 실제 시각으로(강릉페이 리뉴얼과 같은 방식, 오른쪽 아이콘은 그대로).
-// 2) 방 시계: 해 뜨기까지 남은 시간을 15배 빠르게 줄이고, 1분 전과 0에서 다음 화면으로 넘긴다.
+// 2) 방 시계: 해 뜨기까지 남은 시간을 10배 빠르게 줄이고, 1분 전과 0에서 다음 화면으로 넘긴다.
 // 3) 채팅: 방에 처음 들어가면 대화가 하나씩 올라온다.
 // 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
@@ -236,65 +236,165 @@ function runAnalysis(root, ms) {
   });
 }
 
-// ---------- 6) 가로 카드 넘기기 ----------
-// 라운지 맨 위 카드 줄(Carousel / 1, 2)을 손가락이나 마우스로 끌어 넘긴다. 놓으면 가까운 카드에 맞춘다. 누르는 자리도 같이 움직인다.
-function attachCarousel(layer, root) {
+// ---------- 6) 끌기: 가로 카드 넘기기와 세로 스크롤 ----------
+// 요소마다 가로(카드 넘기기)와 세로(스크롤) 이동값을 따로 들고, transform 하나로 합쳐서 놓는다.
+const off = new WeakMap();
+function move(el, k, v, ms) {
+  const o = off.get(el) || { x: 0, y: 0 };
+  o[k] = v;
+  off.set(el, o);
+  el.style.transition = ms ? 'transform ' + ms + 'ms ' + motion.emphasizedDecel : 'none';
+  el.style.transform = o.x || o.y ? 'translate(' + o.x + 'px, ' + o.y + 'px)' : '';
+}
+
+// 라운지 맨 위 카드 줄(Carousel / 1, 2). 놓으면 가까운 카드에 맞추고, 아래 점도 그 자리로 옮긴다.
+function carouselOf(layer, root) {
   const cards = q(root, ':scope > [data-figma^="Carousel /"]');
-  if (cards.length < 2 || root.dataset.carousel) return;
-  root.dataset.carousel = '1';
+  if (cards.length < 2) return null;
   const r0 = relRect(root, cards[0]);
   const stops = cards.map((c) => r0.x - relRect(root, c).x);
-  const min = Math.min(...stops);
   const hot = q(layer, '[data-hotspot]').filter((b) => Math.abs(parseFloat(b.style.top) - r0.y) < 1 && Math.abs(parseFloat(b.style.height) - r0.h) < 1);
-  const moving = cards.concat(hot);
-  let x = 0, start = null, moved = false;
-  const set = (v, ms) => moving.forEach((el) => {
-    el.style.transition = ms ? 'transform ' + ms + 'ms ' + motion.emphasizedDecel : 'none';
-    el.style.transform = 'translateX(' + v + 'px)';
-  });
-  const inBand = (e) => {
-    const s = scaleOf(root), b = root.getBoundingClientRect();
-    const y = (e.clientY - b.top) / s;
-    return y >= r0.y && y <= r0.y + r0.h;
-  };
-  layer.addEventListener('pointerdown', (e) => {
-    if (!inBand(e)) return;
-    start = { x: e.clientX, base: x };
-    moved = false;
-  });
-  window.addEventListener('pointermove', (e) => {
-    if (!start) return;
-    const dx = (e.clientX - start.x) / scaleOf(root);
-    if (Math.abs(dx) > 6) moved = true;
-    if (moved) set(Math.max(min - 40, Math.min(40, start.base + dx)), 0);
-  });
-  window.addEventListener('pointerup', (e) => {
-    if (!start) return;
-    const dx = (e.clientX - start.x) / scaleOf(root);
-    const want = start.base + dx;
-    start = null;
-    if (!moved) return;
-    const i = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
+  const els = cards.concat(hot);
+  const c = { x: 0, base: 0, band: [r0.y, r0.y + r0.h] };
+  c.drag = (dx) => els.forEach((el) => move(el, 'x', Math.max(Math.min(...stops) - 40, Math.min(40, c.base + dx)), 0));
+  c.end = (dx) => {
+    const want = c.base + dx;
+    const near = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
+    const cur = stops.indexOf(c.base);
     const dir = dx < -LIVE.swipeMin ? 1 : dx > LIVE.swipeMin ? -1 : 0;
-    const cur = stops.indexOf(x);
-    const j = dir && cur >= 0 ? Math.max(0, Math.min(stops.length - 1, cur + dir)) : i;
-    x = stops[j];
-    set(x, motion.stateIn + 150);
-    // 아래 점(Page Dots)도 보고 있는 카드 자리로 옮긴다.
+    const j = dir && cur >= 0 ? Math.max(0, Math.min(stops.length - 1, cur + dir)) : near;
+    c.x = c.base = stops[j];
+    els.forEach((el) => move(el, 'x', c.x, motion.stateIn + 150));
     const dots = root.querySelector('[data-figma="Page Dots"]');
     const act = dots && dots.querySelector(':scope > [data-figma="Dot / active"]');
     if (act) {
-      // 점은 절대 위치로 놓여 있다. 왼쪽부터 폭과 사이 간격(피그마 값 6px)을 더해 다시 놓는다.
-      const rest = [...dots.children].filter((d) => d !== act).sort((p, q2) => parseFloat(getComputedStyle(p).left) - parseFloat(getComputedStyle(q2).left));
-      const order = rest.slice(0, j).concat([act], rest.slice(j));
+      // 점은 절대 위치로 놓여 있다. 왼쪽부터 폭과 사이 간격(피그마 값)을 더해 다시 놓는다.
+      const rest = [...dots.children].filter((d) => d !== act).sort((p, p2) => parseFloat(getComputedStyle(p).left) - parseFloat(getComputedStyle(p2).left));
       let left = 0;
-      order.forEach((d) => {
+      rest.slice(0, j).concat([act], rest.slice(j)).forEach((d) => {
         d.style.left = left + 'px';
         left += d.getBoundingClientRect().width / scaleOf(root) + LIVE.dotGap;
       });
     }
+  };
+  return c;
+}
+
+// 라이브와 커뮤니티 목록은 탭바 밑에 가려진 내용이 있다. 위아래로 끌거나 휠을 굴리면 머리말 아래부터 탭바 위까지가 움직인다.
+function scrollerOf(layer, root, n) {
+  if (!LIVE.scrollScreens.includes(n)) return null;
+  const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
+  const bottom = nav ? relRect(root, nav).y : LIVE.screenH;
+  const box = root.querySelector(':scope > [data-figma="Scroll"]');
+  let items, top;
+  if (box) {
+    // 커뮤니티: 피그마의 Scroll 칸 안이 통째로 움직인다. 안쪽 Feed가 자기 칸에서 잘리지 않게 풀고, 바깥 Scroll 칸이 자른다.
+    top = relRect(root, box).y;
+    items = [...box.children];
+    q(box, '[data-figma="Feed"]').forEach((f) => (f.style.overflow = 'visible'));
+  } else {
+    top = LIVE.scrollTop;
+    items = [...root.children].filter((c) => c !== nav && relRect(root, c).y >= top - 0.5);
+  }
+  let end = 0;
+  items.forEach((el) => {
+    const r = relRect(root, el);
+    end = Math.max(end, r.y + r.h);
+    q(el, '*').forEach((d) => {
+      const rr = relRect(root, d);
+      if (rr.h > 0) end = Math.max(end, rr.y + rr.h);
+    });
   });
-  // 끌어서 넘긴 직후의 누름은 화면 이동으로 보지 않는다.
+  const max = Math.max(0, end + LIVE.scrollPad - bottom);
+  if (!max) return null;
+  const hot = q(layer, '[data-hotspot]').filter((b) => {
+    const t = parseFloat(b.style.top);
+    return t >= top - 0.5 && t < bottom && b.getAttribute('aria-label') !== '탭바';
+  });
+  const clipNeeded = !box;
+  const y0 = new Map(items.map((el) => [el, relRect(root, el).y]));
+  const s = { y: 0, base: 0, max, top, bottom };
+  const place = (ms) => {
+    items.forEach((el) => {
+      move(el, 'y', -s.y, ms);
+      if (clipNeeded) {
+        // 머리말 아래로 올라간 부분은 잘라서 머리말 글자와 겹치지 않게 한다.
+        const cut = Math.max(0, top - (y0.get(el) - s.y));
+        el.style.clipPath = cut ? 'inset(' + cut + 'px 0 0 0)' : '';
+        if (ms) el.style.transition += ', clip-path ' + ms + 'ms ' + motion.emphasizedDecel;
+      }
+    });
+    hot.forEach((b) => {
+      move(b, 'y', -s.y, ms);
+      const t = parseFloat(b.style.top) - s.y, h = parseFloat(b.style.height);
+      b.style.visibility = t + h <= top || t >= bottom ? 'hidden' : '';
+    });
+  };
+  s.drag = (dy) => {
+    const v = s.base - dy;
+    s.y = v < 0 ? v / 3 : v > max ? max + (v - max) / 3 : v;
+    place(0);
+  };
+  s.end = () => {
+    s.y = s.base = Math.max(0, Math.min(max, s.y));
+    place(motion.stateIn + 150);
+  };
+  s.wheel = (dy) => {
+    s.y = s.base = Math.max(0, Math.min(max, s.y + dy));
+    place(0);
+  };
+  s.inRegion = (y) => y >= top && y <= bottom;
+  return s;
+}
+
+function attachDrag(layer, root, n) {
+  if (root.dataset.drag) return;
+  root.dataset.drag = '1';
+  const car = carouselOf(layer, root);
+  const scr = scrollerOf(layer, root, n);
+  if (!car && !scr) return;
+  const yOf = (e) => (e.clientY - root.getBoundingClientRect().top) / scaleOf(root);
+  let g = null, moved = false;
+  layer.addEventListener('pointerdown', (e) => {
+    g = { x: e.clientX, y: e.clientY, sy: yOf(e), axis: null, id: e.pointerId };
+    moved = false;
+    if (car) car.base = car.x;
+    if (scr) scr.base = scr.y;
+  });
+  layer.addEventListener('pointermove', (e) => {
+    if (!g || e.pointerId !== g.id) return;
+    const s = scaleOf(root);
+    const dx = (e.clientX - g.x) / s, dy = (e.clientY - g.y) / s;
+    if (!g.axis) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 6) return;
+      const sy = g.sy + (scr ? scr.y : 0);
+      if (Math.abs(dx) > Math.abs(dy) && car && sy >= car.band[0] && sy <= car.band[1]) g.axis = 'x';
+      else if (Math.abs(dy) >= Math.abs(dx) && scr && scr.inRegion(g.sy)) g.axis = 'y';
+      else { g = null; return; }
+      moved = true;
+      try { layer.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
+    }
+    if (g.axis === 'x') car.drag(dx);
+    else scr.drag(dy);
+  });
+  const up = (e) => {
+    if (!g || e.pointerId !== g.id) return;
+    const s = scaleOf(root);
+    if (g.axis === 'x') car.end((e.clientX - g.x) / s);
+    else if (g.axis === 'y') scr.end();
+    g = null;
+  };
+  layer.addEventListener('pointerup', up);
+  layer.addEventListener('pointercancel', up);
+  if (scr) {
+    layer.style.touchAction = 'none';
+    layer.addEventListener('wheel', (e) => {
+      if (!scr.inRegion(yOf(e))) return;
+      e.preventDefault();
+      scr.wheel(e.deltaY / scaleOf(root));
+    }, { passive: false });
+  } else layer.style.touchAction = 'pan-y';
+  // 끌어서 움직인 직후의 누름은 화면 이동으로 보지 않는다.
   layer.addEventListener('click', (e) => {
     if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
   }, true);
@@ -310,7 +410,7 @@ export function attach(layer, n, go, prevN) {
   applyClock(root);
   showEmptyOutlines(root);
   attachInputs(root, n, go);
-  attachCarousel(layer, root);
+  attachDrag(layer, root, n);
   const sc = sceneOf(n);
   if (sc) {
     const kind = timerKind(root);

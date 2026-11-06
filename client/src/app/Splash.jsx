@@ -61,6 +61,11 @@ export default function Splash({ onDone }) {
             poster={BASE + 'assets/splash/logo-motion-poster.jpg'}
             playsInline
             preload="auto"
+            onPlaying={(e) => {
+              // 로고가 다 그려진 뒤(splashCut)에 끝낸다. 뒤쪽의 멈춘 구간을 기다리지 않는다.
+              const v = e.currentTarget;
+              window.setTimeout(finish, Math.max(0, motion.splashCut - v.currentTime * 1000));
+            }}
             onEnded={finish}
             onError={finish}
             className="absolute inset-0 h-full w-full object-contain"
