@@ -233,7 +233,7 @@ export default function Prototype() {
   const top = layers[layers.length - 1];
   const stageH = layers.reduce((m, l) => Math.max(m, l.h), 0);
   return (
-    <div className="min-h-screen bg-base font-suit">
+    <div className="min-h-screen bg-outside font-suit">
       <div className="relative mx-auto w-screen overflow-hidden bg-base" style={{ height: stageH }}>
         {layers.map((l) => (
           <Layer

@@ -43,13 +43,13 @@ export default function Splash({ onDone }) {
 
   return (
     <div
-      className="fixed inset-0 z-splash flex items-center justify-center bg-splash transition-opacity ease-out"
+      className="fixed inset-0 z-splash flex items-start justify-center bg-outside transition-opacity ease-out"
       style={{ opacity: leaving ? 0 : 1, transitionDuration: motion.splashOut + 'ms', pointerEvents: leaving ? 'none' : 'auto' }}
       onPointerDown={unmute}
       aria-label="DRRRK"
       role="img"
     >
-      <div className="relative h-screen-app w-screen overflow-hidden">
+      <div className="relative h-screen-app w-screen overflow-hidden bg-splash">
         {reduced ? (
           <img src={BASE + 'logo.svg'} alt="" className="absolute left-1/2 top-1/2 w-logo -translate-x-1/2 -translate-y-1/2" />
         ) : (
