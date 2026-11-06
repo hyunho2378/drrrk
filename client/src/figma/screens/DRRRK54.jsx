@@ -1,0 +1,214 @@
+// 자동 생성: figma-to-code. 피그마 FRAME 1647:24531 "DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)" (해시 9625c8e4)
+// 손으로 고치지 말고 피그마를 고친 뒤 다시 생성한다. 다듬은 코드는 별도 파일에서 이 컴포넌트를 감싼다.
+import React from 'react';
+import { useFigmaSubpixel } from '../subpixel';
+import { Icon } from '../Icon';
+const cx = (...a) => a.filter(Boolean).join(' ');
+import svg from '../../assets/svg-map';
+export function DRRRK54({
+  style,
+  className
+}) {
+  const __root = React.useRef(null);
+  useFigmaSubpixel(__root);
+  if (true) return <div ref={__root} data-figma="DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)" data-node="1647:24531" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
+      <div data-figma="scene (방 미리보기)" data-node="1647:24532" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.5734883546829224,0.24865606427192688]],\"op\":1,\"flip\":\"\"}"} className="w-[426px] h-[438px] absolute left-[-18px] top-[0px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -189.91px / 100% 174.371% no-repeat"
+    }} />
+      <div data-figma="scene fade" data-node="1647:24533" className="w-[390px] h-[140px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_#121415_100%)] absolute left-[0px] top-[300px]" />
+      <div data-figma="Rectangle 1954141373" data-node="1647:24534" className="w-[390px] h-[125px] [background:linear-gradient(180deg,_#000_0%,_rgba(0,_0,_0,_0.00)_100%)] absolute left-[0px] top-[0px]" />
+      <p data-figma="부드러운 리클라이너21" data-node="1647:24535" data-outline="" className="[color:rgba(248,_248,_248,_0.50)] [text-shadow:0_0_4px_rgba(0,_0,_0,_0.50)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:14px] [letter-spacing:-0.44px] absolute left-[10px] top-[128px] w-[95px] h-[14px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.004px] left-[0px]">{"부드러운 리클라이너21"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1647:24535"]
+      }} /></p>
+      <p data-figma="아기자기 나무스툴12" data-node="1647:24536" data-outline="" className="[color:rgba(248,_248,_248,_0.50)] [text-shadow:0_0_4px_rgba(0,_0,_0,_0.50)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:14px] [letter-spacing:-0.44px] absolute left-[208px] top-[168px] w-[86px] h-[14px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.004px] left-[0px]">{"아기자기 나무스툴12"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1647:24536"]
+      }} /></p>
+      <p data-figma="새로 산 가죽소파19" data-node="1647:24537" data-outline="" className="[color:rgba(248,_248,_248,_0.50)] [text-shadow:0_0_4px_rgba(0,_0,_0,_0.50)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:14px] [letter-spacing:-0.44px] absolute left-[296px] top-[154px] w-[79px] h-[14px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.004px] left-[0px]">{"새로 산 가죽소파19"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1647:24537"]
+      }} /></p>
+      <p data-figma="새벽2시 택배상자" data-node="1647:24538" data-outline="" className="[color:#F8F8F8] [text-shadow:0_0_4px_rgba(0,_0,_0,_0.25)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:15px] [letter-spacing:-0.48px] absolute left-[115px] top-[161px] w-[80px] h-[15px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[0.132px] left-[0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1647:24538"]
+      }} /></p>
+      <div data-figma="Group 2147229021" data-node="1647:24539" className="w-[31px] h-[20px] absolute left-[136px] top-[125px]">
+        <div data-figma="voice wave" data-node="1647:24540" className="w-[3px] h-[8px] [border-radius:2px] [background:#2EE59D] absolute left-[0px] top-[6px]" />
+        <div data-figma="voice wave" data-node="1647:24541" className="w-[3px] h-[14px] [border-radius:2px] [background:#2EE59D] absolute left-[7px] top-[3px]" />
+        <div data-figma="voice wave" data-node="1647:24542" className="w-[3px] h-[20px] [border-radius:2px] [background:#2EE59D] absolute left-[14px] top-[0px]" />
+        <div data-figma="voice wave" data-node="1647:24543" className="w-[3px] h-[14px] [border-radius:2px] [background:#2EE59D] absolute left-[21px] top-[3px]" />
+        <div data-figma="voice wave" data-node="1647:24544" className="w-[3px] h-[8px] [border-radius:2px] [background:#2EE59D] absolute left-[28px] top-[6px]" />
+      </div>
+      <Icon data-figma="chevron-left" data-node="1647:24555" name="chevron-left-1620-23175" color="#FFFFFF" className="w-[24px] h-[24px] absolute left-[24px] top-[79px]" />
+      <div data-figma="고민" data-node="1647:24556" className="flex w-[342px] [flex-direction:column] [align-items:flex-start] gap-[12px] absolute left-[24px] top-[321px] h-[171px] overflow-hidden">
+        <p data-figma="둘이 찍은 사진인데 지만 보정해서 올린 여우" data-node="1647:24557" data-outline="" className="[color:#F8F8F8] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:21px] [font-style:normal] [font-weight:700] [line-height:28px] shrink-0 w-[208px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"둘이 찍은 사진인데\n지만 보정해서 올린 여우"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1647:24557"]
+        }} /></p>
+        <div data-figma="대화 중인 의자" data-node="1647:24558" className="flex w-[342px] [flex-direction:column] [align-items:flex-start] gap-[12px] shrink-0 overflow-hidden">
+          <div data-figma="Header" data-node="1647:24559" className="flex [align-items:center] gap-[6px] shrink-0 overflow-hidden">
+            <div data-figma="Frame" data-node="1647:24560" className="w-[18px] h-[18px] shrink-0 relative overflow-hidden">
+              <span data-figma="Vector" data-node="1647:24561" className="w-[2px] h-[4px] absolute left-[1px] top-[7px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24561"]
+            }} />
+              <span data-figma="Vector" data-node="1647:24562" className="w-[2px] h-[10px] absolute left-[5px] top-[4px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24562"]
+            }} />
+              <span data-figma="Vector" data-node="1647:24563" className="w-[2px] h-[16px] absolute left-[9px] top-[1px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24563"]
+            }} />
+              <span data-figma="Vector" data-node="1647:24564" className="w-[2px] h-[10px] absolute left-[13px] top-[4px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24564"]
+            }} />
+            </div>
+            <p data-figma="대화 중 4" data-node="1647:24565" data-outline="" className="[color:#F8F8F8] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:14px] [font-style:normal] [font-weight:700] [line-height:17px] shrink-0 w-[54px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"대화 중 4"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24565"]
+            }} /></p>
+          </div>
+          <div data-figma="Seats" data-node="1647:24566" className="flex [align-items:flex-start] gap-[14px] shrink-0 overflow-hidden">
+            <div data-figma="Seat / 새벽2시 택배상자" data-node="1647:24567" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
+              <img data-figma="avatar" data-node="1647:24568" data-px="" data-hires="" alt="" src="./assets/raster/1647-24568.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <p data-figma="새벽2시 택배상자" data-node="1647:24569" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#36D2FF] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"새벽2시 택배상자"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["1647:24569"]
+              }} /></p>
+            </div>
+            <div data-figma="Seat / 나무스툴12" data-node="1647:24570" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
+              <img data-figma="avatar" data-node="1647:24571" data-px="" data-hires="" alt="" src="./assets/raster/1647-24571.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <p data-figma="나무스툴12" data-node="1647:24572" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#9AA1A6] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"나무스툴12"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["1647:24572"]
+              }} /></p>
+            </div>
+            <div data-figma="Seat / 가죽소파19" data-node="1647:24573" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
+              <img data-figma="avatar" data-node="1647:24574" data-px="" data-hires="" alt="" src="./assets/raster/1647-24574.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <p data-figma="가죽소파19" data-node="1647:24575" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#9AA1A6] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"가죽소파19"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["1647:24575"]
+              }} /></p>
+            </div>
+            <div data-figma="Seat / 리클라이너21" data-node="1647:24576" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
+              <img data-figma="avatar" data-node="1647:24577" data-px="" data-hires="" alt="" src="./assets/raster/1647-24577.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <p data-figma="리클라이너21" data-node="1647:24578" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#9AA1A6] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"리클라이너21"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["1647:24578"]
+              }} /></p>
+            </div>
+            <div data-figma="Seat / 빈 자리 · 앉기 (참여)" data-node="1647:24579" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
+              <div data-figma="empty seat" data-node="1647:24580" className="flex w-[54px] h-[54px] [padding:16px] [justify-content:center] [align-items:center] [border-radius:27px] shrink-0 relative overflow-hidden [isolation:isolate]">
+                <span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [z-index:-1] [line-height:0]" dangerouslySetInnerHTML={{
+                __html: "<svg data-px=\"\" data-box=\"\" width=\"54\" height=\"54\" viewBox=\"0 0 54 54\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"54\" height=\"54\" rx=\"27\" style=\"fill:#06303C\"/><defs><clipPath id=\"c1647_24580\"><rect width=\"54\" height=\"54\" rx=\"27\"/></clipPath></defs><g clip-path=\"url(#c1647_24580)\"><path d=\"M27 54 L27 53.25 C26.3391 53.25 25.684 53.2256 25.0355 53.1776 L24.9802 53.9256 L24.9249 54.6735 C25.6101 54.7242 26.3021 54.75 27 54.75 L27 54 Z M21.978 53.5338 L22.1166 52.7967 C20.8171 52.5523 19.5514 52.2121 18.3271 51.7837 L18.0794 52.4916 L17.8317 53.1995 C19.1265 53.6526 20.4651 54.0124 21.8393 54.2709 L21.978 53.5338 Z M15.2828 51.3319 L15.6087 50.6564 C14.4245 50.0851 13.2896 49.4274 12.2123 48.6915 L11.7892 49.3108 L11.3662 49.9301 C12.5049 50.708 13.7047 51.4033 14.9569 52.0074 L15.2828 51.3319 Z M9.38806 47.4657 L9.87753 46.8974 C8.88513 46.0426 7.95737 45.1149 7.10258 44.1225 L6.53431 44.6119 L5.96605 45.1014 C6.86939 46.1502 7.84983 47.1306 8.89859 48.034 L9.38806 47.4657 Z M4.68917 42.2108 L5.30848 41.7877 C4.57257 40.7104 3.9149 39.5755 3.34359 38.3913 L2.66809 38.7172 L1.99259 39.0431 C2.59669 40.2953 3.29201 41.4951 4.06987 42.6338 L4.68917 42.2108 Z M1.50843 35.9206 L2.21634 35.6729 C1.78795 34.4486 1.44772 33.1829 1.20326 31.8834 L0.466187 32.022 L-0.270886 32.1607 C-0.012382 33.5349 0.347436 34.8735 0.800518 36.1683 L1.50843 35.9206 Z M0.0744078 29.0198 L0.822365 28.9645 C0.774412 28.316 0.75 27.6609 0.75 27 L0 27 L-0.75 27 C-0.75 27.6979 -0.724223 28.3899 -0.67355 29.0751 L0.0744078 29.0198 Z M0 27 L0.75 27 C0.75 26.3391 0.774412 25.684 0.822365 25.0355 L0.0744078 24.9802 L-0.67355 24.9249 C-0.724223 25.6101 -0.75 26.3021 -0.75 27 L0 27 Z M0.466186 21.978 L1.20326 22.1166 C1.44772 20.8171 1.78795 19.5514 2.21634 18.3271 L1.50843 18.0794 L0.800516 17.8317 C0.347435 19.1265 -0.0123826 20.4651 -0.270887 21.8393 L0.466186 21.978 Z M2.66809 15.2828 L3.34358 15.6087 C3.91489 14.4245 4.57257 13.2896 5.30848 12.2123 L4.68917 11.7892 L4.06987 11.3662 C3.292 12.5049 2.59669 13.7047 1.99259 14.9569 L2.66809 15.2828 Z M6.53431 9.38806 L7.10257 9.87753 C7.95736 8.88513 8.88513 7.95737 9.87752 7.10258 L9.38805 6.53431 L8.89859 5.96605 C7.84983 6.86939 6.86939 7.84983 5.96605 8.89859 L6.53431 9.38806 Z M11.7892 4.68917 L12.2123 5.30848 C13.2896 4.57257 14.4245 3.9149 15.6087 3.34359 L15.2828 2.66809 L14.9569 1.99259 C13.7047 2.59669 12.5049 3.29201 11.3662 4.06987 L11.7892 4.68917 Z M18.0794 1.50843 L18.3271 2.21634 C19.5514 1.78795 20.8171 1.44772 22.1166 1.20326 L21.978 0.466187 L21.8393 -0.270886 C20.4651 -0.012382 19.1265 0.347436 17.8317 0.800518 L18.0794 1.50843 Z M24.9802 0.0744078 L25.0355 0.822365 C25.684 0.774412 26.3391 0.75 27 0.75 L27 0 L27 -0.75 C26.3021 -0.75 25.6101 -0.724223 24.9249 -0.67355 L24.9802 0.0744078 Z M27 0 L27 0.75 C27.6609 0.75 28.316 0.774412 28.9645 0.822365 L29.0198 0.0744078 L29.0751 -0.67355 C28.3899 -0.724223 27.6979 -0.75 27 -0.75 L27 0 Z M32.022 0.466186 L31.8834 1.20326 C33.1829 1.44772 34.4486 1.78795 35.6729 2.21634 L35.9206 1.50843 L36.1683 0.800516 C34.8735 0.347435 33.5349 -0.0123826 32.1607 -0.270887 L32.022 0.466186 Z M38.7172 2.66809 L38.3913 3.34358 C39.5755 3.91489 40.7104 4.57257 41.7877 5.30848 L42.2108 4.68917 L42.6338 4.06987 C41.4951 3.292 40.2953 2.59669 39.0431 1.99259 L38.7172 2.66809 Z M44.6119 6.53431 L44.1225 7.10257 C45.1149 7.95736 46.0426 8.88513 46.8974 9.87752 L47.4657 9.38805 L48.0339 8.89859 C47.1306 7.84983 46.1502 6.86939 45.1014 5.96605 L44.6119 6.53431 Z M49.3108 11.7892 L48.6915 12.2123 C49.4274 13.2896 50.0851 14.4245 50.6564 15.6087 L51.3319 15.2828 L52.0074 14.9569 C51.4033 13.7047 50.708 12.5049 49.9301 11.3662 L49.3108 11.7892 Z M52.4916 18.0794 L51.7837 18.3271 C52.212 19.5514 52.5523 20.8171 52.7967 22.1166 L53.5338 21.978 L54.2709 21.8393 C54.0124 20.4651 53.6526 19.1265 53.1995 17.8317 L52.4916 18.0794 Z M53.9256 24.9802 L53.1776 25.0355 C53.2256 25.684 53.25 26.3391 53.25 27 L54 27 L54.75 27 C54.75 26.3021 54.7242 25.6101 54.6735 24.9249 L53.9256 24.9802 Z M54 27 L53.25 27 C53.25 27.6609 53.2256 28.316 53.1776 28.9645 L53.9256 29.0198 L54.6735 29.0751 C54.7242 28.3899 54.75 27.6979 54.75 27 L54 27 Z M53.5338 32.022 L52.7967 31.8834 C52.5523 33.1829 52.2121 34.4486 51.7837 35.6729 L52.4916 35.9206 L53.1995 36.1683 C53.6526 34.8735 54.0124 33.5349 54.2709 32.1607 L53.5338 32.022 Z M51.3319 38.7172 L50.6564 38.3913 C50.0851 39.5755 49.4274 40.7104 48.6915 41.7877 L49.3108 42.2108 L49.9301 42.6338 C50.708 41.4951 51.4033 40.2953 52.0074 39.0431 L51.3319 38.7172 Z M47.4657 44.6119 L46.8974 44.1225 C46.0426 45.1149 45.1149 46.0426 44.1225 46.8974 L44.6119 47.4657 L45.1014 48.0339 C46.1502 47.1306 47.1306 46.1502 48.034 45.1014 L47.4657 44.6119 Z M42.2108 49.3108 L41.7877 48.6915 C40.7104 49.4274 39.5755 50.0851 38.3913 50.6564 L38.7172 51.3319 L39.0431 52.0074 C40.2953 51.4033 41.4951 50.708 42.6338 49.9301 L42.2108 49.3108 Z M35.9206 52.4916 L35.6729 51.7837 C34.4486 52.212 33.1829 52.5523 31.8834 52.7967 L32.022 53.5338 L32.1607 54.2709 C33.5349 54.0124 34.8735 53.6526 36.1683 53.1995 L35.9206 52.4916 Z M29.0198 53.9256 L28.9645 53.1776 C28.316 53.2256 27.6609 53.25 27 53.25 L27 54 L27 54.75 C27.6979 54.75 28.3899 54.7242 29.0751 54.6735 L29.0198 53.9256 Z M27 54 L27 52.5 C26.3575 52.5 25.7209 52.4763 25.0908 52.4297 L24.9802 53.9256 L24.8696 55.4215 C25.5732 55.4735 26.2836 55.5 27 55.5 L27 54 Z M21.978 53.5338 L22.2553 52.0597 C20.993 51.8222 19.7638 51.4918 18.5748 51.0757 L18.0794 52.4916 L17.584 53.9074 C18.9141 54.3728 20.2891 54.7424 21.7007 55.008 L21.978 53.5338 Z M15.2828 51.3319 L15.9346 49.9809 C14.7843 49.426 13.6819 48.7872 12.6353 48.0722 L11.7892 49.3108 L10.9432 50.5494 C12.1126 51.3483 13.3448 52.0624 14.631 52.6829 L15.2828 51.3319 Z M9.38806 47.4657 L10.367 46.3292 C9.40278 45.4986 8.50135 44.5972 7.67084 43.633 L6.53431 44.6119 L5.39779 45.5909 C6.3254 46.6678 7.33218 47.6746 8.40912 48.6022 L9.38806 47.4657 Z M4.68917 42.2108 L5.92778 41.3647 C5.21285 40.3181 4.574 39.2157 4.01908 38.0654 L2.66809 38.7172 L1.31709 39.369 C1.93759 40.6552 2.65173 41.8874 3.45056 43.0569 L4.68917 42.2108 Z M1.50843 35.9206 L2.92425 35.4252 C2.50821 34.2362 2.17777 33.007 1.94033 31.7447 L0.466187 32.022 L-1.00796 32.2993 C-0.742432 33.7109 -0.372822 35.0859 0.0926062 36.416 L1.50843 35.9206 Z M0.0744078 29.0198 L1.57032 28.9092 C1.52373 28.2791 1.5 27.6425 1.5 27 L0 27 L-1.5 27 C-1.5 27.7164 -1.47354 28.4268 -1.42151 29.1304 L0.0744078 29.0198 Z M0 27 L1.5 27 C1.5 26.3575 1.52373 25.7209 1.57032 25.0908 L0.0744078 24.9802 L-1.42151 24.8696 C-1.47354 25.5732 -1.5 26.2836 -1.5 27 L0 27 Z M0.466186 21.978 L1.94033 22.2553 C2.17777 20.993 2.50821 19.7638 2.92425 18.5748 L1.50843 18.0794 L0.0926043 17.584 C-0.372823 18.9141 -0.742433 20.2891 -1.00796 21.7007 L0.466186 21.978 Z M2.66809 15.2828 L4.01908 15.9346 C4.57399 14.7843 5.21285 13.6819 5.92778 12.6353 L4.68917 11.7892 L3.45056 10.9432 C2.65172 12.1126 1.93759 13.3448 1.31709 14.631 L2.66809 15.2828 Z M6.53431 9.38806 L7.67083 10.367 C8.50135 9.40278 9.40278 8.50135 10.367 7.67084 L9.38805 6.53431 L8.40912 5.39779 C7.33218 6.3254 6.3254 7.33218 5.39779 8.40912 L6.53431 9.38806 Z M11.7892 4.68917 L12.6353 5.92778 C13.6819 5.21285 14.7843 4.574 15.9346 4.01908 L15.2828 2.66809 L14.631 1.31709 C13.3448 1.93759 12.1126 2.65173 10.9432 3.45056 L11.7892 4.68917 Z M18.0794 1.50843 L18.5748 2.92425 C19.7638 2.50821 20.993 2.17777 22.2553 1.94033 L21.978 0.466187 L21.7007 -1.00796 C20.2891 -0.742432 18.9141 -0.372822 17.584 0.0926062 L18.0794 1.50843 Z M24.9802 0.0744078 L25.0908 1.57032 C25.7209 1.52373 26.3575 1.5 27 1.5 L27 0 L27 -1.5 C26.2836 -1.5 25.5732 -1.47354 24.8696 -1.42151 L24.9802 0.0744078 Z M27 0 L27 1.5 C27.6425 1.5 28.2791 1.52373 28.9092 1.57032 L29.0198 0.0744078 L29.1304 -1.42151 C28.4268 -1.47354 27.7164 -1.5 27 -1.5 L27 0 Z M32.022 0.466186 L31.7447 1.94033 C33.007 2.17777 34.2362 2.50821 35.4252 2.92425 L35.9206 1.50843 L36.416 0.0926043 C35.0859 -0.372823 33.7109 -0.742433 32.2993 -1.00796 L32.022 0.466186 Z M38.7172 2.66809 L38.0654 4.01908 C39.2157 4.57399 40.3181 5.21285 41.3647 5.92778 L42.2108 4.68917 L43.0568 3.45056 C41.8874 2.65172 40.6552 1.93759 39.369 1.31709 L38.7172 2.66809 Z M44.6119 6.53431 L43.633 7.67083 C44.5972 8.50135 45.4986 9.40278 46.3292 10.367 L47.4657 9.38805 L48.6022 8.40912 C47.6746 7.33218 46.6678 6.3254 45.5909 5.39779 L44.6119 6.53431 Z M49.3108 11.7892 L48.0722 12.6353 C48.7871 13.6819 49.426 14.7843 49.9809 15.9346 L51.3319 15.2828 L52.6829 14.631 C52.0624 13.3448 51.3483 12.1126 50.5494 10.9432 L49.3108 11.7892 Z M52.4916 18.0794 L51.0757 18.5748 C51.4918 19.7638 51.8222 20.993 52.0597 22.2553 L53.5338 21.978 L55.008 21.7007 C54.7424 20.2891 54.3728 18.9141 53.9074 17.584 L52.4916 18.0794 Z M53.9256 24.9802 L52.4297 25.0908 C52.4763 25.7209 52.5 26.3575 52.5 27 L54 27 L55.5 27 C55.5 26.2836 55.4735 25.5732 55.4215 24.8696 L53.9256 24.9802 Z M54 27 L52.5 27 C52.5 27.6425 52.4763 28.2791 52.4297 28.9092 L53.9256 29.0198 L55.4215 29.1304 C55.4735 28.4268 55.5 27.7164 55.5 27 L54 27 Z M53.5338 32.022 L52.0597 31.7447 C51.8222 33.007 51.4918 34.2362 51.0757 35.4252 L52.4916 35.9206 L53.9074 36.416 C54.3728 35.0859 54.7424 33.7109 55.008 32.2993 L53.5338 32.022 Z M51.3319 38.7172 L49.9809 38.0654 C49.426 39.2157 48.7872 40.3181 48.0722 41.3647 L49.3108 42.2108 L50.5494 43.0568 C51.3483 41.8874 52.0624 40.6552 52.6829 39.369 L51.3319 38.7172 Z M47.4657 44.6119 L46.3292 43.633 C45.4986 44.5972 44.5972 45.4986 43.633 46.3292 L44.6119 47.4657 L45.5909 48.6022 C46.6678 47.6746 47.6746 46.6678 48.6022 45.5909 L47.4657 44.6119 Z M42.2108 49.3108 L41.3647 48.0722 C40.3181 48.7871 39.2157 49.426 38.0654 49.9809 L38.7172 51.3319 L39.369 52.6829 C40.6552 52.0624 41.8874 51.3483 43.0569 50.5494 L42.2108 49.3108 Z M35.9206 52.4916 L35.4252 51.0757 C34.2362 51.4918 33.007 51.8222 31.7447 52.0597 L32.022 53.5338 L32.2993 55.008 C33.7109 54.7424 35.0859 54.3728 36.416 53.9074 L35.9206 52.4916 Z M29.0198 53.9256 L28.9092 52.4297 C28.2791 52.4763 27.6425 52.5 27 52.5 L27 54 L27 55.5 C27.7164 55.5 28.4268 55.4735 29.1304 55.4215 L29.0198 53.9256 Z\" fill-rule=\"nonzero\" style=\"fill:#36D2FF\"/></g></svg>"
+              }} />
+                <div data-figma="Frame" data-node="1647:24581" className="w-[22px] h-[22px] shrink-0 absolute left-[16px] top-[16px] overflow-hidden">
+                  <span data-figma="Vector" data-node="1647:24582" className="w-[12.83px] h-[12.83px] absolute left-[4.58px] top-[4.58px] [line-height:0]" dangerouslySetInnerHTML={{
+                  __html: svg["1647:24582"]
+                }} />
+                </div>
+              </div>
+              <p data-figma="앉기" data-node="1647:24583" data-outline="" className="[color:#36D2FF] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:13px] shrink-0 w-[21px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"앉기"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["1647:24583"]
+              }} /></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-figma="Rectangle" data-node="1647:24584" className="w-[92px] h-[1px] [background:#222628] absolute left-[0px] top-[519px]" />
+      <div data-figma="Rectangle" data-node="1647:24585" className="w-[92px] h-[1px] [background:#222628] absolute left-[298px] top-[519px]" />
+      <div data-figma="댓글 (라이브 채팅)" data-node="1647:24586" className="flex w-[342px] [flex-direction:column] [align-items:flex-start] gap-[8px] absolute left-[24px] top-[540px] h-[150px] overflow-hidden">
+        <div data-figma="댓글 · 구경하는 스툴3" data-node="1647:24587" className="flex [flex-direction:column] [align-items:flex-start] gap-[4px] shrink-0 overflow-hidden">
+          <p data-figma="구경하는 스툴3" data-node="1647:24588" data-outline="" className="[color:#6E767C] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.22px] shrink-0 w-[66px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.496px] left-[0px]">{"구경하는 스툴3"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1647:24588"]
+          }} /></p>
+          <div data-figma="bubble" data-node="1647:24589" className="flex [padding:7px_12px] [align-items:flex-start] [border-radius:14px] [background:#222628] shrink-0 overflow-hidden">
+            <p data-figma="택배상자님 목소리 너무 차분해서 더 슬픔" data-node="1647:24590" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:18px] [letter-spacing:-0.26px] shrink-0 w-[203px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.268px] left-[0px]">{"택배상자님 목소리 너무 차분해서 더 슬픔"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24590"]
+            }} /></p>
+          </div>
+        </div>
+        <div data-figma="댓글 · 폭신한 방석20" data-node="1647:24591" className="flex [flex-direction:column] [align-items:flex-start] gap-[4px] shrink-0 overflow-hidden">
+          <p data-figma="폭신한 방석20" data-node="1647:24592" data-outline="" className="[color:#6E767C] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.22px] shrink-0 w-[63px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.496px] left-[0px]">{"폭신한 방석20"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1647:24592"]
+          }} /></p>
+          <div data-figma="bubble" data-node="1647:24593" className="flex [padding:7px_12px] [align-items:flex-start] [border-radius:14px] [background:#222628] shrink-0 overflow-hidden">
+            <p data-figma="그 친구 원래 그런 스타일이야?" data-node="1647:24594" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:18px] [letter-spacing:-0.26px] shrink-0 w-[152px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.268px] left-[0px]">{"그 친구 원래 그런 스타일이야?"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24594"]
+            }} /></p>
+          </div>
+        </div>
+        <div data-figma="내 댓글" data-node="1647:24595" className="flex [justify-content:flex-end] [align-items:flex-start] [align-self:stretch] shrink-0 overflow-hidden">
+          <div data-figma="bubble" data-node="1647:24596" className="flex [padding:7px_12px] [align-items:flex-start] [border-radius:14px] [background:#36D2FF] shrink-0 overflow-hidden">
+            <p data-figma="택배상자님 힘내요!!" data-node="1647:24597" data-outline="" className="[color:#000] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:18px] shrink-0 w-[103px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.268px] left-[0px]">{"택배상자님 힘내요!!"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1647:24597"]
+            }} /></p>
+          </div>
+        </div>
+      </div>
+      <p data-figma="댓글은 이야기 중인 의자들에게도 보여요" data-node="1647:24598" data-outline="" className="[color:#6E767C] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:400] [line-height:16px] [letter-spacing:-0.22px] absolute left-[105px] top-[512px] w-[170px] h-[16px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.004px] left-[0px]">{"댓글은 이야기 중인 의자들에게도 보여요"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1647:24598"]
+      }} /></p>
+      <div data-figma="보는 중" data-node="1647:24613" className="inline-flex [padding:5px_10px_5px_9px] [align-items:center] gap-[4px] [border-radius:999px] [background:rgba(0,_0,_0,_0.70)] absolute left-[313px] top-[78px] w-[53px] h-[27px] overflow-hidden">
+        <Icon data-figma="view" data-node="1703:10264" name="view-1620-23054" color="var(--icon-foreground, #F8F8F8)" className="w-[16px] h-[16px] shrink-0 relative" />
+        <p data-figma="22" data-node="1647:24617" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.24px] shrink-0 w-[14px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.132px] left-[0px]">{"22"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1647:24617"]
+        }} /></p>
+      </div>
+      <div data-figma="Timer Badge" data-node="1647:24618" data-instance-of="Timer Badge · 20분 기준" className="inline-flex [padding:3.75px_8.75px_3.75px_7.5px] [align-items:center] gap-[3.75px] [border-radius:1248.75px] absolute left-[159px] top-[78px] w-[71.25px] h-[25.5px] [isolation:isolate]">
+        <span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [z-index:-1] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: "<svg data-px=\"\" data-box=\"\" width=\"71.25\" height=\"25.5\" viewBox=\"0 0 71.25 25.5\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"71.25\" height=\"25.5\" rx=\"12.75\" style=\"fill:#000000BF\"/></svg>"
+      }} />
+        <div data-figma="timer" data-node="I1647:24618;1126:2252" className="w-[16.25px] h-[16.25px] shrink-0 relative overflow-hidden">
+          <span data-figma="Vector" data-node="I1647:24618;1126:2253" className="w-[14.22px] h-[14.22px] absolute left-[1.02px] top-[1.01px] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["I1647:24618;1126:2253"]
+        }} />
+          <span data-figma="Vector" data-node="I1647:24618;1126:2254" className="w-[5.41px] h-[8.6px] absolute left-[8.13px] top-[2.7px] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["I1647:24618;1126:2254"]
+        }} />
+        </div>
+        <p data-figma="time" data-node="I1647:24618;1126:2255" data-outline="" className="[color:#36D2FF] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13.75px] [font-style:normal] [font-weight:700] [line-height:18px] shrink-0 w-[35px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[-0.005px] left-[0px]">{"06:12"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["I1647:24618;1126:2255"]
+        }} /></p>
+      </div>
+      <div data-figma="input" data-node="1674:30186" data-instance-of="input" className="inline-flex [align-items:center] gap-[8px] absolute left-[24px] top-[754px] w-[342px] h-[66px]">
+        <div data-figma="댓글" data-node="I1674:30186;1671:44192" className="flex w-[230px] [padding:8px_8px_8px_20px] [align-items:center] gap-[8px] [border-radius:32px] [border:1px_solid_transparent] shrink-0 overflow-hidden relative [isolation:isolate]">
+          <span aria-hidden="true" className="absolute left-[-1px] top-[-1px] w-[0] h-[0] overflow-visible [z-index:-1] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: "<svg data-px=\"\" data-box=\"\" width=\"230\" height=\"66\" viewBox=\"0 0 230 66\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"230\" height=\"66\" rx=\"32\" style=\"fill:#222628\"/><defs><clipPath id=\"cI1674_30186_1671_44192\"><rect width=\"230\" height=\"66\" rx=\"32\"/></clipPath></defs><g clip-path=\"url(#cI1674_30186_1671_44192)\"><path d=\"M32 0 L32 1 L198 1 L198 0 L198 -1 L32 -1 L32 0 Z M230 32 L229 32 L229 34 L230 34 L231 34 L231 32 L230 32 Z M198 66 L198 65 L32 65 L32 66 L32 67 L198 67 L198 66 Z M0 34 L1 34 L1 32 L0 32 L-1 32 L-1 34 L0 34 Z M32 66 L32 65 C14.8792 65 1 51.1208 1 34 L0 34 L-1 34 C-1 52.2254 13.7746 67 32 67 L32 66 Z M230 34 L229 34 C229 51.1208 215.121 65 198 65 L198 66 L198 67 C216.225 67 231 52.2254 231 34 L230 34 Z M198 0 L198 1 C215.121 1 229 14.8792 229 32 L230 32 L231 32 C231 13.7746 216.225 -1 198 -1 L198 0 Z M32 0 L32 -1 C13.7746 -1 -1 13.7746 -1 32 L0 32 L1 32 C1 14.8792 14.8792 1 32 1 L32 0 Z\" fill-rule=\"nonzero\" style=\"fill:#222628\"/></g></svg>"
+        }} />
+          <div data-figma="채팅 입력" data-node="I1674:30186;1671:44193" className="flex h-[48px] [padding-right:16px] [align-items:center] [flex:1_0_0] [border-radius:24px] overflow-hidden">
+            <p data-figma="댓글 달기" data-node="I1674:30186;1671:44194" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:22px] [letter-spacing:-0.64px] shrink-0 w-[58px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.176px] left-[0px]">{"댓글 달기"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1674:30186;1671:44194"]
+            }} /></p>
+          </div>
+          <div data-figma="btn_전송" data-node="I1674:30186;1671:44268" data-instance-of="btn_전송" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] shrink-0 [border-radius:24px] [background:#36D2FF] overflow-hidden">
+            <Icon data-figma="arrow-right" data-node="I1674:30186;1671:44268;1620:43796" name="arrow-right-1620-23215" color="#000000" className="w-[24px] h-[24px] shrink-0 relative" />
+          </div>
+        </div>
+        <div data-figma="Frame 2147249247" data-node="I1674:30186;1671:44219" className="flex [align-items:center] gap-[8px] shrink-0">
+          <div data-figma="btn_드르륵 칵" data-node="I1674:30186;1671:44213" data-instance-of="btn_드르륵 칵" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:24px] [background:#36D2FF] shrink-0 overflow-hidden">
+            <Icon data-figma="thumb-up" data-node="I1674:30186;1671:44213;1620:43829" name="thumb-up-1620-23064" color="#000000" className="w-[24px] h-[24px] shrink-0 relative" />
+          </div>
+          <div data-figma="btn_드르륵 칵" data-node="I1674:30186;1671:44214" data-instance-of="btn_드르륵 칵" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:24px] [background:#06303C] shrink-0 overflow-hidden">
+            <Icon data-figma="thumb-down" data-node="I1674:30186;1671:44214;1620:43835" name="thumb-down-1620-23074" color="var(--icon-foreground, #F8F8F8)" className="w-[24px] h-[24px] shrink-0 relative" />
+          </div>
+        </div>
+      </div>
+      <div data-figma="Status Bar" data-node="1712:25286" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
+        <div data-figma="Group 3" data-node="I1712:25286;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
+          <div data-figma="Right Side" data-node="I1712:25286;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">
+            <div data-figma="Battery" data-node="I1712:25286;3035:450" className="w-[27.69px] h-[12.9px] absolute left-[49.38px] top-[0px]">
+              <span data-figma="Rectangle" data-node="I1712:25286;3035:451" className="w-[25.04px] h-[12.9px] absolute left-[0px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1712:25286;3035:451"]
+            }} />
+              <span data-figma="Combined Shape" data-node="I1712:25286;3035:452" className="w-[1.51px] h-[4.55px] absolute left-[26.18px] top-[4.18px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1712:25286;3035:452"]
+            }} />
+              <span data-figma="Rectangle" data-node="I1712:25286;3035:453" className="w-[20.49px] h-[8.35px] absolute left-[2.28px] top-[2.27px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1712:25286;3035:453"]
+            }} />
+            </div>
+            <span data-figma="Wifi" data-node="I1712:25286;3035:454" className="w-[17.39px] h-[12.48px] absolute left-[26.11px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1712:25286;3035:454"]
+          }} />
+            <span data-figma="Mobile Signal" data-node="I1712:25286;3035:455" className="w-[19.35px] h-[12.14px] absolute left-[0px] top-[0.38px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1712:25286;3035:455"]
+          }} />
+          </div>
+          <span data-figma="9:41" data-node="I1712:25286;3035:456" role="img" aria-label="9:41" className="w-[61.47px] h-[22.77px] absolute left-[0px] top-[0px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 shrink-0 [line-height:0] block" dangerouslySetInnerHTML={{
+          __html: svg["I1712:25286;3035:456"]
+        }} />
+        </div>
+      </div>
+    </div>;
+  return null;
+}
