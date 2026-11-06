@@ -12,8 +12,8 @@ export function DRRRK54({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)" data-node="1647:24531" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="scene (방 미리보기)" data-node="1647:24532" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.5734883546829224,0.24865606427192688]],\"op\":1,\"flip\":\"\"}"} className="w-[426px] h-[438px] absolute left-[-18px] top-[0px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -189.91px / 100% 174.371% no-repeat"
+      <div data-figma="scene (방 미리보기)" data-node="1647:24532" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.5734883546829224,0.24865606427192688]],\"op\":1,\"flip\":\"\"}"} className="w-[426px] h-[438px] absolute left-[-18px] top-[0px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 0px -189.91px / 100% 174.371% no-repeat"
     }} />
       <div data-figma="scene fade" data-node="1647:24533" className="w-[390px] h-[140px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_#121415_100%)] absolute left-[0px] top-[300px]" />
       <div data-figma="Rectangle 1954141373" data-node="1647:24534" className="w-[390px] h-[125px] [background:linear-gradient(180deg,_#000_0%,_rgba(0,_0,_0,_0.00)_100%)] absolute left-[0px] top-[0px]" />
@@ -63,25 +63,25 @@ export function DRRRK54({
           </div>
           <div data-figma="Seats" data-node="1647:24566" className="flex [align-items:flex-start] gap-[14px] shrink-0 overflow-hidden">
             <div data-figma="Seat / 새벽2시 택배상자" data-node="1647:24567" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
-              <img data-figma="avatar" data-node="1647:24568" data-px="" data-hires="" alt="" src="./assets/raster/1647-24568.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <img data-figma="avatar" data-node="1647:24568" data-px="" data-hires="" alt="" src="./assets/raster/1647-24568.webp" className="w-[54px] h-[54px] shrink-0 block" />
               <p data-figma="새벽2시 택배상자" data-node="1647:24569" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#36D2FF] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"새벽2시 택배상자"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
                 __html: svg["1647:24569"]
               }} /></p>
             </div>
             <div data-figma="Seat / 나무스툴12" data-node="1647:24570" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
-              <img data-figma="avatar" data-node="1647:24571" data-px="" data-hires="" alt="" src="./assets/raster/1647-24571.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <img data-figma="avatar" data-node="1647:24571" data-px="" data-hires="" alt="" src="./assets/raster/1647-24571.webp" className="w-[54px] h-[54px] shrink-0 block" />
               <p data-figma="나무스툴12" data-node="1647:24572" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#9AA1A6] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"나무스툴12"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
                 __html: svg["1647:24572"]
               }} /></p>
             </div>
             <div data-figma="Seat / 가죽소파19" data-node="1647:24573" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
-              <img data-figma="avatar" data-node="1647:24574" data-px="" data-hires="" alt="" src="./assets/raster/1647-24574.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <img data-figma="avatar" data-node="1647:24574" data-px="" data-hires="" alt="" src="./assets/raster/1647-24574.webp" className="w-[54px] h-[54px] shrink-0 block" />
               <p data-figma="가죽소파19" data-node="1647:24575" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#9AA1A6] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"가죽소파19"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
                 __html: svg["1647:24575"]
               }} /></p>
             </div>
             <div data-figma="Seat / 리클라이너21" data-node="1647:24576" className="flex [flex-direction:column] [align-items:center] gap-[6px] shrink-0 overflow-hidden">
-              <img data-figma="avatar" data-node="1647:24577" data-px="" data-hires="" alt="" src="./assets/raster/1647-24577.png" className="w-[54px] h-[54px] shrink-0 block" />
+              <img data-figma="avatar" data-node="1647:24577" data-px="" data-hires="" alt="" src="./assets/raster/1647-24577.webp" className="w-[54px] h-[54px] shrink-0 block" />
               <p data-figma="리클라이너21" data-node="1647:24578" data-outline="" className="w-[58px] h-[13px] overflow-hidden [color:#9AA1A6] [text-align:center] [text-overflow:ellipsis] [white-space:pre] [font-family:'Noto_Sans_KR',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:13px] shrink-0 [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative">{"리클라이너21"}<span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
                 __html: svg["1647:24578"]
               }} /></p>

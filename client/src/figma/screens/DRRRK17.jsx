@@ -168,7 +168,7 @@ export function DRRRK17({
       }} />
         <div data-figma="Frame 2147249132" data-node="1647:24111" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[47px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="1647:24112" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <img data-figma="image 1208091460" data-node="1647:24113" data-px="" data-hires="" alt="" src="./assets/raster/1647-24113.png" className="w-[65px] h-[65px] absolute left-[4px] top-[3px] block" />
+          <img data-figma="image 1208091460" data-node="1647:24113" data-px="" data-hires="" alt="" src="./assets/raster/1647-24113.webp" className="w-[65px] h-[65px] absolute left-[4px] top-[3px] block" />
         </div>
         <div data-figma="name" data-node="1647:24114" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[38px] top-[103px] w-[89px] h-[20px] overflow-hidden">
           <p data-figma="새벽2시 택배상자" data-node="1647:24115" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:14px] [letter-spacing:-0.44px] shrink-0 w-[73px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[-0.004px] left-[0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -225,8 +225,8 @@ export function DRRRK17({
       <div data-figma="참여자 타일 · 따뜻한 가죽소파29" data-node="1673:24738" className="w-[165px] h-[147px] [border-radius:16px] [background:#222628] absolute left-[201px] top-[180px] overflow-hidden">
         <div data-figma="Frame 2147249132" data-node="1673:24739" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[47px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="1673:24740" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091459" data-node="1673:24741" data-img={"{\"src\":\"./assets/images/2afba4df7405f0a64b74aa39916d87e4a16c5210.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[66px] h-[66px] [aspect-ratio:1/1] absolute left-[4px] top-[3px]" style={{
-          "background": "url(./assets/images/2afba4df7405f0a64b74aa39916d87e4a16c5210.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091459" data-node="1673:24741" data-img={"{\"src\":\"./assets/images/2afba4df7405f0a64b74aa39916d87e4a16c5210.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[66px] h-[66px] [aspect-ratio:1/1] absolute left-[4px] top-[3px]" style={{
+          "background": "url(./assets/images/2afba4df7405f0a64b74aa39916d87e4a16c5210.webp) 50% / cover no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="1673:24742" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[31px] top-[103px] w-[95px] h-[20px] overflow-hidden">
@@ -238,8 +238,8 @@ export function DRRRK17({
       <div data-figma="참여자 타일 · 딱딱한 나무 스툴12" data-node="1673:24744" className="w-[165px] h-[147px] [border-radius:16px] [background:#222628] absolute left-[24px] top-[341px] overflow-hidden">
         <div data-figma="Frame 2147249134" data-node="1673:24745" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[47px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="1673:24746" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091458" data-node="1673:24747" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+          <div data-figma="image 1208091458" data-node="1673:24747" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="1673:24748" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[22px] top-[103px] w-[112px] h-[20px] overflow-hidden">
@@ -262,8 +262,8 @@ export function DRRRK17({
       <div data-figma="참여자 타일 · 푹신푹신 리클라이너17" data-node="1673:24754" className="w-[165px] h-[147px] [border-radius:16px] [background:#222628] absolute left-[201px] top-[341px] overflow-hidden">
         <div data-figma="Frame 2147249135" data-node="1673:24755" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[47px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="1673:24756" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091458" data-node="1673:24757" data-img={"{\"src\":\"./assets/images/b5c25c4caef8e3119474b09c31d38f8143882196.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
-          "background": "url(./assets/images/b5c25c4caef8e3119474b09c31d38f8143882196.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091458" data-node="1673:24757" data-img={"{\"src\":\"./assets/images/b5c25c4caef8e3119474b09c31d38f8143882196.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
+          "background": "url(./assets/images/b5c25c4caef8e3119474b09c31d38f8143882196.webp) 50% / cover no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="1673:24758" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[21px] top-[103px] w-[114px] h-[20px] overflow-hidden">

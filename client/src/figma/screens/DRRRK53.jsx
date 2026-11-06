@@ -12,8 +12,8 @@ export function DRRRK53({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 온보딩 · 혼자 드르륵 5" data-node="1647:22976" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Rectangle 1954141366" data-node="1647:22977" className="absolute w-[390px] h-[761px] left-[0px] top-[0px] block overflow-visible"><img data-px="" data-hires="" alt="" src="./assets/raster/1647-22977.png" className="absolute left-[0px] top-[0px] w-[390px] h-[762px] block [max-width:none]" /></div>
-      <img data-figma="image 1208091455" data-node="1647:22978" data-px="" data-hires="" alt="" src="./assets/raster/1647-22978.png" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
+      <div data-figma="Rectangle 1954141366" data-node="1647:22977" className="absolute w-[390px] h-[761px] left-[0px] top-[0px] block overflow-visible"><img data-px="" data-hires="" alt="" src="./assets/raster/1647-22977.webp" className="absolute left-[0px] top-[0px] w-[390px] h-[762px] block [max-width:none]" /></div>
+      <img data-figma="image 1208091455" data-node="1647:22978" data-px="" data-hires="" alt="" src="./assets/raster/1647-22978.webp" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
       <div data-figma="bottom_navigation" data-node="1620:43258" data-instance-of="bottom_navigation" className="w-[390px] h-[84px] [background:#121415] absolute left-[0px] top-[760px]">
         <div data-figma="top line" data-node="I1620:43258;1647:27183" className="w-[392px] h-[1px] [background:#222628] absolute left-[0px] top-[0px]" />
         <div data-figma="tab/홈" data-node="I1620:43258;1647:27184" className="flex w-[56px] h-[52px] [flex-direction:column] [justify-content:center] [align-items:center] gap-[4px] absolute left-[20px] top-[12px] overflow-hidden">
@@ -100,7 +100,7 @@ export function DRRRK53({
         }} />
         </div>
       </div>
-      <img data-figma="Rectangle 1954141366" data-node="1647:22991" data-px="" data-hires="" alt="" src="./assets/raster/1647-22991.png" className="w-[168px] h-[192px] absolute left-[193px] top-[305px] block" />
+      <img data-figma="Rectangle 1954141366" data-node="1647:22991" data-px="" data-hires="" alt="" src="./assets/raster/1647-22991.webp" className="w-[168px] h-[192px] absolute left-[193px] top-[305px] block" />
       <div data-figma="Group 2147229002" data-node="1647:22992" className="w-[90.13px] h-[34px] [aspect-ratio:90.13/34.00] absolute left-[24px] top-[64px]">
         <span data-figma="Vector" data-node="1647:22993" className="w-[30.55px] h-[31.51px] absolute left-[0px] top-[2.49px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:22993"]
@@ -127,7 +127,7 @@ export function DRRRK53({
         }} /></p>
       </div>
       <div data-figma="Group 2147229009" data-node="1647:23001" className="w-[27px] h-[28px] absolute left-[339px] top-[67px]">
-        <img data-figma="bell" data-node="1647:23002" data-px="" data-hires="" alt="" src="./assets/raster/1647-23002.png" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
+        <img data-figma="bell" data-node="1647:23002" data-px="" data-hires="" alt="" src="./assets/raster/1647-23002.webp" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
         <span data-figma="badge" data-node="1647:23003" className="w-[8px] h-[8px] absolute left-[19px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:23003"]
       }} />
@@ -137,8 +137,8 @@ export function DRRRK53({
         <div data-figma="Visual" data-node="1647:23006" className="w-[326px] h-[220px] [background:#36D2FF] shrink-0 relative overflow-hidden">
           <div data-figma="흰 패널" data-node="1647:23007" className="w-[230px] h-[200px] [border-radius:18px] [background:#F8F8F8] [box-shadow:0_6px_16px_0_rgba(0,_0,_0,_0.12)] absolute left-[48px] top-[44px] overflow-hidden">
             <div data-figma="avatar / ai" data-node="1647:23008" className="flex w-[40px] h-[40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] absolute left-[16px] top-[18px] overflow-hidden">
-              <div data-figma="image" data-node="1647:23009" data-img={"{\"src\":\"./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
-              "background": "url(./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.png) 50% / cover no-repeat"
+              <div data-figma="image" data-node="1647:23009" data-img={"{\"src\":\"./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
+              "background": "url(./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.webp) 50% / cover no-repeat"
             }} />
             </div>
             <p data-figma="AI 드르륵 의자" data-node="1647:23010" data-outline="" className="[color:#121415] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:14px] absolute left-[64px] top-[31px] w-[65px] h-[14px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.004px] left-[0px]">{"AI 드르륵 의자"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{

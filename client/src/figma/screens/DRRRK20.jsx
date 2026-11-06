@@ -13,7 +13,7 @@ export function DRRRK20({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 현장 모드" data-node="1647:24954" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:24955" className="w-[390px] h-[844px] [opacity:0.35] [background:#000] absolute left-[0px] top-[0px]" />
-      <img data-figma="image 1208091463" data-node="1647:24956" data-px="" data-hires="" alt="" src="./assets/raster/1647-24956.jpg" className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block" />
+      <img data-figma="image 1208091463" data-node="1647:24956" data-px="" data-hires="" alt="" src="./assets/raster/1647-24956.webp" className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block" />
       <span data-figma="Ellipse" data-node="1647:24964" className="w-[7px] h-[7px] absolute left-[150px] top-[294px] [line-height:0]" dangerouslySetInnerHTML={{
       __html: svg["1647:24964"]
     }} />

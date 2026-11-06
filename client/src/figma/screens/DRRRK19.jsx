@@ -13,7 +13,7 @@ export function DRRRK19({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 현장 모드" data-node="1647:24874" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:24875" className="w-[390px] h-[844px] [opacity:0.35] [background:#000] absolute left-[0px] top-[0px]" />
-      <img data-figma="image 1208091463" data-node="1647:24876" data-px="" data-hires="" alt="" src="./assets/raster/1647-24876.jpg" className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block" />
+      <img data-figma="image 1208091463" data-node="1647:24876" data-px="" data-hires="" alt="" src="./assets/raster/1647-24876.webp" className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block" />
       <div data-figma="Status Bar" data-node="1712:25316" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25316;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
           <div data-figma="Right Side" data-node="I1712:25316;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">

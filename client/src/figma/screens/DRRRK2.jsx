@@ -54,8 +54,8 @@ export function DRRRK2({
       }} />
         <div data-figma="Frame 2147249133" data-node="I1647:23377;3053:3702" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="I1647:23377;3053:3703" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091459" data-node="I1647:23377;3053:3704" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+          <div data-figma="image 1208091459" data-node="I1647:23377;3053:3704" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="I1647:23377;3053:3705" className="inline-flex [padding:4px_8px] [align-items:center] gap-[5px] [border-radius:12px] [border:1.5px_solid_transparent] absolute left-[34px] top-[103px] w-[98px] h-[25px] overflow-hidden [isolation:isolate]">
@@ -81,15 +81,15 @@ export function DRRRK2({
       </div>
       <div data-figma="Frame 2147249132" data-node="1647:28880" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[248px] top-[198px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1647:28881" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091460" data-node="1647:28882" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+        <div data-figma="image 1208091460" data-node="1647:28882" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
       }} />
       </div>
       <div data-figma="Participant Tile v2 · 그리드" data-node="1647:23379" data-instance-of="Participant Tile v2 · 그리드" className="w-[165px] h-[147px] [border-radius:16px] [background:#222628] absolute left-[24px] top-[341px] overflow-hidden">
         <div data-figma="Frame 2147249134" data-node="I1647:23379;3053:3685" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="I1647:23379;3053:3686" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091458" data-node="I1647:23379;3053:3687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+          <div data-figma="image 1208091458" data-node="I1647:23379;3053:3687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="I1647:23379;3053:3688" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[35px] top-[103px] w-[95px] h-[20px] overflow-hidden">
@@ -114,8 +114,8 @@ export function DRRRK2({
       <div data-figma="참여자 타일 · 푹신푹신 리클라이너17" data-node="1647:23380" data-instance-of="Participant Tile v2 · 그리드" className="flex w-[165px] h-[147px] [padding:18px_26px_24px_27px] [flex-direction:column] [align-items:center] gap-[13px] [border-radius:16px] [background:#222628] absolute left-[201px] top-[341px] overflow-hidden">
         <div data-figma="Frame 2147249135" data-node="I1647:23380;3053:3696" className="w-[72px] h-[72px] shrink-0 [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="I1647:23380;3053:3697" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091458" data-node="I1647:23380;3053:3698" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
-          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 2.644px 2.644px / 92.106% 92.106% no-repeat"
+          <div data-figma="image 1208091458" data-node="I1647:23380;3053:3698" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
+          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 2.644px 2.644px / 92.106% 92.106% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="I1647:23380;3053:3699" className="flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[27px] top-[103px] w-[112px] h-[20px] overflow-hidden">

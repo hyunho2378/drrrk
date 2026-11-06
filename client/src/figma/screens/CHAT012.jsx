@@ -13,7 +13,7 @@ export function CHAT012({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="CHAT-01 · 참여자 미니 프로필" data-node="1647:21995" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:21996" className="w-[390px] h-[844px] [opacity:0.35] [background:#000] absolute left-[0px] top-[0px]" />
-      <video data-figma="image 1208091463" data-node="1647:21997" src="./assets/video/d00775bcc2fc908ad49724da6e67139fbd1869c0.mp4" poster="./assets/raster/1647-21997.jpg" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
+      <video data-figma="image 1208091463" data-node="1647:21997" src="./assets/video/d00775bcc2fc908ad49724da6e67139fbd1869c0.mp4" poster="./assets/raster/1647-21997.webp" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
       <div data-figma="Status Bar" data-node="1712:25066" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25066;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
           <div data-figma="Right Side" data-node="I1712:25066;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">
@@ -187,8 +187,8 @@ export function CHAT012({
         <div data-figma="Rectangle" data-node="1647:22062" className="w-[40px] h-[4px] [border-radius:2px] [background:#6E767C] shrink-0" />
         <div data-figma="Frame" data-node="1647:22063" className="flex [align-items:center] gap-[16px] [align-self:stretch] shrink-0 overflow-hidden">
           <div data-figma="avatar" data-node="1647:22064" className="flex w-[72px] h-[72px] [padding:6px_6.96px_6.96px_6px] [justify-content:center] [align-items:center] [border-radius:36px] [background:#222628] shrink-0 relative overflow-hidden">
-            <div data-figma="image 1208091459" data-node="1647:22065" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[59.04px] h-[59.04px] shrink-0 [aspect-ratio:1/1] absolute left-[6px] top-[6px]" style={{
-            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 4.748px 4.92px / 83.916% 83.916% no-repeat"
+            <div data-figma="image 1208091459" data-node="1647:22065" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[59.04px] h-[59.04px] shrink-0 [aspect-ratio:1/1] absolute left-[6px] top-[6px]" style={{
+            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 4.748px 4.92px / 83.916% 83.916% no-repeat"
           }} />
           </div>
           <div data-figma="Frame" data-node="1647:22066" className="flex [flex-direction:column] [align-items:flex-start] gap-[4px] [flex:1_0_0] overflow-hidden">
@@ -228,14 +228,14 @@ export function CHAT012({
                 "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222.11%22%20height%3D%2227.42%22%20viewBox%3D%220%200%2022.11%2027.42%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M13.6361%206.26111%20L14.0748%201.89015%20L14.0748%200%20L9.23134%201.89015%20L5.99109%206.26111%20L0%207.29056%20L0%2027.424%20L22.108%2027.424%20L22.108%2014.2605%20L19.644%209.02882%20L17.3488%209.56886%20L15.9819%209.85576%20L13.6361%206.26111%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
                 "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222.11%22%20height%3D%2227.42%22%20viewBox%3D%220%200%2022.11%2027.42%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M13.6361%206.26111%20L14.0748%201.89015%20L14.0748%200%20L9.23134%201.89015%20L5.99109%206.26111%20L0%207.29056%20L0%2027.424%20L22.108%2027.424%20L22.108%2014.2605%20L19.644%209.02882%20L17.3488%209.56886%20L15.9819%209.85576%20L13.6361%206.26111%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
               }}>
-                  <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:22085" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[51.844px] h-[34.563px] [aspect-ratio:3/2] absolute left-[-14.95px] top-[-3.29px]" style={{
-                  "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+                  <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:22085" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[51.844px] h-[34.563px] [aspect-ratio:3/2] absolute left-[-14.95px] top-[-3.29px]" style={{
+                  "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
                 }} />
                 </div>
               </div>
               <div data-figma="reaction · 웃김" data-node="1647:22086" className="flex w-[36px] h-[36px] [justify-content:center] [align-items:center] [border-radius:32.727px] [background:#06303C] shrink-0 overflow-hidden">
-                <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:22087" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[18.831px] h-[26.657px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:18.83/26.66]" style={{
-                "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -15.252px -3.078px / 272.824% 128.482% no-repeat"
+                <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:22087" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[18.831px] h-[26.657px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:18.83/26.66]" style={{
+                "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -15.252px -3.078px / 272.824% 128.482% no-repeat"
               }} />
               </div>
             </div>

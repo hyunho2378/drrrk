@@ -12,8 +12,8 @@ export function DRRRK9({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 온보딩 · 함께 드르륵 9" data-node="1647:22751" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Rectangle 1954141366" data-node="1647:22752" className="absolute w-[390px] h-[761px] left-[0px] top-[0px] block overflow-visible"><img data-px="" data-hires="" alt="" src="./assets/raster/1647-22752.png" className="absolute left-[0px] top-[0px] w-[390px] h-[762px] block [max-width:none]" /></div>
-      <img data-figma="image 1208091455" data-node="1647:22753" data-px="" data-hires="" alt="" src="./assets/raster/1647-22753.png" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
+      <div data-figma="Rectangle 1954141366" data-node="1647:22752" className="absolute w-[390px] h-[761px] left-[0px] top-[0px] block overflow-visible"><img data-px="" data-hires="" alt="" src="./assets/raster/1647-22752.webp" className="absolute left-[0px] top-[0px] w-[390px] h-[762px] block [max-width:none]" /></div>
+      <img data-figma="image 1208091455" data-node="1647:22753" data-px="" data-hires="" alt="" src="./assets/raster/1647-22753.webp" className="w-[390px] h-[271px] [mix-blend-mode:luminosity] absolute left-[0px] top-[0px] block" />
       <div data-figma="image 1208091451" data-node="1647:22755" className="w-[257px] h-[257px] [aspect-ratio:1/1] absolute left-[54px] top-[237px]" />
       <div data-figma="Status Bar" data-node="1712:25116" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25116;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
@@ -41,7 +41,7 @@ export function DRRRK9({
         }} />
         </div>
       </div>
-      <img data-figma="Rectangle 1954141366" data-node="1647:22766" data-px="" data-hires="" alt="" src="./assets/raster/1647-22766.png" className="w-[168px] h-[192px] absolute left-[193px] top-[305px] block" />
+      <img data-figma="Rectangle 1954141366" data-node="1647:22766" data-px="" data-hires="" alt="" src="./assets/raster/1647-22766.webp" className="w-[168px] h-[192px] absolute left-[193px] top-[305px] block" />
       <div data-figma="Group 2147229002" data-node="1647:22767" className="w-[90.13px] h-[34px] [aspect-ratio:90.13/34.00] absolute left-[24px] top-[64px]">
         <span data-figma="Vector" data-node="1647:22768" className="w-[30.55px] h-[31.51px] absolute left-[0px] top-[2.49px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:22768"]
@@ -68,7 +68,7 @@ export function DRRRK9({
         }} /></p>
       </div>
       <div data-figma="Group 2147229009" data-node="1647:22776" className="w-[27px] h-[28px] absolute left-[339px] top-[67px]">
-        <img data-figma="bell" data-node="1647:22777" data-px="" data-hires="" alt="" src="./assets/raster/1647-22777.png" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
+        <img data-figma="bell" data-node="1647:22777" data-px="" data-hires="" alt="" src="./assets/raster/1647-22777.webp" className="w-[26px] h-[26px] absolute left-[0px] top-[2px] block" />
         <span data-figma="badge" data-node="1647:22778" className="w-[8px] h-[8px] absolute left-[19px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:22778"]
       }} />
@@ -87,23 +87,23 @@ export function DRRRK9({
             </div>
             <div data-figma="아바타 줄" data-node="1647:22786" className="inline-flex [align-items:center] gap-[10px] absolute left-[20px] top-[64px] w-[190px] h-[40px] overflow-hidden">
               <div data-figma="avatar / box" data-node="1647:22787" className="flex w-[40px] h-[40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] shrink-0 relative overflow-hidden">
-                <div data-figma="image" data-node="1647:22788" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
-                "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+                <div data-figma="image" data-node="1647:22788" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
+                "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
               }} />
               </div>
               <div data-figma="avatar / sofa" data-node="1647:22789" className="flex w-[40px] h-[40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] shrink-0 relative overflow-hidden">
-                <div data-figma="image" data-node="1647:22790" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
-                "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 3.217px 3.333px / 83.916% 83.916% no-repeat"
+                <div data-figma="image" data-node="1647:22790" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
+                "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 3.217px 3.333px / 83.916% 83.916% no-repeat"
               }} />
               </div>
               <div data-figma="avatar / stool" data-node="1647:22791" className="flex w-[40px] h-[40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] shrink-0 relative overflow-hidden">
-                <div data-figma="image" data-node="1647:22792" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
-                "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 1.585px 1.667px / 92.077% 92.077% no-repeat"
+                <div data-figma="image" data-node="1647:22792" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
+                "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 1.585px 1.667px / 92.077% 92.077% no-repeat"
               }} />
               </div>
               <div data-figma="avatar / recl" data-node="1647:22793" className="flex w-[40px] h-[40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] shrink-0 relative overflow-hidden">
-                <div data-figma="image" data-node="1647:22794" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
-                "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 1.579px 1.579px / 92.106% 92.106% no-repeat"
+                <div data-figma="image" data-node="1647:22794" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"\"}"} className="w-[40px] h-[40px] shrink-0 absolute left-[0px] top-[0px]" style={{
+                "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 1.579px 1.579px / 92.106% 92.106% no-repeat"
               }} />
               </div>
             </div>

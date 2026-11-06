@@ -13,7 +13,7 @@ export function CHAT00({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="CHAT-00 · 캐릭터 탭 → 이름 표시" data-node="1647:22319" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:22320" className="w-[390px] h-[844px] [opacity:0.35] [background:#000] absolute left-[0px] top-[0px]" />
-      <video data-figma="image 1208091463" data-node="1647:22321" src="./assets/video/d00775bcc2fc908ad49724da6e67139fbd1869c0.mp4" poster="./assets/raster/1647-22321.jpg" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
+      <video data-figma="image 1208091463" data-node="1647:22321" src="./assets/video/d00775bcc2fc908ad49724da6e67139fbd1869c0.mp4" poster="./assets/raster/1647-22321.webp" autoPlay muted loop playsInline className="w-[390px] h-[844px] absolute left-[0px] top-[0px] block [object-fit:cover]" />
       <div data-figma="Status Bar" data-node="1712:25086" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25086;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">
           <div data-figma="Right Side" data-node="I1712:25086;3035:449" className="w-[77.07px] h-[12.9px] absolute left-[239.32px] top-[5.06px]">

@@ -103,8 +103,8 @@ export function DRRRK3({
       }} />
         <div data-figma="Frame 2147249133" data-node="I1647:23394;3053:3702" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="I1647:23394;3053:3703" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091459" data-node="I1647:23394;3053:3704" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 5.79px 6px / 83.916% 83.916% no-repeat"
+          <div data-figma="image 1208091459" data-node="I1647:23394;3053:3704" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[72px] h-[72px] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 5.79px 6px / 83.916% 83.916% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="I1647:23394;3053:3705" className="inline-flex [padding:4px_8px] [align-items:center] gap-[5px] [border-radius:12px] [border:1.5px_solid_transparent] absolute left-[34px] top-[103px] w-[98px] h-[25px] overflow-hidden [isolation:isolate]">
@@ -131,8 +131,8 @@ export function DRRRK3({
       <div data-figma="Participant Tile v2 · 그리드" data-node="1647:23396" data-instance-of="Participant Tile v2 · 그리드" className="w-[165px] h-[147px] [border-radius:16px] [background:#222628] absolute left-[24px] top-[341px] overflow-hidden">
         <div data-figma="Frame 2147249134" data-node="I1647:23396;3053:3685" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="I1647:23396;3053:3686" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091458" data-node="I1647:23396;3053:3687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.png) 2.852px 3px / 92.077% 92.077% no-repeat"
+          <div data-figma="image 1208091458" data-node="I1647:23396;3053:3687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 2.852px 3px / 92.077% 92.077% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="I1647:23396;3053:3688" className="inline-flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[35px] top-[103px] w-[95px] h-[20px] overflow-hidden">
@@ -157,8 +157,8 @@ export function DRRRK3({
       <div data-figma="참여자 타일 · 푹신푹신 리클라이너17" data-node="1647:23397" data-instance-of="Participant Tile v2 · 그리드" className="flex w-[165px] h-[147px] [padding:18px_26px_24px_27px] [flex-direction:column] [align-items:center] gap-[13px] [border-radius:16px] [background:#222628] absolute left-[201px] top-[341px] overflow-hidden">
         <div data-figma="Frame 2147249135" data-node="I1647:23397;3053:3696" className="w-[72px] h-[72px] shrink-0 [border-radius:600px] absolute left-[46.5px] top-[18px] overflow-hidden">
           <div data-figma="image 1208091463" data-node="I1647:23397;3053:3697" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-          <div data-figma="image 1208091458" data-node="I1647:23397;3053:3698" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
-          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.png) 2.644px 2.644px / 92.106% 92.106% no-repeat"
+          <div data-figma="image 1208091458" data-node="I1647:23397;3053:3698" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"x\"}"} className="w-[67px] h-[67px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[2.5px] top-[3px]" style={{
+          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 2.644px 2.644px / 92.106% 92.106% no-repeat"
         }} />
         </div>
         <div data-figma="name" data-node="I1647:23397;3053:3699" className="flex [padding:3px_8px] [align-items:center] gap-[5px] [border-radius:8px] [background:#000] absolute left-[27px] top-[103px] w-[112px] h-[20px] overflow-hidden">
@@ -189,8 +189,8 @@ export function DRRRK3({
       </div>
       <div data-figma="Frame 2147249132" data-node="1647:28884" className="w-[72px] h-[72px] [border-radius:600px] absolute left-[248px] top-[198px] overflow-hidden">
         <div data-figma="image 1208091463" data-node="1647:28885" className="w-[72px] h-[72px] [background:#121415] absolute left-[0px] top-[0px]" />
-        <div data-figma="image 1208091460" data-node="1647:28886" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
-        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.png) 50% / cover no-repeat"
+        <div data-figma="image 1208091460" data-node="1647:28886" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"x\"}"} className="w-[72px] h-[72px] [transform:scaleX(-1)] [aspect-ratio:1/1] absolute left-[0px] top-[0px]" style={{
+        "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
       }} />
       </div>
       <div data-figma="고민 주제 · 최소화 (탭하면 자세히)" data-node="1679:31586" className="flex w-[342px] h-[40px] [padding:10px_14px] [align-items:center] gap-[8px] [border-radius:16px] [background:rgba(10,_11,_12,_0.60)] absolute left-[24px] top-[124px] overflow-hidden">
@@ -206,7 +206,7 @@ export function DRRRK3({
       <div data-figma="바텀시트 · 미니 프로필" data-node="1647:23406" className="flex w-[390px] [padding:14px_24px_34px_24px] [flex-direction:column] [align-items:center] gap-[18px] [border-radius:24px_24px_0_0] [background:#121415] absolute left-[0px] top-[495px] h-[349px] overflow-hidden">
         <div data-figma="Rectangle" data-node="1647:23407" className="w-[40px] h-[4px] [border-radius:2px] [background:#6E767C] shrink-0" />
         <div data-figma="Frame" data-node="1647:23408" className="flex [align-items:center] gap-[16px] [align-self:stretch] shrink-0 overflow-hidden">
-          <img data-figma="avatar" data-node="1647:23409" data-missing-component="Avatar · 의자" data-px="" data-hires="" alt="" src="./assets/raster/1647-23409.png" className="w-[72px] h-[72px] shrink-0 relative block" />
+          <img data-figma="avatar" data-node="1647:23409" data-missing-component="Avatar · 의자" data-px="" data-hires="" alt="" src="./assets/raster/1647-23409.webp" className="w-[72px] h-[72px] shrink-0 relative block" />
           <div data-figma="Frame" data-node="1647:23410" className="flex [flex-direction:column] [align-items:flex-start] gap-[4px] [flex:1_0_0] overflow-hidden">
             <div data-figma="Frame" data-node="1647:23411" className="flex [align-items:center] gap-[8px] shrink-0 overflow-hidden">
               <p data-figma="따뜻한 가죽소파29" data-node="1647:23412" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:19px] [font-style:normal] [font-weight:700] [line-height:27px] [letter-spacing:-0.38px] shrink-0 w-[140px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[-0.416px] left-[0px]">{"따뜻한 가죽소파29"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -247,14 +247,14 @@ export function DRRRK3({
                 "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222.11%22%20height%3D%2227.42%22%20viewBox%3D%220%200%2022.11%2027.42%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M13.6361%206.26111%20L14.0748%201.89015%20L14.0748%200%20L9.23134%201.89015%20L5.99109%206.26111%20L0%207.29056%20L0%2027.424%20L22.108%2027.424%20L22.108%2014.2605%20L19.644%209.02882%20L17.3488%209.56886%20L15.9819%209.85576%20L13.6361%206.26111%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
                 "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222.11%22%20height%3D%2227.42%22%20viewBox%3D%220%200%2022.11%2027.42%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M13.6361%206.26111%20L14.0748%201.89015%20L14.0748%200%20L9.23134%201.89015%20L5.99109%206.26111%20L0%207.29056%20L0%2027.424%20L22.108%2027.424%20L22.108%2014.2605%20L19.644%209.02882%20L17.3488%209.56886%20L15.9819%209.85576%20L13.6361%206.26111%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
               }}>
-                  <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:23430" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[51.844px] h-[34.563px] [aspect-ratio:3/2] absolute left-[-14.95px] top-[-3.29px]" style={{
-                  "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+                  <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:23430" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[51.844px] h-[34.563px] [aspect-ratio:3/2] absolute left-[-14.95px] top-[-3.29px]" style={{
+                  "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
                 }} />
                 </div>
               </div>
               <div data-figma="reaction · 웃김" data-node="1647:23431" className="flex w-[36px] h-[36px] [justify-content:center] [align-items:center] [border-radius:32.727px] [background:#06303C] shrink-0 overflow-hidden">
-                <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:23432" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[18.831px] h-[26.657px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:18.83/26.66]" style={{
-                "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -15.252px -3.078px / 272.824% 128.482% no-repeat"
+                <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:23432" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[18.831px] h-[26.657px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:18.83/26.66]" style={{
+                "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -15.252px -3.078px / 272.824% 128.482% no-repeat"
               }} />
               </div>
             </div>
@@ -267,7 +267,7 @@ export function DRRRK3({
             }} /></p>
           </div>
         </div>
-        <img data-figma="신고 · 차단" data-node="1647:23435" data-missing-component="신고 · 차단 링크" data-px="" data-hires="" alt="" src="./assets/raster/1647-23435.png" className="shrink-0 w-[123px] h-[18px] block" />
+        <img data-figma="신고 · 차단" data-node="1647:23435" data-missing-component="신고 · 차단 링크" data-px="" data-hires="" alt="" src="./assets/raster/1647-23435.webp" className="shrink-0 w-[123px] h-[18px] block" />
       </div>
     </div>;
   return null;

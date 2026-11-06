@@ -15,8 +15,8 @@ export function DRRRK4({
       <div data-figma="Rectangle 1954141365" data-node="1647:23516" className="w-[390px] h-[844px] [background:#0A0B0C] absolute left-[0px] top-[0px]" />
       <div data-figma="Group 2147229007" data-node="1647:23517" className="w-[342px] h-[304px] absolute left-[24px] top-[180px]">
         <div data-figma="Group 2147229006" data-node="1647:23518" className="w-[200px] h-[200px] absolute left-[71px] top-[0px]">
-          <div data-figma="image 1208091452" data-node="1647:23519" data-img={"{\"src\":\"./assets/images/df0a1d154446b484e3518dd2e5f901753261b27f.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[133px] h-[133px] [transform:rotate(-15deg)] [aspect-ratio:1/1] absolute left-[33.99px] top-[33px]" style={{
-          "background": "url(./assets/images/df0a1d154446b484e3518dd2e5f901753261b27f.png) 50% / cover no-repeat"
+          <div data-figma="image 1208091452" data-node="1647:23519" data-img={"{\"src\":\"./assets/images/df0a1d154446b484e3518dd2e5f901753261b27f.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[133px] h-[133px] [transform:rotate(-15deg)] [aspect-ratio:1/1] absolute left-[33.99px] top-[33px]" style={{
+          "background": "url(./assets/images/df0a1d154446b484e3518dd2e5f901753261b27f.webp) 50% / cover no-repeat"
         }} />
           <span data-figma="ring track" data-node="1647:23520" className="w-[200px] h-[200px] absolute left-[0px] top-[0px] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1647:23520"]

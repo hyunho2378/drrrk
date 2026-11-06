@@ -68,8 +68,8 @@ export function CHAT04({
       <div data-figma="Content" data-node="1647:22234" className="flex w-[342px] [flex-direction:column] [align-items:flex-start] gap-[22px] absolute left-[24px] top-[168px] h-[535px] overflow-hidden">
         <div data-figma="Frame" data-node="1647:22235" className="flex [flex-direction:column] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">
           <div data-figma="avatar" data-node="1647:22236" className="flex w-[104px] h-[104px] [padding:9.001px_9.72px_9.719px_9px] [justify-content:center] [align-items:center] [border-radius:52px] [background:#222628] shrink-0 relative overflow-hidden">
-            <div data-figma="image 1208091459" data-node="1647:22237" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[85.28px] h-[85.28px] shrink-0 [aspect-ratio:1/1] absolute left-[9px] top-[9px]" style={{
-            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.png) 6.858px 7.107px / 83.916% 83.916% no-repeat"
+            <div data-figma="image 1208091459" data-node="1647:22237" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="w-[85.28px] h-[85.28px] shrink-0 [aspect-ratio:1/1] absolute left-[9px] top-[9px]" style={{
+            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 6.858px 7.107px / 83.916% 83.916% no-repeat"
           }} />
           </div>
           <div data-figma="Frame" data-node="1647:22238" className="flex [align-items:center] gap-[8px] shrink-0 overflow-hidden">
@@ -130,13 +130,13 @@ export function CHAT04({
           }} /></p>
           <div data-figma="Frame" data-node="1647:22264" className="flex [align-items:flex-start] gap-[12px] shrink-0 overflow-hidden">
             <div data-figma="reaction · 공감" data-node="1647:22265" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [background:#06303C] shrink-0 overflow-hidden">
-              <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1647:22266" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[31.949px] h-[27.68px] shrink-0 [aspect-ratio:31.95/27.68]" style={{
-              "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.png) -17.823px -9.241px / 211.57% 162.798% no-repeat"
+              <div data-figma="p_OPENAI_IMAGE_01M5KE8XYXVAK7JQV2477R5QS0 1" data-node="1647:22266" data-img={"{\"src\":\"./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp\",\"mode\":\"CROP\",\"tf\":[[0.47265625,0,0.263671875],[0,0.6142578125,0.205078125]],\"op\":1,\"flip\":\"\"}"} className="w-[31.949px] h-[27.68px] shrink-0 [aspect-ratio:31.95/27.68]" style={{
+              "background": "url(./assets/images/39c4699cff6e6ae783c19577fa2c388d7f7c8cf8.webp) -17.823px -9.241px / 211.57% 162.798% no-repeat"
             }} />
             </div>
             <div data-figma="reaction · 응원" data-node="1647:22267" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [background:#06303C] shrink-0 overflow-hidden">
-              <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1647:22268" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[28.473px] h-[27.53px] shrink-0 [aspect-ratio:28.47/27.53]" style={{
-              "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.png) -14.67px -4.601px / 203.444% 140.274% no-repeat"
+              <div data-figma="p_OPENAI_IMAGE_01M5KEBSWJG89YDCD1WCNFXJZR 1" data-node="1647:22268" data-img={"{\"src\":\"./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp\",\"mode\":\"CROP\",\"tf\":[[0.4915364682674408,0,0.2532552182674408],[0,0.712890625,0.119140625]],\"op\":1,\"flip\":\"\"}"} className="w-[28.473px] h-[27.53px] shrink-0 [aspect-ratio:28.47/27.53]" style={{
+              "background": "url(./assets/images/fdda6b299a661632004bb717bfb605125aa631c9.webp) -14.67px -4.601px / 203.444% 140.274% no-repeat"
             }} />
             </div>
             <div data-figma="reaction · 토닥" data-node="1647:22269" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [border:1.477px_solid_transparent] shrink-0 overflow-hidden relative [isolation:isolate]">
@@ -147,14 +147,14 @@ export function CHAT04({
               "maskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2229.48%22%20height%3D%2236.57%22%20viewBox%3D%220%200%2029.48%2036.57%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M18.1814%208.34814%20L18.7664%202.52019%20L18.7664%200%20L12.3084%202.52019%20L7.98812%208.34814%20L0%209.72075%20L0%2036.5653%20L29.4773%2036.5653%20L29.4773%2019.014%20L26.192%2012.0384%20L23.1318%2012.7585%20L21.3091%2013.141%20L18.1814%208.34814%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")",
               "WebkitMaskImage": "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2229.48%22%20height%3D%2236.57%22%20viewBox%3D%220%200%2029.48%2036.57%22%3E%3Cpath%20transform%3D%22translate(0%200)%22%20d%3D%22M18.1814%208.34814%20L18.7664%202.52019%20L18.7664%200%20L12.3084%202.52019%20L7.98812%208.34814%20L0%209.72075%20L0%2036.5653%20L29.4773%2036.5653%20L29.4773%2019.014%20L26.192%2012.0384%20L23.1318%2012.7585%20L21.3091%2013.141%20L18.1814%208.34814%20Z%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fsvg%3E\")"
             }}>
-                <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:22272" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[69.125px] h-[46.084px] [aspect-ratio:3/2] absolute left-[-19.26px] top-[-3.72px]" style={{
-                "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.png) 50% / cover no-repeat"
+                <div data-figma="p_OPENAI_IMAGE_01M5KEJWD26P7FGYG0P7G7AKWP 1" data-node="1647:22272" data-img={"{\"src\":\"./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[69.125px] h-[46.084px] [aspect-ratio:3/2] absolute left-[-19.26px] top-[-3.72px]" style={{
+                "background": "url(./assets/images/95b00586701c05d92a766dc58abb2b0c5fbf98c0.webp) 50% / cover no-repeat"
               }} />
               </div>
             </div>
             <div data-figma="reaction · 웃김" data-node="1647:22273" className="flex w-[48px] h-[48px] [justify-content:center] [align-items:center] [border-radius:43.636px] [background:#06303C] shrink-0 overflow-hidden">
-              <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:22274" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[25.108px] h-[35.543px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:25.11/35.54]" style={{
-              "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.png) -20.336px -4.104px / 272.824% 128.482% no-repeat"
+              <div data-figma="p_OPENAI_IMAGE_01M5KF7KZD42KN97QHWKSJXW9E 1" data-node="1647:22274" data-img={"{\"src\":\"./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp\",\"mode\":\"CROP\",\"tf\":[[0.3665364682674408,0,0.296875],[0,0.7783202528953552,0.089868925511837]],\"op\":1,\"flip\":\"x\"}"} className="w-[25.108px] h-[35.543px] [transform:scaleX(-1)] shrink-0 [aspect-ratio:25.11/35.54]" style={{
+              "background": "url(./assets/images/4f356a7c790e52c48f84f9dc1c00f4f97633c691.webp) -20.336px -4.104px / 272.824% 128.482% no-repeat"
             }} />
             </div>
           </div>
