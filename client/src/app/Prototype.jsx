@@ -5,6 +5,7 @@ import { LINKS, AUTO } from './flow.js';
 import { motion } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
 import { useReducedMotion } from './useReducedMotion.js';
+import { morph } from './morph.js';
 
 // 화면 하나를 그리는 칸. 새 화면은 투명하게 먼저 그리고, 피그마 마무리 단계(그림과 글자 다시 그리기)가 끝나면 알린다.
 function Layer({ layer, hidden, active, onReady, onPress, setNode }) {
@@ -20,16 +21,32 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode }) {
     setNode(layer.key, ref.current);
     return () => setNode(layer.key, null);
   }, [layer.key, setNode]);
+  // 그림과 글꼴이 준비되면 바로 알린다. 피그마 마무리 단계(16점 다시 그리기)는 전환이 끝난 뒤에 돌아서 전환을 막지 않는다.
   useEffect(() => {
     let alive = true;
-    const t0 = performance.now();
-    const tick = () => {
-      if (!alive) return;
-      const el = ref.current;
-      if ((el && el.querySelector('[data-raster-done]')) || performance.now() - t0 > 8000) onReady(layer.key);
-      else window.setTimeout(tick, 40);
-    };
-    tick();
+    const el = ref.current;
+    const urls = new Set();
+    el.querySelectorAll('[style], img').forEach((e) => {
+      const st = e.getAttribute('style') || '';
+      (st.match(/url\(([^)]+)\)/g) || []).forEach((u) => {
+        const v = u.slice(4, -1).replace(/["']/g, '');
+        if (v.indexOf('assets/') >= 0 && !/\.mp4$/.test(v)) urls.add(v);
+      });
+      const s = e.getAttribute('src');
+      if (s && s.indexOf('assets/') >= 0 && !/\.mp4$/.test(s)) urls.add(s);
+    });
+    const load = (u) => new Promise((res) => {
+      const i = new Image();
+      i.onload = () => (i.decode ? i.decode().then(res, res) : res());
+      i.onerror = res;
+      i.src = u;
+    });
+    Promise.all([...urls].map(load))
+      .then(() => (document.fonts ? document.fonts.ready : null))
+      .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
+      .then(() => {
+        if (alive) onReady(layer.key);
+      });
     return () => {
       alive = false;
     };
@@ -65,6 +82,17 @@ export default function Prototype() {
   const pending = useRef(null);
   const autoTimer = useRef(0);
   const shown = useRef(false);
+  const holdDone = useRef(null);
+  // 전환 중에는 피그마 마무리 단계를 멈춰 둔다(window.__figmaHold). 전환이 끝나면 푼다.
+  const hold = () => {
+    if (holdDone.current) return;
+    window.__figmaHold = new Promise((r) => (holdDone.current = r));
+  };
+  const release = () => {
+    if (holdDone.current) holdDone.current();
+    holdDone.current = null;
+    window.__figmaHold = null;
+  };
 
   const setNode = useCallback((key, el) => {
     if (el) nodes.current.set(key, el);
@@ -74,9 +102,11 @@ export default function Prototype() {
   // 화면 번호가 바뀌면 새 칸을 만든다. 전환 종류는 누른 자리(state.t)에서, 브라우저 뒤로 가기는 back으로 본다.
   useEffect(() => {
     let alive = true;
-    const t = navType === 'POP' ? (shown.current ? 'back' : 'none') : (location.state && location.state.t) || 'none';
+    const first = !shown.current;
+    const t = navType === 'POP' ? (first ? 'none' : 'back') : (location.state && location.state.t) || 'none';
     shown.current = true;
     busy.current = true;
+    if (!first) hold();
     window.clearTimeout(autoTimer.current);
     loadScreen(n).then((Comp) => {
       if (!alive) return;
@@ -100,7 +130,11 @@ export default function Prototype() {
     (key) => {
       setLayers((prev) => prev.filter((l) => l.key === key).map((l) => ({ ...l, z: undefined })));
       busy.current = false;
+      release();
       window.scrollTo(0, 0);
+      // 이 화면에서 갈 수 있는 화면의 코드를 미리 받아 둔다(다음 누름의 대기를 줄인다).
+      const idle = window.requestIdleCallback || ((f) => window.setTimeout(f, 200));
+      idle(() => [...new Set(LINKS.filter((l) => l.from === n).map((l) => l.to))].forEach((to) => loadScreen(to)));
       const s = SCREENS[n - 1];
       const au = AUTO[s && s.n];
       if (au) autoTimer.current = window.setTimeout(() => go({ to: au.to, t: au.t }), au.ms);
@@ -125,25 +159,42 @@ export default function Prototype() {
       setLayers((ls) => ls.map((l) => (l.key === key ? { ...l, ready: true } : l)));
       if (next) next.style.opacity = '1';
       let t = p.t;
-      if (!prev || t === 'tab' || t === 'none') {
+      if (!prev || t === 'none') {
         finish(key);
         return;
       }
-      if (reduced) t = 'fade';
-      const o = { duration: t === 'fade' ? (reduced ? motion.reduced : motion.fade) : motion.push, easing: t === 'fade' ? motion.easeOut : motion.ease, fill: 'both' };
-      let a;
-      if (t === 'push') {
+      // 같은 방 안 상태 변화와 탭 전환: 요소 단위로 잇는다(탭바처럼 같은 요소는 움직이지 않는다).
+      if (t === 'fade' || t === 'tab') {
+        morph(prev, next, reduced).then(() => finish(key));
+        return;
+      }
+      // 화면 이동: 앞으로는 오른쪽에서 들어오고, 뒤로는 반대로 빠진다. 줄인 움직임 설정이면 옅은 페이드로 바꾼다.
+      if (reduced) {
         next.style.zIndex = '2';
-        a = next.animate([{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }], o);
-        prev.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(' + motion.pushShift + ')', opacity: motion.pushDim }], o);
-      } else if (t === 'back') {
+        const a0 = next.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.reduced, easing: motion.easeOut, fill: 'both' });
+        let d0 = false;
+        const e0 = () => {
+          if (d0) return;
+          d0 = true;
+          a0.cancel();
+          next.style.zIndex = '';
+          finish(key);
+        };
+        a0.onfinish = e0;
+        window.setTimeout(e0, motion.reduced + 60);
+        return;
+      }
+      const o = { duration: t === 'back' ? motion.back : motion.push, easing: motion.emphasizedDecel, fill: 'both' };
+      let a;
+      if (t === 'back') {
         prev.style.zIndex = '2';
         next.style.zIndex = '1';
         a = next.animate([{ transform: 'translateX(' + motion.pushShift + ')', opacity: motion.pushDim }, { transform: 'translateX(0)', opacity: 1 }], o);
         prev.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(100%)' }], o);
       } else {
         next.style.zIndex = '2';
-        a = next.animate([{ opacity: 0 }, { opacity: 1 }], o);
+        a = next.animate([{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }], o);
+        prev.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(' + motion.pushShift + ')', opacity: motion.pushDim }], o);
       }
       let done = false;
       const end = () => {
@@ -170,7 +221,14 @@ export default function Prototype() {
     [navigate],
   );
 
-  useEffect(() => () => window.clearTimeout(autoTimer.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(autoTimer.current);
+      release();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const top = layers[layers.length - 1];
   const s = SCREENS[n - 1];

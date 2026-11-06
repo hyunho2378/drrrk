@@ -10,20 +10,32 @@ export const color = {
   'text-3': 'var(--text-tertiary)',
   brand: 'var(--brand-primary)',
   'brand-subtle': 'var(--brand-subtle)',
-  'press-dim': 'rgb(0 0 0 / 0.22)',
+  'press-dark': 'var(--bg-base)',
+  'press-light': 'var(--text-primary)',
   'hint-fill': 'rgb(54 210 255 / 0.14)',
 };
 
+// 수치 근거: Material Design 3 Easing and duration tokens(easing, short/medium 토큰), NN/g Executing UX Animations(100~500ms, 진입이 퇴장보다 조금 길게), Apple HIG Motion(짧고 정확하게).
 export const motion = {
-  push: 320,
-  fade: 200,
-  press: 90,
+  push: 300,
+  back: 250,
+  sheetIn: 300,
+  sheetOut: 220,
+  modalIn: 250,
+  modalOut: 200,
+  modalScale: 0.92,
+  stateIn: 150,
+  stateOut: 90,
+  press: 100,
   hint: 450,
-  reduced: 120,
-  ease: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
-  easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+  reduced: 150,
+  standard: 'cubic-bezier(0.2, 0, 0, 1)',
+  emphasizedDecel: 'cubic-bezier(0.05, 0.7, 0.1, 1)',
+  emphasizedAccel: 'cubic-bezier(0.3, 0, 0.8, 0.15)',
+  easeOut: 'cubic-bezier(0, 0, 0, 1)',
   pushShift: '-28%',
   pushDim: 0.7,
+  pressOpacity: 0.1,
 };
 
 export const layout = { screenWidth: 390, touchMin: 44, listWidth: 560 };
