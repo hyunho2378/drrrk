@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate, useNavigationType, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigationType, useParams } from 'react-router-dom';
 import { SCREENS, loadScreen } from './screens.js';
-import { LINKS, AUTO } from './flow.js';
+import { LINKS, AUTO, START } from './flow.js';
 import { motion } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
 import { useReducedMotion } from './useReducedMotion.js';
@@ -111,7 +111,7 @@ export default function Prototype() {
     loadScreen(n).then((Comp) => {
       if (!alive) return;
       if (!Comp) {
-        navigate('/', { replace: true });
+        navigate('/s/' + START, { replace: true });
         return;
       }
       const s = SCREENS[n - 1];
@@ -231,18 +231,9 @@ export default function Prototype() {
   );
 
   const top = layers[layers.length - 1];
-  const s = SCREENS[n - 1];
   const stageH = layers.reduce((m, l) => Math.max(m, l.h), 0);
   return (
     <div className="min-h-screen bg-base font-suit">
-      <header className="sticky top-0 z-bar flex min-h-touch items-center justify-center gap-4 bg-base px-3 text-bar text-text-2">
-        <Link to="/" className="text-brand no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand">
-          목록
-        </Link>
-        <span>
-          {n} / {SCREENS.length}&nbsp;&nbsp;{s ? s.name : ''}
-        </span>
-      </header>
       <div className="relative mx-auto w-screen overflow-hidden bg-base" style={{ height: stageH }}>
         {layers.map((l) => (
           <Layer

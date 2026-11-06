@@ -169,4 +169,4 @@ export const LINKS = [
 // 고민 분석 화면은 잠시 뒤 추천 화면으로 넘어간다.
 export const AUTO = { 26: { to: 27, ms: 2600, t: 'push' } };
 
-export const START = 12;
+export const START = 24;
