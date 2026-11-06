@@ -29,6 +29,16 @@ export function setText(p, text) {
   p.style.webkitTextFillColor = 'currentColor';
 }
 
+// 피그마에서 윤곽 글자를 못 받은 칸(화면 밖에 걸친 카드 등)은 덮개가 비어 글자가 안 보인다. 그런 칸은 실제 글자를 보이게 한다.
+// 피그마에서 일부러 숨긴 글자(opacity 0)는 그대로 둔다.
+function showEmptyOutlines(root) {
+  q(root, 'p[data-outline]').forEach((p) => {
+    const ov = p.querySelector(':scope > span[aria-hidden]');
+    if (!ov || ov.innerHTML.trim() || !p.textContent.trim()) return;
+    p.style.webkitTextFillColor = 'currentColor';
+  });
+}
+
 // ---------- 1) 상태바 시계 ----------
 const fmtClock = (d) => (d.getHours() % 12 || 12) + ':' + String(d.getMinutes()).padStart(2, '0');
 function applyClock(root) {
@@ -51,7 +61,9 @@ function tickClock() {
 }
 
 // ---------- 2) 방 시계 ----------
-const room = { scene: null, left: 0, at: 0, chatDone: false, fired: {} };
+const room = { scene: null, kind: null, left: 0, at: 0, chatDone: false, fired: {} };
+// 시계 종류: 기다리는 시간(혼자 드르륵 처음 화면)과 해 뜨기까지 남은 시간은 따로 센다.
+const timerKind = (root) => (root.querySelector('[data-figma*="기다리는 중"]') ? 'wait' : 'sun');
 const parseMMSS = (s) => {
   const m = /(\d{1,2}):(\d{2})/.exec(s || '');
   return m ? +m[1] * 60 + +m[2] : null;
@@ -268,6 +280,13 @@ function attachCarousel(layer, root) {
     const j = dir && cur >= 0 ? Math.max(0, Math.min(stops.length - 1, cur + dir)) : i;
     x = stops[j];
     set(x, motion.stateIn + 150);
+    // 아래 점(Page Dots)도 보고 있는 카드 자리로 옮긴다.
+    const dots = root.querySelector('[data-figma="Page Dots"]');
+    const act = dots && dots.querySelector(':scope > [data-figma="Dot / active"]');
+    if (act) {
+      const rest = [...dots.children].filter((d) => d !== act);
+      dots.insertBefore(act, rest[j] || null);
+    }
   });
   // 끌어서 넘긴 직후의 누름은 화면 이동으로 보지 않는다.
   layer.addEventListener('click', (e) => {
@@ -283,17 +302,20 @@ export function attach(layer, n, go, prevN) {
   if (!root) return;
   current = { n, go, layer };
   applyClock(root);
+  showEmptyOutlines(root);
   attachInputs(root, n, go);
   attachCarousel(layer, root);
   const sc = sceneOf(n);
   if (sc) {
-    if (room.scene !== sc) {
+    const kind = timerKind(root);
+    if (room.scene !== sc || room.kind !== kind) {
       const t = timerTexts(root)[0];
+      if (room.scene !== sc) room.chatDone = false;
       room.scene = sc;
+      room.kind = kind;
       room.left = parseMMSS(t && t.textContent) ?? LIVE.defaultLeft;
       room.at = performance.now();
       room.fired = {};
-      room.chatDone = false;
     }
     if (!room.chatDone) {
       room.chatDone = true;
@@ -315,7 +337,7 @@ function tick() {
   const left = remaining();
   const txt = fmtMMSS(left);
   timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
-  const rule = LIVE.rooms[room.scene];
+  const rule = room.kind === 'sun' ? LIVE.rooms[room.scene] : null;
   if (!rule || !current.go) return;
   for (const step of rule) {
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
