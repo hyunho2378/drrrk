@@ -11,8 +11,8 @@ export function CarouselCard({
   className
 }) {
   if (type === "1") return <div data-figma="type=1" data-node="1204:85724" className={cx("w-[318px] h-[232px] [border-radius:var(--radius-10xl,_20px)] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1204:85716" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -200.449px / 100% 245.582% no-repeat"
+      <div data-figma="Scene" data-node="1204:85716" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -200.449px / 100% 245.582% no-repeat"
     }} />
       <div data-figma="Fade" data-node="1204:85717" className="w-[318px] h-[232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1204:85718" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[164px] w-[180px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"둘이 찍은 사진인데\n지만 보정해서 올린 여우"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -47,8 +47,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "2") return <div data-figma="type=2" data-node="1204:85734" className={cx("w-[318px] h-[232px] [border-radius:var(--radius-10xl,_20px)] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1204:85726" data-img={"{\"src\":\"./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.jpg) 50% / cover no-repeat"
+      <div data-figma="Scene" data-node="1204:85726" data-img={"{\"src\":\"./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.png) 50% / cover no-repeat"
     }} />
       <div data-figma="Fade" data-node="1204:85727" className="w-[318px] h-[232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1204:85728" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[164px] w-[150px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"남친이 1주년 선물로\n다이소 틴트 사줌"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -83,8 +83,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "1 342") return <div data-figma="type=1 342" data-node="1204:85745" className={cx("w-[342px] h-[232px] [border-radius:var(--radius-10xl,_20px)] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1204:85736" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[342px] h-[250px] absolute left-[0px] top-[-9px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -216.001px / 100% 245.582% no-repeat"
+      <div data-figma="Scene" data-node="1204:85736" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[342px] h-[250px] absolute left-[0px] top-[-9px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -216.001px / 100% 245.582% no-repeat"
     }} />
       <div data-figma="Fade" data-node="1204:85737" className="w-[342px] h-[232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1204:85738" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[164px] w-[180px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"둘이 찍은 사진인데\n지만 보정해서 올린 여우"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -121,8 +121,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "2 276") return <div data-figma="type=2 276" data-node="1204:85753" className={cx("w-[276px] h-[187px] [aspect-ratio:245/166] [border-radius:var(--radius-10xl,_20px)] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1204:85747" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[276px] h-[202px] absolute left-[0px] top-[-9px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -174.529px / 100% 245.582% no-repeat"
+      <div data-figma="Scene" data-node="1204:85747" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[276px] h-[202px] absolute left-[0px] top-[-9px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -174.529px / 100% 245.582% no-repeat"
     }} />
       <div data-figma="Fade" data-node="1204:85748" className="w-[276px] h-[187px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1204:85749" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[122px] w-[109px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"부모님이 맨날\n내 앞에서 싸움"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -148,8 +148,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "수정본") return <div data-figma="type=수정본" data-node="1299:19988" className={cx("w-[318px] h-[232px] [border-radius:20px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1299:19982" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -200.449px / 100% 245.582% no-repeat"
+      <div data-figma="Scene" data-node="1299:19982" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -200.449px / 100% 245.582% no-repeat"
     }} />
       <div data-figma="Fade" data-node="1299:19983" className="w-[318px] h-[232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1299:19984" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[164px] w-[180px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"둘이 찍은 사진인데\n지만 보정해서 올린 여우"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -177,8 +177,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "수정본 2") return <div data-figma="type=수정본 2" data-node="1299:19998" className={cx("w-[318px] h-[232px] [border-radius:20px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1299:19990" data-img={"{\"src\":\"./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.jpg) 50% / cover no-repeat"
+      <div data-figma="Scene" data-node="1299:19990" data-img={"{\"src\":\"./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[318px] h-[232px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.png) 50% / cover no-repeat"
     }} />
       <div data-figma="Fade" data-node="1299:19991" className="w-[318px] h-[232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1299:19992" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[164px] w-[150px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"남친이 1주년 선물로\n다이소 틴트 사줌"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -213,8 +213,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "수정본 3") return <div data-figma="type=수정본 3" data-node="1299:20009" className={cx("w-[342px] h-[232px] [border-radius:20px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1299:20000" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[342px] h-[250px] absolute left-[0px] top-[-9px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -216.001px / 100% 245.582% no-repeat"
+      <div data-figma="Scene" data-node="1299:20000" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[342px] h-[250px] absolute left-[0px] top-[-9px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -216.001px / 100% 245.582% no-repeat"
     }} />
       <div data-figma="Fade" data-node="1299:20001" className="w-[342px] h-[232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1299:20002" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[164px] w-[180px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"둘이 찍은 사진인데\n지만 보정해서 올린 여우"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
@@ -251,8 +251,8 @@ export function CarouselCard({
       </div>
     </div>;
   if (type === "수정본 4") return <div data-figma="type=수정본 4" data-node="1299:20017" className={cx("w-[276px] h-[187px] [aspect-ratio:245/166] [border-radius:20px] [background:var(--bg-elevated,_#222628)] relative overflow-hidden", className)} style={style}>
-      <div data-figma="Scene" data-node="1299:20011" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[276px] h-[202px] absolute left-[0px] top-[-9px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -174.529px / 100% 245.582% no-repeat"
+      <div data-figma="Scene" data-node="1299:20011" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="w-[276px] h-[202px] absolute left-[0px] top-[-9px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -174.529px / 100% 245.582% no-repeat"
     }} />
       <div data-figma="Fade" data-node="1299:20012" className="w-[276px] h-[187px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] absolute left-[0px] top-[0px]" />
       <p data-figma="Carousel Title" data-node="1299:20013" data-outline="" className="[color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [letter-spacing:-0.8px] absolute left-[16px] top-[122px] w-[109px] h-[56px] shrink-0 [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent]"><span className="relative top-[-0.28px] left-[0px]">{"부모님이 맨날\n내 앞에서 싸움"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{

@@ -12,8 +12,8 @@ export function DRRRK52({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)" data-node="1647:22677" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="scene (방 미리보기)" data-node="1647:22678" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.5734883546829224,0.24865606427192688]],\"op\":1,\"flip\":\"\"}"} className="w-[426px] h-[438px] absolute left-[-18px] top-[0px]" style={{
-      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 0px -189.91px / 100% 174.371% no-repeat"
+      <div data-figma="scene (방 미리보기)" data-node="1647:22678" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.5734883546829224,0.24865606427192688]],\"op\":1,\"flip\":\"\"}"} className="w-[426px] h-[438px] absolute left-[-18px] top-[0px]" style={{
+      "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 0px -189.91px / 100% 174.371% no-repeat"
     }} />
       <div data-figma="scene fade" data-node="1647:22679" className="w-[390px] h-[140px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_#121415_100%)] absolute left-[0px] top-[300px]" />
       <div data-figma="Rectangle 1954141373" data-node="1647:22680" className="w-[390px] h-[125px] [background:linear-gradient(180deg,_#000_0%,_rgba(0,_0,_0,_0.00)_100%)] absolute left-[0px] top-[0px]" />

@@ -44,8 +44,8 @@ export function CommunityPostItem({
             __html: svg[previewSvg]
           }} /> : null}</p>
         </div>
-        <div data-figma="Thumb" data-node="1299:19722" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:10px] shrink-0" style={{
-        "background": "url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.jpg) 50% / cover no-repeat"
+        <div data-figma="Thumb" data-node="1299:19722" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:10px] shrink-0" style={{
+        "background": "url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.png) 50% / cover no-repeat"
       }} />
       </div>
       <div data-figma="Meta" data-node="1299:19723" className="flex [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">

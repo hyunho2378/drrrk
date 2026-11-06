@@ -13,8 +13,8 @@ export function DRRRK21({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 현장 모드" data-node="1647:25052" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:25053" className="w-[390px] h-[844px] [opacity:0.35] [background:#000] absolute left-[0px] top-[0px]" />
-      <div data-figma="image 1208091463" data-node="1647:25054" data-img={"{\"src\":\"./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.jpg\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08604858070611954],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[390px] h-[844px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.jpg) 50% / cover no-repeat"
+      <div data-figma="image 1208091463" data-node="1647:25054" data-img={"{\"src\":\"./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.png\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08604858070611954],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[390px] h-[844px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.png) 50% / cover no-repeat"
     }} />
       <div data-figma="Status Bar" data-node="1712:25336" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25336;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">

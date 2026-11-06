@@ -12,8 +12,8 @@ export function DRRRK14({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 현장 모드" data-node="1647:23761" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="image 1208091463" data-node="1647:23763" data-img={"{\"src\":\"./assets/images/43e991f75c8d3169f64e9a0695d94b6b9b0acda9.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[390px] h-[844px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/43e991f75c8d3169f64e9a0695d94b6b9b0acda9.jpg) 50% / cover no-repeat"
+      <div data-figma="image 1208091463" data-node="1647:23763" data-img={"{\"src\":\"./assets/images/43e991f75c8d3169f64e9a0695d94b6b9b0acda9.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[390px] h-[844px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/43e991f75c8d3169f64e9a0695d94b6b9b0acda9.png) 50% / cover no-repeat"
     }} />
       <div data-figma="Status Bar" data-node="1712:25236" data-instance-of="Status Bar" className="flex w-[390px] h-[64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] absolute left-[0px] top-[0px] overflow-hidden">
         <div data-figma="Group 3" data-node="I1712:25236;3035:448" className="w-[316.391px] h-[22.767px] shrink-0 absolute left-[40.52px] top-[20.26px]">

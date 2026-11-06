@@ -30,8 +30,8 @@ export function V3({
             __html: svg["1647:24627"]
           }} /></p>
           <div data-figma="대화 다시보기" data-node="1647:24628" className="flex [padding:10px_14px_10px_10px] [align-items:center] gap-[12px] [align-self:stretch] [border-radius:14px] [background:#222628] shrink-0 overflow-hidden">
-            <div data-figma="Thumb" data-node="1647:24629" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[52px] h-[52px] [border-radius:10px] shrink-0" style={{
-            "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 50% / cover no-repeat"
+            <div data-figma="Thumb" data-node="1647:24629" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[52px] h-[52px] [border-radius:10px] shrink-0" style={{
+            "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
           }} />
             <div data-figma="Frame" data-node="1647:24630" className="flex [flex-direction:column] [align-items:flex-start] gap-[2px] [flex:1_0_0] overflow-hidden">
               <p data-figma="대화 다시보기" data-node="1647:24631" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:14px] [font-style:normal] [font-weight:700] [line-height:17px] shrink-0 w-[77px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.404px] left-[0px]">{"대화 다시보기"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{

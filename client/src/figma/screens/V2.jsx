@@ -161,8 +161,8 @@ export function V2({
                   __html: svg["1647:29375"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29376" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
-              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 50% / cover no-repeat"
+              <div data-figma="Thumb" data-node="1647:29376" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="Meta" data-node="1647:29377" className="flex h-[24px] [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">
@@ -197,8 +197,8 @@ export function V2({
                   __html: svg["1647:29391"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29392" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
-              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 50% / cover no-repeat"
+              <div data-figma="Thumb" data-node="1647:29392" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="Meta" data-node="1647:29393" className="flex h-[24px] [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">
@@ -233,8 +233,8 @@ export function V2({
                   __html: svg["1647:29407"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29408" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
-              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.jpg) 50% / cover no-repeat"
+              <div data-figma="Thumb" data-node="1647:29408" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="w-[64px] h-[64px] [border-radius:12px] shrink-0" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.png) 50% / cover no-repeat"
             }} />
             </div>
             <div data-figma="Meta" data-node="1647:29409" className="flex h-[24px] [justify-content:center] [align-items:center] gap-[8px] [align-self:stretch] shrink-0 overflow-hidden">

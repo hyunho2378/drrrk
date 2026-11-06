@@ -12,8 +12,8 @@ export function DRRRK18({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 해 뜬 순간" data-node="1647:24283" className={cx("w-[390px] h-[844px] [background:#121415] relative overflow-hidden", className)} style={style}>
-      <div data-figma="image 1208091463" data-node="1647:24285" data-img={"{\"src\":\"./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.jpg\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08506019413471222],[0,1,-7.105427357601002e-15]],\"op\":1,\"flip\":\"\"}"} className="w-[390px] h-[844px] absolute left-[0px] top-[0px]" style={{
-      "background": "url(./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.jpg) 50% / cover no-repeat"
+      <div data-figma="image 1208091463" data-node="1647:24285" data-img={"{\"src\":\"./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.png\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08506019413471222],[0,1,-7.105427357601002e-15]],\"op\":1,\"flip\":\"\"}"} className="w-[390px] h-[844px] absolute left-[0px] top-[0px]" style={{
+      "background": "url(./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.png) 50% / cover no-repeat"
     }} />
       <div data-figma="내 채팅 (잠깐 떴다 사라짐)" data-node="1647:24291" className="inline-flex [padding:8px_12px] [align-items:center] gap-[6px] [border-radius:14px] [opacity:0.24] [background:#36D2FF] absolute left-[284px] top-[662px] w-[82px] h-[34px] overflow-hidden">
         <p data-figma="좋아여 빠이" data-node="1647:24292" data-outline="" className="[color:#000] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:18px] [letter-spacing:-0.52px] shrink-0 w-[58px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] m-0 [-webkit-text-fill-color:transparent] relative"><span className="relative top-[0.268px] left-[0px]">{"좋아여 빠이"}</span><span aria-hidden="true" className="absolute left-[0] top-[0] w-[0] h-[0] overflow-visible [line-height:0]" dangerouslySetInnerHTML={{
