@@ -40,6 +40,8 @@ export const motion = {
   pressOpacity: 0.1,
   splashOut: 400,
   splashStill: 1200,
+  // 로고 모션 영상(4초)은 2.1초에 움직임이 끝나고 나머지는 거의 멈춰 있다(프레임 차이 실측). 2.6초에서 끊고 옅어지게 한다.
+  splashCut: 2600,
 };
 
 export const layout = { screenWidth: 390, screenHeight: 844, touchMin: 44, listWidth: 560, logoWidth: 180 };
@@ -49,7 +51,8 @@ export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lin
 // 화면 위에서 실제로 움직이는 것들의 값(live.js).
 export const live = {
   screenW: 390,
-  timeScale: 15,
+  timeScale: 10,
+  screenH: 844,
   defaultLeft: 312,
   // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 12초에 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35).
   // C 혼자 드르륵은 시계만 흐르고 매칭 발견(42)은 누를 때만 연다. W 라운지 구경 방도 시계만 흐른다.
@@ -60,6 +63,10 @@ export const live = {
   swipeMin: 40,
   // 카드 아래 점 사이 간격(피그마 Page Dots 값).
   dotGap: 6,
+  // 위아래로 움직이는 목록 화면(라이브 10, 커뮤니티 39). 머리말 아래(112)부터 움직이고, 맨 끝 내용 아래로 여백을 둔다.
+  scrollScreens: [10, 39],
+  scrollTop: 112,
+  scrollPad: 24,
   chatFirst: 350,
   chatGap: 900,
   chatSpacing: 12,
