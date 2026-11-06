@@ -1,0 +1,21 @@
+.fx-drrrk-glass {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  /* 피그마 GLASS 효과: 굴절과 빛 반사는 CSS에 없다. 흐림만 옮기고 바탕색과 투명도는 노드 채움 그대로 쓴다. 대조에서 허용 목록으로 둔다. */
+}
+
+.fx-drrrk-shadow {
+  box-shadow: 0px 6px 16px 0px #0000001F;
+}
+
+.fx-drrrk-shadow-text {
+  box-shadow: 0px 0px 4px 0px #00000080;
+}
+
+.fx-drrrk-shadow-strong {
+  box-shadow: 0px 6px 16px 0px #00000073;
+}
+
+.fx-drrrk-shadow-toast {
+  box-shadow: 0px 8px 24px 0px #00000066;
+}
