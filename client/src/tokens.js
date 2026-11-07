@@ -115,11 +115,11 @@ export const live = {
   speakFirst: 1600,
   speakMin: 2200,
   speakMax: 4600,
-  // 온보딩(13): DRR, KAK 대신 주전부리 퀵슬롯
+  // 온보딩(13): 팀 제목은 그대로 두고 DRR, KAK 대신 이모지를 중심에 둔다
   onboardScreen: 13,
   onboardSlots: ['새우깡', '소주', '오징어땅콩'],
-  onboardTitle: '말하기 부담되면\n주전부리를 던져요',
-  onboardSub: '던질 때마다 받은 사람의 엉따 온도가 올라가요',
+  onboardTitle: null,
+  onboardSub: '+ 버튼을 눌러 이모지를 날려요',
   // MY 엉따 온도 막대
   gaugeMs: 1000,
   gaugeDelay: 200,
@@ -130,8 +130,17 @@ export const live = {
   // 주전부리 던지기(끌어서 놓기)
   throwCooldown: 30,
   throwFlyMs: 620,
-  throwWarm: 0.2,
   dragStart: 6,
+  // 던지는 곳은 방 한가운데 테이블이다(피그마 390x844 기준 좌표). nameGroupAt는 의자 이름표 묶음의 피그마 위치로, 휴대폰에서 배경이 옮겨진 만큼을 구하는 기준이다.
+  nameGroupAt: [-16, 233],
+  throwTable: { x: 96, y: 388, w: 198, h: 172 },
+  throwLand: { x: 138, y: 438, w: 112, h: 44 },
+  throwStayMs: 6000,
+  throwHintText: '가운데 테이블로 끌어서 던져요',
+  throwDoneText: '주전부리를 테이블에 올렸어요',
+  throwEmptyText: '남은 주전부리가 없어요',
+  throwCoolText: '쿨타임이에요. 조금만 기다려 주세요',
+  itemDesc: '라이브에서 던지면 가운데 테이블 위에 바삭하게 올라가요.',
 };
 
 export const zIndex = { hotspot: 50, bar: 60, splash: 100 };
