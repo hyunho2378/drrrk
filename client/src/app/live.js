@@ -37,7 +37,7 @@ function showEmptyOutlines(root) {
 }
 
 // ---------- 1) 상태바 시계 ----------
-const fmtClock = (d) => (d.getHours() % 12 || 12) + ':' + String(d.getMinutes()).padStart(2, '0');
+const fmtClock = (d) => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 function applyClock(root) {
   q(root, '[data-figma="9:41"]').forEach((el) => {
     if (el.dataset.live) return;
