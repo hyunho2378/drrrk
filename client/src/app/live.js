@@ -10,6 +10,7 @@ import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
 import { attachTabs, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
 import { warm } from './donor.js';
+import { applySync } from './sync.js';
 
 export { setText };
 
@@ -37,6 +38,7 @@ function showEmptyOutlines(root) {
 }
 
 // ---------- 1) 상태바 시계 ----------
+// 24시간제(23:50). iOS 상태바와 같은 두 자리 시.
 const fmtClock = (d) => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 function applyClock(root) {
   q(root, '[data-figma="9:41"]').forEach((el) => {
@@ -453,6 +455,7 @@ export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;
   current = { n, go, layer };
+  applySync(root);
   showEmptyOutlines(root);
   attachRoom(root, n);
   attachThrow(root);
