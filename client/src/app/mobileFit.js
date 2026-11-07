@@ -73,19 +73,24 @@ export function fitMobile(container, root, visibleH) {
     });
     return v;
   };
+  // 빈 띠가 모자라면 입력창 바로 위에 이어 붙은 채팅도 입력창과 같이 올린다. 단, 올린 자리가 다른 내용(배경 그림 제외)과 겹치면 올리지 않는다.
   if (rest > 0) {
     let top = pinTop;
+    const grown = [];
     for (let grew = true; grew; ) {
       grew = false;
       blocks.forEach((k) => {
-        if (pinned.has(k) || k.t < M.clusterMin || k.b > top + 1) return;
+        if (pinned.has(k) || grown.includes(k) || k.t < M.clusterMin || k.b > top + 1) return;
         if (k.b >= top - M.clusterGap) {
-          pinned.add(k);
+          grown.push(k);
           top = Math.min(top, k.t);
           grew = true;
         }
       });
     }
+    const clash = grown.some((g) => blocks.some((o) => !pinned.has(o) && !grown.includes(o) &&
+      Math.min(g.b - delta, o.b) - Math.max(g.t - delta, o.t) > 4 && Math.min(g.l + g.w, o.l + o.w) - Math.max(g.l, o.l) > 4));
+    if (!clash) grown.forEach((g) => pinned.add(g));
   }
   const shiftOf = (k) => {
     if (k.native) return 0;
@@ -97,6 +102,8 @@ export function fitMobile(container, root, visibleH) {
   kids.forEach((k) => {
     k.shift = shiftOf(k);
     if (k.shift) k.el.style.top = k.t - k.shift + 'px';
+    // 바닥 요소는 스크롤되는 내용 위에 놓는다.
+    if (pinned.has(k) && rest > 0) k.el.style.zIndex = String(M.pinZ);
   });
   // 피그마 스크롤 칸은 보이는 높이까지만 남긴다(안쪽 내용은 그대로 스크롤된다).
   native.forEach((k) => {
