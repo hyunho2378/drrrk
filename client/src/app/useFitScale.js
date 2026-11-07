@@ -4,14 +4,18 @@
 import { useEffect, useState } from 'react';
 import { layout, mobile as M } from '../tokens.js';
 
+let last = null;
 function measure() {
-  if (typeof window === 'undefined') return { scale: 1, mobile: false, view: layout.screenHeight };
+  if (typeof window === 'undefined') return { scale: 1, mobile: false, view: layout.screenHeight, height: layout.screenHeight };
+  // 글을 쓰려고 키보드가 올라오면 화면 높이가 줄어든다. 그때는 배치를 다시 계산하지 않는다(화면이 찌그러지지 않게).
+  const ae = document.activeElement;
+  if (last && last.mobile && ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA') && window.innerWidth <= M.maxWidth) return last;
   const w = window.innerWidth, h = window.innerHeight;
   if (w <= M.maxWidth) {
     const scale = w / layout.screenWidth;
-    return { scale, mobile: true, view: h / scale };
+    return (last = { scale, mobile: true, view: h / scale, height: h });
   }
-  return { scale: Math.min(w / layout.screenWidth, h / layout.screenHeight), mobile: false, view: layout.screenHeight };
+  return (last = { scale: Math.min(w / layout.screenWidth, h / layout.screenHeight), mobile: false, view: layout.screenHeight, height: h });
 }
 
 export function useViewport() {

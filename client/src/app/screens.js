@@ -1,4 +1,5 @@
-// 피그마 루트 새 화면 47장. n은 사이트 번호, file은 src/figma/screens 파일 이름이다.
+// 피그마 화면 목록(루트 새 화면 + 편의점 화면). n은 사이트 번호, file은 src/figma/screens 파일 이름이다.
+// 번호는 처음 47장 번호를 그대로 쓰고, 지운 4, 11, 18, 44는 비어 있다. 새 화면은 48번부터다.
 export const SCREENS = [
  {
   "n": 1,
@@ -19,13 +20,6 @@ export const SCREENS = [
   "id": "1647:27027",
   "name": "DRRRK / 오늘 나눈 대화",
   "file": "Screen1647_27027",
-  "h": 844
- },
- {
-  "n": 4,
-  "id": "1647:21843",
-  "name": "DRRRK · 라운지 · 방 상세 (탭 후)",
-  "file": "DRRRK",
   "h": 844
  },
  {
@@ -71,13 +65,6 @@ export const SCREENS = [
   "h": 844
  },
  {
-  "n": 11,
-  "id": "1647:22677",
-  "name": "DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)",
-  "file": "DRRRK52",
-  "h": 844
- },
- {
   "n": 12,
   "id": "1647:22751",
   "name": "DRRRK · 온보딩 · 함께 드르륵 9",
@@ -109,7 +96,7 @@ export const SCREENS = [
   "n": 16,
   "id": "1647:22976",
   "name": "DRRRK · 온보딩 · 혼자 드르륵 5",
-  "file": "DRRRK53",
+  "file": "DRRRK52",
   "h": 844
  },
  {
@@ -117,13 +104,6 @@ export const SCREENS = [
   "id": "1647:23028",
   "name": "DRRRK · 온보딩 · 혼자 드르륵 6",
   "file": "DRRRK6",
-  "h": 844
- },
- {
-  "n": 18,
-  "id": "1647:23081",
-  "name": "MY · 메인 (엉따 온도 + 꾸미기)",
-  "file": "MY",
   "h": 844
  },
  {
@@ -151,14 +131,14 @@ export const SCREENS = [
   "n": 22,
   "id": "1647:23371",
   "name": "DRRRK · 드르륵 · 일반 모드 · 이름 탭 가능",
-  "file": "DRRRK2",
+  "file": "DRRRK",
   "h": 844
  },
  {
   "n": 23,
   "id": "1647:23388",
   "name": "DRRRK · 드르륵 · 일반 모드 · 이름 탭 가능",
-  "file": "DRRRK3",
+  "file": "DRRRK2",
   "h": 844
  },
  {
@@ -179,61 +159,61 @@ export const SCREENS = [
   "n": 26,
   "id": "1647:23515",
   "name": "DRRRK · 고민 분석",
-  "file": "DRRRK4",
+  "file": "DRRRK3",
   "h": 844
  },
  {
   "n": 27,
   "id": "1671:45285",
   "name": "DRRRK · 추천 드르륵",
-  "file": "DRRRK7",
+  "file": "DRRRK4",
   "h": 844
  },
  {
   "n": 28,
-  "id": "1647:23612",
-  "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK8",
+  "id": "1807:23107",
+  "name": "주전부리 · 퀵슬롯 (기본)",
+  "file": "Screen1807_23107",
   "h": 844
  },
  {
   "n": 29,
-  "id": "1647:23694",
-  "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK13",
+  "id": "1807:23214",
+  "name": "주전부리 · 퀵슬롯 (접힘)",
+  "file": "Screen1807_23214",
   "h": 844
  },
  {
   "n": 30,
-  "id": "1647:23761",
-  "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK14",
+  "id": "1807:22997",
+  "name": "주전부리 · 퀵슬롯 (사용 + 쿨타임)",
+  "file": "Screen1807_22997",
   "h": 844
  },
  {
   "n": 31,
-  "id": "1647:23840",
-  "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK15",
+  "id": "1807:23281",
+  "name": "주전부리 · 퀵슬롯 (접힘)",
+  "file": "Screen1807_23281",
   "h": 844
  },
  {
   "n": 32,
   "id": "1647:23954",
   "name": "DRRRK · 드르륵 · 일반 모드",
-  "file": "DRRRK16",
+  "file": "DRRRK7",
   "h": 844
  },
  {
   "n": 33,
   "id": "1647:24030",
   "name": "DRRRK · 드르륵 · 일반 모드",
-  "file": "DRRRK17",
+  "file": "DRRRK8",
   "h": 844
  },
  {
   "n": 34,
-  "id": "1647:24143",
+  "id": "1806:11080",
   "name": "DRRRK · 홈 (Dark)",
   "file": "DRRRKDark3",
   "h": 844
@@ -242,21 +222,21 @@ export const SCREENS = [
   "n": 35,
   "id": "1647:24283",
   "name": "DRRRK · 드르륵 · 해 뜬 순간",
-  "file": "DRRRK18",
+  "file": "DRRRK13",
   "h": 844
  },
  {
   "n": 36,
-  "id": "1647:24317",
-  "name": "MY · 메인 (엉따 온도 + 꾸미기)",
-  "file": "MY2",
+  "id": "1806:10936",
+  "name": "MY · 메인 (나의 편의점 개선안)",
+  "file": "MY",
   "h": 844
  },
  {
   "n": 37,
   "id": "1647:24531",
   "name": "DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)",
-  "file": "DRRRK54",
+  "file": "DRRRK53",
   "h": 844
  },
  {
@@ -284,35 +264,28 @@ export const SCREENS = [
   "n": 41,
   "id": "1647:24874",
   "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK19",
+  "file": "DRRRK14",
   "h": 844
  },
  {
   "n": 42,
-  "id": "1647:24954",
+  "id": "1804:12770",
   "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK20",
+  "file": "DRRRK15",
   "h": 844
  },
  {
   "n": 43,
   "id": "1647:25052",
   "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK21",
-  "h": 844
- },
- {
-  "n": 44,
-  "id": "1647:25113",
-  "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK22",
+  "file": "DRRRK16",
   "h": 844
  },
  {
   "n": 45,
   "id": "1647:25167",
   "name": "DRRRK · 추천 드르륵",
-  "file": "DRRRK23",
+  "file": "DRRRK17",
   "h": 844
  },
  {
@@ -328,14 +301,116 @@ export const SCREENS = [
   "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)-1",
   "file": "DRRRK51",
   "h": 844
+ },
+ {
+  "n": 48,
+  "id": "1806:11296",
+  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
+  "file": "DRRRK54",
+  "h": 844
+ },
+ {
+  "n": 49,
+  "id": "1806:11462",
+  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
+  "file": "DRRRK55",
+  "h": 844
+ },
+ {
+  "n": 50,
+  "id": "1806:11630",
+  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
+  "file": "DRRRK56",
+  "h": 844
+ },
+ {
+  "n": 51,
+  "id": "1806:11799",
+  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
+  "file": "DRRRK57",
+  "h": 844
+ },
+ {
+  "n": 52,
+  "id": "1806:11979",
+  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
+  "file": "DRRRK58",
+  "h": 844
+ },
+ {
+  "n": 53,
+  "id": "1790:10756",
+  "name": "MY · 나의 편의점 (시트 펼침)",
+  "file": "MY2",
+  "h": 844
+ },
+ {
+  "n": 54,
+  "id": "1790:10988",
+  "name": "MY · 나의 편의점 (아이템 상세)",
+  "file": "MY3",
+  "h": 844
  }
 ];
 
-const modules = import.meta.glob('../figma/screens/*.jsx');
+export const SCREEN_BY_N = Object.fromEntries(SCREENS.map((s) => [s.n, s]));
+
+const modules = {
+  'Screen1647_26726': () => import('../figma/screens/Screen1647_26726.jsx'),
+  'Screen1647_26876': () => import('../figma/screens/Screen1647_26876.jsx'),
+  'Screen1647_27027': () => import('../figma/screens/Screen1647_27027.jsx'),
+  'CHAT01': () => import('../figma/screens/CHAT01.jsx'),
+  'CHAT012': () => import('../figma/screens/CHAT012.jsx'),
+  'CHAT03': () => import('../figma/screens/CHAT03.jsx'),
+  'CHAT04': () => import('../figma/screens/CHAT04.jsx'),
+  'CHAT00': () => import('../figma/screens/CHAT00.jsx'),
+  'DRRRK5': () => import('../figma/screens/DRRRK5.jsx'),
+  'DRRRK9': () => import('../figma/screens/DRRRK9.jsx'),
+  'DRRRK10': () => import('../figma/screens/DRRRK10.jsx'),
+  'DRRRK11': () => import('../figma/screens/DRRRK11.jsx'),
+  'DRRRK12': () => import('../figma/screens/DRRRK12.jsx'),
+  'DRRRK52': () => import('../figma/screens/DRRRK52.jsx'),
+  'DRRRK6': () => import('../figma/screens/DRRRK6.jsx'),
+  'MY39': () => import('../figma/screens/MY39.jsx'),
+  'Screen1647_23223': () => import('../figma/screens/Screen1647_23223.jsx'),
+  'Screen1647_23282': () => import('../figma/screens/Screen1647_23282.jsx'),
+  'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
+  'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),
+  'DRRRKDark': () => import('../figma/screens/DRRRKDark.jsx'),
+  'DRRRKDark2': () => import('../figma/screens/DRRRKDark2.jsx'),
+  'DRRRK3': () => import('../figma/screens/DRRRK3.jsx'),
+  'DRRRK4': () => import('../figma/screens/DRRRK4.jsx'),
+  'Screen1807_23107': () => import('../figma/screens/Screen1807_23107.jsx'),
+  'Screen1807_23214': () => import('../figma/screens/Screen1807_23214.jsx'),
+  'Screen1807_22997': () => import('../figma/screens/Screen1807_22997.jsx'),
+  'Screen1807_23281': () => import('../figma/screens/Screen1807_23281.jsx'),
+  'DRRRK7': () => import('../figma/screens/DRRRK7.jsx'),
+  'DRRRK8': () => import('../figma/screens/DRRRK8.jsx'),
+  'DRRRKDark3': () => import('../figma/screens/DRRRKDark3.jsx'),
+  'DRRRK13': () => import('../figma/screens/DRRRK13.jsx'),
+  'MY': () => import('../figma/screens/MY.jsx'),
+  'DRRRK53': () => import('../figma/screens/DRRRK53.jsx'),
+  'V3': () => import('../figma/screens/V3.jsx'),
+  'V2': () => import('../figma/screens/V2.jsx'),
+  'Screen1647_24788': () => import('../figma/screens/Screen1647_24788.jsx'),
+  'DRRRK14': () => import('../figma/screens/DRRRK14.jsx'),
+  'DRRRK15': () => import('../figma/screens/DRRRK15.jsx'),
+  'DRRRK16': () => import('../figma/screens/DRRRK16.jsx'),
+  'DRRRK17': () => import('../figma/screens/DRRRK17.jsx'),
+  'Screen1647_25199': () => import('../figma/screens/Screen1647_25199.jsx'),
+  'DRRRK51': () => import('../figma/screens/DRRRK51.jsx'),
+  'DRRRK54': () => import('../figma/screens/DRRRK54.jsx'),
+  'DRRRK55': () => import('../figma/screens/DRRRK55.jsx'),
+  'DRRRK56': () => import('../figma/screens/DRRRK56.jsx'),
+  'DRRRK57': () => import('../figma/screens/DRRRK57.jsx'),
+  'DRRRK58': () => import('../figma/screens/DRRRK58.jsx'),
+  'MY2': () => import('../figma/screens/MY2.jsx'),
+  'MY3': () => import('../figma/screens/MY3.jsx'),
+};
 
 export async function loadScreen(n) {
-  const s = SCREENS[n - 1];
+  const s = SCREEN_BY_N[n];
   if (!s) return null;
-  const mod = await modules['../figma/screens/' + s.file + '.jsx']();
+  const mod = await modules[s.file]();
   return Object.values(mod).find((v) => typeof v === 'function') || null;
 }

@@ -5,28 +5,25 @@
 // 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
 import { motion, live as LIVE } from '../tokens.js';
+import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
+import { attachRoom } from './room.js';
+import { attachThrow } from './throw.js';
+import { attachTabs, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
+import { warm } from './donor.js';
+
+export { setText };
 
 // 방마다 묶은 화면. W는 라운지에서 구경하는 방(시계만 흐르고 화면은 넘기지 않는다).
-export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23, 40], B: [29, 28, 30, 31, 32, 33, 35], C: [44, 46, 43, 41, 42], W: [11, 37] };
+export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23, 40], B: [29, 28, 30, 31, 32, 33, 35], C: [46, 43, 41, 42], W: [37] };
 export const sceneOf = (n) => Object.keys(ROOMS).find((k) => ROOMS[k].includes(n)) || null;
 
-const q = (root, sel) => Array.from(root.querySelectorAll(sel));
-const rootOf = (layer) => layer.querySelector('[data-node]');
 const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
-const scaleOf = (root) => root.getBoundingClientRect().width / LIVE.screenW || 1;
-const relRect = (root, el) => {
-  const s = scaleOf(root), a = root.getBoundingClientRect(), b = el.getBoundingClientRect();
-  return { x: (b.left - a.left) / s, y: (b.top - a.top) / s, w: b.width / s, h: b.height / s };
-};
 
-// 윤곽으로 그린 글자(p[data-outline])를 실제 글자로 바꾼다. 글꼴, 크기, 색은 피그마 값(클래스) 그대로다.
-export function setText(p, text) {
-  if (!p) return;
-  const overlay = p.querySelector(':scope > span[aria-hidden]');
-  if (overlay) overlay.remove();
-  const span = p.querySelector(':scope > span') || p;
-  span.textContent = text;
-  p.style.webkitTextFillColor = 'currentColor';
+// 누른 자리가 가는 곳을 정한다. 아이템 상세를 닫으면 눌렀던 화면으로 돌아가고, 아이템을 누르면 어떤 아이템인지 적어 둔다.
+export function resolveTo(l) {
+  if (l.item) pickItem(l.item, l.from);
+  if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
+  return l;
 }
 
 // 피그마에서 윤곽 글자를 못 받은 칸(화면 밖에 걸친 카드 등)은 덮개가 비어 글자가 안 보인다. 그런 칸은 실제 글자를 보이게 한다.
@@ -52,6 +49,10 @@ function applyClock(root) {
     s.textContent = fmtClock(new Date());
     el.appendChild(s);
   });
+}
+export function mountClock(el) {
+  applyClock(el);
+  tickClock();
 }
 function tickClock() {
   const t = fmtClock(new Date());
@@ -217,8 +218,11 @@ function runAnalysis(root, ms) {
     first.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, easing: 'linear', fill: 'forwards' });
     second.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, delay: half, easing: 'linear', fill: 'forwards' });
   }
+  // 세 단계가 끝나면 모두 맨 위 단계와 같은 밝은 체크가 된다(피그마의 어두운 체크와 돌아가는 아이콘은 쓰지 않는다).
   const steps = q(root, '[data-figma^="step ·"]');
-  const checkTpl = root.querySelector('[data-figma^="step ·"] [data-figma="check"]');
+  const tpl = steps[0] && steps[0].querySelector('[data-figma="check"]');
+  const lab0 = steps[0] && steps[0].querySelector('p[data-outline]');
+  const color0 = lab0 ? getComputedStyle(lab0).color : '';
   steps.forEach((st, i) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
@@ -226,12 +230,16 @@ function runAnalysis(root, ms) {
     if (label) label.style.opacity = String(LIVE.stepDim);
     window.setTimeout(() => {
       let ic = icon;
-      if (icon && icon.getAttribute('data-figma') === 'spinner' && checkTpl) {
-        ic = checkTpl.cloneNode(true);
+      if (i > 0 && icon && tpl) {
+        ic = tpl.cloneNode(true);
         icon.replaceWith(ic);
       }
       if (ic) { ic.style.opacity = ''; ic.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
-      if (label) { label.style.opacity = ''; label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn }); }
+      if (label) {
+        if (i > 0 && color0) { label.style.color = color0; setText(label, label.textContent); }
+        label.style.opacity = '';
+        label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn });
+      }
     }, ((i + 1) * ms) / (steps.length + 0.4));
   });
 }
@@ -287,7 +295,8 @@ function scrollerOf(layer, root, n) {
   const generic = !!(fit && fit.rest > 0 && !fit.native);
   if (!LIVE.scrollScreens.includes(n) && !generic) return null;
   const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
-  const pins = fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : [];
+  const named = (LIVE.pinNames[n] || []).map((nm) => root.querySelector(':scope > [data-figma="' + nm + '"]')).filter(Boolean);
+  const pins = [...(fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : []), ...named];
   const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : LIVE.screenH;
   const box = root.querySelector(':scope > [data-figma="Scroll"]');
   let items, top;
@@ -358,12 +367,34 @@ function scrollerOf(layer, root, n) {
   return s;
 }
 
+// MY 편의점 선반(가로 스크롤). 끌면 선반과 그 위의 누르는 자리가 같이 움직인다.
+function shelfOf(layer, root) {
+  const content = root.querySelector('[data-figma="shelf content"]');
+  if (!content) return null;
+  const r = relRect(root, content);
+  const hot = q(layer, '[data-hotspot]').filter((b) => (b.getAttribute('aria-label') || '').startsWith('아이템 '));
+  const min = -(r.w - LIVE.screenW);
+  const els = [content, ...hot];
+  const s = { x: 0, base: 0, band: [r.y, r.y + r.h + 20] };
+  s.drag = (dx) => {
+    const v = s.base + dx;
+    s.x = v > 0 ? v / 3 : v < min ? min + (v - min) / 3 : v;
+    els.forEach((el) => move(el, 'x', s.x, 0));
+  };
+  s.end = () => {
+    s.x = s.base = Math.max(min, Math.min(0, s.x));
+    els.forEach((el) => move(el, 'x', s.x, motion.stateIn + 150));
+  };
+  return s;
+}
+
 function attachDrag(layer, root, n) {
   if (root.dataset.drag) return;
   root.dataset.drag = '1';
   const car = carouselOf(layer, root);
   const scr = scrollerOf(layer, root, n);
-  if (!car && !scr) return;
+  const sh = shelfOf(layer, root);
+  if (!car && !scr && !sh) return;
   const yOf = (e) => (e.clientY - root.getBoundingClientRect().top) / scaleOf(root);
   let g = null, moved = false;
   layer.addEventListener('pointerdown', (e) => {
@@ -371,6 +402,7 @@ function attachDrag(layer, root, n) {
     moved = false;
     if (car) car.base = car.x;
     if (scr) scr.base = scr.y;
+    if (sh) sh.base = sh.x;
   });
   layer.addEventListener('pointermove', (e) => {
     if (!g || e.pointerId !== g.id) return;
@@ -379,19 +411,22 @@ function attachDrag(layer, root, n) {
     if (!g.axis) {
       if (Math.max(Math.abs(dx), Math.abs(dy)) < 6) return;
       const sy = g.sy + (scr ? scr.y : 0);
-      if (Math.abs(dx) > Math.abs(dy) && car && sy >= car.band[0] && sy <= car.band[1]) g.axis = 'x';
+      if (Math.abs(dx) > Math.abs(dy) && sh && g.sy >= sh.band[0] && g.sy <= sh.band[1]) g.axis = 'h';
+      else if (Math.abs(dx) > Math.abs(dy) && car && sy >= car.band[0] && sy <= car.band[1]) g.axis = 'x';
       else if (Math.abs(dy) >= Math.abs(dx) && scr && scr.inRegion(g.sy)) g.axis = 'y';
       else { g = null; return; }
       moved = true;
       try { layer.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
     }
     if (g.axis === 'x') car.drag(dx);
+    else if (g.axis === 'h') sh.drag(dx);
     else scr.drag(dy);
   });
   const up = (e) => {
     if (!g || e.pointerId !== g.id) return;
     const s = scaleOf(root);
     if (g.axis === 'x') car.end((e.clientX - g.x) / s);
+    else if (g.axis === 'h') sh.end();
     else if (g.axis === 'y') scr.end();
     g = null;
   };
@@ -404,7 +439,7 @@ function attachDrag(layer, root, n) {
       e.preventDefault();
       scr.wheel(e.deltaY / scaleOf(root));
     }, { passive: false });
-  } else layer.style.touchAction = 'pan-y';
+  } else layer.style.touchAction = sh ? 'pan-y' : 'pan-y';
   // 끌어서 움직인 직후의 누름은 화면 이동으로 보지 않는다.
   layer.addEventListener('click', (e) => {
     if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
@@ -418,10 +453,15 @@ export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;
   current = { n, go, layer };
-  applyClock(root);
   showEmptyOutlines(root);
+  attachRoom(root, n);
+  attachThrow(root);
   attachInputs(root, n, go);
   attachDrag(layer, root, n);
+  attachTabs(root, n);
+  if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) animateGauge(root);
+  if (n === LIVE.itemScreen) fillItem(root);
+  warm(LIVE.warmDonors);
   const sc = sceneOf(n);
   if (sc) {
     const kind = timerKind(root);
@@ -430,7 +470,8 @@ export function attach(layer, n, go, prevN) {
       if (room.scene !== sc) room.chatDone = false;
       room.scene = sc;
       room.kind = kind;
-      room.left = parseMMSS(t && t.textContent) ?? LIVE.defaultLeft;
+      void t;
+      room.left = LIVE.roomSeconds;
       room.at = performance.now();
       room.fired = {};
     }

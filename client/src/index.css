@@ -10,3 +10,5 @@
 html, body { background: var(--gray-800); color: var(--text-primary); font-family: 'SUIT', system-ui, sans-serif; }
 
 .live-input::placeholder { color: transparent; }
+
+html, body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; }

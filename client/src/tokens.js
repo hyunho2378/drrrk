@@ -28,6 +28,7 @@ export const motion = {
   modalScale: 0.92,
   stateIn: 150,
   stateOut: 90,
+  tab: 180,
   press: 100,
   hint: 450,
   reduced: 150,
@@ -55,20 +56,24 @@ export const mobile = { maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600
 // 화면 위에서 실제로 움직이는 것들의 값(live.js).
 export const live = {
   screenW: 390,
-  timeScale: 10,
   screenH: 844,
-  defaultLeft: 312,
-  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 12초에 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35).
-  // C 혼자 드르륵은 시계만 흐르고 매칭 발견(42)은 누를 때만 연다. W 라운지 구경 방도 시계만 흐른다.
-  rooms: { A: [{ at: 72, to: 40 }, { at: 0, to: 2 }], B: [{ at: 0, to: 35 }] },
+  // 방 시계는 실제 시간으로 3분이다(배속 없음). 방에 들어가면 03:00에서 시작해 1초에 1초씩 줄어든다.
+  timeScale: 1,
+  roomSeconds: 180,
+  defaultLeft: 180,
+  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 남으면 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35).
+  // C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
+  rooms: { A: [{ at: 60, to: 40 }, { at: 0, to: 2 }], B: [{ at: 0, to: 35 }] },
   // 입력칸으로 살릴 안내 글(이 글이 있는 칸만 실제로 쓸 수 있게 한다).
   inputHint: /한마디|댓글|메시지/,
   // 카드를 이만큼(px) 넘게 끌면 다음 카드로 넘긴다.
   swipeMin: 40,
   // 카드 아래 점 사이 간격(피그마 Page Dots 값).
   dotGap: 6,
-  // 위아래로 움직이는 목록 화면(라이브 10, 커뮤니티 39). 머리말 아래(112)부터 움직이고, 맨 끝 내용 아래로 여백을 둔다.
-  scrollScreens: [10, 39],
+  // 위아래로 움직이는 화면(라이브 10, 라운지 카테고리 48~52, 글 상세 38, 커뮤니티 39). 머리말 아래(112)부터 움직이고, 맨 끝 내용 아래로 여백을 둔다.
+  scrollScreens: [10, 38, 39, 48, 49, 50, 51, 52],
+  // 스크롤하지 않고 제자리에 두는 요소(글 상세의 댓글 입력줄).
+  pinNames: { 38: ['input'] },
   scrollTop: 112,
   scrollPad: 24,
   chatFirst: 350,
@@ -76,7 +81,7 @@ export const live = {
   chatSpacing: 12,
   chatTop: 470,
   bubbleMax: 260,
-  afterSend: { 44: 43, 46: 41, 43: 41 },
+  afterSend: {},
   afterSendMs: 900,
   myName: '나',
   justNow: '방금 전',
@@ -87,6 +92,46 @@ export const live = {
   // 상태바 시간: 피그마 Status Bar의 9:41 글자 값(SF Pro Text Semibold 17.075px, 행간 22.767px, 자간 -0.569px).
   clockStyle: { display: 'block', width: '100%', height: '100%', textAlign: 'center', fontFamily: '-apple-system, "SF Pro Text", system-ui, sans-serif', fontSize: '17.075px', fontWeight: '600', lineHeight: '22.767px', letterSpacing: '-0.569px', color: 'var(--white)', transform: 'translateY(-0.5px)', whiteSpace: 'pre' },
   inputStyle: { position: 'absolute', inset: '0', width: '100%', height: '100%', border: '0', outline: 'none', background: 'transparent', color: 'var(--text-primary)', caretColor: 'var(--brand-primary)', padding: '0', margin: '0' },
+  // 라운지 카테고리: 연애(49)를 열면 빨간 점이 사라진다.
+  loveScreen: 49,
+  // 알림 글과 이모지
+  toastMs: 2400,
+  emojiFlyMs: 1000,
+  // 고민 배너 펼치기
+  bannerClosedH: 40,
+  bannerOpenH: 162,
+  bannerMs: 300,
+  bannerBody: '친구가 썸남 앞에서 내 쌍꺼풀 수술을 말해버렸어. 셋이 있던 자리라 웃고 넘어갔는데 아직도 얼굴이 화끈거려. 어떻게 풀어야 할까',
+  bannerTags: ['#친구관계', '#연애'],
+  // 마이크
+  micThreshold: 0.07,
+  micOnText: '마이크가 켜졌어요. 말하면 내 의자가 빛나요',
+  micMutedText: '마이크를 껐어요',
+  micDeniedText: '마이크 사용을 허용해야 목소리가 전달돼요',
+  micUnsupportedText: '이 브라우저는 마이크를 쓸 수 없어요. 사파리나 크롬에서 열어 주세요',
+  // 말하는 사람 돌리기
+  speakRing: '#2EE59D',
+  meWeight: 0.35,
+  speakFirst: 1600,
+  speakMin: 2200,
+  speakMax: 4600,
+  // 온보딩(13): DRR, KAK 대신 주전부리 퀵슬롯
+  onboardScreen: 13,
+  onboardSlots: ['새우깡', '소주', '오징어땅콩'],
+  onboardTitle: '말하기 부담되면\n주전부리를 던져요',
+  onboardSub: '던질 때마다 받은 사람의 엉따 온도가 올라가요',
+  // MY 엉따 온도 막대
+  gaugeMs: 1000,
+  gaugeDelay: 200,
+  // MY 화면들(엉따 온도 막대가 차는 화면)과 아이템 상세, 미리 그려 둘 화면
+  myScreens: [1, 2, 36, 53, 54],
+  itemScreen: 54,
+  warmDonors: [31, 43, 28],
+  // 주전부리 던지기(끌어서 놓기)
+  throwCooldown: 30,
+  throwFlyMs: 620,
+  throwWarm: 0.2,
+  dragStart: 6,
 };
 
 export const zIndex = { hotspot: 50, bar: 60, splash: 100 };

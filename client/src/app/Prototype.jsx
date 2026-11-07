@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useNavigationType, useParams } from 'react-router-dom';
-import { SCREENS, loadScreen } from './screens.js';
+import { SCREEN_BY_N, loadScreen } from './screens.js';
 import { LINKS, AUTO, START } from './flow.js';
 import { motion, mobile as MOB } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
@@ -8,7 +8,8 @@ import { useReducedMotion } from './useReducedMotion.js';
 import { morph } from './morph.js';
 import { useViewport } from './useFitScale.js';
 import { fitMobile } from './mobileFit.js';
-import { attach } from './live.js';
+import { attach, resolveTo } from './live.js';
+import SystemStatusBar from './SystemStatusBar.jsx';
 import { SCREEN_ASSETS } from './screenAssets.js';
 
 // 화면 하나를 그리는 칸. 새 화면은 투명하게 먼저 그리고, 피그마 마무리 단계(그림과 글자 다시 그리기)가 끝나면 알린다.
@@ -24,6 +25,10 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp }) {
     window.setTimeout(() => setHint(false), motion.hint);
   };
   const Comp = layer.Comp;
+  // 상태바는 맨 위 시스템 상태바 하나만 쓴다. 화면 안의 상태바는 숨긴다.
+  useLayoutEffect(() => {
+    ref.current.querySelectorAll('[data-figma="Status Bar"], [data-figma="스테이터스바"]').forEach((e) => (e.style.visibility = 'hidden'));
+  }, [layer.key]);
   // 휴대폰이면 그리자마자(보이기 전에) 높이를 맞춘다.
   useLayoutEffect(() => {
     if (vp.mobile) fitMobile(ref.current, ref.current.querySelector('[data-node]'), layer.h <= 845 ? vp.view : layer.h - MOB.crop);
@@ -99,6 +104,7 @@ export default function Prototype() {
   const holdDone = useRef(null);
   // 칸 번호(key)마다 어느 화면인지 적어 둔다. 전환이 겹쳐도 끝난 칸이 어느 화면인지 정확히 안다.
   const keyN = useRef(new Map());
+  const prevShown = useRef(0);
   // 전환 중에는 피그마 마무리 단계를 멈춰 둔다(window.__figmaHold). 전환이 끝나면 푼다.
   const hold = () => {
     if (holdDone.current) return;
@@ -130,7 +136,7 @@ export default function Prototype() {
         navigate('/s/' + START, { replace: true });
         return;
       }
-      const s = SCREENS[n - 1];
+      const s = SCREEN_BY_N[n];
       const key = ++seq;
       pending.current = { key, t };
       keyN.current.set(key, n);
@@ -160,7 +166,8 @@ export default function Prototype() {
         return;
       }
       const el = nodes.current.get(key);
-      if (el) attach(el, shownN || n, (l) => go(l));
+      if (el) attach(el, shownN || n, (l) => go(l), prevShown.current);
+      prevShown.current = shownN || n;
       window.scrollTo(0, 0);
       // 이 화면에서 갈 수 있는 화면의 코드를 미리 받아 둔다(다음 누름의 대기를 줄인다).
       const idle = window.requestIdleCallback || ((f) => window.setTimeout(f, 200));
@@ -173,7 +180,7 @@ export default function Prototype() {
           });
         }),
       );
-      const s = SCREENS[(shownN || n) - 1];
+      const s = SCREEN_BY_N[shownN || n];
       const au = AUTO[s && s.n];
       if (au) autoTimer.current = window.setTimeout(() => go({ to: au.to, t: au.t }), au.ms);
       if (queued.current) {
@@ -203,7 +210,23 @@ export default function Prototype() {
         return;
       }
       // 같은 방 안 상태 변화와 탭 전환: 요소 단위로 잇는다(탭바처럼 같은 요소는 움직이지 않는다).
-      if (t === 'fade' || t === 'tab') {
+      // 탭바로 화면을 옮길 때는 새 화면이 이전 화면 위에서 옅게 드러난다(이전 화면이 먼저 빠지면 깜빡여 보인다).
+      if (t === 'tab') {
+        next.style.zIndex = '2';
+        const ta = next.animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduced ? motion.reduced : motion.tab, easing: motion.standard, fill: 'both' });
+        let td = false;
+        const te = () => {
+          if (td) return;
+          td = true;
+          ta.cancel();
+          next.style.zIndex = '';
+          finish(key);
+        };
+        ta.onfinish = te;
+        window.setTimeout(te, motion.tab + 80);
+        return;
+      }
+      if (t === 'fade') {
         morph(prev, next, reduced).then(() => finish(key));
         return;
       }
@@ -255,7 +278,8 @@ export default function Prototype() {
         queued.current = l;
         return;
       }
-      navigate('/s/' + l.to, { state: { t: l.t } });
+      const r = resolveTo(l);
+      navigate('/s/' + r.to, { state: { t: r.t } });
     },
     [navigate],
   );
@@ -272,9 +296,10 @@ export default function Prototype() {
   const top = layers[layers.length - 1];
   const stageH = layers.reduce((m, l) => Math.max(m, visH(l, vp)), 0);
   return (
-    <div className="min-h-screen overflow-hidden bg-outside font-suit">
+    <div className="overflow-hidden bg-outside font-suit" style={{ minHeight: vp.mobile ? vp.height + 'px' : '100dvh' }}>
       <div className="mx-auto" style={{ width: 390 * scale, height: stageH * scale }}>
       <div className="relative w-screen origin-top-left overflow-hidden bg-base" style={{ height: stageH, transform: 'scale(' + scale + ')' }}>
+        {!vp.mobile && layers.length > 0 && <SystemStatusBar />}
         {layers.map((l) => (
           <Layer
             key={l.key}
