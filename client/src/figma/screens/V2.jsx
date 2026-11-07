@@ -161,7 +161,9 @@ export function V2({
                   __html: svg["1647:29375"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29376" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:12px] [background:url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp)_50%_/_cover_no-repeat] [flex-shrink:0]" />
+              <div data-figma="Thumb" data-node="1647:29376" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:12px] [flex-shrink:0]" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 50% / cover no-repeat"
+            }} />
             </div>
             <div data-figma="Meta" data-node="1647:29377" className="[display:flex] [height:24px] [justify-content:center] [align-items:center] [gap:8px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
               <p data-figma="딱딱한 나무스툴12" data-node="1647:29378" data-outline="" className="[width:84px] [height:16px] [color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.48px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"딱딱한 나무스툴12"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
@@ -195,7 +197,9 @@ export function V2({
                   __html: svg["1647:29391"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29392" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:12px] [background:url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp)_50%_/_cover_no-repeat] [flex-shrink:0]" />
+              <div data-figma="Thumb" data-node="1647:29392" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:12px] [flex-shrink:0]" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 50% / cover no-repeat"
+            }} />
             </div>
             <div data-figma="Meta" data-node="1647:29393" className="[display:flex] [height:24px] [justify-content:center] [align-items:center] [gap:8px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
               <p data-figma="새벽2시 택배상자" data-node="1647:29394" data-outline="" className="[width:84px] [height:16px] [color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.48px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
@@ -229,7 +233,9 @@ export function V2({
                   __html: svg["1647:29407"]
                 }} /></p>
               </div>
-              <div data-figma="Thumb" data-node="1647:29408" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:12px] [background:url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp)_50%_/_cover_no-repeat] [flex-shrink:0]" />
+              <div data-figma="Thumb" data-node="1647:29408" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:12px] [flex-shrink:0]" style={{
+              "background": "url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp) 50% / cover no-repeat"
+            }} />
             </div>
             <div data-figma="Meta" data-node="1647:29409" className="[display:flex] [height:24px] [justify-content:center] [align-items:center] [gap:8px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
               <p data-figma="새벽2시 택배상자" data-node="1647:29410" data-outline="" className="[width:84px] [height:16px] [color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.48px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{

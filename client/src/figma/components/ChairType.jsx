@@ -24,7 +24,9 @@ export function ChairType({
       <div data-figma="의자 선택 칸" data-node="1204:89228" data-instance-of="의자 선택 칸" className="[display:flex] [width:62px] [padding:var(--spacing-7,_8px)_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [border-radius:var(--radius-6xl,_14px)] [background:var(--bg-elevated,_#222628)] [flex-shrink:0] [overflow:hidden]">
         <div data-figma="Frame" data-node="I1204:89228;1204:87161" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="I1204:89228;1204:87162" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="image 1208091458" data-node="I1204:89228;1204:87162;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="image 1208091458" data-node="I1204:89228;1204:87162;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
+          }} />
           </div>
         </div>
         <div data-figma="Frame" data-node="I1204:89228;1204:87163" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
@@ -39,7 +41,9 @@ export function ChairType({
       }} />
         <div data-figma="Frame" data-node="I1204:89229;1204:87167" className="[width:46px] [height:46px] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="I1204:89229;1204:87168" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [opacity:0.3] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="image 1208091460" data-node="I1204:89229;1204:87168;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="image 1208091460" data-node="I1204:89229;1204:87168;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
+          }} />
           </div>
           <div data-figma="Icon / Line" data-node="I1204:89229;1204:87169" data-instance-of="Icon / Line" className="[display:flex] [width:16px] [height:16px] [justify-content:center] [align-items:center] [position:absolute] [left:15px] [top:15px]">
             <Icon data-figma="lock" data-node="I1204:89229;1204:87169;1405:48269" name="lock" color="var(--white, #FFFFFF)" className="[width:16px] [height:16px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />

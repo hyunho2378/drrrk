@@ -58,7 +58,9 @@ export function DRRRK17({
       <p data-figma="비슷한 고민으로 이야기 중인 방을 찾지 못했어요" data-node="1647:25197" data-outline="" className="[width:342px] [color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:28px] [font-style:normal] [font-weight:700] [line-height:39px] [letter-spacing:-1.12px] [position:absolute] [left:24px] [top:159px] [height:78px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.308px] [left:0px]"><span className="[font-weight:700] [font-size:28px] [color:#F8F8F8]">{"비슷한 고민으로"}</span><span className="[font-weight:800] [font-size:28px] [color:#F8F8F8]">{"\n이야기 중인 방을 찾지 못했어요"}</span></span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1647:25197"]
       }} /></p>
-      <div data-figma="image 1208091464" data-node="1647:25198" data-img={"{\"src\":\"./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:207px] [height:267px] [aspect-ratio:69/89] [background:url(./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.webp)_50%_/_cover_no-repeat] [position:absolute] [left:81px] [top:327px]" />
+      <div data-figma="image 1208091464" data-node="1647:25198" data-img={"{\"src\":\"./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:207px] [height:267px] [aspect-ratio:69/89] [position:absolute] [left:81px] [top:327px]" style={{
+      "background": "url(./assets/images/a35eb3f3d6b94067032500f9d0b4bb57bed9188d.webp) 50% / cover no-repeat"
+    }} />
     </div>;
   return null;
 }

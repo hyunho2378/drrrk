@@ -13,7 +13,9 @@ export function DRRRK16({
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 현장 모드" data-node="1647:25052" className={cx("[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="scene dim" data-node="1647:25053" className="[width:390px] [height:844px] [opacity:0.35] [background:#000] [position:absolute] [left:0px] [top:0px]" />
-      <div data-figma="image 1208091463" data-node="1647:25054" data-img={"{\"src\":\"./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.webp\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08604858070611954],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [background:url(./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+      <div data-figma="image 1208091463" data-node="1647:25054" data-img={"{\"src\":\"./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.webp\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08604858070611954],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [position:absolute] [left:0px] [top:0px]" style={{
+      "background": "url(./assets/images/0d21c11c106ed576a06835b9fe2df608135c65e2.webp) 50% / cover no-repeat"
+    }} />
       <div data-figma="chat fade" data-node="1807:24007" className="[width:390px] [height:334px] [background:linear-gradient(180deg,_rgba(0,_0,_0,_0.00)_0%,_rgba(0,_0,_0,_0.65)_100%)] [position:absolute] [left:0px] [top:510px]" />
       <div data-figma="Status Bar" data-node="1712:25336" data-instance-of="Status Bar" className="[display:flex] [width:390px] [height:64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] [position:absolute] [left:0px] [top:0px] [overflow:hidden]">
         <div data-figma="Group 3" data-node="I1712:25336;3035:448" className="[width:316.391px] [height:22.767px] [flex-shrink:0] [position:absolute] [left:40.52px] [top:20.26px]">

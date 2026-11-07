@@ -87,16 +87,24 @@ export function DRRRK9({
             </div>
             <div data-figma="아바타 줄" data-node="1647:22786" className="[display:inline-flex] [align-items:center] [gap:10px] [position:absolute] [left:20px] [top:64px] [width:190px] [height:40px] [overflow:hidden]">
               <div data-figma="avatar / box" data-node="1647:22787" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] [flex-shrink:0] [position:relative] [overflow:hidden]">
-                <div data-figma="image" data-node="1647:22788" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [background:url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+                <div data-figma="image" data-node="1647:22788" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" style={{
+                "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
+              }} />
               </div>
               <div data-figma="avatar / sofa" data-node="1647:22789" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] [flex-shrink:0] [position:relative] [overflow:hidden]">
-                <div data-figma="image" data-node="1647:22790" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [background:url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp)_3.217px_3.333px_/_83.916%_83.916%_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+                <div data-figma="image" data-node="1647:22790" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"CROP\",\"tf\":[[1.1916682720184326,0,-0.0958341509103775],[0,1.1916682720184326,-0.09930568933486938]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" style={{
+                "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 3.217px 3.333px / 83.916% 83.916% no-repeat"
+              }} />
               </div>
               <div data-figma="avatar / stool" data-node="1647:22791" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] [flex-shrink:0] [position:relative] [overflow:hidden]">
-                <div data-figma="image" data-node="1647:22792" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [background:url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp)_1.585px_1.667px_/_92.077%_92.077%_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+                <div data-figma="image" data-node="1647:22792" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"CROP\",\"tf\":[[1.0860475301742554,0,-0.043023731559515],[0,1.0860475301742554,-0.04525198042392731]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" style={{
+                "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 1.585px 1.667px / 92.077% 92.077% no-repeat"
+              }} />
               </div>
               <div data-figma="avatar / recl" data-node="1647:22793" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#121415] [flex-shrink:0] [position:relative] [overflow:hidden]">
-                <div data-figma="image" data-node="1647:22794" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [background:url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp)_1.579px_1.579px_/_92.106%_92.106%_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+                <div data-figma="image" data-node="1647:22794" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"CROP\",\"tf\":[[1.0857055187225342,0,-0.04285278171300888],[0,1.0857055187225342,-0.04285278171300888]],\"op\":1,\"flip\":\"\"}"} className="[width:40px] [height:40px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" style={{
+                "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 1.579px 1.579px / 92.106% 92.106% no-repeat"
+              }} />
               </div>
             </div>
             <div data-figma="skel / 글 줄" data-node="1647:22795" className="[width:170px] [height:14px] [border-radius:7px] [background:rgba(154,_161,_166,_0.28)] [position:absolute] [left:30px] [top:124px]" />

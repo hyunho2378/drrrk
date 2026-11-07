@@ -12,7 +12,9 @@ export function Screen1647_24788({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="영상" data-node="1647:24788" className={cx("[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="image 1208091463" data-node="1647:24790" data-img={"{\"src\":\"./assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [background:url(./assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+      <div data-figma="image 1208091463" data-node="1647:24790" data-img={"{\"src\":\"./assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [position:absolute] [left:0px] [top:0px]" style={{
+      "background": "url(./assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.webp) 50% / cover no-repeat"
+    }} />
       <div data-figma="Group 2147229349" data-node="1803:22700" className="[width:431px] [height:90px] [position:absolute] [left:-16px] [top:233px]">
         <p data-figma="새벽녘 플라스틱의자29" data-node="1803:22701" data-outline="" className="[color:rgba(248,_248,_248,_0.50)] [text-shadow:0_0_4px_rgba(0,_0,_0,_0.50)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:14px] [letter-spacing:-0.44px] [position:absolute] [left:0px] [top:76px] [width:97px] [height:14px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:-0.004px] [left:0px]">{"새벽녘 플라스틱의자29"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1803:22701"]

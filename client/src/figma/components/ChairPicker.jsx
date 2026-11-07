@@ -12,7 +12,9 @@ export function ChairPicker({
   if (type === "택배 박스") return <div data-figma="type=택배 박스" data-node="1204:87147" className={cx("[display:flex] [width:62px] [padding:var(--spacing-7,_8px)_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [border-radius:var(--radius-6xl,_14px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="Frame" data-node="1204:87143" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
         <div data-figma="Chair Illustration" data-node="1204:87144" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-          <div data-figma="box" data-node="I1204:87144;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+          <div data-figma="box" data-node="I1204:87144;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+          "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
+        }} />
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87145" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
@@ -24,7 +26,9 @@ export function ChairPicker({
   if (type === "나무 스툴") return <div data-figma="type=나무 스툴" data-node="1204:87153" className={cx("[display:flex] [width:62px] [padding:var(--spacing-7,_8px)_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [border-radius:var(--radius-6xl,_14px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="Frame" data-node="1204:87149" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
         <div data-figma="Chair Illustration" data-node="1204:87150" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-          <div data-figma="stool" data-node="I1204:87150;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+          <div data-figma="stool" data-node="I1204:87150;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+          "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 50% / cover no-repeat"
+        }} />
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87151" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
@@ -36,7 +40,9 @@ export function ChairPicker({
   if (type === "편의점 의자") return <div data-figma="type=편의점 의자" data-node="1204:87159" className={cx("[display:flex] [width:62px] [padding:var(--spacing-7,_8px)_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [border-radius:var(--radius-6xl,_14px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="Frame" data-node="1204:87155" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
         <div data-figma="Chair Illustration" data-node="1204:87156" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-          <div data-figma="chair" data-node="I1204:87156;1204:89685" data-img={"{\"src\":\"./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+          <div data-figma="chair" data-node="I1204:87156;1204:89685" data-img={"{\"src\":\"./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+          "background": "url(./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp) 50% / cover no-repeat"
+        }} />
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87157" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
@@ -51,7 +57,9 @@ export function ChairPicker({
     }} />
       <div data-figma="Frame" data-node="1204:87161" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
         <div data-figma="Chair Illustration" data-node="1204:87162" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-          <div data-figma="image 1208091458" data-node="I1204:87162;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+          <div data-figma="image 1208091458" data-node="I1204:87162;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+          "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
+        }} />
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87163" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
@@ -63,7 +71,9 @@ export function ChairPicker({
   if (type === "리클라이너") return <div data-figma="type=리클라이너" data-node="1204:87172" className={cx("[display:flex] [width:62px] [padding:var(--spacing-7,_8px)_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [border-radius:var(--radius-6xl,_14px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="Frame" data-node="1204:87167" className="[width:46px] [height:46px] [flex-shrink:0] [position:relative] [overflow:hidden]">
         <div data-figma="Chair Illustration" data-node="1204:87168" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [opacity:0.3] [position:absolute] [left:0px] [top:0px]">
-          <div data-figma="image 1208091460" data-node="I1204:87168;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+          <div data-figma="image 1208091460" data-node="I1204:87168;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+          "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
+        }} />
         </div>
         <div data-figma="Icon / Line" data-node="1204:87169" data-instance-of="Icon / Line" className="[display:flex] [width:16px] [height:16px] [justify-content:center] [align-items:center] [position:absolute] [left:15px] [top:15px]">
           <Icon data-figma="lock" data-node="I1204:87169;1405:48269" name="lock" color="var(--white, #FFFFFF)" className="[width:16px] [height:16px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
@@ -79,7 +89,9 @@ export function ChairPicker({
       <div data-figma="의자 / 택배 박스" data-node="1299:20770" className="[display:flex] [width:62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] [flex-shrink:0] [overflow:hidden]">
         <div data-figma="Frame" data-node="1299:20771" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="1299:20772" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="box" data-node="I1299:20772;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="box" data-node="I1299:20772;1204:89691" data-img={"{\"src\":\"./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/3ce7017af2e5445570968a1ddfceafe220f58ff8.webp) 50% / cover no-repeat"
+          }} />
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20773" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
@@ -91,7 +103,9 @@ export function ChairPicker({
       <div data-figma="의자 / 나무 스툴" data-node="1299:20775" className="[display:flex] [width:62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] [flex-shrink:0] [overflow:hidden]">
         <div data-figma="Frame" data-node="1299:20776" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="1299:20777" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="stool" data-node="I1299:20777;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="stool" data-node="I1299:20777;1204:89687" data-img={"{\"src\":\"./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp) 50% / cover no-repeat"
+          }} />
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20778" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
@@ -103,7 +117,9 @@ export function ChairPicker({
       <div data-figma="의자 / 편의점 의자" data-node="1299:20780" className="[display:flex] [width:62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] [flex-shrink:0] [overflow:hidden]">
         <div data-figma="Frame" data-node="1299:20781" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="1299:20782" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="chair" data-node="I1299:20782;1204:89685" data-img={"{\"src\":\"./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="chair" data-node="I1299:20782;1204:89685" data-img={"{\"src\":\"./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp) 50% / cover no-repeat"
+          }} />
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20783" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
@@ -118,7 +134,9 @@ export function ChairPicker({
       }} />
         <div data-figma="Frame" data-node="1299:20786" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="1299:20787" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="image 1208091458" data-node="I1299:20787;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="image 1208091458" data-node="I1299:20787;1204:89689" data-img={"{\"src\":\"./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/eab22a7a4d5070b5801bb3367d4f0342e5726543.webp) 50% / cover no-repeat"
+          }} />
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20788" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
@@ -130,7 +148,9 @@ export function ChairPicker({
       <div data-figma="의자 / 리클라이너" data-node="1299:20790" className="[display:flex] [width:62px] [padding:8px_0] [flex-direction:column] [justify-content:center] [align-items:center] [gap:2px] [border-radius:14px] [background:var(--bg-elevated,_#222628)] [flex-shrink:0] [overflow:hidden]">
         <div data-figma="Frame" data-node="1299:20791" className="[width:46px] [height:46px] [flex-shrink:0] [position:relative] [overflow:hidden]">
           <div data-figma="Chair Illustration" data-node="1299:20792" data-instance-of="Chair Illustration" className="[display:flex] [width:46px] [height:46px] [justify-content:center] [align-items:center] [opacity:0.3] [position:absolute] [left:0px] [top:0px]">
-            <div data-figma="image 1208091460" data-node="I1299:20792;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [background:url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+            <div data-figma="image 1208091460" data-node="I1299:20792;1204:89693" data-img={"{\"src\":\"./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:46px] [height:46px] [flex-shrink:0] [aspect-ratio:1/1] [position:absolute] [left:0px] [top:0px]" style={{
+            "background": "url(./assets/images/ef3d01c1807348609019737b6ad41d82875319aa.webp) 50% / cover no-repeat"
+          }} />
           </div>
           <div data-figma="icon/lock" data-node="1299:20793" data-instance-of="Icon / Line" className="[display:flex] [width:16px] [height:16px] [justify-content:center] [align-items:center] [position:absolute] [left:15px] [top:15px]">
             <Icon data-figma="lock" data-node="I1299:20793;1405:48269" name="lock" color="var(--white, #FFFFFF)" className="[width:16px] [height:16px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />

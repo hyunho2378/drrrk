@@ -44,7 +44,9 @@ export function CommunityPostItem({
             __html: svg[previewSvg]
           }} /> : null}</p>
         </div>
-        <div data-figma="Thumb" data-node="1299:19722" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:10px] [background:url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp)_50%_/_cover_no-repeat] [flex-shrink:0]" />
+        <div data-figma="Thumb" data-node="1299:19722" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:64px] [height:64px] [border-radius:10px] [flex-shrink:0]" style={{
+        "background": "url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp) 50% / cover no-repeat"
+      }} />
       </div>
       <div data-figma="Meta" data-node="1299:19723" className="[display:flex] [justify-content:center] [align-items:center] [gap:8px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
         <div data-figma="Tag / 대화 다시보기" data-node="1299:19724" className="[display:flex] [padding:4px_10px_4px_8px] [justify-content:center] [align-items:center] [gap:4px] [border-radius:12px] [background:var(--brand-subtle,_#06303C)] [flex-shrink:0] [overflow:hidden]">

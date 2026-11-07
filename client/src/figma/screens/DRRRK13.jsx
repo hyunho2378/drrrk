@@ -12,7 +12,9 @@ export function DRRRK13({
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   if (true) return <div ref={__root} data-figma="DRRRK · 드르륵 · 해 뜬 순간" data-node="1647:24283" className={cx("[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="image 1208091463" data-node="1647:24285" data-img={"{\"src\":\"./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.webp\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08506019413471222],[0,1,-7.105427357601002e-15]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [background:url(./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+      <div data-figma="image 1208091463" data-node="1647:24285" data-img={"{\"src\":\"./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.webp\",\"mode\":\"FILL\",\"tf\":[[0.8279028534889221,0,0.08506019413471222],[0,1,-7.105427357601002e-15]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [position:absolute] [left:0px] [top:0px]" style={{
+      "background": "url(./assets/images/0a6dff4c137b3628922f8bea007b18fe3d882ff2.webp) 50% / cover no-repeat"
+    }} />
       <div data-figma="스테이터스바" data-node="1647:24309" data-instance-of="Status Bar" className="[display:flex] [width:390px] [height:64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] [position:absolute] [left:0px] [top:0px] [overflow:hidden]">
         <div data-figma="Group 3" data-node="I1647:24309;3035:448" className="[width:316.391px] [height:22.767px] [flex-shrink:0] [position:absolute] [left:40.52px] [top:20.26px]">
           <div data-figma="Right Side" data-node="I1647:24309;3035:449" className="[width:77.07px] [height:12.9px] [position:absolute] [left:239.32px] [top:5.06px]">

@@ -12,7 +12,9 @@ export function ListCard({
   className
 }) {
   if (type === "1") return <div data-figma="type=1" data-node="1204:88544" className={cx("[width:342px] [height:112px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="Thumb" data-node="1204:88536" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,0.5581395626068115,0.22093023359775543]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [background:url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp)_50%_/_cover_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+      <div data-figma="Thumb" data-node="1204:88536" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,0.5581395626068115,0.22093023359775543]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [position:absolute] [left:246px] [top:16px]" style={{
+      "background": "url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp) 50% / cover no-repeat"
+    }} />
       <p data-figma="List Title" data-node="1204:88537" data-outline="" className="[width:214px] [color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [letter-spacing:-0.64px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"친구가 썸남 앞에서\n내 쌍밍아웃함"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1204:88537"]
       }} /></p>
@@ -41,7 +43,9 @@ export function ListCard({
       </div>
     </div>;
   if (type === "2") return <div data-figma="type=2" data-node="1204:88554" className={cx("[width:342px] [height:112px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="Thumb" data-node="1204:88546" data-img={"{\"src\":\"./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp\",\"mode\":\"CROP\",\"tf\":[[0.5581395626068115,0,0.0006077940342947841],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [background:url(./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp)_-0.087px_0px_/_179.167%_100%_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+      <div data-figma="Thumb" data-node="1204:88546" data-img={"{\"src\":\"./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp\",\"mode\":\"CROP\",\"tf\":[[0.5581395626068115,0,0.0006077940342947841],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [position:absolute] [left:246px] [top:16px]" style={{
+      "background": "url(./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp) -0.087px 0px / 179.167% 100% no-repeat"
+    }} />
       <p data-figma="List Title" data-node="1204:88547" data-outline="" className="[width:214px] [color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [letter-spacing:-0.64px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"화장실에서 혼자\n급식 먹다가 걸린 썰 푼다"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1204:88547"]
       }} /></p>
@@ -70,7 +74,9 @@ export function ListCard({
       </div>
     </div>;
   if (type === "3") return <div data-figma="type=3" data-node="1204:88564" className={cx("[width:342px] [height:112px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="Thumb" data-node="1204:88556" data-img={"{\"src\":\"./assets/images/25a2bc805dc33cf06662b290446454bc6e680354.webp\",\"mode\":\"CROP\",\"tf\":[[0.8279028534889221,0,0.0007004235521890223],[0,1,-3.552713678800501e-15]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [background:url(./assets/images/25a2bc805dc33cf06662b290446454bc6e680354.webp)_-0.068px_0px_/_120.787%_100%_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+      <div data-figma="Thumb" data-node="1204:88556" data-img={"{\"src\":\"./assets/images/25a2bc805dc33cf06662b290446454bc6e680354.webp\",\"mode\":\"CROP\",\"tf\":[[0.8279028534889221,0,0.0007004235521890223],[0,1,-3.552713678800501e-15]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [position:absolute] [left:246px] [top:16px]" style={{
+      "background": "url(./assets/images/25a2bc805dc33cf06662b290446454bc6e680354.webp) -0.068px 0px / 120.787% 100% no-repeat"
+    }} />
       <p data-figma="List Title" data-node="1204:88557" data-outline="" className="[width:214px] [color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [letter-spacing:-0.64px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"맨날 얻어먹고 한 번도\n안 사는 친구 손절각?"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1204:88557"]
       }} /></p>
@@ -99,7 +105,9 @@ export function ListCard({
       </div>
     </div>;
   if (type === "1 342") return <div data-figma="type=1 342" data-node="1204:88577" className={cx("[width:342px] [height:112px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="Thumb" data-node="1204:88566" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,0.5581395626068115,0.22093023359775543]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [background:url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp)_50%_/_cover_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+      <div data-figma="Thumb" data-node="1204:88566" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,0.5581395626068115,0.22093023359775543]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [position:absolute] [left:246px] [top:16px]" style={{
+      "background": "url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp) 50% / cover no-repeat"
+    }} />
       <p data-figma="List Title" data-node="1204:88567" data-outline="" className="[width:214px] [color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [letter-spacing:-0.64px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"친구가 썸남 앞에서\n내 쌍밍아웃함"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1204:88567"]
       }} /></p>
@@ -133,7 +141,9 @@ export function ListCard({
       </div>
     </div>;
   if (type === "2 342") return <div data-figma="type=2 342" data-node="1204:88590" className={cx("[width:342px] [height:112px] [border-radius:var(--radius-7xl,_16px)] [background:var(--bg-elevated,_#222628)] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="Thumb" data-node="1204:88579" data-img={"{\"src\":\"./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp\",\"mode\":\"CROP\",\"tf\":[[0.5581395626068115,0,0.0006077940342947841],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [background:url(./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp)_-0.087px_0px_/_179.167%_100%_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+      <div data-figma="Thumb" data-node="1204:88579" data-img={"{\"src\":\"./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp\",\"mode\":\"CROP\",\"tf\":[[0.5581395626068115,0,0.0006077940342947841],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:var(--radius-5xl,_12px)] [position:absolute] [left:246px] [top:16px]" style={{
+      "background": "url(./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp) -0.087px 0px / 179.167% 100% no-repeat"
+    }} />
       <p data-figma="List Title" data-node="1204:88580" data-outline="" className="[width:214px] [color:var(--text-primary,_#F8F8F8)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [letter-spacing:-0.64px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"친구가 내 몸무게\n공개해버림"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1204:88580"]
       }} /></p>
