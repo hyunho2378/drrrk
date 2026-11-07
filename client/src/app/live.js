@@ -558,6 +558,24 @@ function patchLounge(root, n) {
   });
 }
 
+// 새 장면(28, 30, 31)에서 팀 피그마가 옮긴 이름표 묶음과 채팅 줄 위치를 맞춘다(피그마 값: 묶음 y 288, 높이 115, 안쪽 +25, 가죽소파 줄 y 509).
+const SCENE_FIX = [28, 30, 31];
+function patchScene(root, n) {
+  if (!SCENE_FIX.includes(n) || root.dataset.sceneFix) return;
+  root.dataset.sceneFix = '1';
+  const g = root.querySelector(':scope > [data-figma="Group 2147229349"]');
+  if (g) {
+    g.style.top = '288px';
+    g.style.height = '115px';
+    [...g.children].forEach((k) => {
+      const top = parseFloat(getComputedStyle(k).top);
+      if (!Number.isNaN(top)) k.style.top = top + 25 + 'px';
+    });
+  }
+  const row = root.querySelector(':scope > [data-figma="row · 가죽소파"]');
+  if (row) row.style.top = '509px';
+}
+
 function prepareChat(root, n) {
   const sc = sceneOf(n);
   if (!sc || (room.scene === sc && room.chatDone)) return;
@@ -578,6 +596,7 @@ export async function prepare(layer, n, prevN) {
   root.dataset.prepared = '1';
   applySync(root);
   showEmptyOutlines(root);
+  patchScene(root, n);
   attachRoom(root, n);
   attachThrow(root);
   attachDrag(layer, root, n);
@@ -601,6 +620,7 @@ export function attach(layer, n, go, prevN) {
   // prepare가 못 한 경우(예: 준비 중에 오류)를 위해 같은 일을 한 번 더 한다. 모두 두 번 해도 같은 결과가 되도록 만들어져 있다.
   applySync(root);
   showEmptyOutlines(root);
+  patchScene(root, n);
   attachRoom(root, n);
   attachThrow(root);
   attachInputs(root, n, go);
