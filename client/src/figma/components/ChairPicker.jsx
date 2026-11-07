@@ -18,7 +18,7 @@ export function ChairPicker({
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87145" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
-        <p data-figma="36.5°" data-node="1204:87146" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"36.5°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        <p data-figma="36.5°" data-node="1204:87146" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"36.5°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1204:87146"]
         }} /></p>
       </div>
@@ -32,7 +32,7 @@ export function ChairPicker({
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87151" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
-        <p data-figma="37.0°" data-node="1204:87152" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"37.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        <p data-figma="37.0°" data-node="1204:87152" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"37.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1204:87152"]
         }} /></p>
       </div>
@@ -46,7 +46,7 @@ export function ChairPicker({
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87157" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
-        <p data-figma="38.0°" data-node="1204:87158" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"38.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        <p data-figma="38.0°" data-node="1204:87158" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"38.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1204:87158"]
         }} /></p>
       </div>
@@ -63,7 +63,7 @@ export function ChairPicker({
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87163" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
-        <p data-figma="39.0°" data-node="1204:87164" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"39.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        <p data-figma="39.0°" data-node="1204:87164" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"39.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1204:87164"]
         }} /></p>
       </div>
@@ -80,7 +80,7 @@ export function ChairPicker({
         </div>
       </div>
       <div data-figma="Frame" data-node="1204:87170" className="[display:flex] [justify-content:center] [align-items:center] [gap:var(--spacing-1,_2px)] [flex-shrink:0] [overflow:hidden]">
-        <p data-figma="40.0°" data-node="1204:87171" data-outline="" className="[color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"40.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        <p data-figma="40.0°" data-node="1204:87171" data-outline="" className="[color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"40.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1204:87171"]
         }} /></p>
       </div>
@@ -95,7 +95,7 @@ export function ChairPicker({
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20773" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
-          <p data-figma="36.5°" data-node="1299:20774" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"36.5°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="36.5°" data-node="1299:20774" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"36.5°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1299:20774"]
           }} /></p>
         </div>
@@ -109,7 +109,7 @@ export function ChairPicker({
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20778" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
-          <p data-figma="37.0°" data-node="1299:20779" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"37.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="37.0°" data-node="1299:20779" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"37.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1299:20779"]
           }} /></p>
         </div>
@@ -123,7 +123,7 @@ export function ChairPicker({
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20783" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
-          <p data-figma="38.0°" data-node="1299:20784" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"38.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="38.0°" data-node="1299:20784" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:26px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"38.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1299:20784"]
           }} /></p>
         </div>
@@ -140,7 +140,7 @@ export function ChairPicker({
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20788" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
-          <p data-figma="39.0°" data-node="1299:20789" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"39.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="39.0°" data-node="1299:20789" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"39.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1299:20789"]
           }} /></p>
         </div>
@@ -157,7 +157,7 @@ export function ChairPicker({
           </div>
         </div>
         <div data-figma="Frame" data-node="1299:20794" className="[display:flex] [justify-content:center] [align-items:center] [gap:2px] [flex-shrink:0] [overflow:hidden]">
-          <p data-figma="40.0°" data-node="1299:20795" data-outline="" className="[color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"40.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="40.0°" data-node="1299:20795" data-outline="" className="[color:var(--text-tertiary,_#6E767C)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:500] [line-height:15px] [letter-spacing:-0.44px] [flex-shrink:0] [width:27px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.496px] [left:0px]">{"40.0°"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1299:20795"]
           }} /></p>
         </div>

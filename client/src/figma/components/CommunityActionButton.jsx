@@ -22,7 +22,7 @@ export function CommunityActionButton({
         __html: svg["1299:20630"]
       }} />
       </div>
-      <p data-figma="DRR 48" data-node="1299:20631" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] [flex-shrink:0] [width:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"DRR 48"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+      <p data-figma="DRR 48" data-node="1299:20631" data-outline="" className="[color:var(--brand-primary,_#36D2FF)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] [flex-shrink:0] [width:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"DRR 48"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1299:20631"]
       }} /></p>
     </div>;
@@ -32,7 +32,7 @@ export function CommunityActionButton({
         __html: svg["1299:20635"]
       }} />
       </div>
-      <p data-figma="댓글 23" data-node="1299:20636" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] [flex-shrink:0] [width:39px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"댓글 23"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+      <p data-figma="댓글 23" data-node="1299:20636" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] [flex-shrink:0] [width:39px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"댓글 23"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1299:20636"]
       }} /></p>
     </div>;
@@ -42,7 +42,7 @@ export function CommunityActionButton({
         __html: svg["1299:20640"]
       }} />
       </div>
-      <p data-figma="공유" data-node="1299:20641" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] [flex-shrink:0] [width:23px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"공유"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+      <p data-figma="공유" data-node="1299:20641" data-outline="" className="[color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:700] [line-height:18px] [letter-spacing:-0.52px] [flex-shrink:0] [width:23px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"공유"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1299:20641"]
       }} /></p>
     </div>;

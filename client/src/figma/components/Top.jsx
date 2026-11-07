@@ -12,7 +12,7 @@ export function Top({
   if (type === "default") return <div data-figma="type=default" data-node="1405:47081" className={cx("[display:flex] [width:310px] [align-items:center] [gap:var(--spacing-7,_8px)] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="Frame 2147249205" data-node="1405:47078" className="[display:flex] [align-items:center] [gap:8px] [flex:1_0_0]">
         <Thumb data-figma="Thumb" className="[display:flex] [width:24px] [height:24px] [padding:2px_1px_0_1px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]" type={"default"} />
-        <p data-figma="이름 · DRRRK/C1 Bold" data-node="1405:47080" data-outline="" className="[flex:1_0_0] [color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"따뜻한 가죽소파29"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        <p data-figma="이름 · DRRRK/C1 Bold" data-node="1405:47080" data-outline="" className="[flex:1_0_0] [color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"따뜻한 가죽소파29"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
           __html: svg["1405:47080"]
         }} /></p>
       </div>
@@ -25,7 +25,7 @@ export function Top({
         }} />
         </div>
       </div>
-      <p data-figma="이름 · DRRRK/C1 Bold" data-node="1405:47087" data-outline="" className="[flex:1_0_0] [color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+      <p data-figma="이름 · DRRRK/C1 Bold" data-node="1405:47087" data-outline="" className="[flex:1_0_0] [color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"새벽2시 택배상자"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1405:47087"]
       }} /></p>
     </div>;
@@ -37,7 +37,7 @@ export function Top({
         }} />
         </div>
       </div>
-      <p data-figma="이름 · DRRRK/C1 Bold" data-node="1405:47092" data-outline="" className="[flex:1_0_0] [color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"딱딱한 나무 스툴12"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+      <p data-figma="이름 · DRRRK/C1 Bold" data-node="1405:47092" data-outline="" className="[flex:1_0_0] [color:var(--text-secondary,_#9AA1A6)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"딱딱한 나무 스툴12"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
         __html: svg["1405:47092"]
       }} /></p>
     </div>;
