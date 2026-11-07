@@ -43,6 +43,11 @@ export const motion = {
   splashStill: 1200,
   // 로고 모션 영상(4초)은 2.1초에 움직임이 끝나고 나머지는 거의 멈춰 있다(프레임 차이 실측). 2.6초에서 끊고 옅어지게 한다.
   splashCut: 2600,
+  // 휴대폰은 같은 영상을 1.6배 빠르게 틀고, 움직임이 끝나는 자리(영상 시간 2.3초)에서 바로 끊는다. 합쳐서 약 1.7초.
+  splashMobileRate: 1.6,
+  splashMobileCut: 2300,
+  splashMobileOut: 280,
+  splashMobileMax: 2200,
 };
 
 export const layout = { screenWidth: 390, screenHeight: 844, touchMin: 44, listWidth: 560, logoWidth: 180 };
