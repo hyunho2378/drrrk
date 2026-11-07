@@ -50,7 +50,7 @@ export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lin
 
 // 휴대폰에서 꽉 채우기(mobileFit.js). 폭 600 이하를 휴대폰으로 본다. crop은 숨기는 피그마 상태바 줄 높이, head는 머리말 끝,
 // keep은 빈 띠마다 남기는 최소 높이, bgMin 이상 높이는 배경 그림으로 본다.
-export const mobile = { maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600, bgAnchor: 0.6, bottomSeed: 100, clusterMin: 300, clusterGap: 28, homeBar: [134, 5] };
+export const mobile = { maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600, bgAnchor: 0.6, bottomSeed: 100, clusterMin: 300, clusterGap: 28, homeBar: [134, 5], pinZ: 3 };
 
 // 화면 위에서 실제로 움직이는 것들의 값(live.js).
 export const live = {
