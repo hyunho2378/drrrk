@@ -1,50 +1,97 @@
-// 네이버 클립 모방 화면 두 장이 함께 쓰는 도구. 값은 팀 피그마 섹션 "네이버 클립 모방"(1843:40426)에서 가져왔다.
+// 네이버 클립 모방 화면을 그리는 도구. 장면 데이터(ClipScenes.js)를 그대로 화면에 그린다.
 import React from 'react';
 
 export const BASE = import.meta.env.BASE_URL;
 export const pic = (n) => BASE + 'assets/images/clip-' + n + '.webp';
 const FONT = "'SUIT', system-ui, sans-serif";
 
-export const A = (x, y, w, h, extra) => ({ position: 'absolute', left: x, top: y, width: w, height: h, ...extra });
-export const type = (size, weight, color, extra) => ({
-  fontFamily: FONT, fontSize: size, fontWeight: weight, color,
-  lineHeight: Math.round(size * 1.4) + 'px', letterSpacing: '-0.02em', whiteSpace: 'nowrap', margin: 0, ...extra,
+const rgba = (hex, a = 1) => {
+  const n = parseInt(hex.slice(1), 16);
+  return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+};
+const fillCss = (f) => (!f || f.img ? undefined : f.g ? 'linear-gradient(180deg,' + f.g.map(([c, a, p]) => rgba(c, a) + ' ' + p * 100 + '%').join(',') + ')' : rgba(f.c, f.a == null ? 1 : f.a));
+const radius = (r) => (Array.isArray(r) ? r.map((v) => v + 'px').join(' ') : r || 0);
+const shadowFilter = (sh) => (sh ? 'drop-shadow(' + sh[0] + 'px ' + sh[1] + 'px ' + sh[2] + 'px rgba(0,0,0,' + sh[3] + '))' : undefined);
+const lineH = (it) => it.lh || Math.round(it.size * 1.4);
+const textBase = (size, wt, c, a, lh) => ({
+  fontFamily: FONT, fontSize: size, fontWeight: wt, color: rgba(c || '#FFFFFF', a == null ? 1 : a),
+  lineHeight: lh + 'px', letterSpacing: '-0.02em', whiteSpace: 'pre', margin: 0,
 });
 
-// 선 아이콘 한 장(SVG 문장). 피그마와 같은 경로를 쓴다.
-export const S = (w, h, body, o = {}) =>
-  '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" fill="none" stroke="' +
-  (o.c || '#FFFFFF') + '" stroke-width="' + (o.sw || 1.8) + '" stroke-linecap="round" stroke-linejoin="round" style="display:block">' + body + '</svg>';
-
-export function Svg({ html, x, y, w, h, name, style }) {
-  return <span data-figma={name} style={{ ...A(x, y, w, h), lineHeight: 0, fontSize: 0, ...style }} dangerouslySetInnerHTML={{ __html: html }} />;
+function Fill({ img }) {
+  return <img src={pic(img)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />;
 }
 
-// 그림 한 장. round면 원형이다.
-export function Pic({ src, x, y, w, h, r = 0, round, name, style }) {
+function Item({ it, flow, pw }) {
+  const pos = (x, y, w, h) => (flow ? { position: 'relative', flexShrink: 0, marginLeft: it.ml || 0 } : { position: 'absolute', left: x, top: y, width: w, height: h });
+  switch (it.k) {
+    case 'rect':
+      return (
+        <div data-figma={it.n} style={{ ...pos(it.x, it.y, it.w, it.h), borderRadius: radius(it.r), overflow: 'hidden', boxSizing: 'border-box', background: fillCss(it.f), border: it.s ? it.s.w + 'px solid ' + rgba(it.s.c, it.s.a) : undefined }}>
+          {it.f && it.f.img ? <Fill img={it.f.img} /> : null}
+        </div>
+      );
+    case 'img':
+      return (
+        <div data-figma={it.n} style={{ ...pos(it.x, it.y, it.w, it.h), width: it.w, height: it.h, borderRadius: '50%', overflow: 'hidden', background: '#2D2D2D' }}>
+          <Fill img={it.img} />
+        </div>
+      );
+    case 'svg':
+      return <span data-figma={it.n} style={{ ...pos(it.x, it.y, it.w, it.h), width: it.w, height: it.h, lineHeight: 0, fontSize: 0, filter: shadowFilter(it.sh) }} dangerouslySetInnerHTML={{ __html: it.svg }} />;
+    case 'text': {
+      const lh = lineH(it);
+      const st = textBase(it.size, it.wt, it.c, it.a, lh);
+      let box;
+      if (flow) box = { position: 'relative', flexShrink: 0, marginLeft: it.ml || 0 };
+      else if (it.cx != null) box = { position: 'absolute', left: it.cx - 150, width: 300, textAlign: 'center', top: it.cy - lh / 2, height: lh };
+      else box = { position: 'absolute', left: it.x, top: it.cy != null ? it.cy - lh / 2 : it.y, width: it.w || undefined };
+      let body = it.s;
+      if (it.sp) {
+        const out = [];
+        let last = 0;
+        it.sp.forEach(([a, b, c], k) => {
+          out.push(it.s.slice(last, a));
+          out.push(<span key={k} style={{ color: c }}>{it.s.slice(a, b)}</span>);
+          last = b;
+        });
+        out.push(it.s.slice(last));
+        body = out;
+      }
+      return <div data-figma={it.n} style={{ ...box, ...st, textShadow: it.sh ? it.sh[0] + 'px ' + it.sh[1] + 'px ' + it.sh[2] + 'px rgba(0,0,0,' + it.sh[3] + ')' : undefined }}>{body}</div>;
+    }
+    case 'pill': {
+      const tx = it.text;
+      const where = flow ? { position: 'relative', flexShrink: 0, marginLeft: it.ml || 0 } : it.right != null ? { position: 'absolute', right: pw - it.right, top: it.y } : { position: 'absolute', left: it.x, top: it.y };
+      return (
+        <div data-figma={it.n} style={{ ...where, height: it.h, boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 ' + it.px + 'px', borderRadius: it.rad, background: fillCss(it.f), border: it.s ? it.s.w + 'px solid ' + rgba(it.s.c, it.s.a) : undefined, ...textBase(tx.size, tx.wt, tx.c, 1, Math.round(tx.size * 1.4)) }}>{tx.s}</div>
+      );
+    }
+    case 'group': {
+      const auto = it.w === 'auto';
+      const st = {
+        ...(flow ? { position: 'relative' } : { position: 'absolute', left: it.x, top: it.y }),
+        height: it.h, width: auto ? undefined : it.w, borderRadius: radius(it.r), background: fillCss(it.f), overflow: it.clip ? 'hidden' : undefined,
+        backdropFilter: it.blur ? 'blur(' + it.blur + 'px)' : undefined, WebkitBackdropFilter: it.blur ? 'blur(' + it.blur + 'px)' : undefined,
+        ...(auto ? { display: 'inline-flex', alignItems: 'center', padding: it.pad[0] + 'px ' + it.pad[1] + 'px ' + it.pad[2] + 'px ' + it.pad[3] + 'px', gap: it.gap, boxSizing: 'border-box' } : {}),
+      };
+      return <div data-figma={it.n} style={st}>{it.ch.map((c, i) => <Item key={i} it={c} flow={auto} pw={it.w} />)}</div>;
+    }
+    case 'row':
+      return (
+        <div data-figma={it.n} style={{ position: 'absolute', left: it.x, top: it.cy - 16, height: 32, display: 'flex', alignItems: 'center' }}>
+          {it.items.map((c, i) => <Item key={i} it={c} flow pw={0} />)}
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
+export function Scene({ items, name, node, bg, style, className }) {
   return (
-    <div data-figma={name} style={{ ...A(x, y, w, h), borderRadius: round ? '50%' : r, overflow: 'hidden', background: '#2D2D2D', ...style }}>
-      <img src={pic(src)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+    <div data-figma={name} data-node={node} className={className} style={{ position: 'relative', width: '390px', height: '844px', overflow: 'hidden', background: bg, ...style }}>
+      {items.map((it, i) => <Item key={i} it={it} pw={390} />)}
     </div>
-  );
-}
-
-// 글자 한 줄. cx를 주면 그 가운데에 맞추고, x를 주면 왼쪽에 맞춘다. cy는 세로 가운데다.
-export function Label({ children, name, x, cx, cy, y, size, weight, color, w = 160, style }) {
-  const lh = Math.round(size * 1.4);
-  const top = cy != null ? cy - lh / 2 : y;
-  const box = cx != null ? { left: cx - w / 2, width: w, textAlign: 'center' } : { left: x };
-  return <div data-figma={name} style={{ position: 'absolute', top, height: lh, ...box, ...type(size, weight, color), ...style }}>{children}</div>;
-}
-
-// 알약. x 또는 right로 자리를 잡는다.
-export function Pill({ children, name, x, right, y, h, bg, color = '#FFFFFF', size = 12, weight = 500, padX = 8, radius, border, style }) {
-  const pos = right != null ? { right } : { left: x };
-  return (
-    <div data-figma={name} style={{
-      position: 'absolute', top: y, height: h, ...pos, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box',
-      padding: '0 ' + padX + 'px', borderRadius: radius == null ? h / 2 : radius, background: bg, border: border || 'none',
-      ...type(size, weight, color), ...style,
-    }}>{children}</div>
   );
 }
