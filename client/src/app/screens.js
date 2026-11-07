@@ -350,6 +350,20 @@ export const SCREENS = [
   "name": "MY · 나의 편의점 (아이템 상세)",
   "file": "MY3",
   "h": 844
+ },
+ {
+  "n": 55,
+  "id": "clip-list",
+  "name": "네이버 클립 · 콘텐츠 리스트",
+  "file": "ClipList",
+  "h": 844
+ },
+ {
+  "n": 56,
+  "id": "clip-player",
+  "name": "네이버 클립 · 영상 보기",
+  "file": "ClipPlayer",
+  "h": 844
  }
 ];
 
@@ -406,6 +420,8 @@ const modules = {
   'DRRRK58': () => import('../figma/screens/DRRRK58.jsx'),
   'MY2': () => import('../figma/screens/MY2.jsx'),
   'MY3': () => import('../figma/screens/MY3.jsx'),
+  'ClipList': () => import('./ClipList.jsx'),
+  'ClipPlayer': () => import('./ClipPlayer.jsx'),
 };
 
 export async function loadScreen(n) {
