@@ -282,9 +282,13 @@ function carouselOf(layer, root) {
 
 // 라이브와 커뮤니티 목록은 탭바 밑에 가려진 내용이 있다. 위아래로 끌거나 휠을 굴리면 머리말 아래부터 탭바 위까지가 움직인다.
 function scrollerOf(layer, root, n) {
-  if (!LIVE.scrollScreens.includes(n)) return null;
+  // 휴대폰에서 바닥 요소를 창 바닥에 붙인 화면(mobileFit.js)도 가려진 내용을 스크롤로 본다.
+  const fit = root.__fit;
+  const generic = !!(fit && fit.rest > 0 && !fit.native);
+  if (!LIVE.scrollScreens.includes(n) && !generic) return null;
   const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
-  const bottom = nav ? relRect(root, nav).y : LIVE.screenH;
+  const pins = fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : [];
+  const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : LIVE.screenH;
   const box = root.querySelector(':scope > [data-figma="Scroll"]');
   let items, top;
   if (box) {
@@ -294,7 +298,7 @@ function scrollerOf(layer, root, n) {
     q(box, '[data-figma="Feed"]').forEach((f) => (f.style.overflow = 'visible'));
   } else {
     top = LIVE.scrollTop;
-    items = [...root.children].filter((c) => c !== nav && relRect(root, c).y >= top - 0.5);
+    items = [...root.children].filter((c) => !pins.includes(c) && c !== nav && relRect(root, c).y >= top - 0.5);
   }
   let end = 0;
   items.forEach((el) => {
@@ -309,7 +313,7 @@ function scrollerOf(layer, root, n) {
   if (!max) return null;
   const hot = q(layer, '[data-hotspot]').filter((b) => {
     const t = parseFloat(b.style.top);
-    return t >= top - 0.5 && t < bottom && b.getAttribute('aria-label') !== '탭바';
+    return t >= top - 0.5 && t < bottom && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
   });
   const clipNeeded = !box;
   const y0 = new Map(items.map((el) => [el, relRect(root, el).y]));
@@ -344,6 +348,11 @@ function scrollerOf(layer, root, n) {
     place(0);
   };
   s.inRegion = (y) => y >= top && y <= bottom;
+  // 입력창이 바닥에 붙은 화면(채팅, 댓글)은 입력창 바로 위 내용이 보이도록 맨 아래에서 시작한다.
+  if (generic && fit.input) {
+    s.y = s.base = max;
+    place(0);
+  }
   return s;
 }
 
