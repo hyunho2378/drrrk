@@ -255,7 +255,8 @@ function playAnalysis(root, ms) {
     const label = st.querySelector('p[data-outline]');
     window.setTimeout(() => {
       if (!root.isConnected) return;
-      if (icon && icon.getAttribute('data-figma') === 'spinner' && tpl) {
+      // 둘째 단계의 어두운 체크와 셋째 단계의 돌아가는 아이콘은 맨 위 단계와 같은 밝은 체크 그림으로 바꾼다.
+      if (icon && tpl && i > 0) {
         icon.innerHTML = tpl.innerHTML;
         icon.setAttribute('data-figma', 'check');
       }
@@ -501,7 +502,8 @@ function attachDrag(layer, root, n) {
 // 옛 그림을 쓰는 곳은 새 그림으로 바꾼다(MY 의자는 128px 작은 그림이라 깨져 보여서, 의자 꾸미기의 원본 크기 그림을 쓴다).
 export const ASSET_SWAP = { 'f76f40b49cba6dd89cb0cf61935be0f11b55cfcc.webp': '4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp' };
 // 이름 탭 화면(22, 23)은 '나'의 칸에 박스 그림이 남아 있다. 박스 의자는 없앴으므로 32번 화면의 '나' 칸과 같은 의자 그림으로 바꾼다.
-export const SCREEN_SWAP = { 22: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' }, 23: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' } };
+// 28, 30, 31은 팀 피그마 최신 장면(라임 의자, 회색 리클라이너, 흰 의자)으로 바꾼다.
+export const SCREEN_SWAP = { 28: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 30: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 31: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 22: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' }, 23: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' } };
 export function swapAssets(el, n) {
   const map = Object.assign({}, ASSET_SWAP, SCREEN_SWAP[n] || {});
   const keys = Object.keys(map);
@@ -511,6 +513,48 @@ export function swapAssets(el, n) {
     for (const k of keys) {
       if (st.indexOf(k) >= 0) e.setAttribute('style', st.split(k).join(map[k]));
     }
+  });
+}
+
+// 목록 카드의 눈 아이콘: 팀 피그마의 현재 아이콘(carbon:view-filled, 16 x 16, #6E767C)이다. 옛 그림은 원본이 지워져 비어 있었다.
+const EYE_SVG = '<svg style="display:block" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" fill="#6E767C"/><path d="M15.47 7.83C14.8819 6.30882 13.861 4.99331 12.5334 4.04604C11.2058 3.09878 9.62971 2.56129 7.99997 2.5C6.37023 2.56129 4.79416 3.09878 3.46657 4.04604C2.13898 4.99331 1.11805 6.30882 0.52997 7.83C0.490254 7.93985 0.490254 8.06015 0.52997 8.17C1.11805 9.69118 2.13898 11.0067 3.46657 11.954C4.79416 12.9012 6.37023 13.4387 7.99997 13.5C9.62971 13.4387 11.2058 12.9012 12.5334 11.954C13.861 11.0067 14.8819 9.69118 15.47 8.17C15.5097 8.06015 15.5097 7.93985 15.47 7.83ZM7.99997 11.25C7.35718 11.25 6.72883 11.0594 6.19437 10.7023C5.65991 10.3452 5.24335 9.83758 4.99736 9.24372C4.75138 8.64986 4.68702 7.99639 4.81242 7.36596C4.93782 6.73552 5.24735 6.15642 5.70187 5.7019C6.15639 5.24738 6.73549 4.93785 7.36593 4.81245C7.99637 4.68705 8.64983 4.75141 9.24369 4.99739C9.83755 5.24338 10.3451 5.65994 10.7022 6.1944C11.0594 6.72886 11.25 7.35721 11.25 8C11.2486 8.86155 10.9058 9.68743 10.2966 10.2966C9.6874 10.9058 8.86152 11.2487 7.99997 11.25Z" fill="#6E767C"/></svg>';
+function fixIcons(root) {
+  q(root, '[data-figma="icon/eye"]').forEach((el) => {
+    if (el.dataset.fixed) return;
+    el.dataset.fixed = '1';
+    el.innerHTML = EYE_SVG;
+    Object.assign(el.style, { width: '16px', height: '16px' });
+    const meta = el.closest('[data-figma="meta"]');
+    if (meta) Object.assign(meta.style, { width: 'auto' });
+  });
+}
+
+// 라운지 카테고리 화면(48 친구)은 전체 화면 틀에서 선택된 탭과 카드 내용을 바꾼다.
+function patchLounge(root, n) {
+  const spec = LIVE.lounge && LIVE.lounge[n];
+  if (!spec || root.dataset.lounge) return;
+  root.dataset.lounge = '1';
+  q(root, '[data-figma^="Tab / "]').forEach((p) => {
+    const on = p.getAttribute('data-figma') === 'Tab / ' + spec.tab;
+    setText(p, p.textContent.trim());
+    Object.assign(p.style, { color: on ? '#F8F8F8' : '#9AA1A6', fontWeight: on ? '700' : '500' });
+    if (on) {
+      const ul = root.querySelector('[data-figma="Tab Underline"]');
+      if (ul) Object.assign(ul.style, { left: parseFloat(getComputedStyle(p).left) + 'px' });
+    }
+  });
+  [1, 2, 3].forEach((i) => {
+    const card = root.querySelector('[data-figma="List Card / ' + i + '"]');
+    const c = spec.cards[i - 1];
+    if (!card || !c) return;
+    const title = card.querySelector('[data-figma="List Title"]');
+    if (title) { setText(title, c[0]); Object.assign(title.style, { height: 'auto', width: '214px' }); }
+    const who = [...card.querySelectorAll('p')].find((p) => /이야기 중/.test(p.textContent));
+    if (who) { setText(who, c[1]); Object.assign(who.style, { width: 'auto' }); }
+    const view = card.querySelector('[data-figma="보는 중"] p');
+    if (view) { setText(view, c[2]); Object.assign(view.style, { width: 'auto' }); }
+    const time = card.querySelector('[data-figma^="Timer Badge"] [data-figma="time"]');
+    if (time) setText(time, c[3]);
   });
 }
 
@@ -538,6 +582,8 @@ export async function prepare(layer, n, prevN) {
   attachThrow(root);
   attachDrag(layer, root, n);
   prepTabs(root, n);
+  fixIcons(root);
+  patchLounge(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
   if (n === LIVE.itemScreen) await fillItem(root);
   if (n === LIVE.analysisScreen) initAnalysis(root);
@@ -560,6 +606,8 @@ export function attach(layer, n, go, prevN) {
   attachInputs(root, n, go);
   attachDrag(layer, root, n);
   attachTabs(root, n);
+  fixIcons(root);
+  patchLounge(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);

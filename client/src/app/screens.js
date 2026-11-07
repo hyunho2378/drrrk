@@ -304,9 +304,9 @@ export const SCREENS = [
  },
  {
   "n": 48,
-  "id": "1806:11296",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
-  "file": "DRRRK54",
+  "id": "1810:12798",
+  "name": "DRRRK · 라운지 5안 · 친구",
+  "file": "DRRRK5",
   "h": 844
  },
  {

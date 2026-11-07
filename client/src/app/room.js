@@ -222,24 +222,7 @@ export function attachMic(root) {
     });
   });
   paint();
-  // 말할 때 마이크 버튼 둘레가 목소리 크기대로 커진다.
-  const loop = () => {
-    if (!root.isConnected) return;
-    const on = mic.live && !mic.muted;
-    btns.forEach((b) => {
-      let r = b.querySelector(':scope > div[data-mic-ring]');
-      if (on && !r) {
-        r = document.createElement('div');
-        r.setAttribute('data-mic-ring', '');
-        Object.assign(r.style, { position: 'absolute', inset: '0', borderRadius: '50%', pointerEvents: 'none', transition: 'box-shadow 80ms linear' });
-        b.style.overflow = 'visible';
-        b.appendChild(r);
-      }
-      if (r) r.style.boxShadow = on && mic.speaking ? '0 0 0 ' + (4 + mic.level * 10).toFixed(1) + 'px rgba(46,229,157,0.38)' : '0 0 0 0 rgba(46,229,157,0)';
-    });
-    window.setTimeout(loop, 80);
-  };
-  loop();
+  // 말할 때 내 마이크 버튼이나 내 의자에는 초록 테두리와 번짐을 붙이지 않는다(팀 지시). 켜짐과 꺼짐 색만 바뀐다.
 }
 
 // ---------- 4) 말하는 사람 돌리기 ----------
