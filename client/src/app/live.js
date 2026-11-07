@@ -558,7 +558,7 @@ function patchLounge(root, n) {
   });
 }
 
-// 새 장면(28, 30, 31)에서 팀 피그마가 옮긴 이름표 묶음과 채팅 줄 위치를 맞춘다(피그마 값: 묶음 y 288, 높이 115, 안쪽 +25, 가죽소파 줄 y 509).
+// 새 장면(28, 30, 31)에서 팀 피그마가 옮긴 이름표 묶음 위치를 맞춘다(피그마 값: 묶음 y 288, 높이 115, 안쪽 +25).
 const SCENE_FIX = [28, 30, 31];
 function patchScene(root, n) {
   if (!SCENE_FIX.includes(n) || root.dataset.sceneFix) return;
@@ -572,8 +572,6 @@ function patchScene(root, n) {
       if (!Number.isNaN(top)) k.style.top = top + 25 + 'px';
     });
   }
-  const row = root.querySelector(':scope > [data-figma="row · 가죽소파"]');
-  if (row) row.style.top = '509px';
 }
 
 function prepareChat(root, n) {
