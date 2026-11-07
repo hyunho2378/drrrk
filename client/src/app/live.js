@@ -317,14 +317,18 @@ function scrollerOf(layer, root, n) {
   });
   const clipNeeded = !box;
   const y0 = new Map(items.map((el) => [el, relRect(root, el).y]));
+  const h0 = new Map(items.map((el) => [el, relRect(root, el).h]));
   const s = { y: 0, base: 0, max, top, bottom };
   const place = (ms) => {
     items.forEach((el) => {
       move(el, 'y', -s.y, ms);
       if (clipNeeded) {
         // 머리말 아래로 올라간 부분은 잘라서 머리말 글자와 겹치지 않게 한다.
-        const cut = Math.max(0, top - (y0.get(el) - s.y));
-        el.style.clipPath = cut ? 'inset(' + cut + 'px 0 0 0)' : '';
+        // 머리말 아래로 올라간 부분과 바닥 요소(탭바, 입력창) 윗선 아래로 내려간 부분은 잘라서 비치지 않게 한다.
+        const yy = y0.get(el) - s.y;
+        const cut = Math.max(0, top - yy);
+        const cutB = Math.max(0, yy + h0.get(el) - bottom);
+        el.style.clipPath = cut || cutB ? 'inset(' + cut + 'px -400px ' + cutB + 'px -400px)' : '';
         if (ms) el.style.transition += ', clip-path ' + ms + 'ms ' + motion.emphasizedDecel;
       }
     });
@@ -348,11 +352,9 @@ function scrollerOf(layer, root, n) {
     place(0);
   };
   s.inRegion = (y) => y >= top && y <= bottom;
-  // 입력창이 바닥에 붙은 화면(채팅, 댓글)은 입력창 바로 위 내용이 보이도록 맨 아래에서 시작한다.
-  if (generic && fit.input) {
-    s.y = s.base = max;
-    place(0);
-  }
+  // 라이브 댓글 화면은 입력창 바로 위 댓글이 보이도록 맨 아래에서 시작한다.
+  if (generic && fit.input) s.y = s.base = max;
+  place(0);
   return s;
 }
 
