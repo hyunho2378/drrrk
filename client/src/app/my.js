@@ -32,6 +32,9 @@ export function animateGauge(root) {
 
 // 아이템 상세(54): 누른 아이템의 이름, 개수, 그림으로 바꾼다. 새우깡이면 피그마 그대로다.
 export async function fillItem(root) {
+  // 설명 문구는 피그마 원문이 사람에게 던지는 것으로 적혀 있어서, 던지는 곳이 가운데 테이블이라는 문구로 바꾼다.
+  const desc = q(root, 'p[data-figma^="라이브에서 던지면"]')[0];
+  if (desc) { setText(desc, LIVE.itemDesc); Object.assign(desc.style, { width: 'auto', whiteSpace: 'pre', textAlign: 'center' }); }
   const name = state.item;
   if (!name || name === '새우깡') return;
   const src = await cloneOf(53, '[data-figma="item · ' + name + '"]');

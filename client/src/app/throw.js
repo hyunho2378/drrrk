@@ -1,5 +1,6 @@
-// 주전부리 던지기: 퀵슬롯의 주전부리를 손가락이나 마우스로 끌어서 의자 위에 놓으면 그 의자 앞에 던진다.
-// 끄는 동안 의자가 빛나고, 놓으면 날아가 떨어지며 효과음이 난다. 한 번 던지면 개수가 줄고 쿨타임이 돈다.
+// 주전부리 던지기: 퀵슬롯의 주전부리를 손가락이나 마우스로 끌어서 방 한가운데 테이블 위에 놓으면 테이블에 던져 올린다.
+// 끄는 동안 테이블이 빛나고, 놓으면 날아가 테이블 위에 떨어지며 효과음이 난다. 한 번 던지면 개수가 줄고 쿨타임이 돈다.
+// 던지는 대상은 사람이 아니라 테이블이다. 받는 사람이나 온도와는 관계가 없다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText } from './dom.js';
 import { sfx } from './sfx.js';
@@ -8,6 +9,7 @@ import { toast } from './room.js';
 // 던진 기록은 화면을 옮겨도 남는다(이름별 남은 개수와 쿨타임이 끝나는 시각).
 const inv = {};
 const nameOf = (slot) => (slot.getAttribute('data-figma') || '').replace(/^slot · /, '');
+const rand = (a, b) => a + Math.random() * (b - a);
 
 export function attachThrow(root) {
   const dock = root.querySelector('[data-figma="주전부리 퀵슬롯"]');
@@ -20,24 +22,32 @@ export function attachThrow(root) {
     const s = scaleOf(root);
     return { x: (ev.clientX - rr.left) / s, y: (ev.clientY - rr.top) / s };
   };
-  // 의자 자리: 이름표 둘레를 의자 위로 본다. 놓는 순간 위치로 계산한다.
-  const zones = () => {
-    const labels = group ? q(group, ':scope > p[data-outline]') : [];
-    return labels.map((p) => {
-      const r = relRect(root, p);
-      return { label: p, x: r.x - 56, y: r.y - 26, w: r.w + 112, h: 210, cx: r.x + r.w / 2, fy: r.y + 130 };
-    });
+  // 테이블 자리. 피그마 화면 기준 좌표에 의자 이름표 묶음이 움직인 만큼을 더한다(휴대폰에서 배경이 옮겨져도 테이블을 따라간다).
+  const table = () => {
+    let dx = 0, dy = 0;
+    if (group) {
+      const g = relRect(root, group);
+      dx = g.x - LIVE.nameGroupAt[0];
+      dy = g.y - LIVE.nameGroupAt[1];
+    }
+    const t = LIVE.throwTable, l = LIVE.throwLand;
+    return { x: t.x + dx, y: t.y + dy, w: t.w, h: t.h, land: { x: l.x + dx, y: l.y + dy, w: l.w, h: l.h } };
   };
-  const zoneAt = (pt) => zones().findIndex((z) => pt.x >= z.x && pt.x <= z.x + z.w && pt.y >= z.y && pt.y <= z.y + z.h);
+  const inTable = (pt) => {
+    const t = table();
+    return pt.x >= t.x && pt.x <= t.x + t.w && pt.y >= t.y && pt.y <= t.y + t.h;
+  };
   let glow = null;
-  const setGlow = (z) => {
+  const setGlow = (on) => {
     if (!glow) {
       glow = document.createElement('div');
-      Object.assign(glow.style, { position: 'absolute', borderRadius: '16px', background: 'rgba(46,229,157,0.14)', boxShadow: 'inset 0 0 0 2px #2EE59D', pointerEvents: 'none', zIndex: '12', opacity: '0', transition: 'opacity 140ms linear' });
+      Object.assign(glow.style, { position: 'absolute', borderRadius: '50%', background: 'rgba(46,229,157,0.16)', boxShadow: 'inset 0 0 0 2px #2EE59D', pointerEvents: 'none', zIndex: '12', opacity: '0', transition: 'opacity 140ms linear' });
       root.appendChild(glow);
     }
-    if (z) Object.assign(glow.style, { left: z.x + 'px', top: z.y + 'px', width: z.w + 'px', height: z.h + 'px', opacity: '1' });
-    else glow.style.opacity = '0';
+    if (on) {
+      const t = table();
+      Object.assign(glow.style, { left: t.x + 10 + 'px', top: t.y + 30 + 'px', width: t.w - 20 + 'px', height: t.h - 70 + 'px', opacity: '1' });
+    } else glow.style.opacity = '0';
   };
 
   const cool = (slot, secs) => {
@@ -85,12 +95,12 @@ export function attachThrow(root) {
     slot.style.cursor = 'grab';
     slot.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
-      if (slot.dataset.cool === 'empty') { sfx.deny(); toast(root, '남은 주전부리가 없어요'); return; }
-      if (slot.dataset.cool) { sfx.deny(); toast(root, '쿨타임이에요. 조금만 기다려 주세요'); return; }
+      if (slot.dataset.cool === 'empty') { sfx.deny(); toast(root, LIVE.throwEmptyText); return; }
+      if (slot.dataset.cool) { sfx.deny(); toast(root, LIVE.throwCoolText); return; }
       const sx = e.clientX, sy = e.clientY;
       const img = slot.querySelector(':scope > [data-figma]:not([data-figma="count"])');
       if (!img) return;
-      let ghost = null, hot = -1, last = null;
+      let ghost = null, hot = false;
       const move = (ev) => {
         if (!ghost) {
           if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < LIVE.dragStart) return;
@@ -100,48 +110,45 @@ export function attachThrow(root) {
           slot.style.opacity = '0.45';
           sfx.pick();
         }
-        last = toRoot(ev);
-        ghost.style.transform = 'translate(' + (last.x - 16) + 'px,' + (last.y - 16) + 'px) scale(1.25)';
-        const z = zoneAt(last);
-        if (z !== hot) {
-          hot = z;
-          setGlow(z >= 0 ? zones()[z] : null);
-          if (z >= 0) sfx.tick();
+        const p = toRoot(ev);
+        ghost.style.transform = 'translate(' + (p.x - 16) + 'px,' + (p.y - 16) + 'px) scale(1.25)';
+        const on = inTable(p);
+        if (on !== hot) {
+          hot = on;
+          setGlow(on);
+          if (on) sfx.tick();
         }
       };
       const done = (ev) => {
         window.removeEventListener('pointermove', move);
         window.removeEventListener('pointerup', done);
         window.removeEventListener('pointercancel', done);
-        setGlow(null);
-        if (!ghost) { toast(root, '의자 쪽으로 끌어서 놓으면 던져요'); return; }
+        setGlow(false);
+        if (!ghost) { toast(root, LIVE.throwHintText); return; }
         const pt = toRoot(ev);
-        const z = zoneAt(pt);
         const from = 'translate(' + (pt.x - 16) + 'px,' + (pt.y - 16) + 'px) scale(1.25)';
-        if (z < 0) {
+        if (!inTable(pt)) {
           const sr = relRect(root, slot);
           const a = ghost.animate([{ transform: from, opacity: 1 }, { transform: 'translate(' + (sr.x + 6) + 'px,' + (sr.y + 6) + 'px) scale(1)', opacity: 0.6 }], { duration: 220, easing: motion.emphasizedDecel, fill: 'forwards' });
           a.onfinish = () => { ghost.remove(); slot.style.opacity = ''; };
           sfx.miss();
           return;
         }
-        const zone = zones()[z];
-        const tx = zone.cx - 16, ty = zone.fy;
+        // 테이블 위 아무 곳에나 떨어진다.
+        const t = table();
+        const tx = rand(t.land.x, t.land.x + t.land.w) - 16;
+        const ty = rand(t.land.y, t.land.y + t.land.h) - 16;
+        const rot = rand(-14, 14);
         sfx.throw();
         const a = ghost.animate([
           { transform: from },
-          { transform: 'translate(' + (tx + (pt.x - 16 - tx) * 0.4) + 'px,' + (Math.min(ty, pt.y) - 70) + 'px) scale(1.5) rotate(-18deg)', offset: 0.5 },
-          { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(8deg)' },
+          { transform: 'translate(' + (tx + (pt.x - 16 - tx) * 0.4) + 'px,' + (Math.min(ty, pt.y) - 60) + 'px) scale(1.45) rotate(-16deg)', offset: 0.5 },
+          { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' },
         ], { duration: LIVE.throwFlyMs, easing: motion.emphasizedDecel, fill: 'forwards' });
         a.onfinish = () => {
           sfx.land();
-          ghost.animate([{ transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(8deg)' }, { transform: 'translate(' + tx + 'px,' + (ty - 12) + 'px) scale(1.12) rotate(4deg)' }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(8deg)' }], { duration: 240, easing: motion.standard });
-          const plus = document.createElement('div');
-          plus.textContent = '+' + LIVE.throwWarm.toFixed(1) + '°';
-          Object.assign(plus.style, { position: 'absolute', left: zone.cx - 22 + 'px', top: zone.fy - 24 + 'px', width: '44px', textAlign: 'center', color: '#36D2FF', fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '15px', fontWeight: '800', zIndex: '46', pointerEvents: 'none' });
-          root.appendChild(plus);
-          plus.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(-10px)', offset: 0.25 }, { opacity: 0, transform: 'translateY(-34px)' }], { duration: 1300, easing: 'ease-out' }).onfinish = () => plus.remove();
-          window.setTimeout(() => ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).onfinish = () => ghost.remove(), 1500);
+          ghost.animate([{ transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + (ty - 12) + 'px) scale(1.1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }], { duration: 240, easing: motion.standard });
+          window.setTimeout(() => ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).onfinish = () => ghost.remove(), LIVE.throwStayMs);
         };
         // 개수와 쿨타임
         const name = nameOf(slot);
@@ -151,7 +158,7 @@ export function attachThrow(root) {
         inv[name] = Object.assign(inv[name] || {}, { count: next });
         if (cp) setText(cp, String(next));
         cool(slot, LIVE.throwCooldown);
-        toast(root, '주전부리를 던졌어요. 받은 사람의 엉따 온도가 올라가요');
+        toast(root, LIVE.throwDoneText);
       };
       window.addEventListener('pointermove', move);
       window.addEventListener('pointerup', done);

@@ -247,7 +247,7 @@ const pickNext = (n, cur, meIdx) => {
   const weights = [];
   for (let i = 0; i < n; i++) {
     if (i === cur) weights.push(0);
-    else if (i === meIdx) weights.push(mic.live && !mic.muted ? 0 : LIVE.meWeight);
+    else if (i === meIdx) weights.push(0); // 말하는 표시(초록 테두리와 바)는 나에게는 붙이지 않는다
     else weights.push(1);
   }
   const sum = weights.reduce((a, b) => a + b, 0);
@@ -267,7 +267,7 @@ export function attachSpeakers(root) {
     const meIdx = Math.max(0, tiles.findIndex((t) => /새벽2시/.test(t.getAttribute('data-figma'))));
     const r0 = tiles.map((t) => relRect(root, t));
     const bar0 = bars.slice(0, 5).map((b) => relRect(root, b));
-    let cur = meIdx;
+    let cur = (meIdx + 1) % tiles.length;
     tiles.forEach((t) => {
       t.style.transition = 'box-shadow 260ms ' + motion.standard;
       // 피그마가 말하는 칸 하나에만 그려 둔 초록 테두리(SVG)는 숨기고, 돌아가는 테두리로 대신한다.
@@ -285,8 +285,8 @@ export function attachSpeakers(root) {
     place(cur);
     const step = () => {
       if (!root.isConnected) return;
-      if (mic.live && !mic.muted && mic.speaking) { if (cur !== meIdx) { cur = meIdx; place(cur); } }
-      else if (!(mic.live && !mic.muted && cur === meIdx && mic.level > 0.05)) { cur = pickNext(tiles.length, cur, meIdx); place(cur); }
+      cur = pickNext(tiles.length, cur, meIdx);
+      place(cur);
       window.setTimeout(step, LIVE.speakMin + Math.random() * (LIVE.speakMax - LIVE.speakMin));
     };
     window.setTimeout(step, LIVE.speakFirst);
@@ -302,7 +302,7 @@ export function attachSpeakers(root) {
     const rects = labels.map((p) => relRect(root, p));
     const d0 = relRect(root, dot), w0 = relRect(root, wave), m0 = relRect(root, meLabel);
     const meIdx = labels.indexOf(meLabel);
-    let cur = meIdx;
+    let cur = (meIdx + 1) % labels.length;
     [dot, wave].forEach((e) => (e.style.transition = 'transform 320ms ' + motion.emphasizedDecel + ', opacity 200ms'));
     const place = (i) => {
       const r = rects[i];
@@ -313,10 +313,11 @@ export function attachSpeakers(root) {
     };
     q(wave, '[data-figma="voice wave"]').forEach((b, k) => b.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(0.45)' }, { transform: 'scaleY(1.25)' }, { transform: 'scaleY(0.7)' }], { duration: 620 + k * 110, iterations: Infinity, easing: 'ease-in-out' }));
     void d0; void w0;
+    place(cur);
     const step = () => {
       if (!root.isConnected) return;
-      if (mic.live && !mic.muted && mic.speaking) { if (cur !== meIdx) { cur = meIdx; place(cur); } }
-      else if (!(mic.live && !mic.muted && cur === meIdx && mic.level > 0.05)) { cur = pickNext(labels.length, cur, meIdx); place(cur); }
+      cur = pickNext(labels.length, cur, meIdx);
+      place(cur);
       window.setTimeout(step, LIVE.speakMin + Math.random() * (LIVE.speakMax - LIVE.speakMin));
     };
     window.setTimeout(step, LIVE.speakFirst);
@@ -349,35 +350,38 @@ export function fixCommentBar(root) {
 }
 
 // ---------- 6) 온보딩 ----------
+// 따봉, 싫어요 버튼(DRR KAK)은 없애고 이모지 알약을 가운데로 키워서 반응의 중심으로 둔다. 제목은 팀 문구 그대로다.
 export async function patchOnboarding(root) {
-  const slotBox = root.querySelector('[data-figma="DRR KAK"]');
-  if (!slotBox || slotBox.dataset.live) return;
-  slotBox.dataset.live = 'quick';
-  const names = LIVE.onboardSlots;
-  const slots = (await Promise.all(names.map((n) => cloneOf(28, '[data-figma="slot · ' + n + '"]')))).filter(Boolean);
-  if (!slots.length || !root.isConnected) return;
-  slotBox.innerHTML = '';
-  Object.assign(slotBox.style, { height: slots.length * 50 - 6 + 'px', width: '44px', overflow: 'visible' });
-  slots.forEach((s, i) => {
-    Object.assign(s.style, { left: '0px', top: i * 50 + 'px', position: 'absolute' });
-    slotBox.appendChild(s);
-    s.animate([{ opacity: 0, transform: 'translateX(10px)' }, { opacity: 1, transform: 'translateX(0)' }], { duration: motion.stateIn + 150, delay: 120 + i * 90, easing: motion.emphasizedDecel, fill: 'backwards' });
-  });
-  const snack = slots[0].querySelector('[data-figma="' + names[0] + '"]');
-  if (snack) {
-    const f = snack.cloneNode(true);
-    Object.assign(f.style, { position: 'absolute', left: '6px', top: '6px', zIndex: '3', pointerEvents: 'none', opacity: '0' });
-    slotBox.appendChild(f);
-    f.animate([
-      { opacity: 0, transform: 'translate(0,0) rotate(0deg)' },
-      { opacity: 1, transform: 'translate(-20px,-6px) rotate(-12deg)', offset: 0.12 },
-      { opacity: 1, transform: 'translate(-96px,-26px) rotate(-40deg)', offset: 0.7 },
-      { opacity: 0, transform: 'translate(-124px,-4px) rotate(-70deg)' },
-    ], { duration: 3200, iterations: Infinity, easing: 'ease-out' });
+  const box = root.querySelector('[data-figma="DRR KAK"]');
+  if (!box || box.dataset.live) return;
+  box.dataset.live = 'emoji';
+  box.style.display = 'none';
+  q(root, '[data-figma="skel / 말풍선"]').slice(2).forEach((b) => (b.style.display = 'none'));
+  const chip = root.querySelector('[data-figma="칩"]');
+  if (chip) {
+    const par = chip.parentElement;
+    const pr = relRect(root, par), cr = relRect(root, chip);
+    // 알약을 흰 패널 가운데 아래쪽으로 옮기고 1.5배로 키운다.
+    const tx = pr.w / 2 - (cr.x - pr.x + cr.w / 2);
+    const ty = 150 - (cr.y - pr.y + cr.h / 2);
+    Object.assign(chip.style, { transformOrigin: '50% 50%', transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1.5)', zIndex: '3' });
+    // 하트 하나가 위로 떠오르며 날아간다.
+    const heart = chip.querySelector('[data-figma="heart-1"]');
+    if (heart) {
+      const hr = relRect(root, heart);
+      const fly = heart.cloneNode(true);
+      Object.assign(fly.style, { position: 'absolute', left: hr.x - pr.x + tx + 'px', top: hr.y - pr.y + ty - 18 + 'px', zIndex: '4', pointerEvents: 'none', opacity: '0', transformOrigin: '50% 50%' });
+      par.appendChild(fly);
+      fly.animate([
+        { opacity: 0, transform: 'translate(0,10px) scale(1.2) rotate(0deg)' },
+        { opacity: 1, transform: 'translate(8px,-14px) scale(1.7) rotate(8deg)', offset: 0.2 },
+        { opacity: 0, transform: 'translate(26px,-74px) scale(2.1) rotate(16deg)' },
+      ], { duration: 2400, iterations: Infinity, easing: 'ease-out' });
+    }
   }
   const title = root.querySelector('[data-figma="title"]');
   const sub = root.querySelector('[data-figma="sub"]');
-  setText(title, LIVE.onboardTitle);
+  if (LIVE.onboardTitle) setText(title, LIVE.onboardTitle);
   setText(sub, LIVE.onboardSub);
   [title, sub].forEach((p) => p && Object.assign(p.style, { width: 'auto', whiteSpace: 'pre', textAlign: 'center' }));
 }
