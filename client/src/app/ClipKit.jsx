@@ -27,7 +27,7 @@ function Item({ it, flow, pw }) {
   switch (it.k) {
     case 'rect':
       return (
-        <div data-figma={it.n} style={{ ...pos(it.x, it.y, it.w, it.h), borderRadius: radius(it.r), overflow: 'hidden', boxSizing: 'border-box', background: fillCss(it.f), border: it.s ? it.s.w + 'px solid ' + rgba(it.s.c, it.s.a) : undefined }}>
+        <div data-figma={it.n} style={{ ...pos(it.x, it.y, it.w, it.h), borderRadius: radius(it.r), overflow: 'hidden', boxSizing: 'border-box', background: fillCss(it.f), border: it.s ? it.s.w + 'px solid ' + rgba(it.s.c, it.s.a) : undefined, boxShadow: it.sh ? it.sh[0] + 'px ' + it.sh[1] + 'px ' + it.sh[2] + 'px rgba(0,0,0,' + it.sh[3] + ')' : undefined }}>
           {it.f && it.f.img ? <Fill img={it.f.img} /> : null}
         </div>
       );

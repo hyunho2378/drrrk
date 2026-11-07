@@ -22,6 +22,11 @@ const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
 
 // 누른 자리가 가는 곳을 정한다. 아이템 상세를 닫으면 눌렀던 화면으로 돌아가고, 아이템을 누르면 어떤 아이템인지 적어 둔다.
 export function resolveTo(l) {
+  // 네이버 클립에서 드르륵으로 들어가는 길: 스플래시를 띄우고 화면은 바로 바꾼다(스플래시가 덮고 있는 동안 홈이 그려진다).
+  if (l.t === 'enter') {
+    window.dispatchEvent(new Event('drrrk:splash'));
+    return Object.assign({}, l, { t: 'none' });
+  }
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
   return l;
