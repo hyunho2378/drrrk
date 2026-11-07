@@ -26,10 +26,10 @@ export function DRRRK3({
         }} />
         </div>
         <div data-figma="Frame 2147249129" data-node="1647:23522" className="[display:flex] [width:342px] [flex-direction:column] [align-items:center] [gap:8px] [position:absolute] [left:0px] [top:240px] [height:67px]">
-          <p data-figma="드르륵 읽는 중..." data-node="1647:23523" data-outline="" className="[align-self:stretch] [color:#F8F8F8] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:28px] [font-style:normal] [font-weight:700] [line-height:39px] [letter-spacing:-1.12px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.308px] [left:-0.56px]">{"드르륵 읽는 중..."}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="드르륵 읽는 중..." data-node="1647:23523" data-outline="" className="[align-self:stretch] [color:#F8F8F8] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:28px] [font-style:normal] [font-weight:700] [line-height:39px] [letter-spacing:-1.12px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.308px] [left:-0.56px]">{"드르륵 읽는 중..."}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1647:23523"]
           }} /></p>
-          <p data-figma="비슷한 고민을 가진 사람을 찾고 있어요" data-node="1647:23524" data-outline="" className="[align-self:stretch] [color:#9AA1A6] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:-0.32px]">{"비슷한 고민을 가진 사람을 찾고 있어요"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="비슷한 고민을 가진 사람을 찾고 있어요" data-node="1647:23524" data-outline="" className="[align-self:stretch] [color:#9AA1A6] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:-0.32px]">{"비슷한 고민을 가진 사람을 찾고 있어요"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1647:23524"]
           }} /></p>
         </div>
@@ -44,7 +44,7 @@ export function DRRRK3({
             __html: svg["1647:23529"]
           }} />
           </div>
-          <p data-figma="고민 맥락 분석 중" data-node="1647:23530" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [width:104px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:0px]">{"고민 맥락 분석 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="고민 맥락 분석 중" data-node="1647:23530" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [width:104px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:0px]">{"고민 맥락 분석 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1647:23530"]
           }} /></p>
         </div>
@@ -57,7 +57,7 @@ export function DRRRK3({
             __html: svg["1647:23534"]
           }} />
           </div>
-          <p data-figma="비슷한 경험 찾는 중" data-node="1647:23535" data-outline="" className="[width:117px] [color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:0px]">{"비슷한 경험 찾는 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="비슷한 경험 찾는 중" data-node="1647:23535" data-outline="" className="[width:117px] [color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:0px]">{"비슷한 경험 찾는 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1647:23535"]
           }} /></p>
         </div>
@@ -70,7 +70,7 @@ export function DRRRK3({
             __html: svg["1647:23539"]
           }} />
           </div>
-          <p data-figma="드르륵 방 연결 중" data-node="1647:23540" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:500] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [width:104px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:0px]">{"드르륵 방 연결 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          <p data-figma="드르륵 방 연결 중" data-node="1647:23540" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:500] [line-height:20px] [letter-spacing:-0.64px] [flex-shrink:0] [width:104px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.176px] [left:0px]">{"드르륵 방 연결 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
             __html: svg["1647:23540"]
           }} /></p>
         </div>
