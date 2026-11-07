@@ -42,15 +42,23 @@ export function fitMobile(container, root, visibleH) {
   const isBg = (k) => k.h >= M.bgMin && !k.native && !k.text;
   const blocks = kids.filter((k) => !isBg(k) && !k.native && !k.hidden && !(k.t <= 1 && k.h <= 70) && k.b > M.head).sort((a, b) => a.t - b.t);
   const native = kids.filter((k) => k.native);
-  // 빈 띠
+  // 바닥에 붙일 요소: 바닥까지 닿는 전체 폭 요소(탭바, 시트, 그라데이션)와 바닥 띠 안에 들어 있는 요소(입력창, 버튼, 링크).
+  // 시트 위에 얹힌 요소(시트 윗선 아래에서 시작하는 요소)도 시트와 같이 붙인다.
+  const pinned = new Set(blocks.filter((k) => (k.b >= H0 - 1 && k.l <= 1 && k.w >= 389) || (k.t >= H0 - M.bottomSeed && k.b <= H0 + 1)));
+  const sheets = Array.from(pinned).filter((k) => k.l <= 1 && k.w >= 389 && k.b >= H0 - 1);
+  const sheetTop = sheets.length ? Math.min(...sheets.map((k) => k.t)) : H0;
+  blocks.forEach((k) => { if (k.t >= sheetTop) pinned.add(k); });
+  let pinTop = pinned.size ? Math.min(...Array.from(pinned).map((k) => k.t)) : H0;
+  // 빈 띠(머리말 아래부터 바닥 요소 윗선까지)
   const gaps = [];
   let cur = M.head;
   if (!native.length) {
     blocks.forEach((k) => {
-      if (k.t > cur) gaps.push({ a: cur, z: k.t });
+      if (pinned.has(k)) return;
+      if (k.t > cur && k.t <= pinTop) gaps.push({ a: cur, z: Math.min(k.t, pinTop) });
       cur = Math.max(cur, k.b);
     });
-    if (cur < H0) gaps.push({ a: cur, z: H0 });
+    if (cur < pinTop) gaps.push({ a: cur, z: pinTop });
   }
   gaps.forEach((g) => (g.use = Math.max(0, g.z - g.a - M.keep)));
   const total = gaps.reduce((a, g) => a + g.use, 0);
@@ -65,10 +73,8 @@ export function fitMobile(container, root, visibleH) {
     });
     return v;
   };
-  // 바닥에 붙일 요소: 바닥까지 닿는 전체 폭 요소(탭바, 시트, 그라데이션)와 바닥 띠 안에 들어 있는 요소(입력창, 버튼, 링크)
-  const pinned = new Set(blocks.filter((k) => (k.b >= H0 - 1 && k.l <= 1 && k.w >= 389) || (k.t >= H0 - M.bottomSeed && k.b <= H0 + 1)));
-  if (rest) {
-    let top = pinned.size ? Math.min(...Array.from(pinned).map((k) => k.t)) : H0;
+  if (rest > 0) {
+    let top = pinTop;
     for (let grew = true; grew; ) {
       grew = false;
       blocks.forEach((k) => {
@@ -85,7 +91,8 @@ export function fitMobile(container, root, visibleH) {
     if (k.native) return 0;
     if (isBg(k)) return shiftAt(k.t + k.h * M.bgAnchor);
     if (k.t < M.head) return 0;
-    return shiftAt(k.t) + (pinned.has(k) ? rest : 0);
+    // 바닥 요소는 창 바닥에 맞게 차이 전체만큼 옮기고, 나머지는 줄인 빈 띠만큼 옮긴다.
+    return pinned.has(k) ? delta : shiftAt(k.t);
   };
   kids.forEach((k) => {
     k.shift = shiftOf(k);
@@ -107,6 +114,7 @@ export function fitMobile(container, root, visibleH) {
     rest: Math.max(0, rest),
     pinned: new Set(Array.from(pinned).map((k) => k.el)),
     native: native.length > 0,
-    input: Array.from(pinned).some((k) => /^input|채팅 입력/.test(k.name) || !!k.el.querySelector('[data-figma="채팅 입력"]')),
+    // 라이브 댓글 화면은 입력창 바로 위 댓글이 보이도록 맨 아래에서 시작한다.
+    input: !!root.querySelector('[data-figma="댓글 (라이브 채팅)"]'),
   };
 }
