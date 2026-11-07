@@ -12,3 +12,7 @@ html, body { background: var(--gray-800); color: var(--text-primary); font-famil
 .live-input::placeholder { color: transparent; }
 
 html, body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+
+/* 끌어서 놓을 때 글자가 선택되어 파랗게 보이지 않게 한다. 입력칸은 그대로 선택된다. */
+.font-suit { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.font-suit input { -webkit-user-select: text; user-select: text; }

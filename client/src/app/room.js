@@ -268,7 +268,11 @@ export function attachSpeakers(root) {
     const r0 = tiles.map((t) => relRect(root, t));
     const bar0 = bars.slice(0, 5).map((b) => relRect(root, b));
     let cur = meIdx;
-    tiles.forEach((t) => { t.style.transition = 'box-shadow 260ms ' + motion.standard + ', border-color 260ms'; t.style.borderColor = 'transparent'; });
+    tiles.forEach((t) => {
+      t.style.transition = 'box-shadow 260ms ' + motion.standard;
+      // 피그마가 말하는 칸 하나에만 그려 둔 초록 테두리(SVG)는 숨기고, 돌아가는 테두리로 대신한다.
+      q(t, ':scope > span[aria-hidden]').forEach((o) => { if (o.querySelector('path[style*="2EE59D"]')) o.style.display = 'none'; });
+    });
     const place = (i) => {
       tiles.forEach((t, k) => (t.style.boxShadow = k === i ? 'inset 0 0 0 2px ' + ring : 'inset 0 0 0 0 ' + ring));
       const ox = r0[i].x + r0[i].w - (r0[meIdx].x + r0[meIdx].w), oy = r0[i].y - r0[meIdx].y;
