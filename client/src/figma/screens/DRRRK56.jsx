@@ -1,0 +1,387 @@
+// 자동 생성: figma-to-code. 피그마 FRAME 1806:11630 "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)" (해시 ca499042)
+// 손으로 고치지 말고 피그마를 고친 뒤 다시 생성한다. 다듬은 코드는 별도 파일에서 이 컴포넌트를 감싼다.
+import React from 'react';
+import { useFigmaSubpixel } from '../subpixel';
+import { Icon } from '../Icon';
+import svg from '../../assets/svg-map';
+const cx = (...a) => a.filter(Boolean).join(" ");
+export function DRRRK56({
+  style,
+  className
+}) {
+  const __root = React.useRef(null);
+  useFigmaSubpixel(__root);
+  if (true) return <div ref={__root} data-figma="DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)" data-node="1806:11630" className={cx("[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden]", className)} style={style}>
+      <div data-figma="Status Bar" data-node="1806:11631" data-instance-of="Status Bar" className="[display:flex] [width:390px] [height:64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] [position:absolute] [left:0px] [top:0px] [overflow:hidden]">
+        <div data-figma="Group 3" data-node="I1806:11631;3035:448" className="[width:316.391px] [height:22.767px] [flex-shrink:0] [position:absolute] [left:40.52px] [top:20.26px]">
+          <div data-figma="Right Side" data-node="I1806:11631;3035:449" className="[width:77.07px] [height:12.9px] [position:absolute] [left:239.32px] [top:5.06px]">
+            <div data-figma="Battery" data-node="I1806:11631;3035:450" className="[width:27.69px] [height:12.9px] [position:absolute] [left:49.38px] [top:0px]">
+              <span data-figma="Rectangle" data-node="I1806:11631;3035:451" className="[width:25.04px] [height:12.9px] [position:absolute] [left:0px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1806:11631;3035:451"]
+            }} />
+              <span data-figma="Combined Shape" data-node="I1806:11631;3035:452" className="[width:1.51px] [height:4.55px] [position:absolute] [left:26.18px] [top:4.18px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1806:11631;3035:452"]
+            }} />
+              <span data-figma="Rectangle" data-node="I1806:11631;3035:453" className="[width:20.49px] [height:8.35px] [position:absolute] [left:2.28px] [top:2.27px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["I1806:11631;3035:453"]
+            }} />
+            </div>
+            <span data-figma="Wifi" data-node="I1806:11631;3035:454" className="[width:17.39px] [height:12.48px] [position:absolute] [left:26.11px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11631;3035:454"]
+          }} />
+            <span data-figma="Mobile Signal" data-node="I1806:11631;3035:455" className="[width:19.35px] [height:12.14px] [position:absolute] [left:0px] [top:0.38px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11631;3035:455"]
+          }} />
+          </div>
+          <span data-figma="9:41" data-node="I1806:11631;3035:456" role="img" aria-label="9:41" className="[width:61.47px] [height:22.77px] [position:absolute] [left:0px] [top:0px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [flex-shrink:0] [line-height:0] [display:block]" dangerouslySetInnerHTML={{
+          __html: svg["I1806:11631;3035:456"]
+        }} />
+        </div>
+      </div>
+      <div data-figma="List Card / 1" data-node="1806:11632" className="[width:342px] [height:112px] [border-radius:16px] [background:#222628] [position:absolute] [left:24px] [top:488px] [overflow:hidden]">
+        <div data-figma="Thumb" data-node="1806:11633" data-img={"{\"src\":\"./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,0.5581395626068115,0.22093023359775543]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:12px] [background:url(./assets/images/5534d467597ad85cccf9aa5b99ce17f801a0a8d6.webp)_50%_/_cover_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+        <p data-figma="List Title" data-node="1806:11634" data-outline="" className="[width:214px] [color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"친구가 썸남 앞에서\n내 쌍밍아웃함"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11634"]
+        }} /></p>
+        <div data-figma="meta" data-node="1806:11635" className="[display:inline-flex] [align-items:center] [gap:6px] [position:absolute] [left:16px] [top:76px] [width:130px] [height:17px] [overflow:hidden]">
+          <div data-figma="voice wave" data-node="1806:11636" className="[display:flex] [align-items:center] [gap:1.5px] [flex-shrink:0] [overflow:hidden]">
+            <div data-figma="Rectangle" data-node="1806:11637" className="[width:2px] [height:3px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11638" className="[width:2px] [height:7px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11639" className="[width:2px] [height:10px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11640" className="[width:2px] [height:7px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11641" className="[width:2px] [height:3px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+          </div>
+          <p data-figma="4명 이야기 중" data-node="1806:11642" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:64px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"4명 이야기 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1806:11642"]
+          }} /></p>
+          <span data-figma="Ellipse" data-node="1806:11643" className="[position:relative] [width:3px] [height:3px] [flex-shrink:0] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11643"]
+        }} />
+          <div data-figma="보는 중" data-node="1806:11644" className="[display:flex] [align-items:center] [gap:4px] [border-radius:999px] [flex-shrink:0] [overflow:hidden]">
+            <div data-figma="icon/eye" data-node="1806:11645" className="[width:13px] [height:13px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+              <span data-figma="Vector" data-node="1806:11646" className="[width:10.83px] [height:7.58px] [position:absolute] [left:1.08px] [top:2.71px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11646"]
+            }} />
+              <span data-figma="Vector" data-node="1806:11647" className="[width:3.25px] [height:3.25px] [position:absolute] [left:4.88px] [top:4.88px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11647"]
+            }} />
+            </div>
+            <p data-figma="18" data-node="1806:11648" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:12px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"18"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11648"]
+            }} /></p>
+          </div>
+        </div>
+        <div data-figma="Timer Badge" data-node="1806:11649" data-instance-of="Timer Badge · 20분 기준" className="[display:inline-flex] [padding:3px_7px_3px_6px] [align-items:center] [gap:3px] [border-radius:999px] [background:rgba(0,_0,_0,_0.75)] [position:absolute] [left:258px] [top:72px] [width:57px] [height:20px]">
+          <div data-figma="timer" data-node="I1806:11649;1126:2222" className="[width:13px] [height:13px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+            <span data-figma="Vector" data-node="I1806:11649;1126:2223" className="[width:11.38px] [height:11.38px] [position:absolute] [left:0.81px] [top:0.81px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11649;1126:2223"]
+          }} />
+            <span data-figma="Vector" data-node="I1806:11649;1126:2224" className="[width:7.84px] [height:8.67px] [position:absolute] [left:3px] [top:2.17px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11649;1126:2224"]
+          }} />
+          </div>
+          <p data-figma="time" data-node="I1806:11649;1126:2225" data-outline="" className="[color:#36D2FF] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:14px] [flex-shrink:0] [width:28px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:-0.004px] [left:0px]">{"12:32"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11649;1126:2225"]
+          }} /></p>
+        </div>
+      </div>
+      <div data-figma="List Card / 2" data-node="1806:11650" className="[width:342px] [height:112px] [border-radius:16px] [background:#222628] [position:absolute] [left:24px] [top:612px] [overflow:hidden]">
+        <div data-figma="Thumb" data-node="1806:11651" data-img={"{\"src\":\"./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp\",\"mode\":\"CROP\",\"tf\":[[0.5581395626068115,0,0.0006077940342947841],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:12px] [background:url(./assets/images/7a39098e95ff000eea8de3123bf7e72c2ca2e6b1.webp)_-0.087px_0px_/_179.167%_100%_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+        <p data-figma="List Title" data-node="1806:11652" data-outline="" className="[width:214px] [color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"화장실에서 혼자\n급식 먹다가 걸린 썰 푼다"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11652"]
+        }} /></p>
+        <div data-figma="meta" data-node="1806:11653" className="[display:inline-flex] [align-items:center] [gap:6px] [position:absolute] [left:16px] [top:76px] [width:130px] [height:17px] [overflow:hidden]">
+          <div data-figma="voice wave" data-node="1806:11654" className="[display:flex] [align-items:center] [gap:1.5px] [flex-shrink:0] [overflow:hidden]">
+            <div data-figma="Rectangle" data-node="1806:11655" className="[width:2px] [height:3px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11656" className="[width:2px] [height:7px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11657" className="[width:2px] [height:10px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11658" className="[width:2px] [height:7px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11659" className="[width:2px] [height:3px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+          </div>
+          <p data-figma="6명 이야기 중" data-node="1806:11660" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:64px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"6명 이야기 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1806:11660"]
+          }} /></p>
+          <span data-figma="Ellipse" data-node="1806:11661" className="[position:relative] [width:3px] [height:3px] [flex-shrink:0] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11661"]
+        }} />
+          <div data-figma="보는 중" data-node="1806:11662" className="[display:flex] [align-items:center] [gap:4px] [border-radius:999px] [flex-shrink:0] [overflow:hidden]">
+            <div data-figma="icon/eye" data-node="1806:11663" className="[width:13px] [height:13px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+              <span data-figma="Vector" data-node="1806:11664" className="[width:10.83px] [height:7.58px] [position:absolute] [left:1.08px] [top:2.71px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11664"]
+            }} />
+              <span data-figma="Vector" data-node="1806:11665" className="[width:3.25px] [height:3.25px] [position:absolute] [left:4.88px] [top:4.88px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11665"]
+            }} />
+            </div>
+            <p data-figma="31" data-node="1806:11666" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:12px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"31"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11666"]
+            }} /></p>
+          </div>
+        </div>
+        <div data-figma="Timer Badge" data-node="1806:11667" data-instance-of="Timer Badge · 20분 기준" className="[display:inline-flex] [padding:3px_7px_3px_6px] [align-items:center] [gap:3px] [border-radius:999px] [background:#FF4D6A] [position:absolute] [left:257px] [top:72px] [width:58px] [height:20px]">
+          <div data-figma="timer" data-node="I1806:11667;1126:2272" className="[width:13px] [height:13px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+            <span data-figma="Vector" data-node="I1806:11667;1126:2273" className="[width:11.38px] [height:11.38px] [position:absolute] [left:0.81px] [top:0.81px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11667;1126:2273"]
+          }} />
+            <span data-figma="Vector" data-node="I1806:11667;1126:2274" className="[width:3.5px] [height:4.33px] [position:absolute] [left:6.5px] [top:2.17px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11667;1126:2274"]
+          }} />
+          </div>
+          <p data-figma="time" data-node="I1806:11667;1126:2275" data-outline="" className="[color:#000] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:14px] [flex-shrink:0] [width:29px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:-0.004px] [left:0px]">{"02:41"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11667;1126:2275"]
+          }} /></p>
+        </div>
+      </div>
+      <div data-figma="List Card / 3" data-node="1806:11668" className="[width:342px] [height:112px] [border-radius:16px] [background:#222628] [position:absolute] [left:24px] [top:736px] [overflow:hidden]">
+        <div data-figma="Thumb" data-node="1806:11669" data-img={"{\"src\":\"./assets/images/25a2bc805dc33cf06662b290446454bc6e680354.webp\",\"mode\":\"CROP\",\"tf\":[[0.8279028534889221,0,0.0007004235521890223],[0,1,-3.552713678800501e-15]],\"op\":1,\"flip\":\"\"}"} className="[width:80px] [height:80px] [border-radius:12px] [background:url(./assets/images/25a2bc805dc33cf06662b290446454bc6e680354.webp)_-0.068px_0px_/_120.787%_100%_no-repeat] [position:absolute] [left:246px] [top:16px]" />
+        <p data-figma="List Title" data-node="1806:11670" data-outline="" className="[width:214px] [color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:700] [line-height:22px] [position:absolute] [left:16px] [top:16px] [height:44px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.176px] [left:0px]">{"맨날 얻어먹고 한 번도\n안 사는 친구 손절각?"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11670"]
+        }} /></p>
+        <div data-figma="meta" data-node="1806:11671" className="[display:inline-flex] [align-items:center] [gap:6px] [position:absolute] [left:16px] [top:76px] [width:125px] [height:17px] [overflow:hidden]">
+          <div data-figma="voice wave" data-node="1806:11672" className="[display:flex] [align-items:center] [gap:1.5px] [flex-shrink:0] [overflow:hidden]">
+            <div data-figma="Rectangle" data-node="1806:11673" className="[width:2px] [height:3px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11674" className="[width:2px] [height:7px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11675" className="[width:2px] [height:10px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11676" className="[width:2px] [height:7px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+            <div data-figma="Rectangle" data-node="1806:11677" className="[width:2px] [height:3px] [border-radius:1px] [background:#2EE59D] [flex-shrink:0]" />
+          </div>
+          <p data-figma="2명 이야기 중" data-node="1806:11678" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:64px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"2명 이야기 중"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1806:11678"]
+          }} /></p>
+          <span data-figma="Ellipse" data-node="1806:11679" className="[position:relative] [width:3px] [height:3px] [flex-shrink:0] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11679"]
+        }} />
+          <div data-figma="보는 중" data-node="1806:11680" className="[display:flex] [align-items:center] [gap:4px] [border-radius:999px] [flex-shrink:0] [overflow:hidden]">
+            <div data-figma="icon/eye" data-node="1806:11681" className="[width:13px] [height:13px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+              <span data-figma="Vector" data-node="1806:11682" className="[width:10.83px] [height:7.58px] [position:absolute] [left:1.08px] [top:2.71px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11682"]
+            }} />
+              <span data-figma="Vector" data-node="1806:11683" className="[width:3.25px] [height:3.25px] [position:absolute] [left:4.88px] [top:4.88px] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11683"]
+            }} />
+            </div>
+            <p data-figma="7" data-node="1806:11684" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:500] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:7px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:0px]">{"7"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+              __html: svg["1806:11684"]
+            }} /></p>
+          </div>
+        </div>
+        <div data-figma="Timer Badge" data-node="1806:11685" data-instance-of="Timer Badge · 20분 기준" className="[display:inline-flex] [padding:3px_7px_3px_6px] [align-items:center] [gap:3px] [border-radius:999px] [background:rgba(0,_0,_0,_0.75)] [position:absolute] [left:263px] [top:72px] [width:60px] [height:20px]">
+          <div data-figma="timer" data-node="I1806:11685;1126:2237" className="[width:13px] [height:13px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+            <span data-figma="Vector" data-node="I1806:11685;1126:2238" className="[width:11.38px] [height:11.38px] [position:absolute] [left:0.81px] [top:0.81px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11685;1126:2238"]
+          }} />
+            <span data-figma="Vector" data-node="I1806:11685;1126:2239" className="[width:4.33px] [height:8.67px] [position:absolute] [left:6.5px] [top:2.17px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11685;1126:2239"]
+          }} />
+          </div>
+          <p data-figma="time" data-node="I1806:11685;1126:2240" data-outline="" className="[color:#36D2FF] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:11px] [font-style:normal] [font-weight:700] [line-height:14px] [flex-shrink:0] [width:31px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:-0.004px] [left:0px]">{"09:05"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11685;1126:2240"]
+          }} /></p>
+        </div>
+      </div>
+      <div data-figma="Page Dots" data-node="1806:11686" className="[width:64px] [height:6px] [position:absolute] [left:163px] [top:372px]">
+        <div data-figma="Dot / active" data-node="1806:11687" className="[width:16px] [height:6px] [border-radius:3px] [background:#F8F8F8] [position:absolute] [left:0px] [top:0px]" />
+        <span data-figma="Dot" data-node="1806:11688" className="[width:6px] [height:6px] [position:absolute] [left:22px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11688"]
+      }} />
+        <span data-figma="Dot" data-node="1806:11689" className="[width:6px] [height:6px] [position:absolute] [left:34px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11689"]
+      }} />
+        <span data-figma="Dot" data-node="1806:11690" className="[width:6px] [height:6px] [position:absolute] [left:46px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11690"]
+      }} />
+        <span data-figma="Dot" data-node="1806:11691" className="[width:6px] [height:6px] [position:absolute] [left:58px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11691"]
+      }} />
+      </div>
+      <div data-figma="Tab Divider" data-node="1806:11692" className="[width:390px] [height:1px] [background:#222628] [position:absolute] [left:0px] [top:423px]" />
+      <div data-figma="Tabs" data-node="1806:11693" className="[width:342px] [height:29px] [position:absolute] [left:24px] [top:396px]">
+        <p data-figma="Tab / 전체" data-node="1806:11694" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:15px] [font-style:normal] [font-weight:500] [line-height:19px] [position:absolute] [left:0px] [top:0px] [width:27px] [height:19px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.04px] [left:0px]">{"전체"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11694"]
+        }} /></p>
+        <p data-figma="Tab / 친구" data-node="1806:11695" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:15px] [font-style:normal] [font-weight:500] [line-height:19px] [position:absolute] [left:63px] [top:0px] [width:27px] [height:19px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.04px] [left:0px]">{"친구"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11695"]
+        }} /></p>
+        <p data-figma="Tab / 연애" data-node="1806:11696" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:15px] [font-style:normal] [font-weight:500] [line-height:19px] [position:absolute] [left:126px] [top:0px] [width:27px] [height:19px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.04px] [left:0px]">{"연애"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11696"]
+        }} /></p>
+        <p data-figma="Tab / 가족" data-node="1806:11697" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:15px] [font-style:normal] [font-weight:700] [line-height:19px] [position:absolute] [left:189px] [top:0px] [width:27px] [height:19px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.04px] [left:0px]">{"가족"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11697"]
+        }} /></p>
+        <p data-figma="Tab / 학교" data-node="1806:11698" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:15px] [font-style:normal] [font-weight:500] [line-height:19px] [position:absolute] [left:252px] [top:0px] [width:27px] [height:19px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.04px] [left:0px]">{"학교"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11698"]
+        }} /></p>
+        <p data-figma="Tab / 진로" data-node="1806:11699" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:15px] [font-style:normal] [font-weight:500] [line-height:19px] [position:absolute] [left:315px] [top:0px] [width:27px] [height:19px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.04px] [left:0px]">{"진로"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11699"]
+        }} /></p>
+        <div data-figma="Tab Underline" data-node="1806:11700" className="[width:27px] [height:2px] [background:#F8F8F8] [position:absolute] [left:189px] [top:27px]" />
+      </div>
+      <div data-figma="Carousel / 1" data-node="1806:11703" className="[width:318px] [height:232px] [border-radius:20px] [background:#222628] [position:absolute] [left:24px] [top:128px] [overflow:hidden]">
+        <div data-figma="Scene" data-node="1806:11704" data-img={"{\"src\":\"./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp\",\"mode\":\"CROP\",\"tf\":[[1,0,0],[0,0.40719613432884216,0.351818710565567]],\"op\":1,\"flip\":\"\"}"} className="[width:318px] [height:232px] [background:url(./assets/images/4376d77ef68072b6a51ce4ff9143582be36ad608.webp)_0px_-200.449px_/_100%_245.582%_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+        <div data-figma="Fade" data-node="1806:11705" className="[width:318px] [height:232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] [position:absolute] [left:0px] [top:0px]" />
+        <p data-figma="Carousel Title" data-node="1806:11706" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:24px] [position:absolute] [left:16px] [top:164px] [width:189px] [height:48px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:-0.28px] [left:0px]">{"둘이 찍은 사진인데\n지만 보정해서 올린 여우"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11706"]
+        }} /></p>
+        <p data-figma="Versus" data-node="1806:11707" data-outline="" className="[color:rgba(248,_248,_248,_0.80)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:16px] [position:absolute] [left:16px] [top:140px] [width:108px] [height:16px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.268px] [left:0px]">{"이거 백퍼 질투 맞지?"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11707"]
+        }} /></p>
+        <div data-figma="보는 중" data-node="1806:11708" className="[display:inline-flex] [padding:5px_10px_5px_9px] [align-items:center] [gap:4px] [border-radius:999px] [background:rgba(0,_0,_0,_0.70)] [position:absolute] [left:253px] [top:12px] [width:53px] [height:27px] [overflow:hidden]">
+          <Icon data-figma="view" data-node="1806:11709" name="view-1620-23054" color="var(--icon-foreground, #F8F8F8)" className="[width:16px] [height:16px] [flex-shrink:0] [position:relative]" />
+          <p data-figma="22" data-node="1806:11710" data-outline="" className="[color:#F8F8F8] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:14px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:-0.12px]">{"22"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1806:11710"]
+          }} /></p>
+        </div>
+        <div data-figma="Timer Badge" data-node="1806:11711" data-instance-of="Timer Badge · 20분 기준" className="[display:inline-flex] [padding:3.75px_8.75px_3.75px_7.5px] [align-items:center] [gap:3.75px] [border-radius:1248.75px] [position:absolute] [left:12px] [top:12px] [width:75.25px] [height:25.5px] [isolation:isolate]">
+          <span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [z-index:-1] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: "<svg data-px=\"\" data-box=\"\" width=\"75.25\" height=\"25.5\" viewBox=\"0 0 75.25 25.5\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"75.25\" height=\"25.5\" rx=\"12.75\" style=\"fill:#000000BF\"/></svg>"
+        }} />
+          <div data-figma="timer" data-node="I1806:11711;1126:2262" className="[width:16.25px] [height:16.25px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+            <span data-figma="Vector" data-node="I1806:11711;1126:2263" className="[width:14.22px] [height:14.22px] [position:absolute] [left:1.02px] [top:1.01px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11711;1126:2263"]
+          }} />
+            <span data-figma="Vector" data-node="I1806:11711;1126:2264" className="[width:5.42px] [height:5.42px] [position:absolute] [left:8.13px] [top:2.7px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11711;1126:2264"]
+          }} />
+          </div>
+          <p data-figma="time" data-node="I1806:11711;1126:2265" data-outline="" className="[color:#36D2FF] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13.75px] [font-style:normal] [font-weight:700] [line-height:18px] [flex-shrink:0] [width:39px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:-0.005px] [left:0px]">{"04:30"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11711;1126:2265"]
+          }} /></p>
+        </div>
+      </div>
+      <div data-figma="bottom_navigation" data-node="1806:11712" data-instance-of="bottom_navigation" className="[width:390px] [height:84px] [background:#121415] [position:absolute] [left:0px] [top:760px]">
+        <div data-figma="top line" data-node="I1806:11712;1620:43021" className="[width:392px] [height:1px] [background:#222628] [position:absolute] [left:0px] [top:0px]" />
+        <div data-figma="tab/홈" data-node="I1806:11712;1620:43022" className="[display:flex] [width:56px] [height:52px] [flex-direction:column] [justify-content:center] [align-items:center] [gap:4px] [position:absolute] [left:20px] [top:12px] [overflow:hidden]">
+          <div data-figma="icon wrap" data-node="I1806:11712;1620:43023" className="[display:flex] [width:56px] [height:32px] [padding:4px_16px] [justify-content:center] [align-items:center] [flex-shrink:0] [border-radius:16px] [position:relative] [overflow:hidden]">
+            <div data-figma="Icon / Line" data-node="I1806:11712;1620:43024" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:16px] [top:4px]">
+              <div data-figma="home-chair" data-node="I1806:11712;1620:43025" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
+                <span data-figma="shape" data-node="I1806:11712;1620:43026" className="[width:20px] [height:20px] [position:absolute] [left:2px] [top:2px] [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["I1806:11712;1620:43026"]
+              }} />
+              </div>
+            </div>
+          </div>
+          <p data-figma="홈" data-node="I1806:11712;1620:43027" data-outline="" className="[width:12px] [height:16px] [flex-shrink:0] [color:#6E767C] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:400] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:-0.24px]">{"홈"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11712;1620:43027"]
+          }} /></p>
+        </div>
+        <div data-figma="tab/라이브" data-node="I1806:11712;1620:43028" className="[display:flex] [width:56px] [height:52px] [flex-direction:column] [justify-content:center] [align-items:center] [gap:4px] [position:absolute] [left:120px] [top:12px] [overflow:hidden]">
+          <div data-figma="icon wrap" data-node="I1806:11712;1620:43029" className="[display:flex] [width:56px] [height:32px] [padding:4px_16px] [justify-content:center] [align-items:center] [flex-shrink:0] [border-radius:16px] [position:relative] [overflow:hidden]">
+            <div data-figma="Icon / Line" data-node="I1806:11712;1620:43030" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:16px] [top:4px]">
+              <div data-figma="live" data-node="I1806:11712;1620:43031" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
+                <span data-figma="shape" data-node="I1806:11712;1620:43032" className="[width:20px] [height:19px] [position:absolute] [left:2px] [top:3px] [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["I1806:11712;1620:43032"]
+              }} />
+              </div>
+            </div>
+          </div>
+          <p data-figma="라이브" data-node="I1806:11712;1620:43033" data-outline="" className="[width:32px] [height:16px] [flex-shrink:0] [color:#36D2FF] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:-0.24px]">{"라이브"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11712;1620:43033"]
+          }} /></p>
+        </div>
+        <div data-figma="tab/커뮤니티" data-node="I1806:11712;1620:43034" className="[display:flex] [width:56px] [height:52px] [flex-direction:column] [justify-content:center] [align-items:center] [gap:4px] [position:absolute] [left:216px] [top:12px] [overflow:hidden]">
+          <div data-figma="icon wrap" data-node="I1806:11712;1620:43035" className="[display:flex] [width:56px] [height:32px] [padding:4px_16px] [justify-content:center] [align-items:center] [flex-shrink:0] [border-radius:16px] [position:relative] [overflow:hidden]">
+            <div data-figma="Icon / Line" data-node="I1806:11712;1620:43036" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:16px] [top:4px]">
+              <div data-figma="community" data-node="I1806:11712;1620:43037" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
+                <span data-figma="shape" data-node="I1806:11712;1620:43038" className="[width:20px] [height:20px] [position:absolute] [left:2px] [top:2px] [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["I1806:11712;1620:43038"]
+              }} />
+              </div>
+            </div>
+          </div>
+          <p data-figma="커뮤니티" data-node="I1806:11712;1620:43039" data-outline="" className="[width:44px] [height:16px] [flex-shrink:0] [color:#6E767C] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:400] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:-0.24px]">{"커뮤니티"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11712;1620:43039"]
+          }} /></p>
+        </div>
+        <div data-figma="tab/MY" data-node="I1806:11712;1620:43040" className="[display:flex] [width:56px] [height:52px] [flex-direction:column] [justify-content:center] [align-items:center] [gap:4px] [position:absolute] [left:312px] [top:12px] [overflow:hidden]">
+          <div data-figma="icon wrap" data-node="I1806:11712;1620:43041" className="[display:flex] [width:56px] [height:32px] [padding:4px_16px] [justify-content:center] [align-items:center] [flex-shrink:0] [border-radius:16px] [position:relative] [overflow:hidden]">
+            <div data-figma="Icon / Line" data-node="I1806:11712;1620:43042" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:16px] [top:4px]">
+              <div data-figma="my" data-node="I1806:11712;1620:43043" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
+                <span data-figma="shape" data-node="I1806:11712;1620:43044" className="[width:15px] [height:20px] [position:absolute] [left:4px] [top:2px] [line-height:0]" dangerouslySetInnerHTML={{
+                __html: svg["I1806:11712;1620:43044"]
+              }} />
+              </div>
+            </div>
+          </div>
+          <p data-figma="마이" data-node="I1806:11712;1620:43045" data-outline="" className="[width:24px] [height:16px] [flex-shrink:0] [color:#6E767C] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:400] [line-height:17px] [letter-spacing:-0.48px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:-0.24px]">{"마이"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11712;1620:43045"]
+          }} /></p>
+        </div>
+      </div>
+      <div data-figma="Carousel / 2" data-node="1806:11713" className="[width:318px] [height:232px] [border-radius:20px] [background:#222628] [position:absolute] [left:354px] [top:128px] [overflow:hidden]">
+        <div data-figma="Scene" data-node="1806:11714" data-img={"{\"src\":\"./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:318px] [height:232px] [background:url(./assets/images/1d41632906932dd6811d6990fd7cd0a8fc9724e5.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+        <div data-figma="Fade" data-node="1806:11715" className="[width:318px] [height:232px] [background:linear-gradient(180deg,_rgba(18,_20,_21,_0.00)_0%,_rgba(18,_20,_21,_0.00)_35%,_rgba(18,_20,_21,_0.90)_100%)] [position:absolute] [left:0px] [top:0px]" />
+        <p data-figma="Carousel Title" data-node="1806:11716" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:24px] [position:absolute] [left:16px] [top:164px] [width:158px] [height:48px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:-0.28px] [left:0px]">{"남친이 1주년 선물로\n다이소 틴트 사줌"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11716"]
+        }} /></p>
+        <p data-figma="Versus" data-node="1806:11717" data-outline="" className="[color:rgba(248,_248,_248,_0.80)] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:16px] [position:absolute] [left:16px] [top:140px] [width:72px] [height:16px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:0.268px] [left:0px]">{"헤어질까 말까"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11717"]
+        }} /></p>
+        <div data-figma="Timer Badge" data-node="1806:11718" data-instance-of="Timer Badge · 20분 기준" className="[display:inline-flex] [padding:3.75px_8.75px_3.75px_7.5px] [align-items:center] [gap:3.75px] [border-radius:1248.75px] [position:absolute] [left:12px] [top:12px] [width:74.25px] [height:25.5px] [isolation:isolate]">
+          <span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [z-index:-1] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: "<svg data-px=\"\" data-box=\"\" width=\"74.25\" height=\"25.5\" viewBox=\"0 0 74.25 25.5\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"74.25\" height=\"25.5\" rx=\"12.75\" style=\"fill:#000000BF\"/></svg>"
+        }} />
+          <div data-figma="timer" data-node="I1806:11718;1126:2247" className="[width:16.25px] [height:16.25px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+            <span data-figma="Vector" data-node="I1806:11718;1126:2248" className="[width:14.22px] [height:14.22px] [position:absolute] [left:1.02px] [top:1.01px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11718;1126:2248"]
+          }} />
+            <span data-figma="Vector" data-node="I1806:11718;1126:2249" className="[width:5.41px] [height:9.8px] [position:absolute] [left:8.13px] [top:2.7px] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11718;1126:2249"]
+          }} />
+          </div>
+          <p data-figma="time" data-node="I1806:11718;1126:2250" data-outline="" className="[color:#36D2FF] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13.75px] [font-style:normal] [font-weight:700] [line-height:18px] [flex-shrink:0] [width:38px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:-0.005px] [left:0px]">{"07:50"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["I1806:11718;1126:2250"]
+          }} /></p>
+        </div>
+        <div data-figma="보는 중" data-node="1806:11719" className="[display:inline-flex] [padding:5px_10px_5px_9px] [align-items:center] [gap:4px] [border-radius:999px] [opacity:0.1] [background:rgba(0,_0,_0,_0.70)] [position:absolute] [left:255px] [top:12px] [width:51px] [height:27px] [overflow:hidden]">
+          <Icon data-figma="view" data-node="1806:11720" name="view-1620-23054" color="var(--icon-foreground, #F8F8F8)" className="[width:16px] [height:16px] [flex-shrink:0] [position:relative]" />
+          <p data-figma="15" data-node="1806:11721" data-outline="" className="[color:#F8F8F8] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:12px] [font-style:normal] [font-weight:700] [line-height:17px] [letter-spacing:-0.24px] [flex-shrink:0] [width:12px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.132px] [left:-0.12px]">{"15"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1806:11721"]
+          }} /></p>
+        </div>
+      </div>
+      <div data-figma="Group 2147229002" data-node="1806:11722" className="[width:90.13px] [height:34px] [aspect-ratio:90.13/34.00] [position:absolute] [left:24px] [top:64px]">
+        <span data-figma="Vector" data-node="1806:11723" className="[width:30.55px] [height:31.51px] [position:absolute] [left:0px] [top:2.49px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11723"]
+      }} />
+        <span data-figma="Vector" data-node="1806:11724" className="[width:24.11px] [height:31.9px] [position:absolute] [left:66.02px] [top:0px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11724"]
+      }} />
+        <span data-figma="Vector" data-node="1806:11725" className="[width:19.55px] [height:20.75px] [position:absolute] [left:25.14px] [top:10.95px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11725"]
+      }} />
+        <span data-figma="Vector" data-node="1806:11726" className="[width:18.38px] [height:19.84px] [position:absolute] [left:39.81px] [top:9.97px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11726"]
+      }} />
+        <span data-figma="Vector" data-node="1806:11727" className="[width:18.38px] [height:19.77px] [position:absolute] [left:53.4px] [top:9.57px] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11727"]
+      }} />
+      </div>
+      <p data-figma="Title" data-node="1806:11728" data-outline="" className="[display:flex] [width:53px] [height:24px] [flex-direction:column] [justify-content:center] [color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:20px] [font-style:normal] [font-weight:700] [line-height:28px] [position:absolute] [left:125px] [top:69px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [align-items:flex-start] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:-0.28px] [left:0px]">{"라이브"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11728"]
+      }} /></p>
+      <p data-figma="지금 들어갈 수 있는 방" data-node="1806:11729" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:18px] [font-style:normal] [font-weight:700] [line-height:25px] [letter-spacing:-0.36px] [position:absolute] [left:24px] [top:448px] [width:154px] [height:25px] [flex-shrink:0] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent]"><span className="[position:relative] [top:-0.052px] [left:0px]">{"지금 들어갈 수 있는 방"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+        __html: svg["1806:11729"]
+      }} /></p>
+      <div data-figma="정렬 · 인기순" data-node="1806:11730" className="[display:inline-flex] [align-items:center] [gap:2px] [position:absolute] [left:314px] [top:451px] [width:52px] [height:19px] [overflow:hidden]">
+        <p data-figma="인기순" data-node="1806:11731" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:19px] [letter-spacing:-0.26px] [flex-shrink:0] [width:34px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:-0.232px] [left:0px]">{"인기순"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11731"]
+        }} /></p>
+        <div data-figma="icon/down" data-node="1806:11732" className="[width:16px] [height:16px] [flex-shrink:0] [position:relative] [overflow:hidden]">
+          <span data-figma="Vector" data-node="1806:11733" className="[width:8px] [height:4px] [position:absolute] [left:4px] [top:6px] [line-height:0]" dangerouslySetInnerHTML={{
+          __html: svg["1806:11733"]
+        }} />
+        </div>
+      </div>
+      <div data-figma="Header" data-node="1806:11734" className="[width:81px] [height:26px] [position:absolute] [left:285px] [top:68px]">
+        <div data-figma="Keyword Button" data-node="1806:11735" className="[display:inline-flex] [height:26px] [padding:8px_12px] [align-items:center] [gap:6px] [border-radius:18px] [background:#222628] [position:absolute] [left:0px] [top:0px] [width:81px] [overflow:hidden]">
+          <div data-figma="sliders" data-node="1806:11736" className="[display:flex] [width:16px] [height:16px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative] [overflow:hidden]">
+            <Icon data-figma="sliders" data-node="1806:11737" name="sliders-1620-23275" color="var(--icon-foreground, #F8F8F8)" className="[width:16px] [height:16px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
+          </div>
+          <p data-figma="Keyword Label" data-node="1806:11738" data-outline="" className="[color:#F8F8F8] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:13px] [font-style:normal] [font-weight:500] [line-height:16px] [flex-shrink:0] [width:35px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [--webkit-text-fill-color:transparent] [position:relative]"><span className="[position:relative] [top:0.268px] [left:0px]">{"키워드"}</span><span aria-hidden="true" className="[position:absolute] [left:0] [top:0] [width:0] [height:0] [overflow:visible] [line-height:0]" dangerouslySetInnerHTML={{
+            __html: svg["1806:11738"]
+          }} /></p>
+        </div>
+      </div>
+    </div>;
+  return null;
+}
