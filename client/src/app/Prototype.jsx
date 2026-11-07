@@ -2,16 +2,20 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useLocation, useNavigate, useNavigationType, useParams } from 'react-router-dom';
 import { SCREENS, loadScreen } from './screens.js';
 import { LINKS, AUTO, START } from './flow.js';
-import { motion } from '../tokens.js';
+import { motion, mobile as MOB } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
 import { useReducedMotion } from './useReducedMotion.js';
 import { morph } from './morph.js';
-import { useFitScale } from './useFitScale.js';
+import { useViewport } from './useFitScale.js';
+import { fitMobile } from './mobileFit.js';
 import { attach } from './live.js';
 import { SCREEN_ASSETS } from './screenAssets.js';
 
 // 화면 하나를 그리는 칸. 새 화면은 투명하게 먼저 그리고, 피그마 마무리 단계(그림과 글자 다시 그리기)가 끝나면 알린다.
-function Layer({ layer, hidden, active, onReady, onPress, setNode }) {
+// 휴대폰에서 칸의 보이는 높이: 한 화면짜리는 창 높이, 긴 화면은 상태바 줄만 뺀 높이(아래로 스크롤).
+const visH = (l, vp) => (!vp.mobile ? l.h : l.h <= 845 ? vp.view : l.h - MOB.crop);
+
+function Layer({ layer, hidden, active, onReady, onPress, setNode, vp }) {
   const ref = useRef(null);
   const [hint, setHint] = useState(false);
   const flash = (e) => {
@@ -20,6 +24,11 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode }) {
     window.setTimeout(() => setHint(false), motion.hint);
   };
   const Comp = layer.Comp;
+  // 휴대폰이면 그리자마자(보이기 전에) 높이를 맞춘다.
+  useLayoutEffect(() => {
+    if (vp.mobile) fitMobile(ref.current, ref.current.querySelector('[data-node]'), layer.h <= 845 ? vp.view : layer.h - MOB.crop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layer.key]);
   useLayoutEffect(() => {
     setNode(layer.key, ref.current);
     return () => setNode(layer.key, null);
@@ -59,9 +68,9 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode }) {
       ref={ref}
       className="absolute left-0 top-0 w-screen bg-surface will-change-transform"
       // 미리 그리는 동안은 opacity 0으로 숨긴다. visibility를 쓰면 마무리 단계가 만든 캔버스가 숨김 값을 물려받는다(실측: 그림이 검게 빠졌다).
-      style={{ height: layer.h, opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto' }}
+      style={{ height: visH(layer, vp), overflow: vp.mobile ? 'hidden' : undefined, opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto' }}
     >
-      <div className="relative w-screen overflow-hidden" style={{ height: layer.h }} onClick={flash}>
+      <div className="relative w-screen overflow-hidden" style={{ height: layer.h, marginTop: vp.mobile ? -MOB.crop : 0 }} onClick={flash}>
         <Comp />
         <Hotspots links={LINKS.filter((l) => l.from === layer.n)} active={active} hint={hint} onPress={onPress} />
       </div>
@@ -78,7 +87,8 @@ export default function Prototype() {
   const navType = useNavigationType();
   const location = useLocation();
   const reduced = useReducedMotion();
-  const scale = useFitScale();
+  const vp = useViewport();
+  const scale = vp.scale;
   const [layers, setLayers] = useState([]);
   const nodes = useRef(new Map());
   const busy = useRef(false);
@@ -260,7 +270,7 @@ export default function Prototype() {
   );
 
   const top = layers[layers.length - 1];
-  const stageH = layers.reduce((m, l) => Math.max(m, l.h), 0);
+  const stageH = layers.reduce((m, l) => Math.max(m, visH(l, vp)), 0);
   return (
     <div className="min-h-screen overflow-hidden bg-outside font-suit">
       <div className="mx-auto" style={{ width: 390 * scale, height: stageH * scale }}>
@@ -274,6 +284,7 @@ export default function Prototype() {
             onReady={onReady}
             onPress={go}
             setNode={setNode}
+            vp={vp}
           />
         ))}
       </div>

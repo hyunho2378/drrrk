@@ -5,14 +5,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from '../tokens.js';
 import { useReducedMotion } from './useReducedMotion.js';
-import { useFitScale } from './useFitScale.js';
+import { useViewport } from './useFitScale.js';
 
 const BASE = import.meta.env.BASE_URL;
 
 export default function Splash({ onDone }) {
   const video = useRef(null);
   const reduced = useReducedMotion();
-  const scale = useFitScale();
+  const vp = useViewport();
+  const scale = vp.scale;
   const [leaving, setLeaving] = useState(false);
   const done = useRef(false);
 
@@ -51,7 +52,8 @@ export default function Splash({ onDone }) {
       aria-label="DRRRK"
       role="img"
     >
-      <div className="relative h-screen-app w-screen shrink-0 origin-top overflow-hidden bg-surface" style={{ transform: 'scale(' + scale + ')' }}>
+      {/* 휴대폰은 창 전체를 채우고, 컴퓨터는 앱 크기(390 x 844)를 창 높이에 맞춘다. */}
+      <div className="relative h-screen-app w-screen shrink-0 origin-top overflow-hidden bg-surface" style={vp.mobile ? { width: '100vw', height: '100%', transform: 'none' } : { transform: 'scale(' + scale + ')' }}>
         {reduced ? (
           <img src={BASE + 'logo.svg'} alt="" className="absolute left-1/2 top-1/2 w-logo -translate-x-1/2 -translate-y-1/2" />
         ) : (
