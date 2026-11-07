@@ -329,7 +329,8 @@ export function fixNames(root) {
   q(root, 'p[data-outline]').forEach((p) => {
     const t = p.textContent;
     if (!/택배상자/.test(t)) return;
-    setText(p, t.replace(/택배상자/g, '드르륵 칵'));
+    // 원문 끝에 줄바꿈이 붙어 있어서 그대로 쓰면 이름 칸 밖으로 글자가 밀려난다. 끝 공백은 지운다.
+    setText(p, t.replace(/택배상자/g, '드르륵 칵').replace(/\s+$/, ''));
   });
 }
 

@@ -43,7 +43,7 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) 
     let alive = true;
     const el = ref.current;
     // 옛 그림은 그림 목록을 읽기 전에 새 그림으로 바꾼다(그래야 새 그림이 준비된 뒤에 화면이 보인다).
-    swapAssets(el);
+    swapAssets(el, layer.n);
     const urls = new Set();
     el.querySelectorAll('[style], img').forEach((e) => {
       const st = e.getAttribute('style') || '';

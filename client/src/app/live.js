@@ -500,13 +500,16 @@ function attachDrag(layer, root, n) {
 // 글자와 그림을 바꾸는 일과 처음 모습(고민 분석 0, 채팅 숨김, 시계, 엉따 막대 0, 가로 카드 위치)은 보이기 전에 끝낸다.
 // 옛 그림을 쓰는 곳은 새 그림으로 바꾼다(MY 의자는 128px 작은 그림이라 깨져 보여서, 의자 꾸미기의 원본 크기 그림을 쓴다).
 export const ASSET_SWAP = { 'f76f40b49cba6dd89cb0cf61935be0f11b55cfcc.webp': '4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp' };
-export function swapAssets(el) {
-  const keys = Object.keys(ASSET_SWAP);
+// 이름 탭 화면(22, 23)은 '나'의 칸에 박스 그림이 남아 있다. 박스 의자는 없앴으므로 32번 화면의 '나' 칸과 같은 의자 그림으로 바꾼다.
+export const SCREEN_SWAP = { 22: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' }, 23: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' } };
+export function swapAssets(el, n) {
+  const map = Object.assign({}, ASSET_SWAP, SCREEN_SWAP[n] || {});
+  const keys = Object.keys(map);
   el.querySelectorAll('[style]').forEach((e) => {
     const st = e.getAttribute('style') || '';
     if (st.indexOf('url(') < 0) return;
     for (const k of keys) {
-      if (st.indexOf(k) >= 0) e.setAttribute('style', st.split(k).join(ASSET_SWAP[k]));
+      if (st.indexOf(k) >= 0) e.setAttribute('style', st.split(k).join(map[k]));
     }
   });
 }
