@@ -8,7 +8,7 @@ import { useReducedMotion } from './useReducedMotion.js';
 import { morph } from './morph.js';
 import { useViewport } from './useFitScale.js';
 import { fitMobile } from './mobileFit.js';
-import { attach, resolveTo } from './live.js';
+import { attach, prepare, swapAssets, resolveTo } from './live.js';
 import SystemStatusBar from './SystemStatusBar.jsx';
 import { SCREEN_ASSETS } from './screenAssets.js';
 
@@ -16,7 +16,7 @@ import { SCREEN_ASSETS } from './screenAssets.js';
 // 휴대폰에서 칸의 보이는 높이: 한 화면짜리는 창 높이, 긴 화면은 상태바 줄만 뺀 높이(아래로 스크롤).
 const visH = (l, vp) => (!vp.mobile ? l.h : l.h <= 845 ? vp.view : l.h - MOB.crop);
 
-function Layer({ layer, hidden, active, onReady, onPress, setNode, vp }) {
+function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) {
   const ref = useRef(null);
   const [hint, setHint] = useState(false);
   const flash = (e) => {
@@ -42,6 +42,8 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp }) {
   useEffect(() => {
     let alive = true;
     const el = ref.current;
+    // 옛 그림은 그림 목록을 읽기 전에 새 그림으로 바꾼다(그래야 새 그림이 준비된 뒤에 화면이 보인다).
+    swapAssets(el);
     const urls = new Set();
     el.querySelectorAll('[style], img').forEach((e) => {
       const st = e.getAttribute('style') || '';
@@ -60,6 +62,8 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp }) {
     });
     Promise.all([...urls].map(load))
       .then(() => (document.fonts ? document.fonts.ready : null))
+      // 보이기 전에 첫 모습을 만든다(글자 바꾸기, 고민 분석 0, 채팅 숨김, 시계, 막대). 오류가 나도 화면은 보이게 한다.
+      .then(() => (alive ? prepare(el, layer.n, prevN).catch(() => {}) : null))
       .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
       .then(() => {
         if (alive) onReady(layer.key);
@@ -141,7 +145,7 @@ export default function Prototype() {
       pending.current = { key, t };
       keyN.current.set(key, n);
       // 지금 보이는 칸(준비 끝난 칸) 하나만 남기고 새 칸을 얹는다. 준비 중이던 칸은 버린다(빠르게 두 번 누르면 화면이 비던 문제).
-      setLayers((prev) => [...prev.filter((l) => l.ready).slice(-1), { key, n, Comp, h: s.h, ready: false }]);
+      setLayers((prev) => [...prev.filter((l) => l.ready).slice(-1), { key, n, Comp, h: s.h, ready: false, prev: prevShown.current }]);
       document.title = s.name;
     });
     return () => {
@@ -310,6 +314,7 @@ export default function Prototype() {
             onPress={go}
             setNode={setNode}
             vp={vp}
+            prevN={l.prev}
           />
         ))}
       </div>

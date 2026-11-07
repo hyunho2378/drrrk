@@ -8,7 +8,7 @@ import { motion, live as LIVE } from '../tokens.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
-import { attachTabs, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
+import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
 import { warm } from './donor.js';
 import { applySync } from './sync.js';
 
@@ -204,7 +204,8 @@ function halfRing(side) {
     : 'M100 0 A100 100 0 0 1 100 200 L100 195 A95 95 0 0 0 100 5 Z';
   return '<svg width="200" height="200" viewBox="0 0 200 200" style="display:block"><path d="' + d + '" fill="' + LIVE.ringColor + '"/></svg>' + (R && r ? '' : '');
 }
-function runAnalysis(root, ms) {
+// 고민 분석은 보이기 전에 0에서 시작하는 모습(initAnalysis)을 만들어 두고, 화면이 자리를 잡은 뒤(playAnalysis) 차오른다.
+function initAnalysis(root) {
   const ring = root.querySelector('[data-figma^="ring progress"]');
   if (ring && !ring.dataset.live) {
     ring.dataset.live = 'ring';
@@ -220,30 +221,47 @@ function runAnalysis(root, ms) {
       ring.appendChild(clip);
       return rot;
     };
-    const first = mk(false), second = mk(true);
+    ring.__rots = [mk(false), mk(true)];
+  }
+  // 세 단계는 모두 체크 없이, 글자는 흐리게 시작한다. 줄 높이가 변하지 않게 한 줄로 고정한다.
+  const list = root.querySelector('[data-figma="progress steps"]');
+  if (list) list.style.overflow = 'visible';
+  q(root, '[data-figma^="step ·"]').forEach((st) => {
+    const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
+    const label = st.querySelector('p[data-outline]');
+    if (icon) icon.style.opacity = '0';
+    if (label) { label.style.opacity = String(LIVE.stepDim); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
+    st.style.opacity = '1';
+  });
+}
+function playAnalysis(root, ms) {
+  const ring = root.querySelector('[data-figma^="ring progress"]');
+  if (ring && ring.__rots && !ring.dataset.played) {
+    ring.dataset.played = '1';
+    const [first, second] = ring.__rots;
     const half = ms / 2;
     first.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, easing: 'linear', fill: 'forwards' });
     second.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, delay: half, easing: 'linear', fill: 'forwards' });
   }
-  // 세 단계가 끝나면 모두 맨 위 단계와 같은 밝은 체크가 된다(피그마의 어두운 체크와 돌아가는 아이콘은 쓰지 않는다).
+  // 세 단계가 끝나면 모두 맨 위 단계와 같은 밝은 체크가 된다. 돌아가는 아이콘 칸은 비우고 체크 그림만 같은 크기로 넣는다(칸 크기와 자리는 그대로).
   const steps = q(root, '[data-figma^="step ·"]');
+  if (root.dataset.analysisPlayed) return;
+  root.dataset.analysisPlayed = '1';
   const tpl = steps[0] && steps[0].querySelector('[data-figma="check"]');
   const lab0 = steps[0] && steps[0].querySelector('p[data-outline]');
   const color0 = lab0 ? getComputedStyle(lab0).color : '';
   steps.forEach((st, i) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
-    if (icon) icon.style.opacity = '0';
-    if (label) label.style.opacity = String(LIVE.stepDim);
     window.setTimeout(() => {
-      let ic = icon;
-      if (i > 0 && icon && tpl) {
-        ic = tpl.cloneNode(true);
-        icon.replaceWith(ic);
+      if (!root.isConnected) return;
+      if (icon && icon.getAttribute('data-figma') === 'spinner' && tpl) {
+        icon.innerHTML = tpl.innerHTML;
+        icon.setAttribute('data-figma', 'check');
       }
-      if (ic) { ic.style.opacity = ''; ic.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
+      if (icon) { icon.style.opacity = ''; icon.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
       if (label) {
-        if (i > 0 && color0) { label.style.color = color0; setText(label, label.textContent); }
+        if (i > 0 && color0) { label.style.color = color0; setText(label, label.textContent); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
         label.style.opacity = '';
         label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn });
       }
@@ -270,14 +288,11 @@ function carouselOf(layer, root) {
   const stops = cards.map((c) => r0.x - relRect(root, c).x);
   const hot = q(layer, '[data-hotspot]').filter((b) => Math.abs(parseFloat(b.style.top) - r0.y) < 1 && Math.abs(parseFloat(b.style.height) - r0.h) < 1);
   const els = cards.concat(hot);
-  const c = { x: 0, base: 0, band: [r0.y, r0.y + r0.h] };
+  const c = { x: 0, base: 0, i: 0, band: [r0.y, r0.y + r0.h] };
   c.drag = (dx) => els.forEach((el) => move(el, 'x', Math.max(Math.min(...stops) - 40, Math.min(40, c.base + dx)), 0));
-  c.end = (dx) => {
-    const want = c.base + dx;
-    const near = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
-    const cur = stops.indexOf(c.base);
-    const dir = dx < -LIVE.swipeMin ? 1 : dx > LIVE.swipeMin ? -1 : 0;
-    const j = dir && cur >= 0 ? Math.max(0, Math.min(stops.length - 1, cur + dir)) : near;
+  c.go = (j) => {
+    j = Math.max(0, Math.min(stops.length - 1, j));
+    c.i = j;
     c.x = c.base = stops[j];
     els.forEach((el) => move(el, 'x', c.x, motion.stateIn + 150));
     const dots = root.querySelector('[data-figma="Page Dots"]');
@@ -291,6 +306,13 @@ function carouselOf(layer, root) {
         left += d.getBoundingClientRect().width / scaleOf(root) + LIVE.dotGap;
       });
     }
+  };
+  c.step = (dir) => c.go(c.i + dir);
+  c.end = (dx) => {
+    const want = c.base + dx;
+    const near = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
+    const dir = dx < -LIVE.swipeMin ? 1 : dx > LIVE.swipeMin ? -1 : 0;
+    c.go(dir ? c.i + dir : near);
   };
   return c;
 }
@@ -392,6 +414,10 @@ function shelfOf(layer, root) {
     s.x = s.base = Math.max(min, Math.min(0, s.x));
     els.forEach((el) => move(el, 'x', s.x, motion.stateIn + 150));
   };
+  s.wheel = (dx) => {
+    s.x = s.base = Math.max(min, Math.min(0, s.x - dx));
+    els.forEach((el) => move(el, 'x', s.x, 0));
+  };
   return s;
 }
 
@@ -439,27 +465,91 @@ function attachDrag(layer, root, n) {
   };
   layer.addEventListener('pointerup', up);
   layer.addEventListener('pointercancel', up);
-  if (scr) {
-    layer.style.touchAction = 'none';
-    layer.addEventListener('wheel', (e) => {
-      if (!scr.inRegion(yOf(e))) return;
+  if (scr) layer.style.touchAction = 'none';
+  else layer.style.touchAction = 'pan-y';
+  // 휠과 트랙패드: 가로로 굴리면(또는 Shift와 함께 굴리면) 카드 줄과 선반이 터치 없이 넘어간다. 세로로 굴리면 목록이 움직인다.
+  let acc = 0, armed = true, lastWheel = 0;
+  layer.addEventListener('wheel', (e) => {
+    const y = yOf(e);
+    const sy = y + (scr ? scr.y : 0);
+    const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.shiftKey ? e.deltaY : 0;
+    if (dx && ((car && sy >= car.band[0] && sy <= car.band[1]) || (sh && y >= sh.band[0] && y <= sh.band[1]))) {
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheel > 160) { armed = true; acc = 0; }
+      lastWheel = now;
+      if (car && sy >= car.band[0] && sy <= car.band[1]) {
+        acc += dx;
+        if (armed && Math.abs(acc) > 24) { armed = false; car.step(acc > 0 ? 1 : -1); }
+      } else sh.wheel(dx / scaleOf(root));
+      return;
+    }
+    if (scr && scr.inRegion(y)) {
       e.preventDefault();
       scr.wheel(e.deltaY / scaleOf(root));
-    }, { passive: false });
-  } else layer.style.touchAction = sh ? 'pan-y' : 'pan-y';
+    }
+  }, { passive: false });
   // 끌어서 움직인 직후의 누름은 화면 이동으로 보지 않는다.
   layer.addEventListener('click', (e) => {
     if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
   }, true);
 }
 
-// ---------- 붙이기 ----------
+// ---------- 보이기 전에 맞추기 ----------
+// 화면은 투명하게 먼저 그려지고 그림이 준비되면 보인다. 피그마 기본 모습이 잠깐 보였다가 바뀌는 깜빡임이 없도록,
+// 글자와 그림을 바꾸는 일과 처음 모습(고민 분석 0, 채팅 숨김, 시계, 엉따 막대 0, 가로 카드 위치)은 보이기 전에 끝낸다.
+// 옛 그림을 쓰는 곳은 새 그림으로 바꾼다(MY 의자는 128px 작은 그림이라 깨져 보여서, 의자 꾸미기의 원본 크기 그림을 쓴다).
+export const ASSET_SWAP = { 'f76f40b49cba6dd89cb0cf61935be0f11b55cfcc.webp': '4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp' };
+export function swapAssets(el) {
+  const keys = Object.keys(ASSET_SWAP);
+  el.querySelectorAll('[style]').forEach((e) => {
+    const st = e.getAttribute('style') || '';
+    if (st.indexOf('url(') < 0) return;
+    for (const k of keys) {
+      if (st.indexOf(k) >= 0) e.setAttribute('style', st.split(k).join(ASSET_SWAP[k]));
+    }
+  });
+}
+
+function prepareChat(root, n) {
+  const sc = sceneOf(n);
+  if (!sc || (room.scene === sc && room.chatDone)) return;
+  root.dataset.chatHide = '1';
+  q(root, CHAT_SEL).filter((el) => !el.closest('[data-figma^="input"]')).forEach((el) => (el.style.opacity = '0'));
+}
+function prepareRoomClock(root, n) {
+  const sc = sceneOf(n);
+  if (!sc) return;
+  const same = room.scene === sc && room.kind === timerKind(root);
+  const txt = fmtMMSS(same ? remaining() : LIVE.roomSeconds);
+  timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
+}
+
+export async function prepare(layer, n, prevN) {
+  const root = rootOf(layer);
+  if (!root || root.dataset.prepared) return;
+  root.dataset.prepared = '1';
+  applySync(root);
+  showEmptyOutlines(root);
+  attachRoom(root, n);
+  attachThrow(root);
+  attachDrag(layer, root, n);
+  prepTabs(root, n);
+  if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
+  if (n === LIVE.itemScreen) await fillItem(root);
+  if (n === LIVE.analysisScreen) initAnalysis(root);
+  prepareRoomClock(root, n);
+  prepareChat(root, n);
+}
+
+// ---------- 붙이기(전환이 끝난 뒤) ----------
 let ticker = 0;
 let current = { n: 0, go: null, layer: null };
 export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;
   current = { n, go, layer };
+  // prepare가 못 한 경우(예: 준비 중에 오류)를 위해 같은 일을 한 번 더 한다. 모두 두 번 해도 같은 결과가 되도록 만들어져 있다.
   applySync(root);
   showEmptyOutlines(root);
   attachRoom(root, n);
@@ -467,18 +557,15 @@ export function attach(layer, n, go, prevN) {
   attachInputs(root, n, go);
   attachDrag(layer, root, n);
   attachTabs(root, n);
-  if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) animateGauge(root);
-  if (n === LIVE.itemScreen) fillItem(root);
+  if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);
   if (sc) {
     const kind = timerKind(root);
     if (room.scene !== sc || room.kind !== kind) {
-      const t = timerTexts(root)[0];
       if (room.scene !== sc) room.chatDone = false;
       room.scene = sc;
       room.kind = kind;
-      void t;
       room.left = LIVE.roomSeconds;
       room.at = performance.now();
       room.fired = {};
@@ -486,9 +573,11 @@ export function attach(layer, n, go, prevN) {
     if (!room.chatDone) {
       room.chatDone = true;
       staggerChat(root);
+    } else if (root.dataset.chatHide === '1') {
+      q(root, CHAT_SEL).forEach((el) => { if (!el.closest('[data-figma^="input"]') && el.style.opacity === '0') el.style.opacity = ''; });
     }
   } else room.scene = null;
-  if (n === LIVE.analysisScreen) runAnalysis(root, LIVE.analysisMs);
+  if (n === LIVE.analysisScreen) { initAnalysis(root); playAnalysis(root, LIVE.analysisMs); }
   if (!ticker) ticker = window.setInterval(tick, 250);
   tick();
 }

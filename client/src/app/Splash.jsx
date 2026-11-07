@@ -17,12 +17,16 @@ export default function Splash({ onDone }) {
   const [leaving, setLeaving] = useState(false);
   const done = useRef(false);
 
+  const mobile = vp.mobile;
+  const rate = mobile ? motion.splashMobileRate : 1;
+  const cut = mobile ? motion.splashMobileCut : motion.splashCut;
+  const outMs = mobile ? motion.splashMobileOut : motion.splashOut;
   const finish = useCallback(() => {
     if (done.current) return;
     done.current = true;
     setLeaving(true);
-    window.setTimeout(onDone, motion.splashOut);
-  }, [onDone]);
+    window.setTimeout(onDone, outMs);
+  }, [onDone, outMs]);
 
   useEffect(() => {
     if (reduced) {
@@ -31,13 +35,16 @@ export default function Splash({ onDone }) {
     }
     const v = video.current;
     if (!v) return undefined;
+    v.playbackRate = rate;
     v.muted = false;
     v.play().catch(() => {
       v.muted = true;
       v.play().catch(finish);
     });
-    return undefined;
-  }, [reduced, finish]);
+    // 영상이 늦게 시작해도 휴대폰에서는 이 시간 안에 끝낸다.
+    const cap = mobile ? window.setTimeout(finish, motion.splashMobileMax) : 0;
+    return () => window.clearTimeout(cap);
+  }, [reduced, finish, rate, mobile]);
 
   const unmute = () => {
     const v = video.current;
@@ -47,7 +54,7 @@ export default function Splash({ onDone }) {
   return (
     <div
       className="fixed inset-0 z-splash flex items-start justify-center bg-outside transition-opacity ease-out"
-      style={{ opacity: leaving ? 0 : 1, transitionDuration: motion.splashOut + 'ms', pointerEvents: leaving ? 'none' : 'auto' }}
+      style={{ opacity: leaving ? 0 : 1, transitionDuration: outMs + 'ms', pointerEvents: leaving ? 'none' : 'auto' }}
       onPointerDown={unmute}
       aria-label="DRRRK"
       role="img"
@@ -66,7 +73,8 @@ export default function Splash({ onDone }) {
             onPlaying={(e) => {
               // 로고가 다 그려진 뒤(splashCut)에 끝낸다. 뒤쪽의 멈춘 구간을 기다리지 않는다.
               const v = e.currentTarget;
-              window.setTimeout(finish, Math.max(0, motion.splashCut - v.currentTime * 1000));
+              v.playbackRate = rate;
+              window.setTimeout(finish, Math.max(0, (cut - v.currentTime * 1000) / rate));
             }}
             onEnded={finish}
             onError={finish}

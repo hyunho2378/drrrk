@@ -1,15 +1,19 @@
-// 같은 방 안 상태 변화(시트, 모달, 이모지, 고민 펼치기, 탭 전환)를 요소 단위로 잇는다.
-// 두 화면의 최상위 요소를 이름, 자리, 글자로 맞춰 보고 같은 것은 그대로 두고, 사라지는 것은 먼저 빠지고, 새로 생긴 것만 들어온다.
-// 움직임은 transform과 opacity만 쓴다(web.dev, How to create high-performance CSS animations).
-import { motion } from '../tokens.js';
+// 같은 방 안 상태 변화(퀵슬롯 열기와 접기, 시트, 모달, 카테고리 바꾸기)를 한 화면 안의 움직임으로 잇는다.
+// 피그마 프로토타입의 Smart Animate와 같은 방식이다. 두 화면의 최상위 요소를 이름으로 짝지어,
+// 짝이 있는 요소는 제자리에서 자리와 크기를 옮기며 바뀌고(퀵슬롯이 알약에서 목록으로 펼쳐진다), 짝이 없는 요소만 사라지거나 들어온다.
+// 모든 움직임이 동시에 한 번에 흐른다(사라지는 것이 끝나길 기다리지 않는다). 움직임은 transform, opacity, clip-path만 쓴다.
+import { motion, live as LIVE } from '../tokens.js';
 
 const screenRoot = (layer) => layer.querySelector('[data-node]');
+const SMART = 320;
 
 // 피그마 마무리 단계가 만든 캔버스는 주인 요소 옆에 붙는다. 상자 층(data-raster)은 주인 앞, 그림 캔버스는 주인 뒤에 있다.
 function units(root) {
   const host = root.querySelector(':scope > [data-scroll] > [data-scroll-content]');
   const lists = host ? [Array.from(host.children), Array.from(root.children).filter((c) => !c.hasAttribute('data-scroll'))] : [Array.from(root.children)];
   const out = [];
+  const rr = root.getBoundingClientRect();
+  const s = rr.width / LIVE.screenW || 1;
   for (const kids of lists) {
     let pendingBox = [];
     for (const el of kids) {
@@ -19,11 +23,12 @@ function units(root) {
         continue;
       }
       const r = el.getBoundingClientRect();
-      const rr = root.getBoundingClientRect();
-      const name = el.getAttribute('data-figma') || el.tagName;
+      const fig = el.getAttribute('data-figma');
+      const name = fig || el.tagName;
       const text = (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 160);
-      const sig = [name, Math.round(r.left - rr.left), Math.round(r.top - rr.top), Math.round(r.width), Math.round(r.height), text].join('|');
-      out.push({ el, els: [...pendingBox, el], sig, name, r: { x: r.left - rr.left, y: r.top - rr.top, w: r.width, h: r.height }, H: rr.height, W: rr.width });
+      const rect = { x: (r.left - rr.left) / s, y: (r.top - rr.top) / s, w: r.width / s, h: r.height / s };
+      const sig = [name, Math.round(rect.x), Math.round(rect.y), Math.round(rect.w), Math.round(rect.h), text].join('|');
+      out.push({ el, els: [...pendingBox, el], sig, name, named: !!fig, text, r: rect, H: rr.height / s, W: rr.width / s });
       pendingBox = [];
     }
   }
@@ -51,20 +56,31 @@ function frames(kind, dir, reduced) {
     ? { k: [{ opacity: 0 }, { opacity: 1 }], d: motion.sheetIn, e: motion.standard }
     : { k: [{ opacity: 1 }, { opacity: 0 }], d: motion.sheetOut, e: motion.standard };
   return enter
-    ? { k: [{ opacity: 0 }, { opacity: 1 }], d: motion.stateIn, e: motion.standard }
-    : { k: [{ opacity: 1 }, { opacity: 0 }], d: motion.stateOut, e: motion.standard };
+    ? { k: [{ opacity: 0 }, { opacity: 1 }], d: motion.stateIn + 60, e: motion.standard }
+    : { k: [{ opacity: 1 }, { opacity: 0 }], d: motion.stateOut + 40, e: motion.standard };
 }
 
-function run(list, dir, reduced) {
-  let longest = 0;
-  const anims = [];
-  for (const u of list) {
-    const f = frames(kindOf(u), dir, reduced);
-    longest = Math.max(longest, f.d);
-    for (const el of u.els) anims.push(el.animate(f.k, { duration: f.d, easing: f.e, fill: 'both' }));
-  }
-  return { anims, wait: () => new Promise((res) => (longest ? window.setTimeout(res, longest + 20) : res())) };
+// 이름이 같은 요소끼리 짝짓는다. 이름이 여러 개면 자리가 가장 가까운 것끼리 짝짓는다.
+function pairUp(pu, nu) {
+  const byName = new Map();
+  pu.forEach((u) => { if (u.named) (byName.get(u.name) || byName.set(u.name, []).get(u.name)).push(u); });
+  const used = new Set();
+  const pairs = [];
+  nu.forEach((v) => {
+    const arr = v.named && byName.get(v.name);
+    if (!arr) return;
+    let best = null, bd = Infinity;
+    arr.forEach((u) => {
+      if (used.has(u)) return;
+      const d = Math.abs(u.r.x - v.r.x) + Math.abs(u.r.y - v.r.y) + Math.abs(u.r.w - v.r.w) + Math.abs(u.r.h - v.r.h);
+      if (d < bd) { bd = d; best = u; }
+    });
+    if (best && bd < 700) { used.add(best); pairs.push([best, v]); }
+  });
+  return pairs;
 }
+
+const px = (v) => Math.round(v * 100) / 100;
 
 // prev, next: 레이어 요소. next는 opacity 0으로 미리 그려져 있다. 끝나면 prev를 치울 수 있게 resolve한다.
 export async function morph(prev, next, reduced) {
@@ -74,20 +90,55 @@ export async function morph(prev, next, reduced) {
     return;
   }
   const pu = units(pr), nu = units(nr);
-  const ps = new Set(pu.map((u) => u.sig)), ns = new Set(nu.map((u) => u.sig));
-  const exiting = pu.filter((u) => !ns.has(u.sig));
-  const entering = nu.filter((u) => !ps.has(u.sig));
-  // 1) 사라지는 것: 이전 화면을 위에 둔 채 빠진다.
+  const pairs = pairUp(pu, nu);
+  const pairedP = new Set(pairs.map((p) => p[0])), pairedN = new Set(pairs.map((p) => p[1]));
+  const exiting = pu.filter((u) => !pairedP.has(u) && !nu.some((v) => v.sig === u.sig));
+  const entering = nu.filter((v) => !pairedN.has(v) && !pu.some((u) => u.sig === v.sig));
+  // 이전 화면은 위에 두되 바탕은 투명하게 한다(아래 새 화면의 요소가 비쳐 보여야 한다). 이전 화면의 같은 요소는 새 화면이 같은 모양으로 이어받는다.
   prev.style.zIndex = '2';
   next.style.zIndex = '1';
-  const hideIn = entering.flatMap((u) => u.els.map((el) => el.animate([{ opacity: 0 }], { duration: 1, fill: 'forwards' })));
+  const bgs = [prev, prev.firstElementChild, pr].filter(Boolean).map((e) => [e, e.style.background]);
+  bgs.forEach(([e]) => (e.style.background = 'transparent'));
   next.style.opacity = '1';
-  if (exiting.length) await run(exiting, 'out', reduced).wait();
-  // 2) 이전 화면을 치우고(같은 요소는 픽셀이 같아 티가 안 난다) 새로 생긴 것이 들어온다.
+  const anims = [];
+  let longest = 0;
+  const play = (el, k, d, e, delay = 0) => {
+    longest = Math.max(longest, d + delay);
+    anims.push(el.animate(k, { duration: d, delay, easing: e, fill: 'both' }));
+  };
+  const hidePrev = [];
+  const D = reduced ? motion.reduced : SMART;
+  for (const [u, v] of pairs) {
+    if (u.sig === v.sig) { hidePrev.push(u); continue; }
+    const dx = u.r.x - v.r.x, dy = u.r.y - v.r.y;
+    const sizeSame = Math.abs(u.r.w - v.r.w) < 1.5 && Math.abs(u.r.h - v.r.h) < 1.5;
+    if (reduced) { hidePrev.push(u); v.els.forEach((el) => play(el, [{ opacity: 0 }, { opacity: 1 }], D, motion.easeOut)); continue; }
+    if (sizeSame && u.text === v.text) {
+      // 자리만 바뀐 요소: 제자리에서 미끄러진다.
+      hidePrev.push(u);
+      v.els.forEach((el) => play(el, [{ transform: 'translate(' + px(dx) + 'px,' + px(dy) + 'px)' }, { transform: 'translate(0,0)' }], D, motion.emphasizedDecel));
+    } else if (v.r.w >= u.r.w - 1 && v.r.h >= u.r.h - 1) {
+      // 커지는 요소(알약이 목록으로, 접힌 줄이 펼쳐진 줄로): 이전 자리와 크기에서 펼쳐진다. 이전 요소는 그 사이 옅어진다.
+      const L = Math.max(0, u.r.x - v.r.x), T = Math.max(0, u.r.y - v.r.y);
+      const R = Math.max(0, v.r.x + v.r.w - (u.r.x + u.r.w)), B = Math.max(0, v.r.y + v.r.h - (u.r.y + u.r.h));
+      v.els.forEach((el) => play(el, [{ clipPath: 'inset(' + px(T) + 'px ' + px(R) + 'px ' + px(B) + 'px ' + px(L) + 'px round 14px)', opacity: 0.2 }, { clipPath: 'inset(0px 0px 0px 0px round 14px)', opacity: 1 }], D, motion.emphasizedDecel));
+      u.els.forEach((el) => play(el, [{ opacity: 1 }, { opacity: 0 }], Math.round(D * 0.6), motion.standard));
+    } else {
+      // 줄어드는 요소: 이전 요소가 새 크기로 접히며 옅어지고, 새 요소가 들어온다.
+      const L = Math.max(0, v.r.x - u.r.x), T = Math.max(0, v.r.y - u.r.y);
+      const R = Math.max(0, u.r.x + u.r.w - (v.r.x + v.r.w)), B = Math.max(0, u.r.y + u.r.h - (v.r.y + v.r.h));
+      u.els.forEach((el) => play(el, [{ clipPath: 'inset(0px 0px 0px 0px round 14px)', opacity: 1 }, { clipPath: 'inset(' + px(T) + 'px ' + px(R) + 'px ' + px(B) + 'px ' + px(L) + 'px round 14px)', opacity: 0 }], D, motion.emphasizedAccel));
+      v.els.forEach((el) => play(el, [{ opacity: 0 }, { opacity: 1 }], D, motion.standard, Math.round(D * 0.25)));
+    }
+  }
+  // 같은 모양으로 이어받는 요소와 자리만 옮기는 요소는 이전 화면 쪽을 숨긴다(두 번 그려져 겹쳐 보이지 않게).
+  hidePrev.forEach((u) => u.els.forEach((el) => (el.style.visibility = 'hidden')));
+  // 짝이 없는 요소: 사라지는 것은 이전 화면 위에서 빠지고, 새로 생기는 것은 같은 때에 들어온다.
+  exiting.forEach((u) => { const f = frames(kindOf(u), 'out', reduced); u.els.forEach((el) => play(el, f.k, f.d, f.e)); });
+  entering.forEach((v) => { const f = frames(kindOf(v), 'in', reduced); v.els.forEach((el) => play(el, f.k, f.d, f.e, reduced ? 0 : 40)); });
+  await new Promise((res) => window.setTimeout(res, longest ? longest + 24 : 0));
   prev.style.visibility = 'hidden';
-  hideIn.forEach((a) => a.cancel());
-  const r = run(entering, 'in', reduced);
-  await r.wait();
-  r.anims.forEach((a) => a.cancel());
+  anims.forEach((a) => a.cancel());
+  bgs.forEach(([e, b]) => (e.style.background = b));
   next.style.zIndex = '';
 }
