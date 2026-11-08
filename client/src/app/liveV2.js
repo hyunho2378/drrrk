@@ -1,3 +1,4 @@
+import { LIVE_LIST } from './liveList.js';
 // 라이브 목록 카드 v2. 팀 피그마 "라이브 · 리스트 시안 v2"(1972:22375)와 "라이브 리스트 카드 · 상태 정의"(1972:22488) 값을 그대로 옮겼다.
 // 카드(342 x 112, #222628, 모서리 16)는 그대로 두고, 오른쪽 장면 썸네일과 타이머, 말하는 사람 수를 지운 뒤
 // 아래 줄(보는 사람 수, 점, 남은 시간)과 오른쪽 아래 의자 얼굴 묶음을 상태별로 그린다. iOS LiveRoomCard와 같은 값이다.
@@ -72,11 +73,12 @@ function speaking(x, y) {
   return b;
 }
 
-function cluster(state, smalls, big, more) {
+function cluster(state, smalls, big, more, talkFlag) {
   const g = el('div', { position: 'absolute', left: '0', top: '0', width: '342px', height: '112px', pointerEvents: 'none' });
-  const talking = state === 'talk' || state === 'soon' || state === 'fresh';
+  const talking = talkFlag === undefined ? (state === 'talk' || state === 'soon' || state === 'fresh') : talkFlag;
   // 오른쪽 큰 원의 왼쪽 끝을 기준으로 작은 원을 22씩 겹쳐 왼쪽으로 늘어놓는다(피그마 묶음 값).
-  const bigX = 278;
+  // +N 원이 있는 묶음은 피그마에서 3 왼쪽(275)에 놓인다.
+  const bigX = more ? 275 : 278;
   const bigY = state === 'quiet' ? 51 : 46;
   const smallY = bigY + 16;
   const list = state === 'alone' ? [] : smalls;
@@ -110,49 +112,65 @@ function metaRow(state, views, left) {
   return { m, time: blue ? null : t };
 }
 
+// 피그마 카드 한 장(342 x 112, #222628, 모서리 16). 제목 16 Bold 196 폭, 아래 줄은 카드 왼쪽 16, 위 76.
+function cardOf(c) {
+  const card = el('button', { position: 'relative', display: 'block', width: '342px', height: '112px', flex: '0 0 auto', borderRadius: '16px', background: '#222628', border: '0', padding: '0', margin: '0', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', fontFamily: FONT });
+  card.className = 'lv2-card';
+  card.setAttribute('aria-label', c.title.replace(/\n/g, ' '));
+  const t = el('div', { position: 'absolute', left: '16px', top: '16px', width: '196px', fontSize: '16px', fontWeight: '700', lineHeight: '22px', letterSpacing: '-0.64px', color: '#F8F8F8', whiteSpace: 'pre' }, c.title.replace(/ \n/g, '\n'));
+  card.appendChild(t);
+  const { m } = metaRow(c.st, c.views, c.meta.replace(' 남음', ''));
+  card.appendChild(m);
+  const smalls = c.small.map((h) => h);
+  card.appendChild(cluster(c.st, smalls, c.big, c.more ? c.more.replace('+', '') : 0, c.talk));
+  if (c.st === 'soon') {
+    const pill = el('div', { position: 'absolute', left: '269px', top: '16px', height: '20px', padding: '0 7px 0 6px', borderRadius: '999px', background: '#FF4D6A', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: '700', color: '#000', letterSpacing: '-0.44px' });
+    pill.appendChild(el('span', { display: 'block', width: '13px', height: '13px' }, TIMER));
+    pill.appendChild(el('span', null, c.timer || '03:00'));
+    card.appendChild(pill);
+  }
+  if (c.st === 'fresh') card.appendChild(el('span', { position: 'absolute', left: '8px', top: '24px', width: '6px', height: '6px', borderRadius: '50%', background: '#36D2FF' }));
+  card.addEventListener('click', () => window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 37, t: 'push' } })));
+  return card;
+}
+
+// 목록: 피그마 "지금 들어갈 수 있는 방" 아래(위 488)부터 아래 탭 윗선까지를 스크롤 칸으로 두고, 카드를 12 간격으로 쌓는다.
 export function patchLiveV2(root, n) {
   if (!LIVE_SCREENS.includes(n) || !root || root.dataset.liveV2) return;
-  const plan = PLAN[n] || PLAN[10];
-  // 정렬로 카드 순서가 바뀌어도 화면 위에서부터 피그마 시안 순서(말하는 중, 조용함, ...)가 되게 위치 순으로 놓는다.
-  const cards = [1, 2, 3].map((i) => root.querySelector('[data-figma="List Card / ' + i + '"]')).filter(Boolean)
-    .sort((a, b) => parseFloat(a.style.top || 0) - parseFloat(b.style.top || 0));
-  if (!cards.length) return;
+  const list = LIVE_LIST[n] || LIVE_LIST[10];
+  // 위 가로 카드 장면: 팀 피그마 최신 장면(Carousel / 1 1943:12456, / 2 1943:12466)으로 바꾼다.
+  [1, 2].forEach((i) => {
+    const sc = root.querySelector('[data-figma="Carousel / ' + i + '"] > [data-figma="Scene"]');
+    if (sc) sc.style.backgroundImage = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.png)';
+  });
+  const olds = [1, 2, 3].map((i) => root.querySelector('[data-figma="List Card / ' + i + '"]')).filter(Boolean);
+  if (!olds.length) return;
   root.dataset.liveV2 = '1';
   if (!document.getElementById('lv2-css')) {
     const st = document.createElement('style');
     st.id = 'lv2-css';
-    st.textContent = CSS;
+    st.textContent = CSS + '.lv2-scroll{scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.lv2-scroll::-webkit-scrollbar{display:none}.lv2-card{transition:transform 120ms cubic-bezier(.2,0,0,1)}.lv2-card:active{transform:scale(.98)}';
     document.head.appendChild(st);
   }
-  cards.forEach((card, i) => {
-    if (!card) return;
-    const [state, smalls, big, more] = plan[i];
-    const badge = card.querySelector('[data-figma^="Timer Badge"]');
-    const timeEl = badge && badge.querySelector('[data-figma="time"]');
-    const view = card.querySelector('[data-figma="보는 중"] p');
-    const left = timeEl ? timeEl.textContent.trim() : '';
-    // 옛 썸네일과 타이머 배지, 말하는 사람 수 줄은 숨긴다.
-    ['Thumb', 'meta'].forEach((k) => { const e = card.querySelector(':scope > [data-figma="' + k + '"]'); if (e) e.style.visibility = 'hidden'; });
-    if (badge) badge.style.visibility = 'hidden';
-    const title = card.querySelector('[data-figma="List Title"]');
-    if (title) Object.assign(title.style, { left: '16px', top: '16px', width: '196px' });
-    const { m, time } = metaRow(state, view ? view.textContent.trim() : '22', soonText(state, left));
-    card.appendChild(m);
-    card.appendChild(cluster(state, smalls, big, more));
-    if (state === 'soon') {
-      const pill = el('div', { position: 'absolute', left: '269px', top: '16px', height: '20px', padding: '0 7px 0 6px', borderRadius: '999px', background: '#FF4D6A', display: 'flex', alignItems: 'center', gap: '3px', fontFamily: FONT, fontSize: '11px', fontWeight: '700', color: '#000', letterSpacing: '-0.44px' });
-      pill.appendChild(el('span', { display: 'block', width: '13px', height: '13px' }, TIMER));
-      pill.appendChild(el('span', null, '03:00'));
-      card.appendChild(pill);
-    }
-    if (state === 'fresh') card.appendChild(el('span', { position: 'absolute', left: '8px', top: '24px', width: '6px', height: '6px', borderRadius: '50%', background: '#36D2FF' }));
-    // 옛 타이머 글자가 1초마다 바뀌므로 남은 시간 글도 따라 바꾼다.
-    if (time && timeEl) {
-      const tick = window.setInterval(() => {
-        if (!root.isConnected) { window.clearInterval(tick); return; }
-        time.textContent = timeEl.textContent.trim() + ' 남음';
-      }, 1000);
-    }
+  const top = Math.min(...olds.map((o) => parseFloat(o.style.top || getComputedStyle(o).top) || 488));
+  olds.forEach((o) => (o.style.display = 'none'));
+  const nav = root.querySelector('[data-figma="bottom_navigation"]');
+  const navTop = nav ? parseFloat(nav.style.top || getComputedStyle(nav).top) || 760 : 760;
+  const box = el('div', { position: 'absolute', left: '0', top: top + 'px', width: '390px', height: Math.max(120, navTop - top) + 'px', overflowY: 'auto', overflowX: 'hidden', zIndex: '2' });
+  box.className = 'lv2-scroll';
+  box.dataset.figma = '라이브 목록';
+  // 화면 전체 끌기와 휠 처리(live.js)가 목록 스크롤을 막지 않게, 목록 안에서 난 입력은 위로 올려 보내지 않는다.
+  ['wheel', 'pointerdown', 'touchstart', 'touchmove'].forEach((ev) => box.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
+  const col = el('div', { display: 'flex', flexDirection: 'column', gap: '12px', padding: '0 24px 24px 24px' });
+  list.forEach((c) => col.appendChild(cardOf(c)));
+  box.appendChild(col);
+  // 아래 탭보다 아래에 놓아 탭바가 목록을 덮는다.
+  if (nav) root.insertBefore(box, nav); else root.appendChild(box);
+  // 예전 카드 세 장 자리에 있던 누름 자리는 지운다(새 카드가 직접 눌린다).
+  const layer = root.parentElement || root;
+  layer.querySelectorAll('[data-hotspot]').forEach((h) => {
+    const y = parseFloat(h.style.top), x = parseFloat(h.style.left), w = parseFloat(h.style.width);
+    if (y >= top - 2 && Math.abs(x - 24) < 2 && Math.abs(w - 342) < 2) h.style.display = 'none';
   });
 }
 

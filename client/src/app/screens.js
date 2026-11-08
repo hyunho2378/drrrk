@@ -26,14 +26,14 @@ export const SCREENS = [
   "n": 5,
   "id": "1952:15659",
   "name": "DRRRK · 드르륵 · 해뜨기",
-  "file": "ChatMiniProfile",
+  "file": "MiniProfile",
   "h": 844
  },
  {
   "n": 6,
   "id": "1952:15800",
   "name": "DRRRK · 드르륵 · 해뜨기",
-  "file": "ChatMiniProfile2",
+  "file": "MiniProfile2",
   "h": 844
  },
  {
@@ -108,9 +108,9 @@ export const SCREENS = [
  },
  {
   "n": 19,
-  "id": "1804:20299",
+  "id": "1972:22149",
   "name": "MY · 스킨 획득 팝업",
-  "file": "MySkin",
+  "file": "SkinPopup",
   "h": 844
  },
  {
@@ -397,7 +397,10 @@ const modules = {
   'ChatNameTap': () => import('../figma/screens/ChatNameTap.jsx'),
   'ChatMiniProfile2': () => import('../figma/screens/ChatMiniProfile2.jsx'),
   'ChatMiniProfile': () => import('../figma/screens/ChatMiniProfile.jsx'),
+  'MiniProfile': () => import('./MiniProfile.jsx'),
+  'MiniProfile2': () => import('./MiniProfile2.jsx'),
   'MySkin': () => import('../figma/screens/MySkin.jsx'),
+  'SkinPopup': () => import('./SkinPopup.jsx'),
   'MyMain': () => import('../figma/screens/MyMain.jsx'),
   'LiveAll': () => import('../figma/screens/LiveAll.jsx'),
   'LiveWatch': () => import('../figma/screens/LiveWatch.jsx'),

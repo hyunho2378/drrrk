@@ -107,13 +107,14 @@ export function ChairStudio(props) {
         <span style={{ fontSize: 12, fontWeight: 700, lineHeight: '17px', letterSpacing: '-0.24px', color: '#FF9A4D', whiteSpace: 'pre' }}>엉따 39.2°</span>
       </div>
 
-      <Hero src={big(sel.k, sel.c)} />
+      {/* 잠긴 의자는 큰 그림을 어둡게(밝기 50%, 채도 60%) 두고 가운데 자물쇠를 얹는다(피그마 1951:13839). */}
+      <div style={{ filter: locked ? 'brightness(0.5) saturate(0.6)' : 'none', transition: 'filter 200ms ' + EASE }}><Hero src={big(sel.k, sel.c)} /></div>
       {locked ? (
         <div aria-hidden="true" className="cs-in" style={{ position: 'absolute', left: 167, top: 221, width: 56, height: 56, borderRadius: 28, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockIcon size={24} /></div>
       ) : null}
-      <div key={sel.k + '-' + sel.c} className="cs-text" style={{ position: 'absolute', left: 0, top: 344, width: 390, textAlign: 'center' }}>
+      <div key={sel.k + '-' + sel.c} className="cs-text" style={{ position: 'absolute', left: 0, top: 349, width: 390, textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 19, fontWeight: 700, lineHeight: '27px', letterSpacing: '-0.38px' }}>{kind.name}</p>
-        <p style={{ margin: '3px 0 0', fontSize: 13, fontWeight: 500, lineHeight: '18px', letterSpacing: '-0.26px', color: locked ? '#FF9A4D' : SECONDARY }}>{locked ? lock.need : kind.colors[sel.c]}</p>
+        <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: 500, lineHeight: '18px', letterSpacing: '-0.26px', color: locked ? '#FF9A4D' : SECONDARY }}>{locked ? lock.need : kind.colors[sel.c]}</p>
       </div>
 
       <p data-figma="의자" style={{ ...label, top: 430 }}>의자</p>
@@ -125,7 +126,7 @@ export function ChairStudio(props) {
               onPointerDown={() => preload([big(i, lastColor(i))])}
               onClick={(e) => { e.stopPropagation(); pickKind(i); }}
               style={{ position: 'absolute', left: i * 70, top: 0, width: 62, height: 62, borderRadius: 14, background: on ? SUBTLE : ELEVATED, boxShadow: on ? 'inset 0 0 0 2px ' + PRIMARY : 'inset 0 0 0 0 ' + PRIMARY }}>
-              <img src={thumb(i, 0)} alt="" draggable={false} style={{ position: 'absolute', left: 8, top: 8, width: 46, height: 46, objectFit: 'contain', display: 'block', filter: isLocked(i) ? 'brightness(0.55)' : 'none' }} />
+              <img src={thumb(i, 0)} alt="" draggable={false} style={{ position: 'absolute', left: 8, top: 8, width: 46, height: 46, objectFit: 'contain', display: 'block', opacity: isLocked(i) ? 0.3 : 1 }} />
               {isLocked(i) ? <span aria-hidden="true" style={{ position: 'absolute', left: 23, top: 23, lineHeight: 0 }}><LockIcon size={16} /></span> : null}
             </button>
           );
@@ -143,18 +144,18 @@ export function ChairStudio(props) {
               <button key={sel.k + '-' + c} type="button" className="cs-btn" aria-label={name} aria-pressed={on} data-figma={'색 / ' + name}
                 onPointerDown={() => preload([big(sel.k, c)])}
                 onClick={(e) => { e.stopPropagation(); pickColor(c); }}
-                style={{ position: 'relative', flex: '0 0 108px', width: 108, height: 116, borderRadius: 16, background: on ? SUBTLE : ELEVATED, boxShadow: on ? 'inset 0 0 0 2px ' + PRIMARY : 'inset 0 0 0 0 ' + PRIMARY }}>
-                <img src={thumb(sel.k, c)} alt="" draggable={false} style={{ position: 'absolute', left: 16, top: 8, width: 76, height: 76, objectFit: 'contain', display: 'block', filter: locked ? 'brightness(0.55)' : 'none' }} />
-                {locked ? <span aria-hidden="true" style={{ position: 'absolute', left: 46, top: 38, lineHeight: 0 }}><LockIcon size={16} /></span> : null}
-                <span style={{ position: 'absolute', left: 0, top: 88, width: 108, textAlign: 'center', fontSize: 12, fontWeight: on ? 700 : 500, lineHeight: '16.8px', letterSpacing: '-0.48px', color: on ? PRIMARY : SECONDARY, whiteSpace: 'pre' }}>{name}</span>
+                style={{ position: 'relative', flex: '0 0 108px', width: 108, height: 116, borderRadius: 16, background: on && !locked ? SUBTLE : ELEVATED, boxShadow: on && !locked ? 'inset 0 0 0 2px ' + PRIMARY : 'inset 0 0 0 0 ' + PRIMARY }}>
+                <img src={thumb(sel.k, c)} alt="" draggable={false} style={{ position: 'absolute', left: 16, top: 8, width: 76, height: 76, objectFit: 'contain', display: 'block', opacity: locked ? 0.23 : 1 }} />
+                {locked ? <span aria-hidden="true" style={{ position: 'absolute', left: 42, top: 34, lineHeight: 0 }}><LockIcon size={24} /></span> : null}
+                <span style={{ position: 'absolute', left: 0, top: 88, width: 108, textAlign: 'center', fontSize: 12, fontWeight: on && !locked ? 700 : 500, lineHeight: '16.8px', letterSpacing: '-0.48px', color: on && !locked ? PRIMARY : SECONDARY, whiteSpace: 'pre' }}>{name}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      <div data-figma="CTA" style={{ position: 'absolute', left: 24, top: 764, width: 342, height: 56, borderRadius: 28, background: locked ? ELEVATED : PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 200ms ' + EASE }}>
-        <span style={{ fontSize: 16, fontWeight: 700, lineHeight: '22.4px', letterSpacing: '-0.32px', color: locked ? '#6E767C' : '#000' }}>저장하기</span>
+      <div data-figma="CTA" style={{ position: 'absolute', left: 24, top: 764, width: 342, height: 56, borderRadius: 28, background: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 200ms ' + EASE }}>
+        <span style={{ fontSize: 16, fontWeight: 700, lineHeight: '22.4px', letterSpacing: '-0.32px', color: '#000' }}>저장하기</span>
       </div>
       {note ? (
         <div role="status" className="cs-in" style={{ position: 'absolute', left: 24, top: 704, width: 342, height: 44, borderRadius: 14, background: 'rgba(44,44,46,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, letterSpacing: '-0.28px', color: '#FF9A4D' }}>{note}</div>
