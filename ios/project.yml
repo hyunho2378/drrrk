@@ -8,7 +8,6 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.10"
-    DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
     TARGETED_DEVICE_FAMILY: "1"
     ENABLE_PREVIEWS: YES
@@ -39,7 +38,9 @@ targets:
           - SUIT-Heavy.otf
         NSMicrophoneUsageDescription: 드르륵 방에서 목소리로 이야기하려면 마이크가 필요해요.
         NSSpeechRecognitionUsageDescription: 말한 내용을 채팅 글자로 옮기려면 음성 인식이 필요해요.
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: app.drrrk.ios
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
