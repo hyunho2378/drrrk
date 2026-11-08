@@ -82,6 +82,24 @@ function pairUp(pu, nu) {
 
 const px = (v) => Math.round(v * 100) / 100;
 
+// 주전부리 퀵슬롯: 접힌 알약(PILL)이 목록 패널(PANEL)로 펼쳐지고, 접을 때는 반대로 접힌다. 이모지처럼 칸마다 시차를 둔다.
+const PANEL = '주전부리 퀵슬롯';
+const PILL = '퀵슬롯 · 접힘';
+const CLOSED_H = 86;
+function expandPanel(v, play) {
+  const H = v.r.h;
+  v.els.forEach((el) => play(el, [{ clipPath: 'inset(0px 0px ' + px(Math.max(0, H - CLOSED_H)) + 'px 0px round 20px)', opacity: 0.35 }, { clipPath: 'inset(0px 0px 0px 0px round 20px)', opacity: 1 }], 520, motion.emphasizedDecel));
+  Array.from(v.el.children).forEach((c, i) => play(c, [{ opacity: 0, transform: 'translateY(-18px) scale(0.88)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], 380, motion.emphasizedDecel, 90 + i * 50));
+}
+function collapsePanel(u, play) {
+  const H = u.r.h;
+  u.els.forEach((el) => play(el, [{ clipPath: 'inset(0px 0px 0px 0px round 20px)', opacity: 1 }, { clipPath: 'inset(0px 0px ' + px(Math.max(0, H - CLOSED_H)) + 'px 0px round 20px)', opacity: 0 }], 360, motion.emphasizedAccel));
+  Array.from(u.el.children).forEach((c, i) => play(c, [{ opacity: 1 }, { opacity: 0 }], 160, motion.standard, i * 12));
+}
+// 배경 그림 주소가 서로 다른가(같은 이름과 자리의 장면 그림이 바뀌는 경우).
+const bgUrl = (el) => { const m = /url\(["']?([^"')]+)/.exec(getComputedStyle(el).backgroundImage || ''); return m ? m[1] : ''; };
+const bgChanged = (a, b) => { const x = bgUrl(a), y = bgUrl(b); return !!(x && y && x !== y); };
+
 // prev, next: 레이어 요소. next는 opacity 0으로 미리 그려져 있다. 끝나면 prev를 치울 수 있게 resolve한다.
 export async function morph(prev, next, reduced) {
   const pr = screenRoot(prev), nr = screenRoot(next);
@@ -109,7 +127,12 @@ export async function morph(prev, next, reduced) {
   const hidePrev = [];
   const D = reduced ? motion.reduced : SMART;
   for (const [u, v] of pairs) {
-    if (u.sig === v.sig) { hidePrev.push(u); continue; }
+    if (u.sig === v.sig) {
+      // 같은 자리의 요소라도 배경 그림이 다르면(장면이 바뀌면) 이전 그림이 옅어지며 새 그림이 드러난다.
+      if (!reduced && bgChanged(u.el, v.el)) { u.els.forEach((el) => play(el, [{ opacity: 1 }, { opacity: 0 }], 340, motion.standard)); continue; }
+      hidePrev.push(u);
+      continue;
+    }
     const dx = u.r.x - v.r.x, dy = u.r.y - v.r.y;
     const sizeSame = Math.abs(u.r.w - v.r.w) < 1.5 && Math.abs(u.r.h - v.r.h) < 1.5;
     if (reduced) { hidePrev.push(u); v.els.forEach((el) => play(el, [{ opacity: 0 }, { opacity: 1 }], D, motion.easeOut)); continue; }
@@ -134,8 +157,18 @@ export async function morph(prev, next, reduced) {
   // 같은 모양으로 이어받는 요소와 자리만 옮기는 요소는 이전 화면 쪽을 숨긴다(두 번 그려져 겹쳐 보이지 않게).
   hidePrev.forEach((u) => u.els.forEach((el) => (el.style.visibility = 'hidden')));
   // 짝이 없는 요소: 사라지는 것은 이전 화면 위에서 빠지고, 새로 생기는 것은 같은 때에 들어온다.
-  exiting.forEach((u) => { const f = frames(kindOf(u), 'out', reduced); u.els.forEach((el) => play(el, f.k, f.d, f.e)); });
-  entering.forEach((v) => { const f = frames(kindOf(v), 'in', reduced); v.els.forEach((el) => play(el, f.k, f.d, f.e, reduced ? 0 : 40)); });
+  exiting.forEach((u) => {
+    if (!reduced && u.name === PANEL) { collapsePanel(u, play); return; }
+    if (!reduced && u.name === PILL) { u.els.forEach((el) => play(el, [{ opacity: 1 }, { opacity: 0 }], 160, motion.standard)); return; }
+    const f = frames(kindOf(u), 'out', reduced);
+    u.els.forEach((el) => play(el, f.k, f.d, f.e));
+  });
+  entering.forEach((v) => {
+    if (!reduced && v.name === PANEL) { expandPanel(v, play); return; }
+    if (!reduced && v.name === PILL) { v.els.forEach((el) => play(el, [{ opacity: 0 }, { opacity: 1 }], 220, motion.standard, 240)); return; }
+    const f = frames(kindOf(v), 'in', reduced);
+    v.els.forEach((el) => play(el, f.k, f.d, f.e, reduced ? 0 : 40));
+  });
   await new Promise((res) => window.setTimeout(res, longest ? longest + 24 : 0));
   prev.style.visibility = 'hidden';
   anims.forEach((a) => a.cancel());

@@ -146,7 +146,6 @@ export default function Prototype() {
       keyN.current.set(key, n);
       // 지금 보이는 칸(준비 끝난 칸) 하나만 남기고 새 칸을 얹는다. 준비 중이던 칸은 버린다(빠르게 두 번 누르면 화면이 비던 문제).
       setLayers((prev) => [...prev.filter((l) => l.ready).slice(-1), { key, n, Comp, h: s.h, ready: false, prev: prevShown.current }]);
-      document.title = s.name;
     });
     return () => {
       alive = false;

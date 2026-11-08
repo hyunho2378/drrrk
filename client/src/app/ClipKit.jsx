@@ -38,7 +38,7 @@ function Item({ it, flow, pw }) {
         </div>
       );
     case 'svg':
-      return <span data-figma={it.n} style={{ ...pos(it.x, it.y, it.w, it.h), width: it.w, height: it.h, lineHeight: 0, fontSize: 0, filter: shadowFilter(it.sh) }} dangerouslySetInnerHTML={{ __html: it.svg }} />;
+      return <span data-figma={it.n} className={it.cls} style={{ ...pos(it.x, it.y, it.w, it.h), width: it.w, height: it.h, lineHeight: 0, fontSize: 0, filter: shadowFilter(it.sh) }} dangerouslySetInnerHTML={{ __html: it.svg }} />;
     case 'text': {
       const lh = lineH(it);
       const st = textBase(it.size, it.wt, it.c, it.a, lh);
@@ -58,7 +58,7 @@ function Item({ it, flow, pw }) {
         out.push(it.s.slice(last));
         body = out;
       }
-      return <div data-figma={it.n} style={{ ...box, ...st, textShadow: it.sh ? it.sh[0] + 'px ' + it.sh[1] + 'px ' + it.sh[2] + 'px rgba(0,0,0,' + it.sh[3] + ')' : undefined }}>{body}</div>;
+      return <div data-figma={it.n} className={it.cls} style={{ ...box, ...st, textShadow: it.sh ? it.sh[0] + 'px ' + it.sh[1] + 'px ' + it.sh[2] + 'px rgba(0,0,0,' + it.sh[3] + ')' : undefined }}>{body}</div>;
     }
     case 'pill': {
       const tx = it.text;
@@ -88,10 +88,11 @@ function Item({ it, flow, pw }) {
   }
 }
 
-export function Scene({ items, name, node, bg, style, className }) {
+export function Scene({ items, name, node, bg, style, className, children }) {
   return (
     <div data-figma={name} data-node={node} className={className} style={{ position: 'relative', width: '390px', height: '844px', overflow: 'hidden', background: bg, ...style }}>
-      {items.map((it, i) => <Item key={i} it={it} pw={390} />)}
+      {items.map((it, i) => <Item key={it.key || i} it={it} pw={390} />)}
+      {children}
     </div>
   );
 }

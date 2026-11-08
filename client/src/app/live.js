@@ -9,8 +9,11 @@ import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
 import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
-import { warm } from './donor.js';
+import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
+import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
+import { attachPost } from './post.js';
+import { attachSort } from './sort.js';
 
 export { setText };
 
@@ -27,6 +30,9 @@ export function resolveTo(l) {
     window.dispatchEvent(new Event('drrrk:splash'));
     return Object.assign({}, l, { t: 'none' });
   }
+  // 의자 꾸미기: 열 때 보여 줄 의자(새로 얻은 의자 또는 지금 의자)와 확정을 링크의 act로 정한다.
+  if (l.act === 'commit') commitDraft();
+  if (l.to === 20) openStudio(l.act === 'fresh');
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
   return l;
@@ -391,6 +397,12 @@ function scrollerOf(layer, root, n) {
     place(0);
   };
   s.inRegion = (y) => y >= top && y <= bottom;
+  // 카드가 자리를 바꾼 뒤(정렬) 새 자리를 다시 잰다.
+  s.remeasure = () => {
+    items.forEach((el) => y0.set(el, relRect(root, el).y + s.y));
+    place(0);
+  };
+  root.__scroller = s;
   // 라이브 댓글 화면은 입력창 바로 위 댓글이 보이도록 맨 아래에서 시작한다.
   if (generic && fit.input) s.y = s.base = max;
   place(0);
@@ -499,13 +511,32 @@ function attachDrag(layer, root, n) {
 // ---------- 보이기 전에 맞추기 ----------
 // 화면은 투명하게 먼저 그려지고 그림이 준비되면 보인다. 피그마 기본 모습이 잠깐 보였다가 바뀌는 깜빡임이 없도록,
 // 글자와 그림을 바꾸는 일과 처음 모습(고민 분석 0, 채팅 숨김, 시계, 엉따 막대 0, 가로 카드 위치)은 보이기 전에 끝낸다.
-// 옛 그림을 쓰는 곳은 새 그림으로 바꾼다(MY 의자는 128px 작은 그림이라 깨져 보여서, 의자 꾸미기의 원본 크기 그림을 쓴다).
-export const ASSET_SWAP = { 'f76f40b49cba6dd89cb0cf61935be0f11b55cfcc.webp': '4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee.webp' };
-// 이름 탭 화면(22, 23)은 '나'의 칸에 박스 그림이 남아 있다. 박스 의자는 없앴으므로 32번 화면의 '나' 칸과 같은 의자 그림으로 바꾼다.
+// 의자 그림: 작게 줄여 저장했던 옛 그림은 일러스트 자산 원본에서 만든 그림으로 바꾼다(chairs.js). 큰 자리(170px)는 원본 PNG, 작은 자리는 256px 무손실이다.
+// 박스 의자는 없앴다. 박스 그림이 '나'의 자리인 화면(1, 2, 3, 22, 23)은 내가 고른 의자로, 그 밖의 자리는 편의점 의자로 바꾼다.
+const IMG = {
+  box: '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp',
+  sofa: 'eab22a7a4d5070b5801bb3367d4f0342e5726543.webp',
+  stool: '51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp',
+  recl: 'ef3d01c1807348609019737b6ad41d82875319aa.webp',
+  yellow: '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp',
+  myOld: 'f76f40b49cba6dd89cb0cf61935be0f11b55cfcc.webp',
+};
+const MINE_BOX = [1, 2, 3, 22, 23];
+const MINE_YELLOW = [1, 32, 33];
 // 28, 30, 31은 팀 피그마 최신 장면(라임 의자, 회색 리클라이너, 흰 의자)으로 바꾼다.
-export const SCREEN_SWAP = { 28: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 30: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 31: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 22: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' }, 23: { '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp': '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp' } };
+export const SCREEN_SWAP = { 28: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 30: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 31: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' } };
+export function swapMap(n) {
+  const map = Object.assign({}, SCREEN_SWAP[n] || {});
+  map[IMG.sofa] = fixedRel('sofa', 1, n === 19);
+  map[IMG.stool] = n === 19 ? mineRel(true) : fixedRel('stool', 1, false);
+  map[IMG.recl] = fixedRel('recl', 1, false);
+  map[IMG.box] = MINE_BOX.includes(n) ? mineRel(false) : fixedRel('conv', 1, false);
+  if (MINE_YELLOW.includes(n)) map[IMG.yellow] = mineRel(false);
+  map[IMG.myOld] = mineRel(true);
+  return map;
+}
 export function swapAssets(el, n) {
-  const map = Object.assign({}, ASSET_SWAP, SCREEN_SWAP[n] || {});
+  const map = swapMap(n);
   const keys = Object.keys(map);
   el.querySelectorAll('[style]').forEach((e) => {
     const st = e.getAttribute('style') || '';
@@ -574,6 +605,51 @@ function patchScene(root, n) {
   }
 }
 
+// 해 뜬 순간(35)의 시계 알약: 팀 피그마의 해 뜸 변형(바탕 #FFC24D 18%, 해 모양 아이콘)이다. 옛 생성 화면은 아이콘 그림이 비어 있었다.
+const SUN_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="2.33" stroke="#FFC24D" stroke-width="1.8"/><path d="M7 1.2V2.6M7 11.4V12.8M1.2 7H2.6M11.4 7H12.8M3.9 3.9L2.9 2.9M10.1 3.9L11.1 2.9M3.9 10.1L2.9 11.1M10.1 10.1L11.1 11.1" stroke="#FFC24D" stroke-width="1.7" stroke-linecap="round"/></svg>';
+function patchPill(root, n) {
+  if (n !== 35 || root.dataset.pill) return;
+  root.dataset.pill = '1';
+  const pill = root.querySelector('[data-figma="Timer Pill"]');
+  if (!pill) return;
+  Object.assign(pill.style, { background: 'rgba(255, 194, 77, 0.18)', width: 'auto', padding: '0 14px 0 12px', gap: '6px' });
+  const icon = pill.querySelector('[data-figma="timer"]');
+  if (icon) {
+    icon.innerHTML = SUN_SVG;
+    Object.assign(icon.style, { width: '14px', height: '14px', overflow: 'visible' });
+  }
+}
+
+// 아침(2)과 오늘 나눈 대화(3): 스크롤하면 내용이 머리말(상태바, 뒤로 가기) 밑으로 올라가 글자와 겹쳤고, 맨 끝 내용은 아래 버튼 띠에 가렸다.
+// 머리말 높이만큼 바탕색 띠를 두고, 맨 끝에는 버튼 띠 높이만큼 여백을 더한다.
+function patchReport(root, n) {
+  if ((n !== 2 && n !== 3) || root.dataset.report) return;
+  const scroll = root.querySelector(':scope > [data-scroll]');
+  if (!scroll) return;
+  root.dataset.report = '1';
+  const bg = getComputedStyle(root).backgroundColor || '#121415';
+  const mask = document.createElement('div');
+  mask.setAttribute('aria-hidden', 'true');
+  Object.assign(mask.style, { position: 'absolute', left: '0px', top: '0px', width: '390px', height: '112px', pointerEvents: 'none', background: 'linear-gradient(to bottom, ' + bg + ' 0, ' + bg + ' 98px, transparent 112px)' });
+  scroll.after(mask);
+  const content = scroll.querySelector(':scope > [data-scroll-content]') || scroll;
+  const pad = document.createElement('div');
+  pad.setAttribute('aria-hidden', 'true');
+  Object.assign(pad.style, { width: '1px', height: '204px', flexShrink: '0' });
+  content.appendChild(pad);
+}
+
+// 새 의자 팝업(19) 뒤 화면: 옛 뱃지 시트(불꽃 드륵 등)는 쓰지 않는다. MY 화면(36)의 나의 업적 편의점 시트로 바꾼다.
+async function patchSkinPopup(root, n) {
+  if (n !== 19 || root.dataset.skin) return;
+  root.dataset.skin = '1';
+  const old = root.querySelector(':scope > [data-figma="bottom sheet · 뱃지"]');
+  if (!old) return;
+  const sheet = await cloneOf(36, ':scope > [data-figma="bottom sheet · 나의 편의점"]');
+  if (!sheet || !root.isConnected) return;
+  old.replaceWith(sheet);
+}
+
 function prepareChat(root, n) {
   const sc = sceneOf(n);
   if (!sc || (room.scene === sc && room.chatDone)) return;
@@ -597,12 +673,18 @@ export async function prepare(layer, n, prevN) {
   patchScene(root, n);
   attachRoom(root, n);
   attachThrow(root);
+  attachSort(root, n, true);
   attachDrag(layer, root, n);
   prepTabs(root, n);
   fixIcons(root);
   patchLounge(root, n);
+  if ([19, 36, 53, 54].includes(n)) patchMyChair(root);
+  attachPost(root);
+  patchPill(root, n);
+  patchReport(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
   if (n === LIVE.itemScreen) await fillItem(root);
+  await patchSkinPopup(root, n);
   if (n === LIVE.analysisScreen) initAnalysis(root);
   prepareRoomClock(root, n);
   prepareChat(root, n);
@@ -615,6 +697,8 @@ export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;
   current = { n, go, layer };
+  // 클립 영상 보기가 다 보이면 에이전트 버튼이 오른쪽에서 튀어나온다(ClipPlayer.jsx).
+  if (n === 56) window.dispatchEvent(new Event('drrrk:clip-shown'));
   // prepare가 못 한 경우(예: 준비 중에 오류)를 위해 같은 일을 한 번 더 한다. 모두 두 번 해도 같은 결과가 되도록 만들어져 있다.
   applySync(root);
   showEmptyOutlines(root);
@@ -622,8 +706,10 @@ export function attach(layer, n, go, prevN) {
   attachRoom(root, n);
   attachThrow(root);
   attachInputs(root, n, go);
+  attachSort(root, n, false);
   attachDrag(layer, root, n);
   attachTabs(root, n);
+  attachPost(root);
   fixIcons(root);
   patchLounge(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }

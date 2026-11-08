@@ -115,16 +115,9 @@ export const SCREENS = [
  },
  {
   "n": 20,
-  "id": "1647:23223",
-  "name": "의자 꾸미기 · 소파 선택",
-  "file": "Screen1647_23223",
-  "h": 844
- },
- {
-  "n": 21,
-  "id": "1647:23282",
-  "name": "의자 꾸미기 · 잠긴 의자 선택",
-  "file": "Screen1647_23282",
+  "id": "chair-studio",
+  "name": "의자 꾸미기",
+  "file": "ChairStudio",
   "h": 844
  },
  {
@@ -386,8 +379,7 @@ const modules = {
   'DRRRK52': () => import('../figma/screens/DRRRK52.jsx'),
   'DRRRK6': () => import('../figma/screens/DRRRK6.jsx'),
   'MY39': () => import('../figma/screens/MY39.jsx'),
-  'Screen1647_23223': () => import('../figma/screens/Screen1647_23223.jsx'),
-  'Screen1647_23282': () => import('../figma/screens/Screen1647_23282.jsx'),
+  'ChairStudio': () => import('./ChairStudio.jsx'),
   'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
   'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),
   'DRRRKDark': () => import('../figma/screens/DRRRKDark.jsx'),

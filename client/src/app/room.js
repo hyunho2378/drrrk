@@ -78,11 +78,12 @@ export function attachEmoji(root) {
       plus.className = x.className;
       plus.innerHTML = x.innerHTML;
     }
-    menu.animate([{ opacity: 0, transform: 'translateY(12px) scale(0.92)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: motion.modalIn + 50, easing: motion.emphasizedDecel });
+    // 열리는 속도: 너무 빠르지 않게 420ms, 이모지는 아래부터 60ms 간격으로 올라온다.
+    menu.animate([{ opacity: 0, transform: 'translateY(18px) scale(0.86)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: 420, easing: motion.emphasizedDecel });
     const items = q(menu, '[data-figma^="emoji ·"]');
     items.forEach((it, i) => {
       it.style.cursor = 'pointer';
-      it.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, delay: (items.length - 1 - i) * 35, easing: motion.emphasizedDecel, fill: 'backwards' });
+      it.animate([{ opacity: 0, transform: 'translateY(14px) scale(0.9)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: 340, delay: 80 + (items.length - 1 - i) * 60, easing: motion.emphasizedDecel, fill: 'backwards' });
       it.addEventListener('click', (e) => { e.stopPropagation(); fly(it); close(); });
     });
     document.addEventListener('pointerdown', onDoc, true);
@@ -123,7 +124,15 @@ export function attachBanner(root) {
       setText(body, LIVE.bannerBody);
       Object.assign(body.style, { whiteSpace: 'pre-wrap', wordBreak: 'keep-all', height: 'auto' });
       const tags = ps.filter((p) => /^#/.test(p.textContent.trim()));
-      tags.forEach((t, i) => LIVE.bannerTags[i] && setText(t, LIVE.bannerTags[i]));
+      // 키워드 칩: 팀 글자 길이에 맞춘 고정 폭을 풀고 글자 길이대로 늘어나게 한다(좌우 여백이 같아야 한다).
+      tags.forEach((t, i) => {
+        if (!LIVE.bannerTags[i]) return;
+        setText(t, LIVE.bannerTags[i]);
+        Object.assign(t.style, { width: 'auto', whiteSpace: 'nowrap' });
+        if (t.parentElement) Object.assign(t.parentElement.style, { width: 'auto', flex: '0 0 auto' });
+      });
+      const ctx = tags[0] && tags[0].closest('[data-figma="AI 맥락"]');
+      if (ctx) ctx.style.width = 'auto';
     }
     const r = relRect(root, col);
     Object.assign(e.style, { left: r.x + 'px', top: r.y + 'px', zIndex: '15', cursor: 'pointer' });

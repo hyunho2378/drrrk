@@ -10,6 +10,8 @@ const BASE = import.meta.env.BASE_URL;
 
 export default function App() {
   const [splash, setSplash] = useState(0);
+  // 앱이므로 화면을 옮겨도 탭 제목은 늘 Drrrk다.
+  useEffect(() => { document.title = 'Drrrk'; }, []);
   // 스플래시 영상을 미리 받아 둔다(에이전트 버튼을 누를 때 기다리지 않게).
   useEffect(() => {
     const v = document.createElement('video');
