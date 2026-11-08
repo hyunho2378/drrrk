@@ -106,7 +106,6 @@ struct HomeView: View {
                 HomeBackdrop()
                 sheet.at(0, sheetTop)
             }
-            BottomNav()
         }
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
@@ -426,9 +425,7 @@ private struct OnboardingDeck: View {
                     card.at(32, 213)
                 }
             }
-            .overlay(alignment: .bottom) {
-                BottomNav().allowsHitTesting(false).overlay(Color.black.opacity(0.6).allowsHitTesting(false))
-            }
+
         .toolbar(.hidden, for: .navigationBar)
     }
 

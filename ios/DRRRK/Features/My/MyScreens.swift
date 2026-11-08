@@ -94,7 +94,10 @@ private struct MyHome: View {
                 MyShelfSheet { open($0) }
             }
 
-            VStack { Spacer(); BottomNav() }
+            // 평소에는 앱 전체 아래 탭이 보이고, 아이템 시트나 팝업이 열릴 때만 여기서 같은 자리에 그려 시트 아래에 깐다.
+            if router.navLocal {
+                BottomNav().frame(maxHeight: .infinity, alignment: .bottom)
+            }
 
             MySheet(isPresented: item != nil, height: 411, dim: 0.6, background: DS.Palette.bgSurface, onClose: closeItem) {
                 if let item {
@@ -117,6 +120,11 @@ private struct MyHome: View {
         }
         .ignoresSafeArea(edges: .top)
         .toolbar(.hidden, for: .navigationBar)
+        .onChange(of: item != nil || overlay == .skin, initial: true) { _, covered in
+            var t = Transaction(); t.disablesAnimations = true
+            withTransaction(t) { router.navLocal = covered }
+        }
+        .onDisappear { router.navLocal = false }
         .onAppear {
             overlay = startOverlay
             item = startItem

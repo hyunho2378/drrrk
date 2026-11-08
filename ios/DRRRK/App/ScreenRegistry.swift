@@ -50,9 +50,6 @@ struct PendingScreen: View {
             Text(title).suit(17, .bold).foregroundStyle(DS.Palette.textPrimary)
             Button("뒤로") { router.pop() }.suit(14).foregroundStyle(DS.Palette.brandPrimary)
             Spacer()
-            if tab {
-                BottomNav()
-            }
         }
         .frame(maxWidth: .infinity)
         .background(DS.Palette.bgSurface.ignoresSafeArea())

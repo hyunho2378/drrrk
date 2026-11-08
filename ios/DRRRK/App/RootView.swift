@@ -62,6 +62,7 @@ struct AppShell: View {
             .navigationDestination(for: Route.self) { ScreenRegistry.view(for: $0) }
             .toolbar(.hidden, for: .navigationBar)
         }
+        .overlay { GlobalBottomNav().allowsHitTesting(Router.navMode(for: router.current) == .normal) }
         .fullScreenCover(item: $router.modal) { r in
             ScreenRegistry.view(for: r)
                 .presentationBackground(.clear)
@@ -100,9 +101,44 @@ struct BottomNav: View {
             }
             .padding(.top, 11)
             .padding(.horizontal, 20)
+            Spacer(minLength: 0)
         }
-        .padding(.bottom, 8)
-        .background(DS.Palette.bgSurface.ignoresSafeArea(edges: .bottom))
+        // 피그마 bottom_navigation은 홈 표시줄 자리까지 포함해 84 높이다. 화면 바닥에 붙이고 키보드에도 움직이지 않는다.
+        .frame(maxWidth: .infinity)
+        .frame(height: BottomNav.height, alignment: .top)
+        .background(DS.Palette.bgSurface)
+        .ignoresSafeArea(.all, edges: .bottom)
+    }
+
+    /// 피그마 화면(390 x 844)은 폭에 맞춰 키워 그린다. 아래 탭 윗선도 피그마 y 760이 키워진 자리에 오도록,
+    /// 높이는 화면 높이에서 760 x 배율을 뺀 값이다(iPhone 17: 874 - 783.4 = 90.6).
+    static var height: CGFloat {
+        let b = UIScreen.main.bounds
+        return max(84, b.height - 760 * b.width / 390)
+    }
+}
+
+/// 앱 전체에 하나만 있는 아래 탭. 탭을 바꾸거나 화면을 넘겨도 같은 자리에 머문다.
+struct GlobalBottomNav: View {
+    @Environment(Router.self) private var router
+
+    var body: some View {
+        let mode = Router.navMode(for: router.current)
+        ZStack(alignment: .bottom) {
+            if mode != .none, !router.navLocal {
+                BottomNav()
+                    .overlay {
+                        if mode == .dim {
+                            Color.black.opacity(0.6).ignoresSafeArea(.all, edges: .bottom).allowsHitTesting(false)
+                        }
+                    }
+                    .allowsHitTesting(mode == .normal)
+                    .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .ignoresSafeArea(.all, edges: .bottom)
+        .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.18), value: mode)
     }
 }
 

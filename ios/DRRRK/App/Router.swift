@@ -52,6 +52,24 @@ final class Router {
     // 화면 위에 겹쳐 뜨는 시트와 창(미니 프로필, 신고, 차단). 뒤 화면이 그대로 비친다.
     var modal: Route?
     var enteredApp = false
+    /// 마이 화면에서 아이템 시트나 팝업이 아래 탭을 덮을 때만 true. 이때는 마이 화면이 같은 자리에 자기 탭을 그린다.
+    var navLocal = false
+
+    /// 지금 맨 위에 보이는 화면
+    var current: Route {
+        path.last ?? tab.root
+    }
+
+    enum NavMode: Equatable { case none, normal, dim }
+
+    /// 화면마다 아래 탭을 보일지. 온보딩은 어둡게 깔린 채로 보인다.
+    static func navMode(for r: Route) -> NavMode {
+        switch r {
+        case .home, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
+        case .onboardingTogether, .onboardingSolo: .dim
+        default: .none
+        }
+    }
 
     func push(_ r: Route) {
         path.append(r)

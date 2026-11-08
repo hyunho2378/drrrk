@@ -56,7 +56,7 @@ struct LiveView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            BottomNav()
+            .contentMargins(.bottom, BottomNav.height - 34, for: .scrollContent)
         }
         .background(DS.Palette.bgSurface.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
