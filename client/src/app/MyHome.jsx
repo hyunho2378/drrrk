@@ -79,9 +79,9 @@ function ItemSheet({ name }) {
   );
 }
 
-export function MyItem() {
-  return <MyHome item={picked} />;
-}
+// 54 아이템 상세가 열 아이템 이름. 화면 함수(MyItem)를 이 파일에서 내보내면 화면 목록이 36번에도 MyItem을 골라
+// 마이가 늘 시트가 열린 채로 떴다(11/09). 그래서 MyItem은 MyItem.jsx에 두고 여기서는 이름만 내보낸다.
+export const pickedItem = () => picked;
 
 export default function MyHome({ item }) {
   const saved = useSyncExternalStore(subscribe, getSaved, getSaved);
@@ -96,6 +96,12 @@ export default function MyHome({ item }) {
     if (!root) return;
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     for (let n = w.nextNode(); n; n = w.nextNode()) if (n.nodeValue.trim() === 'MY') n.nodeValue = '마이';
+    // 글자 위에 덮인 피그마 윤곽(MY 모양)을 지우고 실제 글자 "마이"를 보이게 한다. 굵기는 다른 탭 글자와 같게 둔다.
+    root.querySelectorAll('p[data-figma="MY"][data-outline]').forEach((p) => {
+      p.querySelectorAll('span[aria-hidden="true"]').forEach((s) => s.remove());
+      p.style.webkitTextFillColor = 'currentColor';
+      p.style.width = 'auto';
+    });
   });
   return (
     <div data-figma="MY · 리디자인" style={{ position: 'relative', width: 390, height: 844, overflow: 'hidden', background: '#121415', fontFamily: FONT }}>
