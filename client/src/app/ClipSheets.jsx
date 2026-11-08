@@ -188,11 +188,11 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
                   <button type="button" className="cp-row" onClick={() => say('답글 쓰기는 준비 중이에요')} style={{ display: 'block', height: 34, padding: 0, fontSize: 14, color: '#EBEBEB', fontWeight: 400, letterSpacing: '-0.28px' }}>답글 쓰기</button>
                 </div>
               </div>
-              <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 12, top: 26, width: 44, height: 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 14, top: 27.5, width: 44, height: 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                 <span key={liked.has(c.id) ? 'on' : 'off'} className={liked.has(c.id) ? 'cp-pop' : undefined} style={{ display: 'block', lineHeight: 0 }}><Heart on={liked.has(c.id)} size={17} off="#C4C4C4" /></span>
-                <span style={{ fontSize: 15, lineHeight: '19px', color: liked.has(c.id) ? '#FF3B5C' : '#DDDDDD', fontWeight: 400 }}>{c.likes}</span>
+                <span style={{ fontSize: 14, lineHeight: '19px', color: liked.has(c.id) ? '#FF3B5C' : '#CACACA', fontWeight: 400 }}>{c.likes}</span>
               </button>
-              <div style={{ position: 'absolute', right: 20, top: 5, width: 16, height: 5, lineHeight: 0 }}>
+              <div style={{ position: 'absolute', right: 28.5, top: 5, width: 16, height: 5, lineHeight: 0 }}>
                 <svg width="16" height="5" viewBox="0 0 16 5" fill="#B5B5B5"><circle cx="2" cy="2.5" r="1.5" /><circle cx="8" cy="2.5" r="1.5" /><circle cx="14" cy="2.5" r="1.5" /></svg>
               </div>
             </div>
@@ -222,12 +222,12 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
 
 // ---------- 더보기 메뉴(원본 16번) ----------
 const ICONS = {
-  full: <><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6" /></>,
-  play: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M10 9.5l5 2.5-5 2.5Z" /></>,
+  full: <><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /></>,
+  play: <><path d="M12 4.5H6.5A3.5 3.5 0 0 0 3 8v7a3.5 3.5 0 0 0 3.5 3.5H11M12 4.5h5.5A3.5 3.5 0 0 1 21 8v3" /><path d="M9.5 8.5l5 2.8-5 2.8Z" /><path d="M21 14.5v1a3 3 0 0 1-3 3h-4M16 16.5l-2 2 2 2" /></>,
   eyeoff: <><path d="M3 3l18 18M10.6 5.2C11 5.1 11.5 5 12 5c5 0 8.5 4.2 9.5 7-0.4 1.1-1.2 2.4-2.3 3.5M6.5 6.8C4.6 8.2 3.4 10.2 2.5 12c1.2 2.9 4.5 7 9.5 7 1.5 0 2.8-.4 4-1M9.9 9.9a3 3 0 0 0 4.2 4.2" /></>,
   person: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7M3 3l18 18" /></>,
   share: <><path d="M21 12L14 5v4C7 9.5 4 13.2 3 19c2.5-3.2 5.5-4.5 11-4.5V19Z" /></>,
-  bell: <><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15ZM10 21a2 2 0 0 0 4 0" /></>,
+  bell: <><path d="M5.5 16.5V12a6.5 6.5 0 0 1 13 0v4.5" /><path d="M3.5 16.5h17a1 1 0 0 1 1 1v1.5a1 1 0 0 1-1 1h-17a1 1 0 0 1-1-1v-1.5a1 1 0 0 1 1-1Z" /><path d="M9.2 12.2A3 3 0 0 1 12 9.6" /></>,
   chat: <><path d="M12 3C6.5 3 2 6.9 2 11.8C2 14.6 3.4 17 5.7 18.6L4.8 22L9.3 20C10.1 20.1 11 20.2 12 20.2C17.5 20.2 22 16.4 22 11.8C22 6.9 17.5 3 12 3Z" /><circle cx="8" cy="11.8" r="0.9" fill={TXT} stroke="none" /><circle cx="12" cy="11.8" r="0.9" fill={TXT} stroke="none" /><circle cx="16" cy="11.8" r="0.9" fill={TXT} stroke="none" /></>,
   keep: <><path d="M5 21V4.5Q5 3 6.5 3h11Q19 3 19 4.5V21l-6.5-6" /><path d="M5 21L19 5.5" /></>,
 };
@@ -265,7 +265,7 @@ export function MoreSheet({ open, onClose, stats, liked: isLiked, saved, onActio
         <Tile x={256.5} w={113.5} icon="keep" text="Keep" on={saved} onClick={() => onAction('save')} />
         <Row icon="full" label="몰입 모드로 보기" top={109} onClick={() => onAction('immersive')} />
         <Row icon="play" label="재생 방식 설정" tail="반복 재생" top={151} onClick={() => onAction('play')} />
-        <div style={{ position: 'absolute', left: 20, top: 222, width: 350, height: 1, background: 'rgba(255,255,255,0.07)' }} />
+        <div style={{ position: 'absolute', left: 20, top: 204, width: 350, height: 1, background: 'rgba(255,255,255,0.07)' }} />
         <Row icon="eyeoff" label="이 콘텐츠 숨기기" top={214} onClick={() => onAction('hide')} />
         <Row icon="person" label={<><span style={{ color: BLUE }}>쌍수일기</span> 콘텐츠 숨기기</>} color={TXT} top={256} onClick={() => onAction('hideCreator')} />
         <Row icon="share" label="공유하기" top={298} onClick={() => onAction('share')} />
