@@ -133,6 +133,9 @@ export async function morph(prev, next, reduced) {
       hidePrev.push(u);
       continue;
     }
+    // 같은 이름의 시트가 거의 같은 자리와 크기에서 내용만 바뀌면(나의 편의점 시트가 아이템 상세 아래에 깔리는 경우) 두 시트를 겹쳐 섞지 않고 바로 바꾼다.
+    // 그래야 위로 올라오는 상세 시트 아래에서 옛 시트가 반투명으로 비쳐 겹쳐 보이지 않는다.
+    if (!reduced && kindOf(v) === 'sheet' && u.text !== v.text && Math.abs(v.r.h - u.r.h) < 24 && Math.abs(v.r.y - u.r.y) < 24) { hidePrev.push(u); continue; }
     const dx = u.r.x - v.r.x, dy = u.r.y - v.r.y;
     const sizeSame = Math.abs(u.r.w - v.r.w) < 1.5 && Math.abs(u.r.h - v.r.h) < 1.5;
     if (reduced) { hidePrev.push(u); v.els.forEach((el) => play(el, [{ opacity: 0 }, { opacity: 1 }], D, motion.easeOut)); continue; }

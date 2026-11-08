@@ -115,7 +115,7 @@ export function CommentSheet({ open, onClose, onCount, say }) {
           <button type="button" onClick={() => setSort('like')} style={optStyle(sort === 'like')} aria-pressed={sort === 'like'}>순공감순</button>
           <button type="button" onClick={() => setSort('new')} style={optStyle(sort === 'new')} aria-pressed={sort === 'new'}>최신순</button>
         </div>
-        <div className="cp-hide" style={{ position: 'absolute', left: 0, top: 78, width: 390, height: 460, overflowY: 'auto', overscrollBehavior: 'contain' }} onWheel={(e) => e.stopPropagation()}>
+        <div className="cp-hide" style={{ position: 'absolute', left: 0, top: 78, width: 390, height: 342, overflowY: 'auto', overscrollBehavior: 'contain' }} onWheel={(e) => e.stopPropagation()}>
           <div style={{ margin: '0 19px', height: 68, borderRadius: 8, background: 'linear-gradient(90deg,#A79AF3 0%,#8F8EF1 100%)', position: 'relative', overflow: 'hidden' }}>
             <p style={{ position: 'absolute', left: 12, top: 11, margin: 0, fontSize: 14.5, fontWeight: 800, lineHeight: '20px', letterSpacing: '-0.3px', color: '#1A1C6A', whiteSpace: 'pre' }}>댓글 좀 치세요? 장려금 드리려는데!</p>
             <div style={{ position: 'absolute', left: 12, top: 38, height: 20, padding: '0 9px', display: 'flex', alignItems: 'center', background: '#262A9C', color: '#fff', fontSize: 11, fontWeight: 600, letterSpacing: '-0.22px', borderRadius: 2 }}>참여 신청하는 곳</div>

@@ -117,15 +117,14 @@ export function attachSort(root, n, first) {
         mode = MODE_BY_KEY[KEYS[i]];
         close(() => applySort(root, n, true));
       });
-      if (on && check && home && r !== home) {
-        const dy = relRect(s, r).y - relRect(s, home).y;
-        check.style.transform = 'translateY(' + dy + 'px)';
-      }
     });
     d.addEventListener('click', (e) => { e.stopPropagation(); close(); });
     root.appendChild(d);
     root.appendChild(s);
     dim = d; sheet = s;
+    // 체크는 고른 줄로 옮긴다(시트가 화면에 붙은 뒤에야 줄 위치를 잴 수 있다).
+    const onRow = rows[KEYS.findIndex((k) => MODE_BY_KEY[k] === mode)];
+    if (check && home && onRow && onRow !== home) check.style.transform = 'translateY(' + (relRect(s, onRow).y - relRect(s, home).y) + 'px)';
     d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.sheetIn, easing: motion.standard });
     s.animate([{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], { duration: motion.sheetIn + 40, easing: motion.emphasizedDecel });
   };

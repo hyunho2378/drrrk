@@ -635,7 +635,8 @@ function patchReport(root, n) {
   const content = scroll.querySelector(':scope > [data-scroll-content]') || scroll;
   const pad = document.createElement('div');
   pad.setAttribute('aria-hidden', 'true');
-  Object.assign(pad.style, { width: '1px', height: '204px', flexShrink: '0' });
+  // 내용 칸은 높이가 고정이고 안쪽이 모두 절대 위치라서, 여백은 내용 맨 아래(칸 높이 자리)에 절대 위치로 둔다.
+  Object.assign(pad.style, { position: 'absolute', left: '0px', top: parseFloat(getComputedStyle(content).height) + 'px', width: '1px', height: '204px' });
   content.appendChild(pad);
 }
 

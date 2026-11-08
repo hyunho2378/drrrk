@@ -135,7 +135,7 @@ export function attachBanner(root) {
       if (ctx) ctx.style.width = 'auto';
     }
     const r = relRect(root, col);
-    Object.assign(e.style, { left: r.x + 'px', top: r.y + 'px', zIndex: '15', cursor: 'pointer' });
+    Object.assign(e.style, { left: r.x + 'px', top: r.y + 'px', zIndex: '35', cursor: 'pointer' });
     root.appendChild(e);
     exp = e;
     const h = LIVE.bannerOpenH, c = LIVE.bannerClosedH;
