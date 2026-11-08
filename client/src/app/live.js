@@ -638,6 +638,13 @@ function patchReport(root, n) {
   // 내용 칸은 높이가 고정이고 안쪽이 모두 절대 위치라서, 여백은 내용 맨 아래(칸 높이 자리)에 절대 위치로 둔다.
   Object.assign(pad.style, { position: 'absolute', left: '0px', top: parseFloat(getComputedStyle(content).height) + 'px', width: '1px', height: '204px' });
   content.appendChild(pad);
+  // 아래 버튼 띠(함께 드르륵 앉기, 새 방 만들기)는 피그마에서 화면 바닥에 고정이다. 생성 화면에서는 스크롤 칸 안에 들어 있어 내용과 같이 올라가 겹쳤다. 칸 밖으로 옮겨 바닥에 고정한다.
+  const cta = [...content.children].find((c) => c !== pad && c.getAttribute('data-figma') !== 'Report' && /함께 드르륵 앉기/.test(c.textContent) && c.textContent.length < 60);
+  if (cta) {
+    const rr = relRect(root, cta);
+    root.appendChild(cta);
+    Object.assign(cta.style, { position: 'absolute', left: rr.x + 'px', top: rr.y + 'px' });
+  }
 }
 
 // 새 의자 팝업(19) 뒤 화면: 옛 뱃지 시트(불꽃 드륵 등)는 쓰지 않는다. MY 화면(36)의 나의 업적 편의점 시트로 바꾼다.

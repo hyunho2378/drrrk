@@ -122,9 +122,9 @@ export function attachSort(root, n, first) {
     root.appendChild(d);
     root.appendChild(s);
     dim = d; sheet = s;
-    // 체크는 고른 줄로 옮긴다(시트가 화면에 붙은 뒤에야 줄 위치를 잴 수 있다).
+    // 체크는 고른 줄 안으로 옮긴다(줄 안쪽 오른쪽 끝에 놓인다).
     const onRow = rows[KEYS.findIndex((k) => MODE_BY_KEY[k] === mode)];
-    if (check && home && onRow && onRow !== home) check.style.transform = 'translateY(' + (relRect(s, onRow).y - relRect(s, home).y) + 'px)';
+    if (check && onRow && check.parentElement !== onRow) onRow.appendChild(check);
     d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.sheetIn, easing: motion.standard });
     s.animate([{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], { duration: motion.sheetIn + 40, easing: motion.emphasizedDecel });
   };
