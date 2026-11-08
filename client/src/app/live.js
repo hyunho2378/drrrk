@@ -556,6 +556,19 @@ export function swapMap(n) {
 export function swapAssets(el, n) {
   const map = swapMap(n);
   const keys = Object.keys(map);
+  // 새로 뽑은 화면은 그림 주소를 class 안 url(assets/...)로 둔다. 이 주소는 CSS 파일(/assets/) 기준으로 풀려 /assets/assets/... 가 되어
+  // 그림이 하나도 안 뜬다(11/09 퀵슬롯 주전부리 빈 원). 같은 그림을 문서 기준 주소로 inline에 옮긴다.
+  const base = import.meta.env.BASE_URL || '/';
+  el.querySelectorAll('[class*="url("]').forEach((e) => {
+    const cls = typeof e.className === 'string' ? e.className : (e.getAttribute('class') || '');
+    const m = cls.match(/url\(([^)]+)\)/);
+    if (!m) return;
+    let v = m[1].replace(/["']/g, '');
+    if (/^(https?:|data:|\/)/.test(v)) return;
+    v = v.replace(/^\.\//, '');
+    for (const k of keys) if (v.indexOf(k) >= 0) v = v.split(k).join(map[k]);
+    e.style.backgroundImage = 'url("' + base + v + '")';
+  });
   el.querySelectorAll('[style]').forEach((e) => {
     const st = e.getAttribute('style') || '';
     if (st.indexOf('url(') < 0) return;
