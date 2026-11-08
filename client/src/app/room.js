@@ -305,6 +305,20 @@ export function tidyTiles(root) {
     });
     nm.querySelectorAll('p').forEach((p) => {
       if (/\s$/.test(p.textContent)) setText(p, p.textContent.replace(/\s+$/, ''));
+      p.style.width = 'auto';
+    });
+  });
+  // 이름이 바뀌어 글자 길이가 달라졌으므로 이름 칸 폭을 글자에 맞추고 타일 가운데에 다시 놓는다.
+  requestAnimationFrame(() => {
+    tiles.forEach((t) => {
+      const nm = q(root, '[data-figma="name"]').find((n) => { const r = relRect(root, n); return inside(t.r, r.x + r.w / 2, r.y + r.h / 2); });
+      if (!nm) return;
+      const before = relRect(root, nm);
+      nm.style.width = 'auto';
+      const after = relRect(root, nm);
+      const dx = (t.r.x + t.r.w / 2) - (after.x + after.w / 2);
+      nm.style.transform = 'translateX(' + Math.round(dx * 2) / 2 + 'px)';
+      void before;
     });
   });
   // 내 의자 뒤에 원이 없으면 다른 칸과 같은 원을 깐다.
