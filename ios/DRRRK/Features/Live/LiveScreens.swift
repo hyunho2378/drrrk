@@ -474,20 +474,7 @@ struct LiveWatchView: View {
             Image(WatchData.scene).resizable().scaledToFill().frame(height: 440).frame(maxWidth: .infinity).clipped()
             LinearGradient(colors: [.black.opacity(0.5), .clear], startPoint: .top, endPoint: .init(x: 0.5, y: 0.3))
             LinearGradient(colors: [DS.Palette.bgSurface.opacity(0), DS.Palette.bgSurface], startPoint: .init(x: 0.5, y: 0.6), endPoint: .init(x: 0.5, y: 0.9))
-            GeometryReader { g in
-                let s = g.size.width / 390
-                ForEach(Array(WatchData.floorNames.enumerated()), id: \.offset) { i, f in
-                    let on = i == speaker
-                    VStack(spacing: 6) {
-                        Image("C-voice").renderingMode(.template).resizable().frame(width: 31, height: 20)
-                            .foregroundStyle(DS.Palette.success).opacity(on ? 1 : 0)
-                        Text(f.0).suit(on ? 12 : 11, on ? .bold : .medium, tracking: -0.44)
-                            .foregroundStyle(on ? DS.Palette.textPrimary : DS.Palette.textPrimary.opacity(0.6)).fixedSize()
-                    }
-                    .position(x: (f.1 + 46) * s, y: (f.2 - 6) * s)
-                }
-            }
-            .frame(height: 440)
+            // 피그마 1943:12838 장면에는 의자 이름표가 없다.
             VStack(alignment: .leading, spacing: 12) {
                 Text(WatchData.title).suit(21, .bold, tracking: -0.84).foregroundStyle(DS.Palette.textPrimary).lineSpacing(3)
                 HStack(spacing: 6) {
@@ -498,8 +485,9 @@ struct LiveWatchView: View {
                 HStack(alignment: .top, spacing: 14) {
                     ForEach(WatchData.seats) { seat in
                         VStack(spacing: 6) {
-                            Image(seat.image).resizable().scaledToFit().frame(width: 54, height: 54)
-                                .background(DS.Palette.bgElevated)
+                            // 피그마처럼 흰 원 바탕. 그림은 투명판이라 원 가장자리가 깨끗하다(흰 배경 원본은 원 밖이 뾰족했다).
+                            Image(seat.image).resizable().scaledToFit().padding(4).frame(width: 54, height: 54)
+                                .background(Color.white)
                                 .clipShape(Circle())
                             Text(seat.name).suit(11, .medium).foregroundStyle(DS.Palette.textSecondary)
                                 .lineLimit(1).frame(width: 58)

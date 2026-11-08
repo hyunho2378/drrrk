@@ -20,6 +20,8 @@ struct ChairStudioView: View {
         let kind = ChairStore.kinds[k]
         let locked = ChairStore.isLocked(k)
 
+        // 피그마 390 x 844 값을 그대로 두고 화면 폭에 맞춰 키운다(다른 화면과 같은 Canvas 방식).
+        ClipCanvas(items: [], background: DS.Palette.bgSurface) {
         ZStack(alignment: .topLeading) {
             // 머리말
             Button { router.pop() } label: {
@@ -187,9 +189,7 @@ struct ChairStudioView: View {
             .offset(x: 24, y: 764)
         }
         .frame(width: 390, height: 844, alignment: .topLeading)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(DS.Palette.bgSurface)
-        .ignoresSafeArea()
+        }
         .toolbar(.hidden, for: .navigationBar)
     }
 

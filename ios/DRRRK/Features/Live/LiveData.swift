@@ -91,7 +91,7 @@ struct WatchSeat: Identifiable, Hashable {
 }
 
 enum WatchData {
-    static let scene = "C-841d51748126"
+    static let scene = "D2-watch-scene"
     static let title = "둘이 찍은 사진인데\n지만 보정해서 올린 여우"
     static let seats: [WatchSeat] = [
         // 투명판 의자 그림(흰 바탕 원본을 쓰면 원 바깥에 흰 테두리가 보인다)
