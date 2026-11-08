@@ -188,11 +188,11 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
                   <button type="button" className="cp-row" onClick={() => say('답글 쓰기는 준비 중이에요')} style={{ display: 'block', height: 34, padding: 0, fontSize: 14, color: '#EBEBEB', fontWeight: 400, letterSpacing: '-0.28px' }}>답글 쓰기</button>
                 </div>
               </div>
-              <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 14, top: 27.5, width: 44, height: 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 14, top: 20.65, width: 44, height: 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.3 }}>
                 <span key={liked.has(c.id) ? 'on' : 'off'} className={liked.has(c.id) ? 'cp-pop' : undefined} style={{ display: 'block', lineHeight: 0 }}><Heart on={liked.has(c.id)} size={17} off="#C4C4C4" /></span>
                 <span style={{ fontSize: 14, lineHeight: '19px', color: liked.has(c.id) ? '#FF3B5C' : '#CACACA', fontWeight: 400 }}>{c.likes}</span>
               </button>
-              <div style={{ position: 'absolute', right: 28.5, top: 5, width: 16, height: 5, lineHeight: 0 }}>
+              <div style={{ position: 'absolute', right: 28.5, top: 6.2, width: 16, height: 5, lineHeight: 0 }}>
                 <svg width="16" height="5" viewBox="0 0 16 5" fill="#B5B5B5"><circle cx="2" cy="2.5" r="1.5" /><circle cx="8" cy="2.5" r="1.5" /><circle cx="14" cy="2.5" r="1.5" /></svg>
               </div>
             </div>
