@@ -480,5 +480,7 @@ export async function loadScreen(n) {
   const s = SCREEN_BY_N[n];
   if (!s) return null;
   const mod = await modules[s.file]();
+  // 기본 내보내기를 먼저 쓴다(이름 순서로 고르면 Onboarding.jsx는 RoomGuide가 골라져 12번이 빈 화면이었다, 11/09 QA).
+  if (typeof mod.default === 'function') return mod.default;
   return Object.values(mod).find((v) => typeof v === 'function') || null;
 }

@@ -5,7 +5,6 @@
 //   맞춤순: 기본 고민("친구가 썸남 앞에서 내 쌍밍아웃함", 키워드 친구관계와 연애)과 이야기가 가까운 방부터
 import { motion } from '../tokens.js';
 import { q, relRect, scaleOf, setText } from './dom.js';
-import { cloneOf } from './donor.js';
 
 export const SORT_SCREENS = [10, 48, 49, 50, 51, 52];
 const KEYS = ['인기순', '최신순', '맞춤순'];
@@ -49,6 +48,14 @@ function orderOf(cards, m, n) {
 
 // 카드가 놓일 자리(위에서부터 세 칸)는 그대로 두고 카드만 자리를 바꾼다. animate가 true면 제자리에서 미끄러진다.
 export function applySort(root, n, animate) {
+  // 새 라이브 목록(liveV2.js)이 있으면 그 목록을 다시 쌓고 버튼 글자만 바꾼다(옛 카드 세 장은 숨겨져 있다).
+  if (root.__lv2Sort) {
+    const lb = root.querySelector('[data-figma="정렬 · 인기순"] p');
+    if (lb && lb.textContent.trim() !== LABEL_BY_MODE[mode]) { setText(lb, LABEL_BY_MODE[mode]); lb.style.width = 'auto'; lb.style.whiteSpace = 'nowrap'; }
+    root.__lv2Sort(mode, animate);
+    root.dataset.sortMode = mode;
+    return;
+  }
   const cards = cardsOf(root);
   if (cards.length < 2) return;
   const slots = cards.map((c) => c.top).sort((a, b) => a - b);
@@ -93,38 +100,43 @@ export function attachSort(root, n, first) {
     a.onfinish = () => { s.remove(); d.remove(); };
     if (after) window.setTimeout(after, Math.round(motion.sheetOut * 0.45));
   };
-  const open = async () => {
-    if (sheet || busy) return;
-    busy = true;
-    const [d, s] = await Promise.all([cloneOf(47, ':scope > [data-figma="dim"]'), cloneOf(47, ':scope > [data-figma="바텀시트 · 정렬"]')]);
-    busy = false;
-    if (!d || !s || sheet || !root.isConnected) return;
+  // 정렬 시트: 팀 피그마 1971:21974 값을 그대로 그린다(예전에는 화면 47에서 복제했는데 47이 새 라이브 화면으로 바뀌어 시트가 사라졌다).
+  //   덮개 #000 60%(아래 탭까지 덮음), 시트 390 x 289 #121415 위 모서리 24, 손잡이 40 x 4 #6E767C(x175, 위 14)
+  //   줄 342 x 69(x24, 첫 줄 위 34, 줄 사이 4), 제목 15 Bold 자간 -2% 행간 145%, 설명 12 Regular #6E767C, 고른 줄 오른쪽 체크 20
+  const open = () => {
+    if (sheet || busy || !root.isConnected) return;
     const H = root.getBoundingClientRect().height / scaleOf(root);
-    Object.assign(d.style, { top: '0px', left: '0px', height: H + 'px', zIndex: '30', cursor: 'pointer' });
-    Object.assign(s.style, { top: H - 289 + 'px', zIndex: '31' });
-    // 고른 정렬에 맞춰 글자 색과 체크를 옮긴다.
-    const rows = KEYS.map((k) => s.querySelector(':scope > [data-figma="' + k + '"]'));
-    const check = s.querySelector('[data-figma="icon/check"]');
-    const home = rows.find((r) => r && r.contains(check));
-    rows.forEach((r, i) => {
-      if (!r) return;
-      const on = MODE_BY_KEY[KEYS[i]] === mode;
-      const label = [...r.querySelectorAll('p')].find((x) => x.textContent.trim() === KEYS[i]);
-      if (label) { setText(label, KEYS[i]); label.style.color = on ? ON_COLOR : OFF_COLOR; Object.assign(label.style, { width: 'auto' }); }
-      r.style.cursor = 'pointer';
-      r.addEventListener('click', (e) => {
+    const mk = (tag, st, html) => { const e = document.createElement(tag); Object.assign(e.style, st); if (html != null) e.innerHTML = html; return e; };
+    const stop = (e) => e.stopPropagation();
+    const d = mk('div', { position: 'absolute', left: '0px', top: '0px', width: '390px', height: H + 'px', background: 'rgba(0,0,0,.6)', zIndex: '30', cursor: 'pointer' });
+    d.dataset.figma = 'dim';
+    const s = mk('div', { position: 'absolute', left: '0px', top: H - 289 + 'px', width: '390px', height: '289px', background: '#121415', borderRadius: '24px 24px 0 0', zIndex: '31', fontFamily: "'SUIT', system-ui, sans-serif" });
+    s.dataset.figma = '바텀시트 · 정렬';
+    s.appendChild(mk('div', { position: 'absolute', left: '175px', top: '14px', width: '40px', height: '4px', borderRadius: '2px', background: '#6E767C' }));
+    const DESC = { 인기순: '보는 사람과 공감이 많은 방부터', 최신순: '방금 의자를 꺼낸 방부터', 맞춤순: '내 고민이랑 비슷한 이야기부터' };
+    const CHECK = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3.5 10L7.75 14L16.5 5.5" stroke="' + ON_COLOR + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    KEYS.forEach((k, i) => {
+      const on = MODE_BY_KEY[k] === mode;
+      const row = mk('div', { position: 'absolute', left: '24px', top: 34 + i * 73 + 'px', width: '342px', height: '69px', cursor: 'pointer' });
+      row.dataset.figma = k;
+      row.setAttribute('role', 'button');
+      row.setAttribute('aria-label', k + ', ' + DESC[k]);
+      row.appendChild(mk('div', { position: 'absolute', left: '0px', top: '14px', fontSize: '15px', fontWeight: '700', letterSpacing: '-0.3px', lineHeight: '22px', color: on ? ON_COLOR : OFF_COLOR, whiteSpace: 'nowrap' }, k));
+      row.appendChild(mk('div', { position: 'absolute', left: '0px', top: '38px', fontSize: '12px', fontWeight: '400', letterSpacing: '-0.24px', lineHeight: '17px', color: '#6E767C', whiteSpace: 'nowrap' }, DESC[k]));
+      if (on) row.appendChild(mk('div', { position: 'absolute', left: '322px', top: '25px', width: '20px', height: '20px' }, CHECK));
+      row.addEventListener('click', (e) => {
         e.stopPropagation();
-        mode = MODE_BY_KEY[KEYS[i]];
+        mode = MODE_BY_KEY[k];
         close(() => applySort(root, n, true));
       });
+      s.appendChild(row);
     });
+    ['pointerdown', 'touchstart', 'wheel'].forEach((ev) => { d.addEventListener(ev, stop, { passive: true }); s.addEventListener(ev, stop, { passive: true }); });
+    s.addEventListener('click', stop);
     d.addEventListener('click', (e) => { e.stopPropagation(); close(); });
     root.appendChild(d);
     root.appendChild(s);
     dim = d; sheet = s;
-    // 체크는 고른 줄 안으로 옮긴다(줄 안쪽 오른쪽 끝에 놓인다).
-    const onRow = rows[KEYS.findIndex((k) => MODE_BY_KEY[k] === mode)];
-    if (check && onRow && check.parentElement !== onRow) onRow.appendChild(check);
     d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.sheetIn, easing: motion.standard });
     s.animate([{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], { duration: motion.sheetIn + 40, easing: motion.emphasizedDecel });
   };

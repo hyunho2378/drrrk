@@ -12,6 +12,7 @@ import { attachThrow } from './throw.js';
 import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
 import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
+import { patchCommunity } from './community.js';
 import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
@@ -733,6 +734,7 @@ export async function prepare(layer, n, prevN) {
   if (n === LIVE.analysisScreen) initAnalysis(root);
   prepareRoomClock(root, n);
   prepareChat(root, n);
+  patchCommunity(root, n);
 }
 
 // ---------- 붙이기(전환이 끝난 뒤) ----------
@@ -765,6 +767,7 @@ export function attach(layer, n, go, prevN) {
   patchLounge(root, n);
   patchLiveV2(root, n);
   patchWatchSeats(root, n);
+  patchCommunity(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);
@@ -777,6 +780,11 @@ export function attach(layer, n, go, prevN) {
       room.left = LIVE.roomSeconds;
       room.at = performance.now();
       room.fired = {};
+    }
+    // 해 뜨기 1분 전(40)은 피그마처럼 01:12에서 센다. 더 많이 남은 시계로 들어오면 01:12로 맞춘다.
+    if (n === 40 && remaining() > 72) {
+      room.left = 72;
+      room.at = performance.now();
     }
     if (!room.chatDone) {
       room.chatDone = true;

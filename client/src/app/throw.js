@@ -118,6 +118,10 @@ export function attachThrow(root) {
         window.removeEventListener('pointercancel', done);
         setGlow(false);
         if (!ghost) { toast(root, LIVE.throwHintText); return; }
+        // 끌고 놓은 손가락이 바로 뒤 click으로 이어지면 빈 곳 누름 안내(누를 수 있는 자리 하늘색 표시)가 떴다(11/09 QA). 한 번만 막는다.
+        const eat = (ce) => { ce.stopPropagation(); ce.preventDefault(); };
+        window.addEventListener('click', eat, { capture: true, once: true });
+        window.setTimeout(() => window.removeEventListener('click', eat, { capture: true }), 400);
         const pt = toRoot(ev);
         const from = 'translate(' + (pt.x - 20) + 'px,' + (pt.y - 20) + 'px) scale(1)';
         if (!inTable(pt)) {

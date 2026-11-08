@@ -1,4 +1,7 @@
 import { LIVE_LIST } from './liveList.js';
+import { currentMode } from './sort.js';
+import { setText } from './dom.js';
+import { motion } from '../tokens.js';
 // 라이브 목록 카드 v2. 팀 피그마 "라이브 · 리스트 시안 v2"(1972:22375)와 "라이브 리스트 카드 · 상태 정의"(1972:22488) 값을 그대로 옮겼다.
 // 카드(342 x 112, #222628, 모서리 16)는 그대로 두고, 오른쪽 장면 썸네일과 타이머, 말하는 사람 수를 지운 뒤
 // 아래 줄(보는 사람 수, 점, 남은 시간)과 오른쪽 아래 의자 얼굴 묶음을 상태별로 그린다. iOS LiveRoomCard와 같은 값이다.
@@ -37,7 +40,7 @@ const TIMER = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const CSS = `
-@keyframes lv2Bar{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1)}}
+@keyframes lv2Bar{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.7)}}
 .lv2-bar{transform-origin:50% 50%;animation:lv2Bar 900ms ease-in-out infinite}
 `;
 
@@ -84,7 +87,7 @@ function cluster(state, smalls, big, more, talkFlag) {
   const list = state === 'alone' ? [] : smalls;
   let x = bigX - 22 * list.length;
   if (more) {
-    const m = el('div', { position: 'absolute', left: x - 19 + 'px', top: smallY + 3 + 'px', width: '26px', height: '26px', borderRadius: '50%', background: '#33383D', boxShadow: '0 0 0 2px #222628', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT, fontSize: '9.72px', fontWeight: '700', color: '#D9DEE3' }, '+' + more);
+    const m = el('div', { position: 'absolute', left: x - 19 + 'px', top: smallY + 3 + 'px', width: '26px', height: '26px', borderRadius: '50%', background: '#33383D', boxShadow: '0 0 0 2px #222628', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '6px', boxSizing: 'border-box', fontFamily: "'Noto Sans KR', " + FONT, fontSize: '9.72px', fontWeight: '700', lineHeight: '14px', letterSpacing: '-0.2px', color: '#D9DEE3', whiteSpace: 'nowrap' }, '+' + more);
     g.appendChild(m);
   }
   list.forEach((f) => { g.appendChild(face(f, x, smallY, false, false)); x += 22; });
@@ -112,6 +115,26 @@ function metaRow(state, views, left) {
   return { m, time: blue ? null : t };
 }
 
+// 목록에서 누른 카드(방 구경 37의 제목과 보는 수에 쓴다). 한 번 쓰면 비운다(위 가로 카드로 들어가면 37 기본 글자 그대로).
+let picked = null;
+
+// 정렬 순서. 인기순: 피그마 목록 순서. 최신순: 방금 열린 방, 첫 상대를 기다리는 방, 그다음 남은 시간이 긴 방.
+// 맞춤순: 기본 고민(친구가 썸남 앞에서 내 쌍밍아웃함)과 가까운 친구와 연애 고민이 먼저(친구 48, 연애 49 탭에 있는 글).
+const secsOf = (c) => { if (c.st === 'soon') return 180; const m = /(\d{1,2}):(\d{2})/.exec(c.meta || ''); return m ? +m[1] * 60 + +m[2] : 0; };
+const MATCH_TITLES = new Set([...(LIVE_LIST[48] || []), ...(LIVE_LIST[49] || [])].map((c) => c.title));
+function orderList(list, mode) {
+  const a = list.map((c, i) => ({ c, i }));
+  const key = (x) => {
+    if (mode === 'new') return [x.c.st === 'fresh' ? 0 : x.c.st === 'alone' ? 1 : 2, -secsOf(x.c), x.i];
+    // 친구 이야기와 썸, 연애 이야기가 둘 다 있는 글이 가장 가깝고, 그다음 한쪽만 있는 글, 친구와 연애 탭 글, 나머지 순이다.
+    if (mode === 'match') { const t = x.c.title; const sc = (/친구|베프|동기/.test(t) ? 1 : 0) + (/썸|남친|애인|여친/.test(t) ? 1 : 0); return [-sc, MATCH_TITLES.has(t) ? 0 : 1, x.i]; }
+    // 인기순은 피그마 목록 순서 그대로다(팀이 인기순 화면으로 그린 순서, iOS와 같음).
+    return [x.i];
+  };
+  a.sort((p, q) => { const kp = key(p), kq = key(q); for (let k = 0; k < kp.length; k++) if (kp[k] !== kq[k]) return kp[k] - kq[k]; return 0; });
+  return a;
+}
+
 // 피그마 카드 한 장(342 x 112, #222628, 모서리 16). 제목 16 Bold 196 폭, 아래 줄은 카드 왼쪽 16, 위 76.
 function cardOf(c) {
   const card = el('button', { position: 'relative', display: 'block', width: '342px', height: '112px', flex: '0 0 auto', borderRadius: '16px', background: '#222628', border: '0', padding: '0', margin: '0', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', fontFamily: FONT });
@@ -130,7 +153,10 @@ function cardOf(c) {
     card.appendChild(pill);
   }
   if (c.st === 'fresh') card.appendChild(el('span', { position: 'absolute', left: '8px', top: '24px', width: '6px', height: '6px', borderRadius: '50%', background: '#36D2FF' }));
-  card.addEventListener('click', () => window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 37, t: 'push' } })));
+  card.addEventListener('click', () => {
+    picked = { title: c.title.replace(/ \n/g, '\n'), views: c.views };
+    window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 37, t: 'push' } }));
+  });
   return card;
 }
 
@@ -140,8 +166,13 @@ export function patchLiveV2(root, n) {
   const list = LIVE_LIST[n] || LIVE_LIST[10];
   // 위 가로 카드 장면: 팀 피그마 최신 장면(Carousel / 1 1943:12456, / 2 1943:12466)으로 바꾼다.
   [1, 2].forEach((i) => {
-    const sc = root.querySelector('[data-figma="Carousel / ' + i + '"] > [data-figma="Scene"]');
-    if (sc) sc.style.backgroundImage = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.png)';
+    const car = root.querySelector('[data-figma="Carousel / ' + i + '"]');
+    if (!car) return;
+    const url = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.png)';
+    const sc = car.querySelector(':scope > [data-figma="Scene"]');
+    // 연애(49) 생성 화면은 장면 칸 없이 카드 자체 배경에 옛 장면을 깔고 있어서, 그때는 카드 배경을 바꾼다.
+    if (sc) sc.style.backgroundImage = url;
+    else car.style.setProperty('background-image', url, 'important');
   });
   const olds = [1, 2, 3].map((i) => root.querySelector('[data-figma="List Card / ' + i + '"]')).filter(Boolean);
   if (!olds.length) return;
@@ -162,8 +193,20 @@ export function patchLiveV2(root, n) {
   // 화면 전체 끌기와 휠 처리(live.js)가 목록 스크롤을 막지 않게, 목록 안에서 난 입력은 위로 올려 보내지 않는다.
   ['wheel', 'pointerdown', 'touchstart', 'touchmove'].forEach((ev) => box.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
   const col = el('div', { display: 'flex', flexDirection: 'column', gap: '12px', padding: '0 24px 24px 24px' });
-  list.forEach((c) => col.appendChild(cardOf(c)));
+  const cards = list.map((c) => cardOf(c));
+  orderList(list, currentMode()).forEach((x) => col.appendChild(cards[x.i]));
   box.appendChild(col);
+  // 정렬 시트(sort.js)가 고른 순서로 카드를 다시 쌓는다. 카드는 제자리에서 새 자리로 미끄러진다.
+  root.__lv2Sort = (mode, animate) => {
+    const before = new Map(cards.map((k) => [k, k.offsetTop]));
+    orderList(list, mode).forEach((x) => col.appendChild(cards[x.i]));
+    box.scrollTop = 0;
+    if (!animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cards.forEach((k) => {
+      const dy = before.get(k) - k.offsetTop;
+      if (Math.abs(dy) > 0.5) k.animate([{ transform: 'translateY(' + dy + 'px)' }, { transform: 'translateY(0)' }], { duration: 440, easing: motion.emphasizedDecel });
+    });
+  };
   // 아래 탭보다 아래에 놓아 탭바가 목록을 덮는다.
   if (nav) root.insertBefore(box, nav); else root.appendChild(box);
   // 예전 카드 세 장 자리에 있던 누름 자리는 지운다(새 카드가 직접 눌린다).
@@ -181,7 +224,19 @@ function soonText(state, left) {
 // 방 구경(37, 피그마 1943:12838) "대화 중 3" 줄. 생성 화면은 흰 바탕이 붙은 원본 그림을 납작하게 구운 그림이라 원 바깥에 흰 테가 보였다.
 // 투명판 그림으로 바꾸고 원 바탕을 #222628로 칠한다(iOS LiveWatchView와 같은 값: 원 54, 그림은 원 안에 꽉 채워 둥글게 자름).
 const WATCH = { '리클라이너21': C.convBlue, '나무스툴12': C.stoolOak, '가죽소파19': C.sofaBrown };
+function patchWatchTitle(root) {
+  if (root.dataset.watchTitle) return;
+  root.dataset.watchTitle = '1';
+  const p = picked;
+  picked = null;
+  if (!p) return;
+  const title = [...root.querySelectorAll('p[data-figma]')].find((e) => e.getAttribute('data-figma').indexOf('둘이 찍은 사진인데') === 0);
+  if (title) { setText(title, p.title); Object.assign(title.style, { whiteSpace: 'pre', width: 'auto' }); }
+  const view = root.querySelector('[data-figma="보는 중"] p');
+  if (view) { setText(view, p.views); Object.assign(view.style, { width: 'auto', whiteSpace: 'nowrap' }); }
+}
 export function patchWatchSeats(root, n) {
+  if (n === 37 && root) patchWatchTitle(root);
   if (n !== 37 || !root || root.dataset.watchSeats) return;
   const imgs = [...root.querySelectorAll('[data-figma="avatar"]')];
   if (!imgs.length) return;
