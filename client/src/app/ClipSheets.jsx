@@ -212,7 +212,7 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
             <Svg size={19} stroke={draft.trim() ? '#000' : '#6E6E6E'} sw={2.2}><path d="M12 19V5M5 12l7-7 7 7" /></Svg>
           </button>
           {EMOJIS.map((e, i) => (
-            <button key={e} type="button" aria-label={'이모지 ' + e} onClick={() => add(e)} className="cp-btn" style={{ left: EMOJI_X[i] - 20, top: 72, width: 40, height: 40, fontSize: 24, lineHeight: '40px', textAlign: 'center' }}>{e}</button>
+            <button key={e} type="button" aria-label={'이모지 ' + e} onClick={() => add(e)} className="cp-btn" style={{ left: EMOJI_X[i] - 20, top: 66, width: 40, height: 40, fontSize: 24, lineHeight: '40px', textAlign: 'center' }}>{e}</button>
           ))}
         </div>
       </Sheet>
@@ -235,13 +235,15 @@ function Row({ icon, label, tail, color, top, onClick }) {
   return (
     <button type="button" className="cp-row" onClick={onClick} style={{ position: 'absolute', left: 0, top, width: 390, height: 42, display: 'block', textAlign: 'left', color: color || TXT }}>
       <span style={{ position: 'absolute', left: 20, top: 10, lineHeight: 0, width: 22 }}><Svg size={22} stroke={TXT} sw={1.5}>{ICONS[icon]}</Svg></span>
-      <span style={{ position: 'absolute', left: 54, top: 10, fontSize: 15.5, fontWeight: 600, lineHeight: '22px', letterSpacing: '-0.31px', whiteSpace: 'pre' }}>{label}</span>
-      {tail ? (
-        <>
-          <i style={{ position: 'absolute', left: 139, top: 19, width: 3.5, height: 3.5, borderRadius: '50%', background: SUB }} />
-          <span style={{ position: 'absolute', left: 150, top: 10, fontSize: 14.5, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.3px', color: '#AEAEAE', whiteSpace: 'pre' }}>{tail}</span>
-        </>
-      ) : null}
+      <span style={{ position: 'absolute', left: 54, top: 10, display: 'flex', alignItems: 'center', gap: 7, whiteSpace: 'pre' }}>
+        <span style={{ fontSize: 15.5, fontWeight: 600, lineHeight: '22px', letterSpacing: '-0.31px' }}>{label}</span>
+        {tail ? (
+          <>
+            <i style={{ width: 3.5, height: 3.5, borderRadius: '50%', background: SUB, display: 'block' }} />
+            <span style={{ fontSize: 14.5, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.3px', color: '#AEAEAE' }}>{tail}</span>
+          </>
+        ) : null}
+      </span>
     </button>
   );
 }
