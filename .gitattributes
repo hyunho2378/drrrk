@@ -1,0 +1,4 @@
+# 깃허브 언어 통계에서 자동 생성 코드와 그림 데이터는 뺀다(손으로 쓴 코드만 센다).
+client/src/figma/** linguist-generated
+client/src/assets/** linguist-generated
+client/public/** linguist-vendored

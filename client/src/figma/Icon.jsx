@@ -808,6 +808,30 @@ export const glyphs = {
     "vw": 24,
     "vh": 24,
     "mono": false
+  },
+  "view-field-1620-23114": {
+    "file": "view-field-1620-23114.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
+  },
+  "arrow-right-1755-10699": {
+    "file": "arrow-right-1755-10699.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
+  },
+  "view-grid-1620-23104": {
+    "file": "view-grid-1620-23104.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
   }
 };
 export function Icon({

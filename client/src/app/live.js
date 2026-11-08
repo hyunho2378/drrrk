@@ -15,6 +15,8 @@ import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chai
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
+import { swapScene } from './scene.js';
+import { applyAvatars } from './avatars.js';
 
 export { setText };
 
@@ -32,7 +34,10 @@ export function resolveTo(l) {
     return Object.assign({}, l, { t: 'none' });
   }
   // 의자 꾸미기: 열 때 보여 줄 의자(새로 얻은 의자 또는 지금 의자)와 확정을 링크의 act로 정한다.
-  if (l.act === 'commit') commitDraft();
+  if (l.act === 'commit' && !commitDraft()) {
+    window.dispatchEvent(new Event('drrrk:chair-locked'));
+    return null;
+  }
   if (l.to === 20) openStudio(l.act === 'fresh');
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
@@ -230,15 +235,18 @@ function initAnalysis(root) {
     };
     ring.__rots = [mk(false), mk(true)];
   }
-  // 세 단계는 모두 체크 없이, 글자는 흐리게 시작한다. 줄 높이가 변하지 않게 한 줄로 고정한다.
+  // 세 단계는 모두 체크 없이 시작한다. 글자는 첫 단계만 흐리게 보이고, 나머지 단계는 차례가 올 때 하나씩 나타난다. 줄 높이가 변하지 않게 한 줄로 고정한다.
   const list = root.querySelector('[data-figma="progress steps"]');
   if (list) list.style.overflow = 'visible';
   q(root, '[data-figma^="step ·"]').forEach((st) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
     if (icon) icon.style.opacity = '0';
-    if (label) { label.style.opacity = String(LIVE.stepDim); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
     st.style.opacity = '1';
+  });
+  q(root, '[data-figma^="step ·"]').forEach((st, i) => {
+    const label = st.querySelector('p[data-outline]');
+    if (label) { label.style.opacity = i === 0 ? String(LIVE.stepDim) : '0'; Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
   });
 }
 function playAnalysis(root, ms) {
@@ -257,9 +265,16 @@ function playAnalysis(root, ms) {
   const tpl = steps[0] && steps[0].querySelector('[data-figma="check"]');
   const lab0 = steps[0] && steps[0].querySelector('p[data-outline]');
   const color0 = lab0 ? getComputedStyle(lab0).color : '';
+  const slot = ms / (steps.length + 0.4);
   steps.forEach((st, i) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
+    // 앞 단계가 끝나는 때에 이 단계 글이 흐리게 나타난다(첫 단계는 처음부터 보인다).
+    if (i > 0 && label) window.setTimeout(() => {
+      if (!root.isConnected) return;
+      label.style.opacity = String(LIVE.stepDim);
+      label.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: LIVE.stepDim, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+    }, i * slot);
     window.setTimeout(() => {
       if (!root.isConnected) return;
       // 둘째 단계의 어두운 체크와 셋째 단계의 돌아가는 아이콘은 맨 위 단계와 같은 밝은 체크 그림으로 바꾼다.
@@ -273,7 +288,7 @@ function playAnalysis(root, ms) {
         label.style.opacity = '';
         label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn });
       }
-    }, ((i + 1) * ms) / (steps.length + 0.4));
+    }, (i + 1) * slot);
   });
 }
 
@@ -525,7 +540,7 @@ const IMG = {
 const MINE_BOX = [1, 2, 3, 22, 23];
 const MINE_YELLOW = [1, 32, 33];
 // 28, 30, 31은 팀 피그마 최신 장면(라임 의자, 회색 리클라이너, 흰 의자)으로 바꾼다.
-export const SCREEN_SWAP = { 28: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 30: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 31: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' } };
+export const SCREEN_SWAP = {};
 export function swapMap(n) {
   const map = Object.assign({}, SCREEN_SWAP[n] || {});
   map[IMG.sofa] = fixedRel('sofa', 1, n === 19);
@@ -679,6 +694,8 @@ export async function prepare(layer, n, prevN) {
   root.dataset.prepared = '1';
   applySync(root);
   fixWraps(root);
+  swapScene(root, n);
+  applyAvatars(root, n);
   showEmptyOutlines(root);
   patchScene(root, n);
   attachRoom(root, n);
@@ -703,6 +720,12 @@ export async function prepare(layer, n, prevN) {
 // ---------- 붙이기(전환이 끝난 뒤) ----------
 let ticker = 0;
 let current = { n: 0, go: null, layer: null };
+// 손으로 쓴 화면(온보딩 등)이 화면 이동을 부탁할 때 쓰는 신호. 지금 보이는 화면의 go로 넘긴다.
+if (typeof window !== 'undefined' && !window.__drrrkGo) {
+  window.__drrrkGo = true;
+  window.addEventListener('drrrk:go', (e) => { if (current && current.go && e.detail) current.go(e.detail); });
+}
+
 export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;

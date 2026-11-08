@@ -24,16 +24,16 @@ export const SCREENS = [
  },
  {
   "n": 5,
-  "id": "1647:21896",
-  "name": "CHAT-01 · 참여자 미니 프로필",
-  "file": "CHAT01",
+  "id": "1952:15659",
+  "name": "DRRRK · 드르륵 · 해뜨기",
+  "file": "ChatMiniProfile",
   "h": 844
  },
  {
   "n": 6,
-  "id": "1647:21995",
-  "name": "CHAT-01 · 참여자 미니 프로필",
-  "file": "CHAT012",
+  "id": "1952:15800",
+  "name": "DRRRK · 드르륵 · 해뜨기",
+  "file": "ChatMiniProfile2",
   "h": 844
  },
  {
@@ -52,23 +52,23 @@ export const SCREENS = [
  },
  {
   "n": 9,
-  "id": "1647:22319",
-  "name": "CHAT-00 · 캐릭터 탭 → 이름 표시",
-  "file": "CHAT00",
+  "id": "1952:15499",
+  "name": "DRRRK · 드르륵 · 해뜨기",
+  "file": "ChatNameTap",
   "h": 844
  },
  {
   "n": 10,
-  "id": "1647:22396",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
-  "file": "DRRRK5",
+  "id": "1943:12396",
+  "name": "라이브 · 전체",
+  "file": "LiveAll",
   "h": 844
  },
  {
   "n": 12,
   "id": "1647:22751",
-  "name": "DRRRK · 온보딩 · 함께 드르륵 9",
-  "file": "DRRRK9",
+  "name": "DRRRK · 온보딩 · 함께 드르륵 1~5",
+  "file": "Onboarding",
   "h": 844
  },
  {
@@ -108,9 +108,9 @@ export const SCREENS = [
  },
  {
   "n": 19,
-  "id": "1647:23143",
-  "name": "MY · 스킨 획득 팝업 (엉따 39°)",
-  "file": "MY39",
+  "id": "1804:20299",
+  "name": "MY · 스킨 획득 팝업",
+  "file": "MySkin",
   "h": 844
  },
  {
@@ -122,16 +122,16 @@ export const SCREENS = [
  },
  {
   "n": 22,
-  "id": "1647:23371",
-  "name": "DRRRK · 드르륵 · 일반 모드 · 이름 탭 가능",
-  "file": "DRRRK",
+  "id": "1952:16328",
+  "name": "DRRRK · 드르륵 · 일반 모드",
+  "file": "NormalNameTap",
   "h": 844
  },
  {
   "n": 23,
-  "id": "1647:23388",
-  "name": "DRRRK · 드르륵 · 일반 모드 · 이름 탭 가능",
-  "file": "DRRRK2",
+  "id": "1952:16490",
+  "name": "DRRRK · 드르륵 · 일반 모드",
+  "file": "NormalNameTap2",
   "h": 844
  },
  {
@@ -199,9 +199,9 @@ export const SCREENS = [
  },
  {
   "n": 33,
-  "id": "1647:24030",
+  "id": "1914:11696",
   "name": "DRRRK · 드르륵 · 일반 모드",
-  "file": "DRRRK8",
+  "file": "NormalEmoji",
   "h": 844
  },
  {
@@ -220,36 +220,36 @@ export const SCREENS = [
  },
  {
   "n": 36,
-  "id": "1806:10936",
-  "name": "MY · 메인 (나의 편의점 개선안)",
-  "file": "MY",
+  "id": "1804:20170",
+  "name": "MY · 메인",
+  "file": "MyMain",
   "h": 844
  },
  {
   "n": 37,
-  "id": "1647:24531",
-  "name": "DRRRK · 라운지 5안 · 방 구경 (라이브 + 댓글)",
-  "file": "DRRRK53",
+  "id": "1943:12838",
+  "name": "라이브 · 방 구경",
+  "file": "LiveWatch",
   "h": 844
  },
  {
   "n": 38,
-  "id": "1647:24619",
-  "name": "커뮤니티 / 글 상세 (v3 · 단순화)",
-  "file": "V3",
+  "id": "1953:12298",
+  "name": "커뮤니티 / 글 상세 (v5 · 글 중심)",
+  "file": "CommunityDetail",
   "h": 844
  },
  {
   "n": 39,
-  "id": "1647:24679",
-  "name": "커뮤니티 / 목록 (v2)",
-  "file": "V2",
+  "id": "1953:19406",
+  "name": "커뮤니티 목록",
+  "file": "CommunityList",
   "h": 844
  },
  {
   "n": 40,
   "id": "1647:24788",
-  "name": "영상",
+  "name": "DRRRK · 드르륵 · 해뜨기",
   "file": "Screen1647_24788",
   "h": 844
  },
@@ -257,77 +257,77 @@ export const SCREENS = [
   "n": 41,
   "id": "1647:24874",
   "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK14",
+  "file": "SoloField1",
   "h": 844
  },
  {
   "n": 42,
   "id": "1804:12770",
   "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK15",
+  "file": "SoloField2",
   "h": 844
  },
  {
   "n": 43,
   "id": "1647:25052",
   "name": "DRRRK · 드르륵 · 현장 모드",
-  "file": "DRRRK16",
+  "file": "SoloField3",
   "h": 844
  },
  {
   "n": 45,
   "id": "1647:25167",
-  "name": "DRRRK · 추천 드르륵",
-  "file": "DRRRK17",
+  "name": "DRRRK · 추천 드르륵 (방을 찾지 못함)",
+  "file": "SoloNoRoom",
   "h": 844
  },
  {
   "n": 46,
   "id": "1647:25199",
   "name": "영상",
-  "file": "Screen1647_25199",
+  "file": "SoloVideo",
   "h": 844
  },
  {
   "n": 47,
-  "id": "1647:22527",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)-1",
-  "file": "DRRRK51",
+  "id": "1943:12396",
+  "name": "라이브 · 전체",
+  "file": "LiveAll",
   "h": 844
  },
  {
   "n": 48,
-  "id": "1810:12798",
-  "name": "DRRRK · 라운지 5안 · 친구",
-  "file": "DRRRK5",
+  "id": "1943:12264",
+  "name": "라이브 · 친구",
+  "file": "LiveFriend",
   "h": 844
  },
  {
   "n": 49,
-  "id": "1806:11462",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
-  "file": "DRRRK55",
+  "id": "1943:11783",
+  "name": "라이브 · 연애",
+  "file": "LiveLove",
   "h": 844
  },
  {
   "n": 50,
-  "id": "1806:11630",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
-  "file": "DRRRK56",
+  "id": "1943:11901",
+  "name": "라이브 · 가족",
+  "file": "LiveFamily",
   "h": 844
  },
  {
   "n": 51,
-  "id": "1806:11799",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
-  "file": "DRRRK57",
+  "id": "1943:12022",
+  "name": "라이브 · 학교",
+  "file": "LiveSchool",
   "h": 844
  },
  {
   "n": 52,
-  "id": "1806:11979",
-  "name": "DRRRK · 라운지 5안 (지금 들어갈 수 있는 방)",
-  "file": "DRRRK58",
+  "id": "1943:12143",
+  "name": "라이브 · 진로",
+  "file": "LiveCareer",
   "h": 844
  },
  {
@@ -357,12 +357,66 @@ export const SCREENS = [
   "name": "네이버 클립 · 영상 보기",
   "file": "ClipPlayer",
   "h": 844
+ },
+ {
+  "n": 57,
+  "id": "1952:14673",
+  "name": "활동 알림",
+  "file": "NotiActivity",
+  "h": 844
+ },
+ {
+  "n": 58,
+  "id": "1952:14700",
+  "name": "키워드 알림",
+  "file": "NotiKeyword",
+  "h": 844
+ },
+ {
+  "n": 59,
+  "id": "1952:14617",
+  "name": "키워드 알림 풀버전",
+  "file": "NotiKeywordFull",
+  "h": 1377
+ },
+ {
+  "n": 60,
+  "id": "1952:14693",
+  "name": "키워드 알림 설정",
+  "file": "NotiKeywordSettings",
+  "h": 844
  }
 ];
 
 export const SCREEN_BY_N = Object.fromEntries(SCREENS.map((s) => [s.n, s]));
 
 const modules = {
+  'NormalEmoji': () => import('../figma/screens/NormalEmoji.jsx'),
+  'NormalNameTap2': () => import('../figma/screens/NormalNameTap2.jsx'),
+  'NormalNameTap': () => import('../figma/screens/NormalNameTap.jsx'),
+  'ChatNameTap': () => import('../figma/screens/ChatNameTap.jsx'),
+  'ChatMiniProfile2': () => import('../figma/screens/ChatMiniProfile2.jsx'),
+  'ChatMiniProfile': () => import('../figma/screens/ChatMiniProfile.jsx'),
+  'MySkin': () => import('../figma/screens/MySkin.jsx'),
+  'MyMain': () => import('../figma/screens/MyMain.jsx'),
+  'LiveAll': () => import('../figma/screens/LiveAll.jsx'),
+  'LiveWatch': () => import('../figma/screens/LiveWatch.jsx'),
+  'CommunityDetail': () => import('../figma/screens/CommunityDetail.jsx'),
+  'CommunityList': () => import('../figma/screens/CommunityList.jsx'),
+  'SoloField1': () => import('../figma/screens/SoloField1.jsx'),
+  'SoloField2': () => import('../figma/screens/SoloField2.jsx'),
+  'SoloField3': () => import('../figma/screens/SoloField3.jsx'),
+  'SoloNoRoom': () => import('../figma/screens/SoloNoRoom.jsx'),
+  'SoloVideo': () => import('../figma/screens/SoloVideo.jsx'),
+  'LiveFriend': () => import('../figma/screens/LiveFriend.jsx'),
+  'LiveLove': () => import('../figma/screens/LiveLove.jsx'),
+  'LiveFamily': () => import('../figma/screens/LiveFamily.jsx'),
+  'LiveSchool': () => import('../figma/screens/LiveSchool.jsx'),
+  'LiveCareer': () => import('../figma/screens/LiveCareer.jsx'),
+  'NotiActivity': () => import('../figma/screens/NotiActivity.jsx'),
+  'NotiKeyword': () => import('../figma/screens/NotiKeyword.jsx'),
+  'NotiKeywordFull': () => import('../figma/screens/NotiKeywordFull.jsx'),
+  'NotiKeywordSettings': () => import('../figma/screens/NotiKeywordSettings.jsx'),
   'Screen1647_26726': () => import('../figma/screens/Screen1647_26726.jsx'),
   'Screen1647_26876': () => import('../figma/screens/Screen1647_26876.jsx'),
   'Screen1647_27027': () => import('../figma/screens/Screen1647_27027.jsx'),
@@ -380,6 +434,7 @@ const modules = {
   'DRRRK6': () => import('../figma/screens/DRRRK6.jsx'),
   'MY39': () => import('../figma/screens/MY39.jsx'),
   'ChairStudio': () => import('./ChairStudio.jsx'),
+  'Onboarding': () => import('./Onboarding.jsx'),
   'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
   'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),
   'DRRRKDark': () => import('../figma/screens/DRRRKDark.jsx'),

@@ -62,9 +62,11 @@ export const mobile = { maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600
 export const live = {
   screenW: 390,
   screenH: 844,
-  // 방 시계는 실제 시간으로 3분이다(배속 없음). 방에 들어가면 03:00에서 시작해 1초에 1초씩 줄어든다.
-  timeScale: 1,
-  roomSeconds: 180,
+  // 방 시계는 화면에 20:00에서 시작해 00:00까지 줄어들고, 이 20분이 실제로는 3분(180초)에 지나간다.
+  // 그래서 시계는 1초에 6.67초씩 줄어든다(1200 / 180).
+  realRoomSeconds: 180,
+  timeScale: 1200 / 180,
+  roomSeconds: 1200,
   defaultLeft: 180,
   // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 남으면 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35).
   // C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
@@ -106,8 +108,11 @@ export const live = {
   bannerClosedH: 40,
   bannerOpenH: 162,
   bannerMs: 300,
-  bannerBody: '친구가 썸남 앞에서 내 쌍꺼풀 수술을 말해버렸어. 셋이 있던 자리라 웃고 넘어갔는데 아직도 얼굴이 화끈거려. 어떻게 풀어야 할까',
-  bannerTags: ['#친구관계', '#연애'],
+  // 배너가 펼쳐지면 퀵슬롯이 내려가는 거리. 피그마 주전부리 퀵슬롯 기본(1884:11435)에서 192에서 296으로 104px 내려간다.
+  dockShift: 104,
+  // 펼친 고민 배너 글과 키워드는 팀 피그마 원문(주전부리 퀵슬롯 기본 1884:11599) 그대로다.
+  bannerBody: '친구가 썸남 앞에서 내 쌍밍아웃함. 셋이 떡볶이 먹으러 가고 있었는데 나보고 볼 때마다 00이 쌍수 참 예쁘게 잘되지 않았냐고 그러는거야. 걔 완전 미친거 아니야? 하..',
+  bannerTags: ['#가족관계', '#가정사'],
   // 마이크
   micThreshold: 0.07,
   micOnText: '마이크가 켜졌어요',
@@ -144,7 +149,6 @@ export const live = {
   itemScreen: 54,
   warmDonors: [31, 43, 28],
   // 주전부리 던지기(끌어서 놓기)
-  throwCooldown: 30,
   throwFlyMs: 620,
   dragStart: 6,
   // 던지는 곳은 방 한가운데 테이블이다(피그마 390x844 기준 좌표). nameGroupAt는 의자 이름표 묶음의 피그마 위치로, 휴대폰에서 배경이 옮겨진 만큼을 구하는 기준이다.
@@ -155,7 +159,6 @@ export const live = {
   throwHintText: '가운데 테이블로 끌어서 던져요',
   throwDoneText: '주전부리를 테이블에 올렸어요',
   throwEmptyText: '남은 주전부리가 없어요',
-  throwCoolText: '쿨타임이에요. 조금만 기다려 주세요',
   itemDesc: '라이브에서 던지면 가운데 테이블 위에 바삭하게 올라가요.',
 };
 
