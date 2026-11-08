@@ -14,6 +14,7 @@ import { applySync } from './sync.js';
 import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
+import { fixWraps } from './wrapFix.js';
 
 export { setText };
 
@@ -677,6 +678,7 @@ export async function prepare(layer, n, prevN) {
   if (!root || root.dataset.prepared) return;
   root.dataset.prepared = '1';
   applySync(root);
+  fixWraps(root);
   showEmptyOutlines(root);
   patchScene(root, n);
   attachRoom(root, n);
