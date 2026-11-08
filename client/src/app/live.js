@@ -16,6 +16,7 @@ import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
 import { swapScene } from './scene.js';
+import { applyAvatars } from './avatars.js';
 
 export { setText };
 
@@ -694,6 +695,7 @@ export async function prepare(layer, n, prevN) {
   applySync(root);
   fixWraps(root);
   swapScene(root, n);
+  applyAvatars(root, n);
   showEmptyOutlines(root);
   patchScene(root, n);
   attachRoom(root, n);

@@ -24,16 +24,16 @@ export const SCREENS = [
  },
  {
   "n": 5,
-  "id": "1647:21896",
-  "name": "CHAT-01 · 참여자 미니 프로필",
-  "file": "CHAT01",
+  "id": "1952:15659",
+  "name": "DRRRK · 드르륵 · 해뜨기",
+  "file": "ChatMiniProfile",
   "h": 844
  },
  {
   "n": 6,
-  "id": "1647:21995",
-  "name": "CHAT-01 · 참여자 미니 프로필",
-  "file": "CHAT012",
+  "id": "1952:15800",
+  "name": "DRRRK · 드르륵 · 해뜨기",
+  "file": "ChatMiniProfile2",
   "h": 844
  },
  {
@@ -52,9 +52,9 @@ export const SCREENS = [
  },
  {
   "n": 9,
-  "id": "1647:22319",
-  "name": "CHAT-00 · 캐릭터 탭 → 이름 표시",
-  "file": "CHAT00",
+  "id": "1952:15499",
+  "name": "DRRRK · 드르륵 · 해뜨기",
+  "file": "ChatNameTap",
   "h": 844
  },
  {
@@ -108,9 +108,9 @@ export const SCREENS = [
  },
  {
   "n": 19,
-  "id": "1647:23143",
-  "name": "MY · 스킨 획득 팝업 (엉따 39°)",
-  "file": "MY39",
+  "id": "1804:20299",
+  "name": "MY · 스킨 획득 팝업",
+  "file": "MySkin",
   "h": 844
  },
  {
@@ -122,16 +122,16 @@ export const SCREENS = [
  },
  {
   "n": 22,
-  "id": "1647:23371",
-  "name": "DRRRK · 드르륵 · 일반 모드 · 이름 탭 가능",
-  "file": "DRRRK",
+  "id": "1952:16328",
+  "name": "DRRRK · 드르륵 · 일반 모드",
+  "file": "NormalNameTap",
   "h": 844
  },
  {
   "n": 23,
-  "id": "1647:23388",
-  "name": "DRRRK · 드르륵 · 일반 모드 · 이름 탭 가능",
-  "file": "DRRRK2",
+  "id": "1952:16490",
+  "name": "DRRRK · 드르륵 · 일반 모드",
+  "file": "NormalNameTap2",
   "h": 844
  },
  {
@@ -199,9 +199,9 @@ export const SCREENS = [
  },
  {
   "n": 33,
-  "id": "1647:24030",
+  "id": "1914:11696",
   "name": "DRRRK · 드르륵 · 일반 모드",
-  "file": "DRRRK8",
+  "file": "NormalEmoji",
   "h": 844
  },
  {
@@ -220,9 +220,9 @@ export const SCREENS = [
  },
  {
   "n": 36,
-  "id": "1806:10936",
-  "name": "MY · 메인 (나의 편의점 개선안)",
-  "file": "MY",
+  "id": "1804:20170",
+  "name": "MY · 메인",
+  "file": "MyMain",
   "h": 844
  },
  {
@@ -249,7 +249,7 @@ export const SCREENS = [
  {
   "n": 40,
   "id": "1647:24788",
-  "name": "영상",
+  "name": "DRRRK · 드르륵 · 해뜨기",
   "file": "Screen1647_24788",
   "h": 844
  },
@@ -391,6 +391,14 @@ export const SCREENS = [
 export const SCREEN_BY_N = Object.fromEntries(SCREENS.map((s) => [s.n, s]));
 
 const modules = {
+  'NormalEmoji': () => import('../figma/screens/NormalEmoji.jsx'),
+  'NormalNameTap2': () => import('../figma/screens/NormalNameTap2.jsx'),
+  'NormalNameTap': () => import('../figma/screens/NormalNameTap.jsx'),
+  'ChatNameTap': () => import('../figma/screens/ChatNameTap.jsx'),
+  'ChatMiniProfile2': () => import('../figma/screens/ChatMiniProfile2.jsx'),
+  'ChatMiniProfile': () => import('../figma/screens/ChatMiniProfile.jsx'),
+  'MySkin': () => import('../figma/screens/MySkin.jsx'),
+  'MyMain': () => import('../figma/screens/MyMain.jsx'),
   'LiveAll': () => import('../figma/screens/LiveAll.jsx'),
   'LiveWatch': () => import('../figma/screens/LiveWatch.jsx'),
   'CommunityDetail': () => import('../figma/screens/CommunityDetail.jsx'),
