@@ -1,5 +1,16 @@
 # DRRRK
 
+이 저장소에는 웹 프로토타입(client)과 iOS 앱(ios) 두 가지가 함께 있다.
+
+## iOS 앱
+
+- 위치: `ios/`
+- 스택: SwiftUI, iOS 17 이상, XcodeGen(`ios/project.yml`)
+- 실행: `cd ios && xcodegen && open DRRRK.xcodeproj`, 또는 `DEV="iPhone 17" ios/run.sh build home`
+- 화면 값(크기, 색, 글자, 아래 탭)은 팀 피그마 값을 그대로 옮겼다. 규칙은 `ios/RULES.md`
+
+## 웹 프로토타입
+
 피그마 화면 47장을 React로 옮기고 화면 사이를 이은 프로토타입이다.
 
 - 사이트: https://hyunho2378.github.io/drrrk/
