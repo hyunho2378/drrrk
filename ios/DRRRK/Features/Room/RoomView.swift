@@ -330,9 +330,9 @@ struct LandedSnack: View {
     @State private var fading = false
     var body: some View {
         Image(asset).resizable().scaledToFit()
-            .frame(width: 32, height: 32)
+            .frame(width: 40, height: 40)
             .rotationEffect(.degrees(landed ? angle : -16))
-            .scaleEffect(landed ? (fading ? 0.9 : 1) : 1.45)
+            .scaleEffect(landed ? (fading ? 0.9 : 1) : 1.15)
             .offset(y: landed ? 0 : -60)
             .opacity(fading ? 0 : 1)
             .onAppear { withAnimation(DS.Motion.decel(0.62)) { landed = true } }

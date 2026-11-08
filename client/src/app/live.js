@@ -5,6 +5,7 @@
 // 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
 import { motion, live as LIVE } from '../tokens.js';
+import { patchLiveV2, patchWatchSeats } from './liveV2.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
@@ -15,6 +16,7 @@ import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chai
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
+import { patchSolo } from './solo.js';
 import { swapScene } from './scene.js';
 import { applyAvatars } from './avatars.js';
 
@@ -244,9 +246,10 @@ function initAnalysis(root) {
     if (icon) icon.style.opacity = '0';
     st.style.opacity = '1';
   });
-  q(root, '[data-figma^="step ·"]').forEach((st, i) => {
+  // 체크와 글은 함께 나타난다. 처음에는 세 단계 모두 비어 있다.
+  q(root, '[data-figma^="step ·"]').forEach((st) => {
     const label = st.querySelector('p[data-outline]');
-    if (label) { label.style.opacity = i === 0 ? String(LIVE.stepDim) : '0'; Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
+    if (label) { label.style.opacity = '0'; Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
   });
 }
 function playAnalysis(root, ms) {
@@ -269,12 +272,7 @@ function playAnalysis(root, ms) {
   steps.forEach((st, i) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
-    // 앞 단계가 끝나는 때에 이 단계 글이 흐리게 나타난다(첫 단계는 처음부터 보인다).
-    if (i > 0 && label) window.setTimeout(() => {
-      if (!root.isConnected) return;
-      label.style.opacity = String(LIVE.stepDim);
-      label.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: LIVE.stepDim, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
-    }, i * slot);
+    // 단계마다 체크와 글이 같은 때에 함께 나타난다(글만 먼저 뜨지 않는다).
     window.setTimeout(() => {
       if (!root.isConnected) return;
       // 둘째 단계의 어두운 체크와 셋째 단계의 돌아가는 아이콘은 맨 위 단계와 같은 밝은 체크 그림으로 바꾼다.
@@ -282,13 +280,15 @@ function playAnalysis(root, ms) {
         icon.innerHTML = tpl.innerHTML;
         icon.setAttribute('data-figma', 'check');
       }
-      if (icon) { icon.style.opacity = ''; icon.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
+      const rise = [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }];
+      const opt = { duration: motion.modalIn, easing: motion.emphasizedDecel };
+      if (icon) { icon.style.opacity = ''; icon.animate(rise, opt); }
       if (label) {
         if (i > 0 && color0) { label.style.color = color0; setText(label, label.textContent); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
         label.style.opacity = '';
-        label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn });
+        label.animate(rise, opt);
       }
-    }, (i + 1) * slot);
+    }, (i + 0.6) * slot);
   });
 }
 
@@ -549,6 +549,8 @@ export function swapMap(n) {
   map[IMG.box] = MINE_BOX.includes(n) ? mineRel(false) : fixedRel('conv', 1, false);
   if (MINE_YELLOW.includes(n)) map[IMG.yellow] = mineRel(false);
   map[IMG.myOld] = mineRel(true);
+  // 고민 분석 의자: 생성 코드가 678KB PNG를 가리켜 휴대폰에서 늦게 떴다. 같은 그림의 78KB WebP(미리 받아 둔 그림)로 바꾼다.
+  map['df0a1d154446b484e3518dd2e5f901753261b27f.png'] = 'df0a1d154446b484e3518dd2e5f901753261b27f.webp';
   return map;
 }
 export function swapAssets(el, n) {
@@ -695,6 +697,7 @@ export async function prepare(layer, n, prevN) {
   applySync(root);
   fixWraps(root);
   swapScene(root, n);
+  patchSolo(root, n);
   applyAvatars(root, n);
   showEmptyOutlines(root);
   patchScene(root, n);
@@ -705,6 +708,8 @@ export async function prepare(layer, n, prevN) {
   prepTabs(root, n);
   fixIcons(root);
   patchLounge(root, n);
+  patchLiveV2(root, n);
+  patchWatchSeats(root, n);
   if ([19, 36, 53, 54].includes(n)) patchMyChair(root);
   attachPost(root);
   patchPill(root, n);
@@ -745,6 +750,8 @@ export function attach(layer, n, go, prevN) {
   attachPost(root);
   fixIcons(root);
   patchLounge(root, n);
+  patchLiveV2(root, n);
+  patchWatchSeats(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);

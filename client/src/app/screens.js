@@ -220,9 +220,9 @@ export const SCREENS = [
  },
  {
   "n": 36,
-  "id": "1804:20170",
-  "name": "MY · 메인",
-  "file": "MyMain",
+  "id": "1972:22735",
+  "name": "MY · 리디자인 (히어로 + 엉따 밴드 + 업적 편의점)",
+  "file": "MyHome",
   "h": 844
  },
  {
@@ -341,7 +341,7 @@ export const SCREENS = [
   "n": 54,
   "id": "1790:10988",
   "name": "MY · 나의 편의점 (아이템 상세)",
-  "file": "MY3",
+  "file": "MyItem",
   "h": 844
  },
  {
@@ -406,7 +406,7 @@ const modules = {
   'SoloField1': () => import('../figma/screens/SoloField1.jsx'),
   'SoloField2': () => import('../figma/screens/SoloField2.jsx'),
   'SoloField3': () => import('../figma/screens/SoloField3.jsx'),
-  'SoloNoRoom': () => import('../figma/screens/SoloNoRoom.jsx'),
+  'SoloNoRoom': () => import('./SoloNoRoom.jsx'),
   'SoloVideo': () => import('../figma/screens/SoloVideo.jsx'),
   'LiveFriend': () => import('../figma/screens/LiveFriend.jsx'),
   'LiveLove': () => import('../figma/screens/LiveLove.jsx'),
@@ -434,6 +434,8 @@ const modules = {
   'DRRRK6': () => import('../figma/screens/DRRRK6.jsx'),
   'MY39': () => import('../figma/screens/MY39.jsx'),
   'ChairStudio': () => import('./ChairStudio.jsx'),
+  'MyHome': () => import('./MyHome.jsx'),
+  'MyItem': () => import('./MyItem.jsx'),
   'Onboarding': () => import('./Onboarding.jsx'),
   'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
   'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),

@@ -36,6 +36,8 @@ export default function Splash({ onDone }) {
     const v = video.current;
     if (!v) return undefined;
     v.playbackRate = rate;
+    // 로고 소리는 원래 크기의 50%로 튼다(사용자 요청 2026-11-09).
+    v.volume = 0.5;
     v.muted = false;
     v.play().catch(() => {
       v.muted = true;
@@ -48,7 +50,7 @@ export default function Splash({ onDone }) {
 
   const unmute = () => {
     const v = video.current;
-    if (v && v.muted) v.muted = false;
+    if (v && v.muted) { v.volume = 0.5; v.muted = false; }
   };
 
   return (

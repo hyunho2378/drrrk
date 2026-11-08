@@ -12,8 +12,12 @@ function measure() {
   if (last && last.mobile && ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA') && window.innerWidth <= M.maxWidth) return last;
   const w = window.innerWidth, h = window.innerHeight;
   if (w <= M.maxWidth) {
-    const scale = w / layout.screenWidth;
-    return (last = { scale, mobile: true, view: h / scale, height: h });
+    // 피그마 비율을 깨지 않는다. 진짜 상태바가 있으니 피그마 상태바 줄(crop)만 빼고, 남은 390 x 796을
+    // 폭과 높이 중 모자란 쪽에 맞춰 같은 배율로 키운다(사파리, 크롬, 카카오톡 인앱처럼 창 높이가 달라도 모양은 같다).
+    // 창이 더 길면 폭에 맞추고 남는 높이는 바닥 요소를 창 바닥에 붙여 채운다(요소 크기와 간격은 그대로).
+    const need = layout.screenHeight - M.crop;
+    const scale = Math.min(w / layout.screenWidth, h / need);
+    return (last = { scale, mobile: true, view: Math.max(need, h / scale), height: h });
   }
   return (last = { scale: Math.min(w / layout.screenWidth, h / layout.screenHeight), mobile: false, view: layout.screenHeight, height: h });
 }

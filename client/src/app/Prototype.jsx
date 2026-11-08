@@ -4,6 +4,7 @@ import { SCREEN_BY_N, loadScreen } from './screens.js';
 import { LINKS, AUTO, START } from './flow.js';
 import { motion, mobile as MOB } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
+import { RoomGuide } from './Onboarding.jsx';
 import { useReducedMotion } from './useReducedMotion.js';
 import { morph } from './morph.js';
 import { useViewport } from './useFitScale.js';
@@ -82,6 +83,7 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) 
       <div className="relative w-screen overflow-hidden" style={{ height: layer.h, marginTop: vp.mobile ? -MOB.crop : 0 }} onClick={flash}>
         <Comp />
         <Hotspots links={LINKS.filter((l) => l.from === layer.n)} active={active} hint={hint} onPress={onPress} />
+        <RoomGuide n={layer.n} />
       </div>
     </div>
   );
@@ -170,6 +172,7 @@ export default function Prototype() {
       }
       const el = nodes.current.get(key);
       if (el) attach(el, shownN || n, (l) => go(l), prevShown.current);
+      const cameFrom = prevShown.current;
       prevShown.current = shownN || n;
       window.scrollTo(0, 0);
       // 이 화면에서 갈 수 있는 화면의 코드를 미리 받아 둔다(다음 누름의 대기를 줄인다).
@@ -185,7 +188,14 @@ export default function Prototype() {
       );
       const s = SCREEN_BY_N[shownN || n];
       const au = AUTO[s && s.n];
-      if (au) autoTimer.current = window.setTimeout(() => go({ to: au.to, t: au.t }), au.ms);
+      // from이 있으면 그 화면에서 왔을 때만 넘긴다. 방 위 온보딩이 떠 있는 동안은 시간을 세지 않고, 닫힌 뒤부터 센다.
+      if (au && (!au.from || au.from.includes(cameFrom))) {
+        const arm = () => {
+          if (document.querySelector('[data-figma="방 온보딩"]')) { autoTimer.current = window.setTimeout(arm, 400); return; }
+          autoTimer.current = window.setTimeout(() => go({ to: au.to, t: au.t }), au.ms);
+        };
+        arm();
+      }
       if (queued.current) {
         const q = queued.current;
         queued.current = null;
@@ -300,8 +310,8 @@ export default function Prototype() {
   const top = layers[layers.length - 1];
   const stageH = layers.reduce((m, l) => Math.max(m, visH(l, vp)), 0);
   return (
-    <div className="overflow-hidden bg-outside font-suit" style={{ minHeight: vp.mobile ? vp.height + 'px' : '100dvh' }}>
-      <div className="mx-auto" style={{ width: 390 * scale, height: stageH * scale }}>
+    <div className={'overflow-hidden font-suit ' + (vp.mobile ? '' : 'bg-outside')} style={{ minHeight: vp.mobile ? vp.height + 'px' : '100dvh', background: vp.mobile ? '#121415' : undefined, display: vp.mobile ? 'flex' : undefined, alignItems: vp.mobile ? 'center' : undefined }}>
+      <div className="mx-auto" style={{ width: 390 * scale, height: stageH * scale, overflow: vp.mobile ? 'hidden' : undefined }}>
       <div className="relative w-screen origin-top-left overflow-hidden bg-base" style={{ height: stageH, transform: 'scale(' + scale + ')' }}>
         {!vp.mobile && layers.length > 0 && <SystemStatusBar />}
         {layers.map((l) => (

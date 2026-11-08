@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Scene, pic } from './ClipKit.jsx';
 import { PLAYER } from './ClipScenes.js';
 import { CSS, CommentSheet, MoreSheet, commentTotal } from './ClipSheets.jsx';
+import { ClipAgent } from './ClipAgent.jsx';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 // 화면을 나갔다 들어와도 켜 둔 상태가 남는다.
@@ -100,9 +101,6 @@ export function ClipPlayer(props) {
   return (
     <Scene items={items} name="클립 영상 보기" node="clip-player" bg="#000000" className={st.imm ? 'cp-imm' : undefined} {...props}>
       <style>{CSS}</style>
-      <div data-figma="드르륵 에이전트 버튼" aria-hidden="true" className={st.popped ? 'cp-agent' : undefined} style={{ position: 'absolute', left: 344, top: 298, width: 60, height: 60, borderRadius: 13, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.35)', opacity: st.popped ? undefined : 0, pointerEvents: 'none' }}>
-        <img src={pic('agent')} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-      </div>
       {btn('소리', 340, 53, 46, 44, () => flip('mute'), 22)}
       {btn('이벤트 댓글 남기기', 333, 410, 52, 56, () => openSheet('comments'), 26)}
       {btn('좋아요', 338, 483, 44, 62, () => flip('like'))}
@@ -115,6 +113,7 @@ export function ClipPlayer(props) {
       {st.imm ? <button type="button" aria-label="화면 되돌리기" onClick={(e) => { e.stopPropagation(); setSt((s) => ({ ...s, imm: false })); }} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 844, zIndex: 55, border: 0, padding: 0, background: 'transparent', cursor: 'pointer' }} /> : null}
       {st.sheet === 'comments' ? <CommentSheet info={st.info} open={st.sheetOpen} onClose={closeSheet} onCount={(n) => setSt((s) => ({ ...s, comments: n }))} say={say} /> : null}
       {st.sheet === 'more' ? <MoreSheet open={st.sheetOpen} onClose={closeSheet} onAction={act} stats={{ like: st.like ? '2,414' : '2,413', comment: st.comments }} liked={st.like} saved={st.save} /> : null}
+      <ClipAgent delay={1600} />
       {toast ? (
         <div key={toast.id} role="status" style={{ position: 'absolute', left: '50%', top: 692, zIndex: 70, maxWidth: 330, padding: '10px 16px', borderRadius: 14, background: 'rgba(44,44,46,0.96)', color: '#F2F2F7', fontFamily: FONT, fontSize: 13.5, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.27px', whiteSpace: 'pre', pointerEvents: 'none', animation: 'cpToast 240ms cubic-bezier(0.05,0.7,0.1,1) both', boxShadow: '0 6px 16px rgba(0,0,0,0.4)' }}>{toast.text}</div>
       ) : null}

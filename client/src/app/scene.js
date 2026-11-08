@@ -5,8 +5,10 @@ const FILES = {
   base: 'fefcb80d4928c0cf3f5620530d53f3059fc8b25b.jpg',
   fold: 'edefa8f194a3501af0e2bc80dad7013e722b3141.jpg',
   field: 'bd5037f7eb80881c82b3de6cd35faf6073b5c925.png',
+  // 혼자 드르륵 방에 처음 들어온 장면(1647:25199 영상의 첫 화면, 멀리서 본 흰 의자와 테이블).
+  far: 'solo-video-still.png',
 };
-export const SCENE_OF = { 28: 'base', 29: 'base', 30: 'base', 31: 'fold', 41: 'field', 42: 'field', 43: 'field', 46: 'field' };
+export const SCENE_OF = { 28: 'base', 29: 'base', 30: 'base', 31: 'fold', 41: 'field', 42: 'field', 43: 'field', 46: 'far' };
 export const sceneUrl = (key) => new URL('assets/images/' + FILES[key], document.baseURI).href;
 export const sceneFiles = (n) => (SCENE_OF[n] ? ['assets/images/' + FILES[SCENE_OF[n]]] : []);
 
@@ -14,7 +16,9 @@ export const sceneFiles = (n) => (SCENE_OF[n] ? ['assets/images/' + FILES[SCENE_
 export function swapScene(root, n) {
   const key = SCENE_OF[n];
   if (!key || !root || root.dataset.sceneSwapped) return;
-  const first = root.firstElementChild;
+  // 맨 아래 칸이 어둡게 깔린 판(scene dim)인 화면이 있어서, 화면을 덮는 그림이나 영상 칸을 먼저 찾는다.
+  const kids = [...root.children].slice(0, 4);
+  const first = kids.find((c) => /^(IMG|VIDEO|CANVAS)$/.test(c.tagName) || /^image /.test(c.dataset.figma || '')) || root.firstElementChild;
   if (!first) return;
   const r = first.getBoundingClientRect();
   const rr = root.getBoundingClientRect();
