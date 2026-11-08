@@ -199,7 +199,7 @@ struct WorryInputView: View {
 struct AnalysisView: View {
     @Environment(Router.self) private var router
     @State private var progress: CGFloat = 0
-    @State private var shown = [true, false, false]
+    /// 단계마다 체크와 글이 같은 때에 함께 나타난다(글만 먼저 뜨지 않는다).
     @State private var done = [false, false, false]
 
     private let steps = ["고민 맥락 분석 중", "비슷한 경험 찾는 중", "드르륵 방 연결 중"]
@@ -233,14 +233,13 @@ struct AnalysisView: View {
                             .stroke(.black, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
                         }
                         .frame(width: 24, height: 24)
-                        .scaleEffect(done[i] ? 1 : 0.6)
-                        .opacity(done[i] ? 1 : 0)
-                        Text(steps[i]).suit(16, done[i] ? .medium : .regular, tracking: -0.64)
-                            .foregroundStyle(done[i] ? DS.Palette.textPrimary : DS.Palette.textSecondary)
-                            .opacity(shown[i] ? (done[i] ? 1 : 0.4) : 0)
-                            .offset(y: shown[i] ? 0 : 6)
+                        // 피그마 1647:23525: 끝난 단계 글은 SUIT Regular 16, #9AA1A6
+                        Text(steps[i]).suit(16, .regular, tracking: -0.64)
+                            .foregroundStyle(DS.Palette.textSecondary)
                     }
                     .frame(height: 24)
+                    .opacity(done[i] ? 1 : 0)
+                    .offset(y: done[i] ? 0 : 6)
                 }
             }
             .at(119, 560)
@@ -249,20 +248,20 @@ struct AnalysisView: View {
         .task { await play() }
     }
 
-    /// 원이 2.4초 동안 차오르고, 앞 단계가 끝나는 때에 다음 단계 글이 흐리게 나타난 뒤 체크가 붙는다. 끝나면 추천 화면으로 간다.
+    /// 원이 2.4초 동안 차오르고, 단계 i는 (i + 0.6) x 칸 시간에 체크와 글이 함께 아래에서 올라오며 나타난다(웹 live.js playAnalysis와 같다).
+    /// 끝나면 추천 화면으로 간다.
     private func play() async {
         withAnimation(.linear(duration: total)) { progress = 1 }
         let slot = total / 3.4
+        var at = 0.0
         for i in steps.indices {
-            if i > 0 {
-                try? await Task.sleep(for: .seconds(0.001))
-                withAnimation(DS.Motion.decel(0.25)) { shown[i] = true }
-            }
-            try? await Task.sleep(for: .seconds(slot))
+            let next = (Double(i) + 0.6) * slot
+            try? await Task.sleep(for: .seconds(next - at))
+            at = next
             UISelectionFeedbackGenerator().selectionChanged()
-            withAnimation(DS.Motion.decel(0.25)) { done[i] = true }
+            withAnimation(DS.Motion.decel(0.42)) { done[i] = true }
         }
-        try? await Task.sleep(for: .seconds(2.6 - total + 0.2))
+        try? await Task.sleep(for: .seconds(max(0.2, 2.6 - at)))
         if router.path.last == .analysis {
             router.path.removeLast()
         }
@@ -321,7 +320,7 @@ struct RecommendView: View {
             }
             .buttonStyle(ClipPressStyle(radius: 28))
             .at(24, 726)
-            Button { router.push(.onboardingSolo) } label: {
+            Button { router.push(.roomSolo) } label: {
                 Text("혼자 드르륵 앉기").suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textSecondary)
                     .frame(width: 342, height: 44).contentShape(Rectangle())
             }
@@ -366,23 +365,61 @@ struct RecommendView: View {
 }
 
 // MARK: - 방을 찾지 못함(45)
+// 피그마 1647:25167. 흰 편의점 의자 위로 오징어땅콩, 먹태(dried_fish), 몬스타가 떠 있고(240 x 240 틀 안에서 잘림),
+// 셋은 각자 다른 박자로 살짝 좌우로 흔들린다(팀 피그마 댓글 2026. 11. 9.).
+
+private struct WobbleSnack: View {
+    let asset: String
+    /// 피그마 회전(반시계가 +)
+    let figmaRotation: Double
+    let amplitude: Double
+    let period: Double
+    let delay: Double
+    @State private var swing = false
+    var body: some View {
+        Image(asset).resizable().scaledToFit()
+            .frame(width: 68, height: 68)
+            .rotationEffect(.degrees(-figmaRotation + (swing ? amplitude : -amplitude)))
+            .onAppear {
+                withAnimation(.easeInOut(duration: period / 2).repeatForever(autoreverses: true).delay(delay)) { swing = true }
+            }
+    }
+}
 
 struct NoRoomView: View {
     @Environment(Router.self) private var router
     var body: some View {
         Canvas390 {
             BackChevron { router.pop() }.at(14, 69)
-            CloseX { router.popToRoot() }.at(332, 69)
-            Text("비슷한 고민으로\n이야기 중인 방을 찾지 못했어요")
-                .suit(28, .extrabold, tracking: -1.12, lineHeight: 39.2)
+            (Text("비슷한 고민으로\n").font(.custom(SUITWeight.bold.rawValue, fixedSize: 28))
+                + Text("이야기 중인 방을 찾지 못했어요").font(.custom(SUITWeight.extrabold.rawValue, fixedSize: 28)))
+                .tracking(-1.12)
+                .lineSpacing(39.2 - 28 * 1.25)
                 .foregroundStyle(DS.Palette.textPrimary)
                 .frame(width: 342, alignment: .leading)
                 .at(24, 159)
-            Text("대신, 혼자 드르륵 앉아서 고민을 털어놓아 볼까요?").suit(14, .medium, tracking: -0.56)
-                .foregroundStyle(Color(hex: 0xDDDDDD)).at(24, 245)
-            LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.7324)], startPoint: .top, endPoint: .bottom)
+            (Text("대신, ").foregroundColor(DS.Palette.textSecondary)
+                + Text("혼자 드르륵").foregroundColor(Color(hex: 0xDDDDDD))
+                + Text(" 앉아서 고민을 털어놓아 볼까요?").foregroundColor(DS.Palette.textSecondary))
+                .suit(14, .medium, tracking: -0.56)
+                .at(24, 245)
+            // 그림 묶음 "image" 240 x 240 (75, 374), 안을 넘는 부분은 잘린다. 자리는 각 그림의 가운데 기준.
+            ZStack(alignment: .topLeading) {
+                Image("B2-noroom-chair").resizable().scaledToFit().frame(width: 216, height: 216).at(12, 39)
+                WobbleSnack(asset: "B2-snack-peanut", figmaRotation: 33.7, amplitude: 5, period: 2.4, delay: 0)
+                    .at(122.15 - 75 - 34, 413.3 - 374 - 34)
+                WobbleSnack(asset: "B2-snack-monster", figmaRotation: -37.7, amplitude: 4, period: 2.9, delay: 0.35)
+                    .at(286.8 - 75 - 34, 459.7 - 374 - 34)
+                WobbleSnack(asset: "B2-snack-nogari", figmaRotation: -38.9, amplitude: 6, period: 2.6, delay: 0.7)
+                    .at(262.9 - 75 - 34, 406.8 - 374 - 34)
+            }
+            .frame(width: 240, height: 240, alignment: .topLeading)
+            .clipped()
+            .allowsHitTesting(false)
+            .at(75, 374)
+            LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
                 .frame(width: 390, height: 230).at(0, 614).allowsHitTesting(false)
-            Button { router.push(.onboardingSolo) } label: {
+            Button { router.push(.roomSolo) } label: {
                 Text("혼자 드르륵 앉기").suit(16, .bold, tracking: -0.64).foregroundStyle(.black)
                     .frame(width: 342, height: 46)
                     .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 28))
@@ -401,6 +438,8 @@ struct NoRoomView: View {
 }
 
 // MARK: - 온보딩(함께 드르륵 다섯 장, 혼자 드르륵 두 장)
+// 온보딩은 홈 위가 아니라 실제 방 위에 겹쳐 뜬다. 함께 드르륵은 추천에서 방(1807:23214)에 처음 들어갈 때,
+// 혼자 드르륵은 혼자 방(1647:25199)에 처음 들어갈 때 한 번 뜬다. 방에는 Dim 60%가 깔리고 카드(326 x 379, 32, 213)가 올라온다.
 
 struct OnboardingPage {
     let visual: String
@@ -408,25 +447,45 @@ struct OnboardingPage {
     let sub: String
 }
 
-private struct OnboardingDeck: View {
+/// 앱을 켜 둔 동안 한 번 본 온보딩은 다시 띄우지 않는다.
+enum OnboardingSeen {
+    static var together = false
+    static var solo = false
+}
+
+enum OnboardingPages {
+    static let together: [OnboardingPage] = [
+        .init(visual: "A-ob-together-1", title: "고민을 적으면\n비슷한 사람들과 매칭돼요", sub: "대화방에서 사람들이 내 고민을 들어줘요"),
+        .init(visual: "A-ob-together-2", title: "말하기 부담되면\n이모지로 반응해요", sub: "+ 버튼을 눌러 이모지를 날려요"),
+        .init(visual: "A-ob-together-3", title: "주전부리를 던지면\n가운데 테이블에 올라가요", sub: "오른쪽 퀵슬롯에서 주전부리를 눌러 던져요"),
+        .init(visual: "A-ob-together-4", title: "대화는 20분 뒤\n저장되지 않고 사라져요", sub: "해 뜨기 타이머가 끝나면 대화방이 종료돼요"),
+        .init(visual: "A-ob-together-5", title: "대화가 끝나면\n리포트가 도착해요", sub: "공감과 추천을 받으면 엉따 온도가 올라가요"),
+    ]
+
+    /// 팀 피그마 1647:22976, 1647:23028 문구와 그림(Visual 프레임을 3배로 내보냄)
+    static let solo: [OnboardingPage] = [
+        .init(visual: "B2-ob-solo-1", title: "매칭될 사람이 없으면\nAI와 먼저 대화해요", sub: "기다리지 않고 바로 고민을 털어놓아요"),
+        .init(visual: "B2-ob-solo-2", title: "대화 중에 사람이 매칭되면\n함께 대화방으로 옮겨가요", sub: "AI와 대화하는 동안에도 계속 사람을 찾아요"),
+    ]
+}
+
+/// 방 화면 위에 겹쳐 뜨는 온보딩. 닫기, 건너뛰기, 시작하기는 덮개만 닫고 방은 그대로 이어진다.
+struct OnboardingOverlay: View {
     let pages: [OnboardingPage]
     let onFinish: () -> Void
     @State private var index = 0
 
     var body: some View {
-        // 아래 탭은 화면 바닥(안전 영역 위)에 고정한다. 카드 장이 바뀌어도 크기 계산에 끼지 않게 배경과 덮개로 나눈다.
-        Color.clear
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                Canvas390 {
-                    HomeBackdrop().allowsHitTesting(false)
-                    Color.black.opacity(0.6).frame(width: 390, height: 844)
-                    CloseX { onFinish() }.at(322, 165)
-                    card.at(32, 213)
-                }
+        ZStack {
+            // 화면 비율이 피그마와 달라도 어둡게 깔린 판이 화면 전체를 덮는다.
+            Color.black.opacity(0.6).ignoresSafeArea()
+                .contentShape(Rectangle())
+                .onTapGesture {}
+            Canvas390(background: .clear) {
+                CloseX { onFinish() }.at(322, 165)
+                card.at(32, 213)
             }
-
-        .toolbar(.hidden, for: .navigationBar)
+        }
     }
 
     private var card: some View {
@@ -448,8 +507,8 @@ private struct OnboardingDeck: View {
                     Text(pages[index].sub).suit(12, .regular, tracking: -0.48)
                         .multilineTextAlignment(.center).foregroundStyle(DS.Palette.textTertiary)
                 }
-                    .id(index)
-                    .transition(.opacity)
+                .id(index)
+                .transition(.opacity)
             }
             .frame(width: 326, height: 91, alignment: .center)
             .padding(.top, 2)
@@ -502,28 +561,16 @@ private struct OnboardingDeck: View {
     }
 }
 
+/// 시뮬레이터 확인용 라우트(onboardingTogether): 함께 방 위에 온보딩을 바로 띄운다.
 struct OnboardingTogetherView: View {
-    @Environment(Router.self) private var router
     var body: some View {
-        OnboardingDeck(pages: [
-            .init(visual: "A-ob-together-1", title: "고민을 적으면\n비슷한 사람들과 매칭돼요", sub: "대화방에서 사람들이 내 고민을 들어줘요"),
-            .init(visual: "A-ob-together-2", title: "말하기 부담되면\n이모지로 반응해요", sub: "+ 버튼을 눌러 이모지를 날려요"),
-            .init(visual: "A-ob-together-3", title: "주전부리를 던지면\n가운데 테이블에 올라가요", sub: "오른쪽 퀵슬롯에서 주전부리를 눌러 던져요"),
-            .init(visual: "A-ob-together-4", title: "대화는 20분 뒤\n저장되지 않고 사라져요", sub: "해 뜨기 타이머가 끝나면 대화방이 종료돼요"),
-            .init(visual: "A-ob-together-5", title: "대화가 끝나면\n리포트가 도착해요", sub: "공감과 추천을 받으면 엉따 온도가 올라가요"),
-        ]) { router.pop() }
+        RoomView(forceOnboarding: true)
     }
 }
 
+/// 시뮬레이터 확인용 라우트(onboardingSolo): 혼자 방 위에 온보딩을 바로 띄운다.
 struct OnboardingSoloView: View {
-    @Environment(Router.self) private var router
     var body: some View {
-        OnboardingDeck(pages: [
-            .init(visual: "A-ob-solo-1", title: "매칭될 사람이 없으면\nAI와 먼저 대화해요", sub: "기다리지 않고 바로 고민을 털어놓아요"),
-            .init(visual: "A-ob-solo-2", title: "대화 중에 사람이 매칭되면\n함께 대화방으로 옮겨가요", sub: "AI와 대화하는 동안에도 계속 사람을 찾아요"),
-        ]) {
-            router.pop()
-            router.push(.roomSolo)
-        }
+        RoomSoloView(forceOnboarding: true)
     }
 }

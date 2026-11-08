@@ -66,7 +66,8 @@ final class Router {
     static func navMode(for r: Route) -> NavMode {
         switch r {
         case .home, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
-        case .onboardingTogether, .onboardingSolo: .dim
+        // 온보딩은 방 위에 겹쳐 뜨므로(2026. 11. 9.) 방과 같이 아래 탭을 보이지 않는다.
+        case .onboardingTogether, .onboardingSolo: .none
         default: .none
         }
     }

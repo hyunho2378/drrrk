@@ -31,22 +31,25 @@ final class ChairStore {
              colors: ["미디엄 그레이", "라이트 그레이", "스카이 블루", "크림 옐로우", "글로시 레더", "클래식 레드"],
              files: ["40b4fa7cb4", "f77c03c1bf", "801d8aedde", "cf2670f44f", "ad12677ce6", "db7b9eb9ee"]),
         Kind(id: "recl", name: "꿀잠 솔솔 리클라이너", label: "리클라이너", nick: "졸린 리클라이너12",
-             colors: ["블루 그레이", "브라운 가죽", "스웨이드 베이지"],
-             files: ["ef3d01c180", "3ff806dcf7", "07c35f83d0"]),
+             colors: ["뮤트 그레이", "빈티지 레더", "크림 화이트", "소프트 블루", "라임 그린", "토프 그레이"],
+             files: ["ef3d01c180", "3ff806dcf7", "ad4a1456", "7c2f0480", "25629e6f", "07c35f83d0"]),
     ]
 
-    // 리클라이너는 엉따가 40.0°가 될 때까지 잠겨 있다(지금 내 엉따는 39.2°).
-    static let lockNeed = "엉따 40.0°가 되면 획득할 수 있어요"
+    // 리클라이너는 엉따가 40.0°가 될 때까지 잠겨 있다(지금 내 엉따는 39.2°). 문구와 6색은 피그마 1951:13839 그대로다.
+    static let lockNeed = "엉따 온도 40.0°가 되면 획득할 수 있어요"
     static func isLocked(_ k: Int) -> Bool {
         kinds[k].id == "recl"
     }
 
+    /// 8자리 이름은 2026. 11. 9. 피그마에서 새로 받은 투명판 원본(D2-chair-, 큰 자리와 작은 자리 같이 쓴다)이다.
     static func big(_ k: Int, _ c: Int) -> String {
-        "D-chair-" + kinds[k].files[c]
+        let f = kinds[k].files[c]
+        return f.count == 8 ? "D2-chair-" + f : "D-chair-" + f
     }
 
     static func thumb(_ k: Int, _ c: Int) -> String {
-        "D-chairt-" + kinds[k].files[c]
+        let f = kinds[k].files[c]
+        return f.count == 8 ? "D2-chair-" + f : "D-chairt-" + f
     }
 
     private static let key = "drrrk.chair.v1"

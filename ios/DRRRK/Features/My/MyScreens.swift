@@ -1,7 +1,8 @@
 import Observation
 import SwiftUI
 
-// 마이 묶음. 새 마이(팀 피그마 1804:20170), 새 의자 팝업(1804:20299), 나의 편의점 시트(1790:10756), 아이템 상세(1790:10988).
+// 마이 묶음. 마이 리디자인(팀 피그마 1972:22735, 히어로와 엉따 밴드, 업적 편의점 격자), 스킨 획득 팝업(1972:22149),
+// 나의 편의점 시트(1790:10756), 아이템 상세(1790:10988).
 // 좌표와 값은 피그마 390 x 844 기준이다. 시트와 팝업은 마이 화면 위에 같은 화면 안에서 올라온다(화면 이동 없음).
 
 struct MyShelfItem: Identifiable, Hashable {
@@ -23,8 +24,9 @@ enum MyShelfData {
     static let monster = MyShelfItem(id: "monster", name: "몬스타", asset: "D-snack-monster", count: 5, group: "음료", isNew: true)
     static let byeollo = MyShelfItem(id: "byeollo", name: "별로", asset: "D-snack-byeollo", count: 1, group: "음료")
 
-    /// 마이 업적 편의점 선반(피그마 순서 그대로, 끝의 마지막처럼도 피그마에 있는 대로다)
+    /// 마이 업적 편의점 격자(피그마 1972:22735 순서 그대로). 끝의 두 칸(몬스타, 마지막처럼)은 아직 잠긴 칸이다.
     static let main: [MyShelfItem] = [shrimp, soju, peanut, nogari, drrra, squid, monster, soju]
+    static let lockedFrom = 6
     // 나의 편의점 전체(8종 19개)
     static let all: [MyShelfItem] = [shrimp, soju, peanut, nogari, drrra, squid, monster, byeollo]
     static let filters = ["전체", "과자", "음료", "안주"]
@@ -133,16 +135,14 @@ private struct MyHome: View {
         }
     }
 
+    /// 히어로 배경(피그마 hero bg 390 x 336: 밤하늘 사진 위 푸른 그라데이션). 아래는 #121415.
     private var background: some View {
-        ZStack(alignment: .top) {
-            Color(hex: 0x17505F)
-            Image("D-sky").resizable().scaledToFill()
-                .frame(height: 271).frame(maxWidth: .infinity).clipped()
-            VStack(spacing: 0) {
-                Color.clear.frame(height: 391)
-                DS.Palette.bgSurface
-            }
+        VStack(spacing: 0) {
+            Image("D2-my-hero").resizable().scaledToFill()
+                .frame(maxWidth: .infinity).frame(height: 336).clipped()
+            DS.Palette.bgSurface
         }
+        .background(DS.Palette.bgSurface)
         .ignoresSafeArea()
     }
 
@@ -156,107 +156,151 @@ private struct MyHome: View {
                 .foregroundStyle(DS.Palette.textPrimary)
                 .frame(width: 24, height: 24)
                 .frame(width: 40, height: 40)
-                .background(Color(hex: 0x454545, alpha: 0.6), in: Circle())
-                .offset(x: 326, y: 61)
+                .contentShape(Rectangle())
+                .offset(x: 326, y: 68)
                 .accessibilityLabel("설정")
 
-            // 내 의자. 누르면 의자 꾸미기로 간다.
+            // 현재 의자(100, 126, 190 x 190). 누르면 의자 꾸미기로 간다.
             Button {
                 chairs.openStudio(fresh: false)
                 router.push(.chairStudio)
             } label: {
                 Image(chairs.myBig).resizable().scaledToFit()
-                    .frame(width: 252, height: 252)
+                    .frame(width: 190, height: 190)
                     .contentShape(Rectangle())
             }
             .buttonStyle(ChairPressStyle())
             .accessibilityLabel("의자 꾸미기, 지금 의자 \(chairs.myKind.name)")
-            .offset(x: 69, y: 134)
+            .offset(x: 100, y: 126)
 
-            temperatureCard
-                .offset(x: 24, y: 421)
+            // 디자인 버튼(278, 280, 84 x 36): 검정 45% 바탕, 하늘색 70% 테두리
+            Button {
+                chairs.openStudio(fresh: false)
+                router.push(.chairStudio)
+            } label: {
+                HStack(spacing: 6) {
+                    Image("D2-icon-hanger").resizable().frame(width: 18, height: 18)
+                    Text("디자인").suit(12, .bold, lineHeight: 18).foregroundStyle(DS.Palette.brandPrimary)
+                }
+                .padding(.leading, 13)
+                .frame(width: 84, height: 36, alignment: .leading)
+                .background(.black.opacity(0.45), in: Capsule())
+                .overlay(Capsule().strokeBorder(DS.Palette.brandPrimary.opacity(0.7), lineWidth: 1))
+            }
+            .buttonStyle(ChairPressStyle())
+            .accessibilityLabel("의자 디자인 바꾸기")
+            .offset(x: 278, y: 280)
 
-            shelfCard
-                .offset(x: 24, y: 555)
+            warmBand.offset(x: 24, y: 356)
+            shelfHeader.offset(x: 24, y: 498)
+            shelfGrid.offset(x: 24, y: 534)
         }
     }
 
-    /// 엉따 온도 카드(342 x 118)
-    private var temperatureCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top) {
+    /// 엉따 온도 밴드(피그마 336 ~ 482): 제목과 39.2°, 막대(342 x 6), 다음 캐릭터 줄(40 높이)
+    private var warmBand: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 0) {
                 MyCardTitle("엉따 온도")
-                Spacer()
-                Text("39.2°").suit(26, .bold, tracking: -0.52)
+                Spacer(minLength: 0)
+                Text("39.2°").suit(26, .bold, tracking: -0.52, lineHeight: 36.4)
                     .foregroundStyle(DS.Palette.accentOrange)
                     .frame(height: 36)
             }
             .frame(height: 36)
-            // 막대가 왼쪽에서 오른쪽으로 찬다.
+            // 막대가 왼쪽에서 오른쪽으로 차오른다(244.8 / 342).
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 3).fill(Color(hex: 0x6E767C, alpha: 0.4))
                 RoundedRectangle(cornerRadius: 3)
                     .fill(LinearGradient(colors: [DS.Palette.brandPrimary, DS.Palette.accentOrange], startPoint: .leading, endPoint: .trailing))
-                    .frame(width: 245)
-                    .mask(alignment: .leading) { Rectangle().frame(width: 245 * gauge) }
+                    .frame(width: 244.8)
+                    .mask(alignment: .leading) { Rectangle().frame(width: 244.8 * gauge) }
             }
-            .frame(width: 306, height: 6)
-            HStack(spacing: 6) {
+            .frame(width: 342, height: 6)
+            HStack(spacing: 10) {
                 Image(ChairStore.thumb(4, 0)).resizable().scaledToFit()
-                    .frame(width: 24, height: 24).opacity(0.5)
-                Text("0.8° 더 따뜻해지면 새 캐릭터가 열려요").suit(12, .regular, tracking: -0.24)
-                    .foregroundStyle(DS.Palette.textSecondary)
+                    .frame(width: 30, height: 30).opacity(0.85)
+                    .frame(width: 40, height: 40)
+                    .background(.white.opacity(0.08), in: Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("다음 캐릭터 · ???").suit(13, .bold, lineHeight: 18).foregroundStyle(DS.Palette.textPrimary)
+                    Text("0.8° 더 따뜻해지면 열려요").suit(12, .medium, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
+                }
+                Spacer(minLength: 0)
+                Text("40°").suit(14, .bold, lineHeight: 20).foregroundStyle(DS.Palette.textPrimary)
             }
-            .frame(height: 24)
+            .frame(height: 40)
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 18)
-        .frame(width: 342, height: 118, alignment: .topLeading)
-        .background(Color(hex: 0x222628, alpha: 0.85), in: RoundedRectangle(cornerRadius: 18))
+        .frame(width: 342, alignment: .topLeading)
     }
 
-    /// 업적 편의점 카드(342 x 173). 선반은 옆으로 넘긴다.
-    private var shelfCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                MyCardTitle("업적 편의점")
-                Spacer()
+    /// 업적 편의점 머리줄(24, 498): 제목과 "전체 8"
+    private var shelfHeader: some View {
+        HStack {
+            MyCardTitle("업적 편의점")
+            Spacer()
+            Button {
+                withAnimation(DS.Motion.emphasizedDecel) { overlay = .shelf }
+            } label: {
+                HStack(spacing: 2) {
+                    Text("전체 8").suit(13, .medium, lineHeight: 18).foregroundStyle(DS.Palette.textSecondary)
+                    Image("D-icon-chevron-right").renderingMode(.template).resizable()
+                        .foregroundStyle(DS.Palette.textSecondary)
+                        .frame(width: 14, height: 14).padding(1)
+                }
+                .frame(height: 20)
+                .padding(.vertical, 12)
+                .padding(.leading, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .padding(.vertical, -12)
+            .accessibilityLabel("나의 편의점 전체 8종 보기")
+        }
+        .frame(width: 342, height: 20)
+    }
+
+    /// 업적 편의점 격자(342 x 198): 4칸 두 줄, 칸 76 x 93, 줄 사이 12. 끝의 두 칸은 잠긴 칸(그림 35%, 자물쇠, ???).
+    private var shelfGrid: some View {
+        let items = MyShelfData.main
+        let step: CGFloat = (342 - 76) / 3
+        return ZStack(alignment: .topLeading) {
+            ForEach(items.indices, id: \.self) { i in
+                let it = items[i]
+                let locked = i >= MyShelfData.lockedFrom
                 Button {
-                    withAnimation(DS.Motion.emphasizedDecel) { overlay = .shelf }
-                } label: {
-                    HStack(spacing: 2) {
-                        Text("전체 8").suit(13, .medium).foregroundStyle(DS.Palette.textSecondary)
-                        Image("D-icon-chevron-right").renderingMode(.template).resizable()
-                            .foregroundStyle(DS.Palette.textSecondary)
-                            .frame(width: 14, height: 14).padding(1)
+                    if locked {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    } else {
+                        open(it)
                     }
-                    .frame(height: 20)
-                    .padding(.vertical, 10)
-                    .padding(.leading, 12)
+                } label: {
+                    VStack(spacing: 4) {
+                        ZStack {
+                            Image(it.asset).resizable().scaledToFit()
+                                .frame(width: 68, height: 68)
+                                .opacity(locked ? 0.35 : 1)
+                            if locked {
+                                Image("D-icon-lock").renderingMode(.template).resizable()
+                                    .foregroundStyle(.white)
+                                    .frame(width: 24, height: 24)
+                            }
+                        }
+                        .frame(width: 72, height: 72)
+                        Text(locked ? "???" : it.name).suit(12, .medium, lineHeight: 17)
+                            .foregroundStyle(locked ? Color(hex: 0x666B73) : Color(hex: 0xD9DEE3))
+                            .lineLimit(1)
+                            .frame(height: 17)
+                    }
+                    .frame(width: 76, height: 93, alignment: .top)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .padding(.vertical, -10)
-                .accessibilityLabel("나의 편의점 전체 8종 보기")
+                .buttonStyle(ChairPressStyle())
+                .accessibilityLabel(locked ? "잠긴 칸" : "\(it.name), 보유 \(it.count)개")
+                .offset(x: CGFloat(i % 4) * step, y: CGFloat(i / 4) * 105)
             }
-            .frame(height: 20)
-
-            ZStack(alignment: .trailing) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    MyShelfRow(items: MyShelfData.main, pad: 16, counts: false) { open($0) }
-                }
-                .frame(width: 324, height: 111)
-                LinearGradient(colors: [.black.opacity(0), .black.opacity(0.95)], startPoint: .leading, endPoint: .trailing)
-                    .frame(width: 129, height: 111)
-                    .allowsHitTesting(false)
-            }
-            .padding(.trailing, -18)
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 18)
-        .frame(width: 342, height: 173, alignment: .topLeading)
-        .background(Color(hex: 0x222628, alpha: 0.85))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .frame(width: 342, height: 198, alignment: .topLeading)
     }
 
     private func open(_ i: MyShelfItem) {
@@ -520,50 +564,108 @@ private struct MyItemSheet: View {
     }
 }
 
-/// 새 의자를 얻었어요 팝업(피그마 1804:20299, 326 x 399).
+/// 스킨 획득 팝업(피그마 1972:22149). 마이 화면 위에 짙은 막(#05080A 88%, 흐림 16)이 덮이고, 주황 빛과 빛줄기 위에
+/// 새 의자(푹신한 가죽 소파 230 x 230), "새로운 디자인" 칩, 이름, 엉따 39° 도달 막대, 지금 앉아보기, 나중에 할게요가 놓인다.
 private struct MySkinModal: View {
     let sit: () -> Void
     let later: () -> Void
     @State private var shown = false
+    @State private var fill: CGFloat = 0
+
+    private let orange = Color(hex: 0xFF9959)
+    private let sparkles: [(CGFloat, CGFloat, CGFloat)] = [(70, 176, 22), (300, 190, 16), (320, 360, 24), (56, 370, 14), (250, 140, 12), (120, 420, 10)]
 
     var body: some View {
-        ZStack {
-            Color.black.opacity(0.72).ignoresSafeArea()
-                .onTapGesture(perform: later)
-            VStack(spacing: 20) {
-                VStack(spacing: 0) {
-                    Text("엉따 39.0°").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.accentOrange)
-                        .padding(.horizontal, 10).frame(height: 25)
-                        .background(DS.Palette.accentOrange.opacity(0.18), in: Capsule())
-                    Image(ChairStore.big(2, 0)).resizable().scaledToFit()
-                        .frame(width: 170, height: 170)
-                    VStack(spacing: 4) {
-                        Text("새 의자를 얻었어요!").suit(20, .bold, tracking: -0.8).foregroundStyle(DS.Palette.textPrimary)
-                            .frame(height: 28)
-                        Text("‘푹신한 가죽 소파’를 획득했어요").suit(14, .regular, tracking: -0.56)
-                            .foregroundStyle(DS.Palette.textSecondary).frame(height: 20)
-                    }
+        GeometryReader { geo in
+            let s = geo.size.width / 390
+            ZStack(alignment: .topLeading) {
+                Image("D2-skin-glow").resizable().frame(width: 380, height: 380).offset(x: 5, y: 101)
+                Image("D2-skin-rays").resizable().frame(width: 390, height: 390).offset(x: 0, y: 100)
+                Image(ChairStore.big(2, 0)).resizable().scaledToFit()
+                    .frame(width: 230, height: 230)
+                    .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 16)
+                    .scaleEffect(shown ? 1 : 0.85)
+                    .offset(x: 80, y: 180)
+                ForEach(sparkles.indices, id: \.self) { i in
+                    Image("D2-sparkle-\(i + 1)").resizable()
+                        .frame(width: sparkles[i].2, height: sparkles[i].2)
+                        .opacity(shown ? 1 : 0)
+                        .offset(x: sparkles[i].0, y: sparkles[i].1)
                 }
+                VStack(spacing: 6) {
+                    Text("새로운 디자인").suit(12, .bold, lineHeight: 18).foregroundStyle(DS.Palette.brandPrimary)
+                        .frame(width: 92, height: 28)
+                        .background(.black.opacity(0.45), in: Capsule())
+                        .overlay(Capsule().strokeBorder(DS.Palette.brandPrimary.opacity(0.7), lineWidth: 1))
+                    Text("푹신한 가죽 소파").suit(28, .bold, lineHeight: 38).foregroundStyle(DS.Palette.textPrimary)
+                        .frame(height: 38)
+                }
+                .frame(width: 390)
+                .offset(y: 450)
+                gauge.offset(x: 75, y: 542)
+                Text("엉따 온도 39°에 도달해서 열렸어요").suit(13, .medium, lineHeight: 18)
+                    .foregroundStyle(DS.Palette.textSecondary)
+                    .frame(width: 390)
+                    .offset(y: 600)
                 VStack(spacing: 12) {
                     Button(action: sit) {
-                        Text("지금 앉아보기").suit(16, .bold, tracking: -0.64).foregroundStyle(.black)
+                        Text("지금 앉아보기").suit(16, .bold, tracking: -0.64, lineHeight: 22.4).foregroundStyle(.black)
                             .frame(width: 278, height: 46)
-                            .background(DS.Palette.brandPrimary, in: Capsule())
+                            .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 28))
                     }
                     .buttonStyle(ChairPressStyle())
                     Button(action: later) {
-                        Text("나중에 할게요").suit(13, .medium, tracking: -0.52).foregroundStyle(DS.Palette.textTertiary)
-                            .frame(height: 18).padding(.horizontal, 20).contentShape(Rectangle())
+                        Text("나중에 할게요").suit(13, .medium, tracking: -0.52, lineHeight: 18.2).foregroundStyle(DS.Palette.textTertiary)
+                            .frame(height: 18).padding(.horizontal, 20).padding(.vertical, 8).contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .padding(.vertical, -8)
                 }
+                .frame(width: 390)
+                .offset(y: 668)
             }
-            .padding(.top, 32).padding(.horizontal, 24).padding(.bottom, 24)
-            .frame(width: 326)
-            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 28))
-            .scaleEffect(shown ? 1 : 0.92)
+            .frame(width: 390, height: 844, alignment: .topLeading)
+            .scaleEffect(s, anchor: .topLeading)
             .opacity(shown ? 1 : 0)
+            .frame(width: geo.size.width, height: geo.size.height, alignment: .topLeading)
         }
-        .onAppear { withAnimation(DS.Motion.decel(0.25)) { shown = true } }
+        .background {
+            ZStack {
+                Rectangle().fill(.ultraThinMaterial)
+                Color(hex: 0x05080A).opacity(0.88)
+            }
+            .opacity(shown ? 1 : 0)
+            .onTapGesture(perform: later)
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation(DS.Motion.decel(0.35)) { shown = true }
+            withAnimation(DS.Motion.decel(0.9).delay(0.25)) { fill = 1 }
+        }
+    }
+
+    /// 36°에서 40°까지 막대(240 x 6, 흰 12%), 39°까지 차오른 부분(180), 도달 점(14, 주황, 테두리 #0A0D0F 3)
+    private var gauge: some View {
+        ZStack(alignment: .topLeading) {
+            Text("39°").suit(13, .bold, lineHeight: 18).foregroundStyle(orange)
+                .offset(x: 169.5)
+                .opacity(fill)
+            RoundedRectangle(cornerRadius: 3).fill(.white.opacity(0.12)).frame(width: 240, height: 6).offset(y: 24)
+            RoundedRectangle(cornerRadius: 3)
+                .fill(LinearGradient(colors: [DS.Palette.brandPrimary, orange], startPoint: .leading, endPoint: .trailing))
+                .frame(width: 180, height: 6)
+                .mask(alignment: .leading) { Rectangle().frame(width: 180 * fill) }
+                .offset(y: 24)
+            Circle().fill(orange)
+                .overlay(Circle().strokeBorder(Color(hex: 0x0A0D0F), lineWidth: 3))
+                .frame(width: 14, height: 14)
+                .shadow(color: orange.opacity(0.8), radius: 5)
+                .opacity(fill)
+                .offset(x: 173, y: 20)
+            Text("36°").suit(11, .medium, lineHeight: 15).foregroundStyle(DS.Palette.textSecondary).offset(y: 34)
+            Text("40°").suit(11, .medium, lineHeight: 15).foregroundStyle(DS.Palette.textSecondary)
+                .frame(width: 240, alignment: .trailing).offset(y: 34)
+        }
+        .frame(width: 240, height: 50, alignment: .topLeading)
     }
 }

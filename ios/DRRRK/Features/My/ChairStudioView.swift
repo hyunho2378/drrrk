@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// 의자 꾸미기. 팀 피그마 "의자 꾸미기 · 소파 선택"(1647:23223, 1951:13222, 1951:13140, 1951:13308)과
-/// "잠긴 의자 선택"(1647:23282)의 자리와 값을 웹 ChairStudio.jsx와 같게 옮겼다(390 x 844 기준 좌표).
+/// 의자 꾸미기. 팀 피그마 "의자 꾸미기 · 소파 선택"(1647:23223, 1951:13222, 1951:13140, 1951:13308, 1951:13839)과
+/// "잠긴 의자 선택"(1647:23282)의 자리와 값을 옮겼다(390 x 844 기준 좌표). 큰 의자 100,151 190, 이름 349, 스타일 이름 384.
 /// 종류를 누르면 그 종류의 의자가, 스타일을 누르면 큰 그림 하나만 바뀐다(화면 전체는 움직이지 않는다).
 /// 리클라이너는 고를 수는 있지만 저장할 수 없다.
 struct ChairStudioView: View {
@@ -59,7 +59,7 @@ struct ChairStudioView: View {
             }
             .frame(width: 190, height: 190)
             .animation(DS.Motion.decel(0.34), value: ChairStore.big(k, c))
-            .offset(x: 100, y: 154)
+            .offset(x: 100, y: 151)
 
             if locked {
                 Image("D-icon-lock").renderingMode(.template).resizable()
@@ -71,16 +71,18 @@ struct ChairStudioView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
             }
 
-            VStack(spacing: 3) {
-                Text(kind.name).suit(19, .bold, tracking: -0.38)
+            VStack(spacing: 8) {
+                Text(kind.name).suit(19, .bold, tracking: -0.38, lineHeight: 26.6)
                     .foregroundStyle(DS.Palette.textPrimary)
-                Text(locked ? ChairStore.lockNeed : kind.colors[c]).suit(13, .medium, tracking: -0.26)
+                    .frame(height: 27)
+                Text(locked ? ChairStore.lockNeed : kind.colors[c]).suit(13, .medium, tracking: -0.26, lineHeight: 18.2)
                     .foregroundStyle(locked ? DS.Palette.accentOrange : DS.Palette.textSecondary)
+                    .frame(height: 18)
             }
             .id("\(k)-\(c)")
             .transition(.opacity.combined(with: .offset(y: 4)))
             .frame(width: 390)
-            .offset(y: 344)
+            .offset(y: 349)
 
             Text("의자").suit(15, .bold, tracking: -0.6).foregroundStyle(DS.Palette.textPrimary)
                 .offset(x: 24, y: 430)
@@ -96,7 +98,7 @@ struct ChairStudioView: View {
                         ZStack {
                             Image(ChairStore.thumb(i, 0)).resizable().scaledToFit()
                                 .frame(width: 46, height: 46)
-                                .brightness(ChairStore.isLocked(i) ? -0.45 : 0)
+                                .opacity(ChairStore.isLocked(i) ? 0.3 : 1)
                             if ChairStore.isLocked(i) {
                                 Image("D-icon-lock").renderingMode(.template).resizable()
                                     .foregroundStyle(DS.Palette.textPrimary)
@@ -132,13 +134,13 @@ struct ChairStudioView: View {
                                 ZStack(alignment: .topLeading) {
                                     Image(ChairStore.thumb(k, j)).resizable().scaledToFit()
                                         .frame(width: 76, height: 76)
-                                        .brightness(locked ? -0.45 : 0)
+                                        .opacity(locked ? 0.23 : 1)
                                         .offset(x: 16, y: 8)
                                     if locked {
                                         Image("D-icon-lock").renderingMode(.template).resizable()
                                             .foregroundStyle(DS.Palette.textPrimary)
-                                            .frame(width: 16, height: 16)
-                                            .offset(x: 46, y: 38)
+                                            .frame(width: 24, height: 24)
+                                            .offset(x: 42, y: 34)
                                     }
                                     Text(kind.colors[j]).suit(12, on && !locked ? .bold : .medium, tracking: -0.48)
                                         .foregroundStyle(on && !locked ? primary : DS.Palette.textSecondary)
@@ -175,13 +177,13 @@ struct ChairStudioView: View {
             }
 
             Button(action: save) {
+                // 피그마 1951:13839: 잠긴 리클라이너를 골라도 저장하기는 하늘색 그대로이고, 누르면 잠금 안내가 뜬다.
                 Text("저장하기").suit(16, .bold, tracking: -0.32)
-                    .foregroundStyle(locked ? DS.Palette.textTertiary : .black)
+                    .foregroundStyle(.black)
                     .frame(width: 342, height: 56)
-                    .background(locked ? elevated : primary, in: Capsule())
+                    .background(primary, in: Capsule())
             }
             .buttonStyle(ChairPressStyle())
-            .animation(DS.Motion.standard, value: locked)
             .offset(x: 24, y: 764)
         }
         .frame(width: 390, height: 844, alignment: .topLeading)

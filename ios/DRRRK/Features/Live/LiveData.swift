@@ -94,9 +94,10 @@ enum WatchData {
     static let scene = "C-841d51748126"
     static let title = "둘이 찍은 사진인데\n지만 보정해서 올린 여우"
     static let seats: [WatchSeat] = [
-        .init(name: "리클라이너21", image: "C-3ab7dfb2602d"),
-        .init(name: "나무스툴12", image: "C-6977f0a432c8"),
-        .init(name: "가죽소파19", image: "C-24a5f181f678"),
+        // 투명판 의자 그림(흰 바탕 원본을 쓰면 원 바깥에 흰 테두리가 보인다)
+        .init(name: "리클라이너21", image: "D-chairt-4fdd18ce8a"),
+        .init(name: "나무스툴12", image: "D-chairt-51be0a544b"),
+        .init(name: "가죽소파19", image: "D-chairt-eab22a7a4d"),
     ]
     static let floorNames: [(String, CGFloat, CGFloat, Bool)] = [
         ("부드러운 리클라이너21", -14, 132, false), ("새벽2시 편의점 의자", 106, 140, true),
