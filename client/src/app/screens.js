@@ -67,8 +67,8 @@ export const SCREENS = [
  {
   "n": 12,
   "id": "1647:22751",
-  "name": "DRRRK · 온보딩 · 함께 드르륵 9",
-  "file": "DRRRK9",
+  "name": "DRRRK · 온보딩 · 함께 드르륵 1~5",
+  "file": "Onboarding",
   "h": 844
  },
  {
@@ -434,6 +434,7 @@ const modules = {
   'DRRRK6': () => import('../figma/screens/DRRRK6.jsx'),
   'MY39': () => import('../figma/screens/MY39.jsx'),
   'ChairStudio': () => import('./ChairStudio.jsx'),
+  'Onboarding': () => import('./Onboarding.jsx'),
   'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
   'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),
   'DRRRKDark': () => import('../figma/screens/DRRRKDark.jsx'),

@@ -415,15 +415,20 @@ private struct OnboardingDeck: View {
     @State private var index = 0
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Canvas390 {
-                HomeBackdrop().allowsHitTesting(false)
-                Color.black.opacity(0.6).frame(width: 390, height: 844)
-                CloseX { onFinish() }.at(322, 165)
-                card.at(32, 213)
+        // 아래 탭은 화면 바닥(안전 영역 위)에 고정한다. 카드 장이 바뀌어도 크기 계산에 끼지 않게 배경과 덮개로 나눈다.
+        Color.clear
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                Canvas390 {
+                    HomeBackdrop().allowsHitTesting(false)
+                    Color.black.opacity(0.6).frame(width: 390, height: 844)
+                    CloseX { onFinish() }.at(322, 165)
+                    card.at(32, 213)
+                }
             }
-            BottomNav().allowsHitTesting(false).overlay(Color.black.opacity(0.6).allowsHitTesting(false))
-        }
+            .overlay(alignment: .bottom) {
+                BottomNav().allowsHitTesting(false).overlay(Color.black.opacity(0.6).allowsHitTesting(false))
+            }
         .toolbar(.hidden, for: .navigationBar)
     }
 
@@ -439,14 +444,16 @@ private struct OnboardingDeck: View {
             }
             .frame(width: 326, height: 220)
             .clipped()
-            VStack(spacing: 8) {
-                Text(pages[index].title).suit(16, .bold, tracking: -0.64, lineHeight: 22.4)
-                    .multilineTextAlignment(.center).foregroundStyle(Color(hex: 0x121415))
-                Text(pages[index].sub).suit(12, .regular, tracking: -0.48)
-                    .multilineTextAlignment(.center).foregroundStyle(DS.Palette.textTertiary)
+            ZStack {
+                VStack(spacing: 8) {
+                    Text(pages[index].title).suit(16, .bold, tracking: -0.64, lineHeight: 22.4)
+                        .multilineTextAlignment(.center).foregroundStyle(Color(hex: 0x121415))
+                    Text(pages[index].sub).suit(12, .regular, tracking: -0.48)
+                        .multilineTextAlignment(.center).foregroundStyle(DS.Palette.textTertiary)
+                }
+                    .id(index)
+                    .transition(.opacity)
             }
-            .id(index)
-            .transition(.opacity)
             .frame(width: 326, height: 91, alignment: .center)
             .padding(.top, 2)
             ZStack {

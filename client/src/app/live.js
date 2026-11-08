@@ -720,6 +720,12 @@ export async function prepare(layer, n, prevN) {
 // ---------- 붙이기(전환이 끝난 뒤) ----------
 let ticker = 0;
 let current = { n: 0, go: null, layer: null };
+// 손으로 쓴 화면(온보딩 등)이 화면 이동을 부탁할 때 쓰는 신호. 지금 보이는 화면의 go로 넘긴다.
+if (typeof window !== 'undefined' && !window.__drrrkGo) {
+  window.__drrrkGo = true;
+  window.addEventListener('drrrk:go', (e) => { if (current && current.go && e.detail) current.go(e.detail); });
+}
+
 export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;
