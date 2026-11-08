@@ -402,89 +402,260 @@ private struct MiniVoiceWave: View {
     }
 }
 
-struct ReportView: View {
-    @Environment(Router.self) private var router
-    @State private var reason: Int? = nil
-    @State private var alsoBlock = false
-    @State private var detail = ""
-    private let reasons = ["욕설, 비하, 혐오 표현", "성적인 발언", "개인정보를 묻거나 노출함", "스팸, 홍보", "대화 방해(도배, 소음)", "기타"]
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            BackHeader(onBack: { router.close() })
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("딱딱한 나무 스툴12님을 신고할까요?").suit(18, .bold, tracking: -0.36).foregroundStyle(DS.Palette.textPrimary)
-                    Text("신고 사유를 하나 골라주세요").suit(13, .medium, tracking: -0.26).foregroundStyle(DS.Palette.textSecondary).padding(.top, 8)
-                    VStack(spacing: 0) {
-                        ForEach(reasons.indices, id: \.self) { i in
-                            Button { withAnimation(DS.Motion.stateIn) { reason = i } } label: {
-                                HStack {
-                                    Text(reasons[i]).suit(14, .medium, tracking: -0.28).foregroundStyle(DS.Palette.textPrimary)
-                                    Spacer()
-                                    Circle().strokeBorder(reason == i ? DS.Palette.brandPrimary : DS.Palette.textTertiary, lineWidth: reason == i ? 6 : 1.5)
-                                        .frame(width: 20, height: 20)
-                                }
-                                .frame(height: 44).contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.top, 20)
-                    Text("자세한 상황을 알려주세요 (선택)").suit(13, .medium, tracking: -0.26).foregroundStyle(DS.Palette.textSecondary).padding(.top, 20)
-                    TextField("", text: $detail, axis: .vertical)
-                        .suit(14).foregroundStyle(DS.Palette.textPrimary).lineLimit(3 ... 5)
-                        .padding(14).background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
-                        .padding(.top, 8)
-                    Text("\(detail.count)/200").suit(11).foregroundStyle(DS.Palette.textTertiary).frame(maxWidth: .infinity, alignment: .trailing).padding(.top, 6)
-                    Text("신고해도 통화는 그대로 유지되고, 상대에게 알리지 않아요. 바로 대화를 끊고 싶다면 차단도 함께 해주세요.")
-                        .suit(12, .medium, tracking: -0.24).foregroundStyle(DS.Palette.textSecondary).padding(.top, 14)
-                    Toggle(isOn: $alsoBlock) { Text("차단도 함께 하기").suit(13, .medium).foregroundStyle(DS.Palette.textPrimary) }
-                        .tint(DS.Palette.brandPrimary).padding(.top, 14)
-                }
-                .padding(.horizontal, 24)
-            }
-            PrimaryButton(title: "신고하기") { router.close() }
-                .disabled(reason == nil).opacity(reason == nil ? 0.4 : 1)
-                .padding(.horizontal, 24).padding(.bottom, 16)
-        }
-        .background(DS.Palette.bgSurface.ignoresSafeArea())
-        .toolbar(.hidden, for: .navigationBar)
+/// 신고와 차단 화면의 위험 색(피그마 btn, Button / Danger: #FF5A5F)
+private let reportRed = Color(hex: 0xFF5A5F)
+
+/// 피그마 글자 스타일(행간 140%, 자간 -2%)
+private extension View {
+    func rb(_ size: CGFloat, _ w: SUITWeight, _ c: Color) -> some View {
+        suit(size, w, tracking: -0.02 * size, lineHeight: size * 1.4).foregroundStyle(c)
     }
 }
 
+/// 체크박스(피그마 checkbox: 칸 20, #6E767C 2px 테두리, 모서리 6, 글자 13 Medium, 간격 8). 켜면 하늘색 칸에 검은 체크.
+private struct ReportCheckBox: View {
+    let title: String
+    @Binding var on: Bool
+    var body: some View {
+        Button {
+            withAnimation(DS.Motion.stateIn) { on.toggle() }
+            UISelectionFeedbackGenerator().selectionChanged()
+        } label: {
+            HStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6).fill(on ? DS.Palette.brandPrimary : .clear)
+                    RoundedRectangle(cornerRadius: 6).strokeBorder(on ? DS.Palette.brandPrimary : DS.Palette.textTertiary, lineWidth: 2)
+                    if on {
+                        CheckMark().stroke(.black, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                            .frame(width: 14, height: 14)
+                    }
+                }
+                .frame(width: 20, height: 20)
+                Text(title).rb(13, .medium, DS.Palette.textPrimary)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(on ? .isSelected : [])
+    }
+}
+
+/// 피그마 icon/check(14 x 14) 선
+private struct CheckMark: Shape {
+    func path(in r: CGRect) -> Path {
+        let k = r.width / 14
+        var p = Path()
+        p.move(to: CGPoint(x: r.minX + 11.6663 * k, y: r.minY + 3.5 * k))
+        p.addLine(to: CGPoint(x: r.minX + 5.2497 * k, y: r.minY + 9.9167 * k))
+        p.addLine(to: CGPoint(x: r.minX + 2.333 * k, y: r.minY + 7 * k))
+        return p
+    }
+}
+
+/// 신고(피그마 1647:22101 "바텀시트 · 신고"). 방 위에 Dim 60%를 깔고 아래에서 올라오는 시트(390 x 657, #121415, 위 모서리 24).
+struct ReportView: View {
+    @Environment(Router.self) private var router
+    @State private var reason = 0
+    @State private var alsoBlock = false
+    @State private var detail = ""
+    @State private var shown = false
+    @FocusState private var typing: Bool
+    // 사유 문구는 피그마 그대로(가운뎃점 포함)
+    private let reasons = ["욕설 · 비하 · 혐오 표현", "성적인 발언", "개인정보를 묻거나 노출함", "스팸 · 홍보", "대화 방해 (도배 · 소음)", "기타"]
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            Color.black.opacity(shown ? 0.6 : 0).ignoresSafeArea().onTapGesture { close() }
+            sheet.offset(y: shown ? 0 : 700)
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear { withAnimation(DS.Motion.decel(0.34)) { shown = true } }
+    }
+
+    private var sheet: some View {
+        VStack(spacing: 16) {
+            RoundedRectangle(cornerRadius: 2).fill(DS.Palette.textTertiary).frame(width: 40, height: 4)
+            VStack(spacing: 4) {
+                Text("딱딱한 나무 스툴12님을 신고할까요?").rb(18, .bold, DS.Palette.textPrimary).multilineTextAlignment(.center)
+                Text("신고 사유를 하나 골라주세요").rb(13, .regular, DS.Palette.textSecondary).multilineTextAlignment(.center)
+            }
+            VStack(spacing: 4) {
+                ForEach(reasons.indices, id: \.self) { i in
+                    let on = reason == i
+                    Button {
+                        withAnimation(DS.Motion.stateIn) { reason = i }
+                        UISelectionFeedbackGenerator().selectionChanged()
+                    } label: {
+                        HStack(spacing: 12) {
+                            ZStack {
+                                Circle().strokeBorder(on ? DS.Palette.brandPrimary : DS.Palette.textTertiary, lineWidth: 2)
+                                Circle().fill(DS.Palette.brandPrimary).frame(width: 10, height: 10).opacity(on ? 1 : 0)
+                            }
+                            .frame(width: 20, height: 20)
+                            Text(reasons[i]).rb(14, on ? .bold : .medium, DS.Palette.textPrimary)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, 14)
+                        .frame(height: 40)
+                        .background(on ? DS.Palette.brandSubtle : .clear, in: RoundedRectangle(cornerRadius: 12))
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(on ? .isSelected : [])
+                }
+            }
+            // 상세 입력(선택) 342 x 76, #222628, 모서리 14
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 14).fill(DS.Palette.bgElevated)
+                TextField("", text: $detail, prompt: Text("자세한 상황을 알려주세요 (선택)").foregroundStyle(DS.Palette.textTertiary), axis: .vertical)
+                    .rb(13, .regular, DS.Palette.textPrimary)
+                    .lineLimit(1 ... 2)
+                    .focused($typing)
+                    .onChange(of: detail) { _, v in if v.count > 200 { detail = String(v.prefix(200)) } }
+                    .padding(.top, 12).padding(.horizontal, 14)
+                Text("\(detail.count)/200").rb(11, .regular, DS.Palette.textTertiary).monospacedDigit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    .padding(.trailing, 11).padding(.bottom, 7)
+            }
+            .frame(height: 76)
+            .onTapGesture { typing = true }
+            // 정책 안내 342 x 58, #222628, 모서리 14, 안쪽 12 / 14, 정보 아이콘 16
+            HStack(alignment: .top, spacing: 8) {
+                Image("B2-icon-info").renderingMode(.template).resizable().frame(width: 16, height: 16)
+                    .foregroundStyle(DS.Palette.brandPrimary)
+                Text("신고해도 통화는 그대로 유지되고, 상대에게 알리지 않아요.  바로 대화를 끊고 싶다면 차단도 함께 해주세요.")
+                    .rb(12, .regular, DS.Palette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, 12).padding(.horizontal, 14)
+            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 14))
+            ReportCheckBox(title: "차단도 함께 하기", on: $alsoBlock)
+                .frame(height: 20)
+            Button(action: submit) {
+                Text("신고하기").suit(16, .bold, tracking: -0.64, lineHeight: 22.4).foregroundStyle(.white)
+                    .frame(maxWidth: .infinity).frame(height: 46)
+                    .background(reportRed, in: RoundedRectangle(cornerRadius: 28))
+            }
+            .buttonStyle(RoomPressStyle())
+        }
+        .padding(.top, 14).padding(.horizontal, 24).padding(.bottom, 36)
+        .frame(maxWidth: .infinity)
+        .background {
+            UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24).fill(DS.Palette.bgSurface)
+                .ignoresSafeArea(.container, edges: .bottom)
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
+    }
+
+    private func submit() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        typing = false
+        if alsoBlock {
+            router.present(.block)
+        } else {
+            close()
+        }
+    }
+
+    private func close() {
+        typing = false
+        withAnimation(DS.Motion.emphasizedAccel) { shown = false }
+        Task {
+            try? await Task.sleep(for: .seconds(0.3))
+            router.close()
+        }
+    }
+}
+
+/// 차단 확인(피그마 1647:22209 "모달 · 차단 확인"). 방 위 Dim 60%, 가운데 326 폭 창(#121415, #222628 1px 테두리, 모서리 24).
+/// 차단해도 나는 이 방에 남으므로 창만 닫는다.
 struct BlockView: View {
     @Environment(Router.self) private var router
     @State private var alsoReport = false
+    @State private var shown = false
+    private let facts = ["지금 바로 서로의 목소리와 채팅이 끊겨요", "앞으로 같은 방에 매칭되지 않아요", "나는 이 방에 계속 남아 있어요"]
+
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6).ignoresSafeArea().onTapGesture { router.close() }
-            VStack(spacing: 0) {
-                Text("딱딱한 나무 스툴12님을\n차단할까요?").suit(18, .bold, tracking: -0.36).multilineTextAlignment(.center).foregroundStyle(DS.Palette.textPrimary)
+            Color.black.opacity(shown ? 0.6 : 0).ignoresSafeArea().onTapGesture { close() }
+            VStack(spacing: 16) {
+                // 금지 아이콘 원 56, #FF5A5F 15%, 아이콘 26
+                ZStack {
+                    Circle().fill(reportRed.opacity(0.15))
+                    BanIcon().stroke(reportRed, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                        .frame(width: 26, height: 26)
+                }
+                .frame(width: 56, height: 56)
+                Text("딱딱한 나무 스툴12님을\n차단할까요?").rb(18, .bold, DS.Palette.textPrimary).multilineTextAlignment(.center)
                 VStack(alignment: .leading, spacing: 8) {
-                    ForEach(["지금 바로 서로의 목소리와 채팅이 끊겨요", "앞으로 같은 방에 매칭되지 않아요", "나는 이 방에 계속 남아 있어요"], id: \.self) {
-                        Text($0).suit(13, .medium, tracking: -0.26).foregroundStyle(DS.Palette.textSecondary)
+                    ForEach(facts, id: \.self) { t in
+                        HStack(spacing: 8) {
+                            CheckMark().stroke(DS.Palette.textTertiary, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                                .frame(width: 14, height: 14)
+                            Text(t).rb(13, .regular, DS.Palette.textPrimary)
+                        }
+                        .frame(height: 18)
                     }
                 }
-                .padding(.top, 16)
-                Toggle(isOn: $alsoReport) { Text("신고도 함께 하기").suit(13, .medium).foregroundStyle(DS.Palette.textPrimary) }
-                    .tint(DS.Palette.brandPrimary).padding(.top, 16)
-                HStack(spacing: 8) {
-                    Button { router.close() } label: {
-                        Text("취소").suit(15, .bold).foregroundStyle(DS.Palette.textPrimary).frame(maxWidth: .infinity).frame(height: 48)
-                            .background(DS.Palette.gray800, in: Capsule())
+                .padding(.vertical, 14).padding(.horizontal, 16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 14))
+                ReportCheckBox(title: "신고도 함께 하기", on: $alsoReport)
+                    .frame(height: 20)
+                HStack(spacing: 10) {
+                    Button { close() } label: {
+                        Text("취소").rb(15, .bold, DS.Palette.textPrimary)
+                            .frame(maxWidth: .infinity).frame(height: 46)
+                            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 26))
                     }
-                    Button { router.popToRoot() } label: {
-                        Text("차단하기").suit(15, .bold).foregroundStyle(.white).frame(maxWidth: .infinity).frame(height: 48)
-                            .background(DS.Palette.danger, in: Capsule())
+                    Button(action: block) {
+                        Text("차단하기").rb(15, .bold, DS.Palette.textPrimary)
+                            .frame(maxWidth: .infinity).frame(height: 46)
+                            .background(reportRed, in: RoundedRectangle(cornerRadius: 26))
                     }
                 }
-                .buttonStyle(RoomPressStyle()).padding(.top, 20)
+                .buttonStyle(RoomPressStyle())
             }
-            .padding(24)
-            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 24))
-            .padding(.horizontal, 24)
+            .padding(.top, 28).padding(.horizontal, 24).padding(.bottom, 24)
+            .frame(width: 326)
+            .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 24))
+            .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(DS.Palette.bgElevated, lineWidth: 1))
+            .scaleEffect(shown ? 1 : 0.92)
+            .opacity(shown ? 1 : 0)
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear { withAnimation(DS.Motion.emphasizedDecel) { shown = true } }
+    }
+
+    private func block() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        if alsoReport {
+            router.present(.report)
+        } else {
+            close()
+        }
+    }
+
+    private func close() {
+        withAnimation(DS.Motion.emphasizedAccel) { shown = false }
+        Task {
+            try? await Task.sleep(for: .seconds(0.25))
+            router.close()
+        }
+    }
+}
+
+/// 피그마 icon/ban(26 x 26): 원과 대각선
+private struct BanIcon: Shape {
+    func path(in r: CGRect) -> Path {
+        let k = r.width / 26
+        var p = Path()
+        p.addEllipse(in: CGRect(x: r.minX + 2.167 * k, y: r.minY + 2.166 * k, width: 21.667 * k, height: 21.667 * k))
+        p.move(to: CGPoint(x: r.minX + 5.309 * k, y: r.minY + 5.309 * k))
+        p.addLine(to: CGPoint(x: r.minX + 20.692 * k, y: r.minY + 20.692 * k))
+        return p
     }
 }
 

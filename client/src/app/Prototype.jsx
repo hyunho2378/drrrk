@@ -10,6 +10,7 @@ import { morph } from './morph.js';
 import { useViewport } from './useFitScale.js';
 import { fitMobile } from './mobileFit.js';
 import { attach, prepare, swapAssets, resolveTo } from './live.js';
+import { carryRoom } from './roomCarry.js';
 import SystemStatusBar from './SystemStatusBar.jsx';
 import { SCREEN_ASSETS } from './screenAssets.js';
 
@@ -65,6 +66,7 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) 
       .then(() => (document.fonts ? document.fonts.ready : null))
       // 보이기 전에 첫 모습을 만든다(글자 바꾸기, 고민 분석 0, 채팅 숨김, 시계, 막대). 오류가 나도 화면은 보이게 한다.
       .then(() => (alive ? prepare(el, layer.n, prevN).catch(() => {}) : null))
+      .then(() => { if (alive) { try { carryRoom(el, layer.n); } catch (e) { /* 이어 붙이기 실패해도 화면은 보인다 */ } } })
       .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
       .then(() => {
         if (alive) onReady(layer.key);

@@ -38,6 +38,8 @@ export const SYNC = {
 export const NAMES = { '새벽녘 플라스틱의자29': '진실의 의자10', '새벽2시 드르륵 칵': '새벽2시 피시방', '새벽2시 택배상자': '새벽2시 피시방' };
 
 export function applyNames(root) {
+  // 대화 요약 화면(1, 2, 3)은 팀 피그마에 아직 "새벽2시 택배상자"(상자 그림)로 남아 있어 이름을 바꾸지 않는다(11. 9. 피그마 확인).
+  if (['1647:26726', '1647:26876', '1647:27027'].includes(root.getAttribute('data-node') || (root.querySelector('[data-node]') && root.querySelector('[data-node]').getAttribute('data-node')))) return;
   root.querySelectorAll('p[data-outline]').forEach((p) => {
     const t = p.textContent.replace(/\s+$/, '');
     const to = NAMES[t.trim()];
