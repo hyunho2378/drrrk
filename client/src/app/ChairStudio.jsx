@@ -2,7 +2,7 @@
 // 종류를 누르면 그 종류의 의자가, 색을 누르면 그 색의 의자 그림 하나만 바뀐다(화면 전체는 움직이지 않는다).
 // 고른 의자는 "이 의자로 앉기"를 누르면 내 의자가 된다(flow.js 링크의 act, live.js resolveTo).
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { KINDS, big, thumb, getDraft, subscribe, pickKind, pickColor, lastColor } from './chairs.js';
+import { KINDS, LOCK, isLocked, big, thumb, getDraft, subscribe, pickKind, pickColor, lastColor } from './chairs.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const EASE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
@@ -29,7 +29,7 @@ const preload = (urls) => urls.forEach((u) => {
 });
 
 // 큰 그림 하나. 새 그림이 다 받아진 뒤에 겹쳐서 바뀐다(받는 동안은 이전 그림이 그대로 있다).
-function Hero({ src }) {
+function Hero({ src, dim }) {
   const [layers, setLayers] = useState([{ src, id: 0, anim: false }]);
   const seq = useRef(0);
   useEffect(() => {
@@ -51,17 +51,35 @@ function Hero({ src }) {
     <>
       {layers.map((l) => (
         <img key={l.id} src={l.src} alt="" draggable={false} className={l.out ? 'cs-out' : l.anim ? 'cs-in' : undefined}
-          style={{ position: 'absolute', left: 91, top: 8, width: 160, height: 160, objectFit: 'contain', display: 'block', pointerEvents: 'none' }} />
+          style={{ position: 'absolute', left: 91, top: 8, width: 160, height: 160, objectFit: 'contain', display: 'block', pointerEvents: 'none', filter: dim ? 'brightness(0.5) saturate(0.55)' : 'none', transition: 'filter 240ms ' + EASE }} />
       ))}
     </>
   );
 }
+
+const LockIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
+    <rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="#F8F8F8" />
+    <path d="M8.2 10.5V8a3.8 3.8 0 0 1 7.6 0v2.5" stroke="#F8F8F8" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="15.4" r="1.5" fill="#222628" />
+  </svg>
+);
 
 const label = { position: 'absolute', left: 24, margin: 0, fontFamily: FONT, fontSize: 15, fontWeight: 700, lineHeight: '21px', letterSpacing: '-0.04em', color: '#F8F8F8', whiteSpace: 'pre' };
 
 export function ChairStudio(props) {
   const sel = useSyncExternalStore(subscribe, getDraft, getDraft);
   const kind = KINDS[sel.k];
+  const locked = isLocked(sel.k);
+  const lock = LOCK[kind.id];
+  const [note, setNote] = useState('');
+  // 잠긴 의자로 앉으려고 하면 이유를 알려 준다(링크가 막히면 live.js가 이 신호를 보낸다).
+  useEffect(() => {
+    let t = 0;
+    const on = () => { setNote(lock ? lock.need : ''); window.clearTimeout(t); t = window.setTimeout(() => setNote(''), 2200); };
+    window.addEventListener('drrrk:chair-locked', on);
+    return () => { window.removeEventListener('drrrk:chair-locked', on); window.clearTimeout(t); };
+  }, [lock]);
   // 들어오면 지금 종류의 큰 그림 6장을 미리 받아 두고, 나머지 종류는 한가한 때에 첫 색만 받는다.
   useEffect(() => {
     preload(KINDS[sel.k].colors.map((_, c) => big(sel.k, c)));
@@ -85,10 +103,13 @@ export function ChairStudio(props) {
       <div data-figma="미리보기" style={{ position: 'absolute', left: 24, top: 112, width: 342, height: 252, borderRadius: 24, overflow: 'hidden', background: 'linear-gradient(180deg, #06303C 0%, #222628 100%)' }}>
         <div aria-hidden="true" style={{ position: 'absolute', left: 41, top: 0, width: 260, height: 190, background: 'radial-gradient(closest-side, rgba(54,210,255,0.22), rgba(54,210,255,0))' }} />
         <div aria-hidden="true" style={{ position: 'absolute', left: 96, top: 152, width: 150, height: 24, background: 'radial-gradient(closest-side, rgba(0,0,0,0.5), rgba(0,0,0,0))' }} />
-        <Hero src={big(sel.k, sel.c)} />
+        <Hero src={big(sel.k, sel.c)} dim={locked} />
+        {locked ? (
+          <div aria-hidden="true" className="cs-in" style={{ position: 'absolute', left: 135, top: 58, width: 72, height: 72, borderRadius: '50%', background: 'rgba(18,20,21,0.78)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockIcon size={30} /></div>
+        ) : null}
         <div key={sel.k + '-' + sel.c} className="cs-text" style={{ position: 'absolute', left: 0, top: 178, width: 342, textAlign: 'center' }}>
-          <p style={{ margin: 0, fontSize: 19, fontWeight: 700, lineHeight: '27px', letterSpacing: '-0.38px' }}>{kind.name}</p>
-          <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 500, lineHeight: '18px', letterSpacing: '-0.26px', color: '#9AA1A6' }}>{kind.colors[sel.c]}</p>
+          <p style={{ margin: 0, fontSize: 19, fontWeight: 700, lineHeight: '27px', letterSpacing: '-0.38px', color: locked ? '#9AA1A6' : '#F8F8F8' }}>{locked ? lock.title : kind.name}</p>
+          <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 500, lineHeight: '18px', letterSpacing: '-0.26px', color: locked ? '#FF9A4D' : '#9AA1A6' }}>{locked ? lock.need : kind.colors[sel.c]}</p>
         </div>
       </div>
 
@@ -101,7 +122,8 @@ export function ChairStudio(props) {
               onPointerDown={() => preload(k.colors.map((_, c) => big(i, c)).slice(0, 1))}
               onClick={(e) => { e.stopPropagation(); pickKind(i); }}
               style={{ position: 'absolute', left: i * 70, top: 0, width: 62, height: 62, borderRadius: 14, background: on ? '#0E3444' : '#222628', boxShadow: on ? 'inset 0 0 0 2px #36D2FF' : 'inset 0 0 0 0 #36D2FF' }}>
-              <img src={thumb(i, i === sel.k ? sel.c : lastColor(i))} alt="" draggable={false} style={{ position: 'absolute', left: 8, top: 8, width: 46, height: 46, objectFit: 'contain', display: 'block' }} />
+              <img src={thumb(i, i === sel.k ? sel.c : lastColor(i))} alt="" draggable={false} style={{ position: 'absolute', left: 8, top: 8, width: 46, height: 46, objectFit: 'contain', display: 'block', filter: isLocked(i) ? 'brightness(0.55) saturate(0.6)' : 'none' }} />
+              {isLocked(i) ? <span aria-hidden="true" style={{ position: 'absolute', right: 6, bottom: 6, width: 22, height: 22, borderRadius: '50%', background: 'rgba(18,20,21,0.82)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockIcon size={13} /></span> : null}
             </button>
           );
         })}
@@ -114,8 +136,8 @@ export function ChairStudio(props) {
           return (
             <button key={sel.k + '-' + c} type="button" className="cs-btn" aria-label={name} aria-pressed={on} data-figma={'색 / ' + name}
               onPointerDown={() => preload([big(sel.k, c)])}
-              onClick={(e) => { e.stopPropagation(); pickColor(c); }}
-              style={{ position: 'absolute', left: (c % 3) * 117, top: Math.floor(c / 3) * 104, width: 108, height: 96, borderRadius: 16, background: on ? '#0E3444' : '#222628', boxShadow: on ? 'inset 0 0 0 2px #36D2FF' : 'inset 0 0 0 0 #36D2FF' }}>
+              onClick={(e) => { e.stopPropagation(); if (!locked) pickColor(c); }}
+              style={{ position: 'absolute', left: (c % 3) * 117, top: Math.floor(c / 3) * 104, width: 108, height: 96, borderRadius: 16, background: on && !locked ? '#0E3444' : '#222628', boxShadow: on && !locked ? 'inset 0 0 0 2px #36D2FF' : 'inset 0 0 0 0 #36D2FF', opacity: locked ? 0.4 : 1, cursor: locked ? 'default' : 'pointer' }}>
               <img src={thumb(sel.k, c)} alt="" draggable={false} style={{ position: 'absolute', left: 26, top: 8, width: 56, height: 56, objectFit: 'contain', display: 'block' }} />
               <span style={{ position: 'absolute', left: 0, top: 68, width: 108, textAlign: 'center', fontSize: 12, fontWeight: on ? 700 : 500, lineHeight: '17px', letterSpacing: '-0.24px', color: on ? '#36D2FF' : '#9AA1A6', whiteSpace: 'pre' }}>{name}</span>
             </button>
@@ -123,9 +145,12 @@ export function ChairStudio(props) {
         })}
       </div>
 
-      <div data-figma="CTA" style={{ position: 'absolute', left: 24, top: 764, width: 342, height: 56, borderRadius: 28, background: '#36D2FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: 16, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.32px', color: '#000' }}>이 의자로 앉기</span>
+      <div data-figma="CTA" style={{ position: 'absolute', left: 24, top: 764, width: 342, height: 56, borderRadius: 28, background: locked ? '#222628' : '#36D2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 200ms ' + EASE }}>
+        <span style={{ fontSize: 16, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.32px', color: locked ? '#6E767C' : '#000' }}>이 의자로 앉기</span>
       </div>
+      {note ? (
+        <div role="status" className="cs-in" style={{ position: 'absolute', left: 24, top: 700, width: 342, height: 44, borderRadius: 14, background: 'rgba(44,44,46,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, letterSpacing: '-0.28px', color: '#FF9A4D' }}>{note}</div>
+      ) : null}
     </div>
   );
 }

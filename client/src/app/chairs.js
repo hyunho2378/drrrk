@@ -13,11 +13,15 @@ export const KINDS = [
   { id: 'recl', name: '리클라이너', label: '리클라이너', nick: '졸린 리클라이너12', colors: ['블루 그레이', '브라운 레더', '화이트', '블루', '라임', '토프'] },
 ];
 
+// 리클라이너는 엉따가 40.0°가 될 때까지 잠겨 있다(팀 피그마 "의자 꾸미기 · 잠긴 의자 선택"). 지금 내 엉따는 39.2°다.
+export const LOCK = { recl: { title: '꿀잠 솔솔 리클라이너', need: '엉따 40.0°가 되면 획득할 수 있어요' } };
+export const isLocked = (k) => !!LOCK[KINDS[k].id];
+
 const KEY = 'drrrk.chair.v1';
 const read = () => {
   try {
     const v = JSON.parse(window.localStorage.getItem(KEY));
-    if (v && KINDS[v.k] && v.c >= 0 && v.c < 6) return { k: v.k, c: v.c };
+    if (v && KINDS[v.k] && v.c >= 0 && v.c < 6 && !isLocked(v.k)) return { k: v.k, c: v.c };
   } catch (e) { /* 저장값이 없거나 읽을 수 없으면 기본 의자 */ }
   return { k: 0, c: 0 };
 };
@@ -53,8 +57,11 @@ export function openStudio(fresh) {
   emit();
 }
 export function commitDraft() {
+  // 잠긴 의자는 앉을 수 없다. 앉을 수 있으면 true를 돌려준다.
+  if (isLocked(draft.k)) return false;
   saved = { k: draft.k, c: draft.c };
   try { window.localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* 저장 못 해도 이번 방문에서는 유지 */ }
+  return true;
 }
 
 export const big = (k, c) => BASE + 'assets/chairs/' + KINDS[k].id + '-' + (c + 1) + '.png';

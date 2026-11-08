@@ -282,6 +282,7 @@ export default function Prototype() {
         return;
       }
       const r = resolveTo(l);
+      if (!r) return;
       navigate('/s/' + r.to, { state: { t: r.t } });
     },
     [navigate],

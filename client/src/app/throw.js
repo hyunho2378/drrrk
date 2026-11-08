@@ -1,5 +1,5 @@
 // 주전부리 던지기: 퀵슬롯의 주전부리를 손가락이나 마우스로 끌어서 방 한가운데 테이블 위에 놓으면 테이블에 던져 올린다.
-// 끄는 동안 테이블이 빛나고, 놓으면 날아가 테이블 위에 떨어지며 효과음이 난다. 한 번 던지면 개수가 줄고 쿨타임이 돈다.
+// 끄는 동안 테이블이 빛나고, 놓으면 날아가 테이블 위에 떨어지며 효과음이 난다. 한 번 던지면 개수가 줄어든다. 쿨타임은 없다.
 // 던지는 대상은 사람이 아니라 테이블이다. 받는 사람이나 온도와는 관계가 없다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText } from './dom.js';
@@ -50,12 +50,6 @@ export function attachThrow(root) {
     } else glow.style.opacity = '0';
   };
 
-  const cool = (slot, secs) => {
-    const name = nameOf(slot);
-    const until = Date.now() + secs * 1000;
-    inv[name] = Object.assign(inv[name] || {}, { until });
-    paintCool(slot);
-  };
   const paintCool = (slot) => {
     const name = nameOf(slot);
     const st = inv[name];
@@ -96,7 +90,6 @@ export function attachThrow(root) {
     slot.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       if (slot.dataset.cool === 'empty') { sfx.deny(); toast(root, LIVE.throwEmptyText); return; }
-      if (slot.dataset.cool) { sfx.deny(); toast(root, LIVE.throwCoolText); return; }
       const sx = e.clientX, sy = e.clientY;
       const img = slot.querySelector(':scope > [data-figma]:not([data-figma="count"])');
       if (!img) return;
@@ -157,7 +150,7 @@ export function attachThrow(root) {
         const next = Math.max(0, cur - 1);
         inv[name] = Object.assign(inv[name] || {}, { count: next });
         if (cp) setText(cp, String(next));
-        cool(slot, LIVE.throwCooldown);
+        paintCool(slot);
         toast(root, LIVE.throwDoneText);
       };
       window.addEventListener('pointermove', move);

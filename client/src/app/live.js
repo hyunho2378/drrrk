@@ -15,6 +15,7 @@ import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chai
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
+import { swapScene } from './scene.js';
 
 export { setText };
 
@@ -32,7 +33,10 @@ export function resolveTo(l) {
     return Object.assign({}, l, { t: 'none' });
   }
   // 의자 꾸미기: 열 때 보여 줄 의자(새로 얻은 의자 또는 지금 의자)와 확정을 링크의 act로 정한다.
-  if (l.act === 'commit') commitDraft();
+  if (l.act === 'commit' && !commitDraft()) {
+    window.dispatchEvent(new Event('drrrk:chair-locked'));
+    return null;
+  }
   if (l.to === 20) openStudio(l.act === 'fresh');
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
@@ -525,7 +529,7 @@ const IMG = {
 const MINE_BOX = [1, 2, 3, 22, 23];
 const MINE_YELLOW = [1, 32, 33];
 // 28, 30, 31은 팀 피그마 최신 장면(라임 의자, 회색 리클라이너, 흰 의자)으로 바꾼다.
-export const SCREEN_SWAP = { 28: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 30: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 31: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' } };
+export const SCREEN_SWAP = {};
 export function swapMap(n) {
   const map = Object.assign({}, SCREEN_SWAP[n] || {});
   map[IMG.sofa] = fixedRel('sofa', 1, n === 19);
@@ -679,6 +683,7 @@ export async function prepare(layer, n, prevN) {
   root.dataset.prepared = '1';
   applySync(root);
   fixWraps(root);
+  swapScene(root, n);
   showEmptyOutlines(root);
   patchScene(root, n);
   attachRoom(root, n);

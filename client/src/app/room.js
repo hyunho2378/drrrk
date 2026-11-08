@@ -95,25 +95,39 @@ export function attachEmoji(root) {
 }
 
 // ---------- 2) 고민 배너 ----------
+// 배너가 펼쳐진 상태는 퀵슬롯을 열고 닫아 화면이 바뀌어도 이어진다(새 화면에서 바로 펼친 모습으로 시작한다).
+let bannerOpen = false;
 export function attachBanner(root) {
   const col = root.querySelector('[data-figma="고민 주제 · 최소화 (탭하면 자세히)"]');
-  if (!col || col.dataset.live) return;
+  if (!col) { bannerOpen = false; return; }
+  if (col.dataset.live) return;
   col.dataset.live = 'banner';
   col.style.cursor = 'pointer';
   const solo = !!root.querySelector('[data-figma="AI 드르륵 의자"]');
   let exp = null, busy = false;
   const radius = () => (parseFloat(getComputedStyle(col).borderTopLeftRadius) || 14) + 'px';
+  // 배너가 펼쳐지면 그 아래 퀵슬롯(접힌 알약이나 열린 목록)이 펼쳐진 만큼 부드럽게 내려간다.
+  const dockEls = () => q(root, ':scope > [data-figma="주전부리 퀵슬롯"], :scope > [data-figma="퀵슬롯 · 접힘"]');
+  const pushDock = (down, instant) => {
+    const dy = down ? LIVE.bannerOpenH - LIVE.bannerClosedH : 0;
+    dockEls().forEach((d) => {
+      d.style.transition = instant ? 'none' : 'transform ' + LIVE.bannerMs + 'ms ' + (down ? motion.emphasizedDecel : motion.emphasizedAccel);
+      d.style.transform = 'translateY(' + dy + 'px)';
+    });
+  };
   const collapse = () => {
     if (!exp || busy) return;
     busy = true;
     const e = exp;
     exp = null;
+    bannerOpen = false;
+    pushDock(false);
     const h = LIVE.bannerOpenH, c = LIVE.bannerClosedH;
     const a = e.animate([{ clipPath: 'inset(0 0 0 0 round ' + radius() + ')' }, { clipPath: 'inset(0 0 ' + (h - c) + 'px 0 round ' + radius() + ')' }], { duration: LIVE.bannerMs, easing: motion.emphasizedAccel, fill: 'forwards' });
     col.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.stateIn, delay: LIVE.bannerMs - 90, fill: 'both' });
     a.onfinish = () => { e.remove(); col.style.opacity = ''; busy = false; };
   };
-  const expand = async () => {
+  const expand = async (instant) => {
     if (exp || busy) return;
     busy = true;
     const e = await cloneOf(43, '[data-figma="고민 주제"]');
@@ -138,14 +152,19 @@ export function attachBanner(root) {
     Object.assign(e.style, { left: r.x + 'px', top: r.y + 'px', zIndex: '35', cursor: 'pointer' });
     root.appendChild(e);
     exp = e;
+    bannerOpen = true;
+    pushDock(true, instant === true);
     const h = LIVE.bannerOpenH, c = LIVE.bannerClosedH;
     col.style.opacity = '0';
-    const a = e.animate([{ clipPath: 'inset(0 0 ' + (h - c) + 'px 0 round ' + radius() + ')', opacity: 0.4 }, { clipPath: 'inset(0 0 0 0 round ' + radius() + ')', opacity: 1 }], { duration: LIVE.bannerMs, easing: motion.emphasizedDecel });
-    q(e, ':scope > *').slice(1).forEach((k) => k.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: LIVE.bannerMs, delay: 60, easing: motion.emphasizedDecel, fill: 'backwards' }));
-    a.onfinish = () => { busy = false; };
+    if (instant === true) { busy = false; } else {
+      const a = e.animate([{ clipPath: 'inset(0 0 ' + (h - c) + 'px 0 round ' + radius() + ')', opacity: 0.4 }, { clipPath: 'inset(0 0 0 0 round ' + radius() + ')', opacity: 1 }], { duration: LIVE.bannerMs, easing: motion.emphasizedDecel });
+      q(e, ':scope > *').slice(1).forEach((k) => k.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: LIVE.bannerMs, delay: 60, easing: motion.emphasizedDecel, fill: 'backwards' }));
+      a.onfinish = () => { busy = false; };
+    }
     e.addEventListener('click', (ev) => { ev.stopPropagation(); collapse(); });
   };
   col.addEventListener('click', (ev) => { ev.stopPropagation(); expand(); });
+  if (bannerOpen) window.setTimeout(() => expand(true), 0);
 }
 
 // ---------- 3) 마이크 ----------
@@ -235,49 +254,123 @@ export function attachMic(root) {
 }
 
 // ---------- 4) 말하는 사람 돌리기 ----------
-const pickNext = (n, cur, meIdx) => {
-  const weights = [];
-  for (let i = 0; i < n; i++) {
-    if (i === cur) weights.push(0);
-    else if (i === meIdx) weights.push(0); // 말하는 표시(초록 테두리와 바)는 나에게는 붙이지 않는다
-    else weights.push(1);
-  }
-  const sum = weights.reduce((a, b) => a + b, 0);
-  let r = Math.random() * sum;
-  for (let i = 0; i < n; i++) { r -= weights[i]; if (r <= 0) return i; }
-  return (cur + 1) % n;
+// 뽑을 수 있는 사람 중에서 방금 말한 사람을 빼고 고른다. 나와 마이크를 끈 사람은 뽑지 않는다.
+const pickFrom = (cands, cur) => {
+  const pool = cands.filter((i) => i !== cur);
+  const list = pool.length ? pool : cands;
+  return list[Math.floor(Math.random() * list.length)];
 };
+const pickNext = (n, cur, meIdx) => {
+  const cands = [];
+  for (let i = 0; i < n; i++) if (i !== meIdx) cands.push(i);
+  return pickFrom(cands, cur);
+};
+
+const TILE_SEL = '[data-figma^="참여자 타일"], [data-figma^="Participant Tile"]';
+const NAME_P = '[data-figma="name"] p[data-outline], [data-figma="name"] p';
+const inside = (r, x, y) => x >= r.x - 2 && x <= r.x + r.w + 2 && y >= r.y - 2 && y <= r.y + r.h + 2;
+
+// 타일 안과 밖에 흩어진 요소(이름 칸, 의자, 말하는 막대)를 타일 칸 안에 있는지로 묶는다.
+function tilesOf(root) {
+  const tiles = q(root, TILE_SEL);
+  return tiles.map((el) => ({ el, r: relRect(root, el) }));
+}
+function labelOfTile(root, t) {
+  const names = q(root, NAME_P).filter((p) => p.getBoundingClientRect().width > 0);
+  const hit = names.find((p) => { const r = relRect(root, p); return inside(t.r, r.x + r.w / 2, r.y + r.h / 2); });
+  return hit ? hit.textContent.trim() : '';
+}
+
+// 타일 바탕과 이름 칸을 모든 칸에서 같게 맞춘다. 말하는 칸으로 그려진 피그마 타일에는 바탕색이 없어서 카드가 사라지는 일이 있었다.
+export function tidyTiles(root) {
+  const tiles = tilesOf(root);
+  if (tiles.length < 3 || root.dataset.tidied) return;
+  root.dataset.tidied = '1';
+  const base = tiles.map((t) => getComputedStyle(t.el)).find((cs) => cs.backgroundColor && !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor));
+  const bg = base ? base.backgroundColor : 'rgb(34, 38, 40)';
+  const radius = base ? base.borderRadius : '16px';
+  tiles.forEach((t) => {
+    const cs = getComputedStyle(t.el);
+    if (/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor)) {
+      const card = document.createElement('div');
+      card.setAttribute('data-card', 'tile');
+      Object.assign(card.style, { position: 'absolute', left: t.r.x + 'px', top: t.r.y + 'px', width: t.r.w + 'px', height: t.r.h + 'px', background: bg, borderRadius: radius, pointerEvents: 'none' });
+      root.insertBefore(card, root.firstChild);
+    }
+  });
+  // 이름 칸 안의 빈 조각(안 보이는 아이콘 자리)은 지운다. 검정 칸 왼쪽이 비어 보이던 원인이다.
+  q(root, '[data-figma="name"]').forEach((nm) => {
+    [...nm.children].forEach((c) => {
+      if (c.tagName === 'DIV' && !c.textContent.trim() && !c.querySelector('svg, img')) c.style.display = 'none';
+    });
+    nm.querySelectorAll('p').forEach((p) => {
+      if (/\s$/.test(p.textContent)) setText(p, p.textContent.replace(/\s+$/, ''));
+    });
+  });
+  // 내 의자 뒤에 원이 없으면 다른 칸과 같은 원을 깐다.
+  const me = tiles.find((t) => /새벽2시/.test(labelOfTile(root, t)));
+  if (me) {
+    const frames = q(root, '[data-figma^="Frame"]').filter((f) => { const r = relRect(root, f); return r.w > 60 && r.w < 90 && inside(me.r, r.x + r.w / 2, r.y + r.h / 2); });
+    const hasDisc = frames.some((f) => q(f, 'div').some((d) => /rgb\(18, 20, 2[01]\)/.test(getComputedStyle(d).backgroundColor)));
+    if (frames.length && !hasDisc) {
+      const r = relRect(root, frames[0]);
+      const disc = document.createElement('div');
+      Object.assign(disc.style, { position: 'absolute', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px', borderRadius: '50%', background: 'rgb(18, 20, 21)', pointerEvents: 'none' });
+      root.insertBefore(disc, frames[0].parentElement === root ? frames[0] : root.firstChild.nextSibling);
+    }
+  }
+}
 
 export function attachSpeakers(root) {
   if (root.dataset.speakers) return;
-  const tiles = q(root, ':scope > [data-figma^="참여자 타일"]');
-  const bars = q(root, ':scope > [data-figma="voice wave"]');
+  const tiles = tilesOf(root);
   const group = root.querySelector(':scope > [data-figma="Group 2147229349"]');
-  if (tiles.length >= 3 && bars.length >= 5) {
+  if (tiles.length >= 3) {
     root.dataset.speakers = 'tiles';
     const ring = LIVE.speakRing;
-    const meIdx = Math.max(0, tiles.findIndex((t) => /새벽2시/.test(t.getAttribute('data-figma'))));
-    const r0 = tiles.map((t) => relRect(root, t));
-    const bar0 = bars.slice(0, 5).map((b) => relRect(root, b));
-    let cur = (meIdx + 1) % tiles.length;
+    const meIdx = tiles.findIndex((t) => /새벽2시/.test(labelOfTile(root, t)));
+    // 마이크를 끈 사람(음소거 배지가 있는 칸)은 말할 수 없다.
+    const muted = tiles.map((t) => !!t.el.querySelector('[data-figma="음소거 배지"]') || !!q(root, '[data-figma="음소거 배지"]').find((b) => { const r = relRect(root, b); return inside(t.r, r.x + r.w / 2, r.y + r.h / 2); }));
+    const cands = tiles.map((_, i) => i).filter((i) => i !== meIdx && !muted[i]);
+    if (!cands.length) return;
+    // 피그마가 말하는 칸 하나에만 그려 둔 초록 테두리는 숨기고, 돌아가는 테두리로 대신한다.
     tiles.forEach((t) => {
-      t.style.transition = 'box-shadow 260ms ' + motion.standard;
-      // 피그마가 말하는 칸 하나에만 그려 둔 초록 테두리(SVG)는 숨기고, 돌아가는 테두리로 대신한다.
-      q(t, ':scope > span[aria-hidden]').forEach((o) => { if (o.querySelector('path[style*="2EE59D"]')) o.style.display = 'none'; });
+      t.el.style.transition = 'box-shadow 260ms ' + motion.standard;
+      q(t.el, ':scope > span[aria-hidden]').forEach((o) => { if (o.querySelector('path[style*="2EE59D"]')) o.style.display = 'none'; });
     });
-    const place = (i) => {
-      tiles.forEach((t, k) => (t.style.boxShadow = k === i ? 'inset 0 0 0 2px ' + ring : 'inset 0 0 0 0 ' + ring));
-      const ox = r0[i].x + r0[i].w - (r0[meIdx].x + r0[meIdx].w), oy = r0[i].y - r0[meIdx].y;
-      bars.slice(0, 5).forEach((b, k) => {
-        b.style.left = bar0[k].x + ox + 'px';
-        b.style.top = bar0[k].y + oy + 'px';
+    // 말하는 막대는 화면 바닥(root)으로 옮겨서 칸마다 따라 움직이게 한다.
+    let bars = q(root, '[data-figma="voice wave"]').filter((b) => b.getBoundingClientRect().width > 0).slice(0, 5);
+    const bar0 = bars.map((b) => relRect(root, b));
+    bars.forEach((b, k) => {
+      root.appendChild(b);
+      Object.assign(b.style, { position: 'absolute', left: bar0[k].x + 'px', top: bar0[k].y + 'px', zIndex: '6', transition: 'left 320ms ' + motion.emphasizedDecel + ', top 320ms ' + motion.emphasizedDecel });
+      b.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(0.45)' }, { transform: 'scaleY(1.25)' }, { transform: 'scaleY(0.7)' }], { duration: 620 + k * 110, iterations: Infinity, easing: 'ease-in-out' });
+    });
+    const home = bar0.length ? tiles.findIndex((t) => inside(t.r, bar0[0].x + bar0[0].w / 2, bar0[0].y + bar0[0].h / 2)) : -1;
+    const homeIdx = home >= 0 ? home : 0;
+    // 막대가 하나도 없는 화면은 오른쪽 위에 직접 만든다.
+    if (!bars.length) {
+      const hs = [5, 11, 20, 10, 6];
+      bars = hs.map((h, k) => {
+        const el = document.createElement('div');
+        Object.assign(el.style, { position: 'absolute', width: '3px', height: h + 'px', borderRadius: '2px', background: '#2EE59D', zIndex: '6', left: tiles[homeIdx].r.x + 129 + k * 5 + 'px', top: tiles[homeIdx].r.y + 32 - h / 2 + 'px', transition: 'left 320ms ' + motion.emphasizedDecel + ', top 320ms ' + motion.emphasizedDecel });
+        root.appendChild(el);
+        el.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(0.45)' }, { transform: 'scaleY(1.25)' }, { transform: 'scaleY(0.7)' }], { duration: 620 + k * 110, iterations: Infinity, easing: 'ease-in-out' });
+        return el;
       });
+      bar0.length = 0;
+      bars.forEach((el) => bar0.push({ x: parseFloat(el.style.left), y: parseFloat(el.style.top) }));
+    }
+    const place = (i) => {
+      tiles.forEach((t, k) => (t.el.style.boxShadow = k === i ? 'inset 0 0 0 2px ' + ring : 'inset 0 0 0 0 ' + ring));
+      const dx = tiles[i].r.x - tiles[homeIdx].r.x, dy = tiles[i].r.y - tiles[homeIdx].r.y;
+      bars.forEach((b, k) => { b.style.left = bar0[k].x + dx + 'px'; b.style.top = bar0[k].y + dy + 'px'; });
     };
-    bars.slice(0, 5).forEach((b, k) => b.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(0.45)' }, { transform: 'scaleY(1.25)' }, { transform: 'scaleY(0.7)' }], { duration: 620 + k * 110, iterations: Infinity, easing: 'ease-in-out' }));
+    let cur = cands.includes(homeIdx) ? homeIdx : cands[0];
     place(cur);
     const step = () => {
       if (!root.isConnected) return;
-      cur = pickNext(tiles.length, cur, meIdx);
+      cur = pickFrom(cands, cur);
       place(cur);
       window.setTimeout(step, LIVE.speakMin + Math.random() * (LIVE.speakMax - LIVE.speakMin));
     };
@@ -322,7 +415,7 @@ export function fixNames(root) {
     const t = p.textContent;
     if (!/택배상자/.test(t)) return;
     // 원문 끝에 줄바꿈이 붙어 있어서 그대로 쓰면 이름 칸 밖으로 글자가 밀려난다. 끝 공백은 지운다.
-    setText(p, t.replace(/택배상자/g, '드르륵 칵').replace(/\s+$/, ''));
+    setText(p, t.replace(/택배상자/g, '피시방').replace(/드르륵 칵/g, '피시방').replace(/\s+$/, ''));
   });
 }
 
@@ -381,6 +474,7 @@ export async function patchOnboarding(root) {
 
 export function attachRoom(root, n) {
   fixNames(root);
+  tidyTiles(root);
   fixCommentBar(root);
   attachEmoji(root);
   attachBanner(root);

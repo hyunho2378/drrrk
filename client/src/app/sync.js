@@ -3,6 +3,20 @@
 import { setText } from './dom.js';
 
 export const SYNC = {
+  "1807:23114": "딱딱한 나무 스툴12",
+  "1807:23118": "진실의 의자10",
+  "1807:23122": "새벽2시 피시방",
+  "1807:23267": "진실의 의자10",
+  "1807:23271": "차가운 새벽의자92",
+  "1807:23004": "딱딱한 나무 스툴12",
+  "1807:23008": "진실의 의자10",
+  "1807:23012": "새벽2시 피시방",
+  "1807:23288": "딱딱한 나무 스툴12",
+  "1807:23292": "진실의 의자10",
+  "1807:23296": "새벽2시 피시방",
+  "1804:12631": "딱딱한 나무 스툴12",
+  "1804:12635": "새벽2시 피시방",
+  "1647:24854": "해 뜨기 1분 전!",
   "1647:22858": "말하기 부담되면\n이모지로 반응해요",
   "1806:10963": "나의 업적 편의점",
   "1647:29639": "48",
@@ -20,7 +34,22 @@ export const SYNC = {
   "1806:11670": "부모님 싸우는 소리에 \n잠을 못 자겠어"
 };
 
+// 방에 앉은 이름이 바뀌었다(팀 피그마 11. 8.): 새벽녘 플라스틱의자29는 진실의 의자10으로, 새벽2시 드르륵 칵과 새벽2시 택배상자는 새벽2시 피시방으로.
+export const NAMES = { '새벽녘 플라스틱의자29': '진실의 의자10', '새벽2시 드르륵 칵': '새벽2시 피시방', '새벽2시 택배상자': '새벽2시 피시방' };
+
+export function applyNames(root) {
+  root.querySelectorAll('p[data-outline]').forEach((p) => {
+    const t = p.textContent.replace(/\s+$/, '');
+    const to = NAMES[t.trim()];
+    if (to && !p.dataset.named) {
+      p.dataset.named = '1';
+      setText(p, to);
+    }
+  });
+}
+
 export function applySync(root) {
+  applyNames(root);
   Object.keys(SYNC).forEach((id) => {
     const p = root.querySelector('p[data-node="' + id + '"]');
     if (!p || p.dataset.sync) return;
