@@ -48,8 +48,12 @@ export function applyNames(root) {
   });
 }
 
+// 팀이 피그마에서 지운 요소(MY 선반의 개수 표시 8개, 11. 8.)는 화면에서도 숨긴다.
+export const HIDE = ['1806:10975', '1806:10979', '1806:10983', '1806:10987', '1806:10991', '1806:10995', '1806:10999', '1806:11004'];
+
 export function applySync(root) {
   applyNames(root);
+  HIDE.forEach((id) => { const el = root.querySelector('[data-node="' + id + '"]'); if (el) el.style.display = 'none'; });
   Object.keys(SYNC).forEach((id) => {
     const p = root.querySelector('p[data-node="' + id + '"]');
     if (!p || p.dataset.sync) return;

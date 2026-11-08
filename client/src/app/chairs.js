@@ -4,13 +4,111 @@ import { setText } from './dom.js';
 
 const BASE = import.meta.env.BASE_URL;
 
-// 종류 순서는 팀 지정: 편의점 의자, 나무 스툴, 소파, 바퀴달린 의자, 리클라이너. 색은 일러스트 자산의 왼쪽부터 순서다.
+// 종류와 스타일(색) 이름, 그림은 팀 피그마 "의자 꾸미기 · 소파 선택" 다섯 장(편의점 의자 5색, 스툴과 소파, 바퀴달린 의자 6색)과
+// "잠긴 의자 선택"(리클라이너 3색)에 들어 있는 그대로다. files는 피그마 그림 원본의 해시 이름이다.
 export const KINDS = [
-  { id: 'conv', name: '편의점 의자', label: '편의점의자', nick: '졸린 편의점의자12', colors: ['블루', '그레이', '화이트', '라임', '퍼플', '스카이'] },
-  { id: 'stool', name: '나무 스툴', label: '나무 스툴', nick: '졸린 스툴12', colors: ['오크', '월넛', '화이트 애시', '퍼플', '레드', '블루'] },
-  { id: 'sofa', name: '소파', label: '소파', nick: '졸린 소파12', colors: ['브라운 레더', '세이지 그린', '초콜릿', '핑크', '아이보리 쿠션', '옐로 쿠션'] },
-  { id: 'swivel', name: '바퀴달린 의자', label: '바퀴달린 의자', nick: '졸린 바퀴의자12', colors: ['차콜', '라이트 그레이', '스카이', '버터 옐로', '브라운 레더', '버건디'] },
-  { id: 'recl', name: '리클라이너', label: '리클라이너', nick: '졸린 리클라이너12', colors: ['블루 그레이', '브라운 레더', '화이트', '블루', '라임', '토프'] },
+  {
+    "id": "conv",
+    "label": "편의점의자",
+    "nick": "졸린 편의점의자12",
+    "name": "편의점 의자",
+    "colors": [
+      "미드나잇 블루",
+      "포그 그레이",
+      "오프 화이트",
+      "네오 라임",
+      "울트라 퍼플"
+    ],
+    "files": [
+      "4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee",
+      "5e85ee935bf42402663b2e77d8a221474cf247c0",
+      "b5c25c4caef8e3119474b09c31d38f8143882196",
+      "33871c043e7c4e9145ae99a02d9e4f55d741e136",
+      "6bfc511e24bfba71de51c7d08b74fd3d6d5d404b"
+    ]
+  },
+  {
+    "id": "stool",
+    "label": "나무 스툴",
+    "nick": "졸린 스툴12",
+    "name": "딱딱한 스툴",
+    "colors": [
+      "클래식 우드",
+      "엔틱 우드",
+      "화이티 우드",
+      "파스텔 퍼플",
+      "에너제틱 레드",
+      "클리어 블루"
+    ],
+    "files": [
+      "51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017",
+      "bbab91fe747a6af0963a989e1bedd5b46ec084b3",
+      "450692c4dbd6f70bf357173d769ea9e0c4932145",
+      "d7b0bb5005bf858f7cc10867129ee131e9e4f7cd",
+      "90255286edc8cfb1926c781e6f530893307bb6eb",
+      "964281ee34073888179994f4a14851ee0b07f123"
+    ]
+  },
+  {
+    "id": "sofa",
+    "label": "소파",
+    "nick": "졸린 소파12",
+    "name": "푹신한 가죽 소파",
+    "colors": [
+      "브라운 레더",
+      "세이지 그린",
+      "엔틱 레더",
+      "파스텔 핑크",
+      "클라우디 화이트",
+      "버터 옐로우"
+    ],
+    "files": [
+      "eab22a7a4d5070b5801bb3367d4f0342e5726543",
+      "6e90eda49e343eb6829327dd7e13087ab82f8cc4",
+      "b684e5de0a908a2dba00620ac53ac78408378aa1",
+      "4a2fafbdd2df80360761b9545fabc16f8eb946ce",
+      "66dbe89daeb432881bb2caf2cfd9e219ed206076",
+      "ff57f819387eec8e46856697ee330f7e210a8aba"
+    ]
+  },
+  {
+    "id": "swivel",
+    "label": "바퀴달린 의자",
+    "nick": "졸린 바퀴의자12",
+    "name": "슝슝 바퀴달린 의자",
+    "colors": [
+      "미디엄 그레이",
+      "라이트 그레이",
+      "스카이 블루",
+      "크림 옐로우",
+      "글로시 레더",
+      "클래식 레드"
+    ],
+    "files": [
+      "40b4fa7cb4ef3462ed43c200a5cc19917bef448e",
+      "f77c03c1bf89bd6ce2986f11ecd9d7660e2d2ad0",
+      "801d8aedde75e785af6bd8cfd63a438caeaaedf9",
+      "cf2670f44f764000f060a5c3ce230b9845c0d44a",
+      "ad12677ce6f516292c08fad678792b25e98e881d",
+      "db7b9eb9eed7f0e0b99d27f32ad7544cfb34fa20"
+    ]
+  },
+  {
+    "id": "recl",
+    "label": "리클라이너",
+    "nick": "졸린 리클라이너12",
+    "name": "꿀잠 솔솔 리클라이너",
+    "colors": [
+      "블루 그레이",
+      "브라운 가죽",
+      "스웨이드 베이지"
+    ],
+    "files": [
+      "ef3d01c1807348609019737b6ad41d82875319aa",
+      "3ff806dcf77f4614dedcd365e0730d81b262f238",
+      "07c35f83d0c3997b2e1ea43d8f3a7ce52c5ba07e"
+    ]
+  }
 ];
 
 // 리클라이너는 엉따가 40.0°가 될 때까지 잠겨 있다(팀 피그마 "의자 꾸미기 · 잠긴 의자 선택"). 지금 내 엉따는 39.2°다.
@@ -21,7 +119,7 @@ const KEY = 'drrrk.chair.v1';
 const read = () => {
   try {
     const v = JSON.parse(window.localStorage.getItem(KEY));
-    if (v && KINDS[v.k] && v.c >= 0 && v.c < 6 && !isLocked(v.k)) return { k: v.k, c: v.c };
+    if (v && KINDS[v.k] && v.c >= 0 && v.c < KINDS[v.k].colors.length && !isLocked(v.k)) return { k: v.k, c: v.c };
   } catch (e) { /* 저장값이 없거나 읽을 수 없으면 기본 의자 */ }
   return { k: 0, c: 0 };
 };
@@ -64,12 +162,14 @@ export function commitDraft() {
   return true;
 }
 
-export const big = (k, c) => BASE + 'assets/chairs/' + KINDS[k].id + '-' + (c + 1) + '.png';
-export const thumb = (k, c) => BASE + 'assets/chairs/t-' + KINDS[k].id + '-' + (c + 1) + '.webp';
-// 화면 그림 주소(./assets/images/...) 안의 파일 이름 자리에 넣는 값: 한 단계 올라가서 chairs 폴더로 간다.
-const rel = (k, c, large) => '../chairs/' + (large ? '' : 't-') + KINDS[k].id + '-' + (c + 1) + (large ? '.png' : '.webp');
+// 큰 자리는 피그마 원본 PNG, 작은 자리는 같은 그림을 256px로 줄인 PNG다.
+export const big = (k, c) => BASE + 'assets/chairs/v2/' + KINDS[k].files[c] + '.png';
+export const thumb = (k, c) => BASE + 'assets/chairs/v2/t-' + KINDS[k].files[c] + '.png';
+// 화면 그림 주소(./assets/images/...) 안의 파일 이름 자리에 넣는 값: 한 단계 올라가서 chairs/v2 폴더로 간다.
+const rel = (k, c, large) => '../chairs/v2/' + (large ? '' : 't-') + KINDS[k].files[c] + '.png';
 export const mineRel = (large) => rel(saved.k, saved.c, large);
-export const fixedRel = (id, n, large) => '../chairs/' + (large ? '' : 't-') + id + '-' + n + (large ? '.png' : '.webp');
+const IDX = { conv: 0, stool: 1, sofa: 2, swivel: 3, recl: 4 };
+export const fixedRel = (id, n, large) => rel(IDX[id], Math.min(n - 1, KINDS[IDX[id]].colors.length - 1), large);
 
 // MY 화면과 새 의자 팝업의 이름 글자를 내 의자에 맞춘다(화면 그림은 live.js swapAssets가 바꾼다).
 export function patchMyChair(root) {
