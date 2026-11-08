@@ -53,8 +53,8 @@ export function ClipPlayer(props) {
     later(() => setSt((s) => ({ ...s, fresh: '' })), 420);
     if (key === 'save') say(memo.save ? '저장했어요' : '저장을 취소했어요');
   };
-  const openSheet = (kind) => {
-    setSt((s) => ({ ...s, sheet: kind, sheetOpen: false }));
+  const openSheet = (kind, info) => {
+    setSt((s) => ({ ...s, sheet: kind, info: !!info, sheetOpen: false }));
     later(() => setSt((s) => ({ ...s, sheetOpen: true })), 30);
   };
   const closeSheet = () => {
@@ -77,6 +77,13 @@ export function ClipPlayer(props) {
   };
   const act = (kind) => {
     if (kind === 'share') return share();
+    if (kind === 'like') { flip('like'); return undefined; }
+    if (kind === 'save') { flip('save'); return undefined; }
+    if (kind === 'comments') {
+      setSt((s) => ({ ...s, sheetOpen: false }));
+      later(() => openSheet('comments'), 360);
+      return undefined;
+    }
     closeSheet();
     if (kind === 'immersive') later(() => setSt((s) => ({ ...s, imm: true })), 380);
     else if (kind === 'play') say('반복 재생으로 설정했어요');
@@ -104,9 +111,10 @@ export function ClipPlayer(props) {
       {btn('더보기', 336, 696, 48, 32, () => openSheet('more'), 16)}
       {btn('댓글 미리보기', 12, 580, 240, 38, () => openSheet('comments'), 19)}
       {btn('댓글 입력', 15, 759, 359, 47, () => openSheet('comments'), 24)}
+      {btn('캡션 더보기', 12, 664, 330, 28, () => openSheet('comments', true), 8)}
       {st.imm ? <button type="button" aria-label="화면 되돌리기" onClick={(e) => { e.stopPropagation(); setSt((s) => ({ ...s, imm: false })); }} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 844, zIndex: 55, border: 0, padding: 0, background: 'transparent', cursor: 'pointer' }} /> : null}
-      {st.sheet === 'comments' ? <CommentSheet open={st.sheetOpen} onClose={closeSheet} onCount={(n) => setSt((s) => ({ ...s, comments: n }))} say={say} /> : null}
-      {st.sheet === 'more' ? <MoreSheet open={st.sheetOpen} onClose={closeSheet} onAction={act} stats={{ like: st.like ? '2,414' : '2,413', comment: st.comments }} /> : null}
+      {st.sheet === 'comments' ? <CommentSheet info={st.info} open={st.sheetOpen} onClose={closeSheet} onCount={(n) => setSt((s) => ({ ...s, comments: n }))} say={say} /> : null}
+      {st.sheet === 'more' ? <MoreSheet open={st.sheetOpen} onClose={closeSheet} onAction={act} stats={{ like: st.like ? '2,414' : '2,413', comment: st.comments }} liked={st.like} saved={st.save} /> : null}
       {toast ? (
         <div key={toast.id} role="status" style={{ position: 'absolute', left: '50%', top: 692, zIndex: 70, maxWidth: 330, padding: '10px 16px', borderRadius: 14, background: 'rgba(44,44,46,0.96)', color: '#F2F2F7', fontFamily: FONT, fontSize: 13.5, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.27px', whiteSpace: 'pre', pointerEvents: 'none', animation: 'cpToast 240ms cubic-bezier(0.05,0.7,0.1,1) both', boxShadow: '0 6px 16px rgba(0,0,0,0.4)' }}>{toast.text}</div>
       ) : null}
