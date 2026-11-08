@@ -65,7 +65,7 @@ final class Router {
     /// 화면마다 아래 탭을 보일지. 온보딩은 어둡게 깔린 채로 보인다.
     static func navMode(for r: Route) -> NavMode {
         switch r {
-        case .home, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
+        case .home, .worryInput, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
         // 온보딩은 방 위에 겹쳐 뜨므로(2026. 11. 9.) 방과 같이 아래 탭을 보이지 않는다.
         case .onboardingTogether, .onboardingSolo: .none
         default: .none

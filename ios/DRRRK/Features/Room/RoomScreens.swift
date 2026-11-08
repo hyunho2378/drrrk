@@ -145,6 +145,14 @@ struct RoomNormalView: View {
             }
             .padding(.horizontal, 24).padding(.top, 16)
 
+            // 피그마 Page Dots: 지금 칸 16 x 6 #F8F8F8, 다른 칸 6 #6E767C, 사이 6
+            HStack(spacing: 6) {
+                Capsule().fill(DS.Palette.textPrimary).frame(width: 16, height: 6)
+                Circle().fill(DS.Palette.textTertiary).frame(width: 6, height: 6)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 20)
+
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: 8) {

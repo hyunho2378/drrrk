@@ -304,7 +304,6 @@ struct RecommendView: View {
     var body: some View {
         Canvas390 {
             BackChevron { router.pop() }.at(14, 69)
-            CloseX { router.popToRoot() }.at(332, 69)
             Text("비슷한 고민으로\n지금 이야기 중인 방을 찾았어요")
                 .suit(28, .extrabold, tracking: -1.12, lineHeight: 39.2)
                 .foregroundStyle(DS.Palette.textPrimary)
