@@ -62,6 +62,12 @@ struct AppShell: View {
             .navigationDestination(for: Route.self) { ScreenRegistry.view(for: $0) }
             .toolbar(.hidden, for: .navigationBar)
         }
+        .fullScreenCover(item: $router.modal) { r in
+            ScreenRegistry.view(for: r)
+                .presentationBackground(.clear)
+                .environment(router)
+        }
+        .transaction { t in if router.modal != nil { t.disablesAnimations = true } }
     }
 }
 

@@ -136,7 +136,7 @@ struct RoomNormalView: View {
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 14) {
                 ForEach(people) { p in
-                    Button { router.push(.miniProfile) } label: {
+                    Button { router.present(.miniProfile) } label: {
                         ParticipantTile(person: p, speaking: p.name == speaker)
                     }
                     .buttonStyle(RoomPressStyle())
@@ -249,7 +249,7 @@ struct MiniProfileView: View {
     @State private var shown = false
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black.opacity(shown ? 0.6 : 0).ignoresSafeArea().onTapGesture { router.pop() }
+            Color.black.opacity(shown ? 0.6 : 0).ignoresSafeArea().onTapGesture { router.close() }
             VStack(spacing: 0) {
                 Capsule().fill(DS.Palette.textTertiary).frame(width: 40, height: 4).padding(.top, 10)
                 if recommended {
@@ -294,8 +294,8 @@ struct MiniProfileView: View {
                 }
                 .buttonStyle(RoomPressStyle()).padding(.top, 20)
                 HStack(spacing: 24) {
-                    Button("신고하기") { router.push(.report) }
-                    Button("차단하기") { router.push(.block) }
+                    Button("신고하기") { router.present(.report) }
+                    Button("차단하기") { router.present(.block) }
                 }
                 .suit(13, .medium, tracking: -0.26).foregroundStyle(DS.Palette.textSecondary)
                 .padding(.top, 14).padding(.bottom, 12)
@@ -305,7 +305,6 @@ struct MiniProfileView: View {
             .background(DS.Palette.bgSurface, in: UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24))
             .offset(y: shown ? 0 : 500)
         }
-        .background(DS.Palette.bgSurface.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { withAnimation(DS.Motion.decel(0.3)) { shown = true } }
     }
@@ -319,7 +318,7 @@ struct ReportView: View {
     private let reasons = ["욕설, 비하, 혐오 표현", "성적인 발언", "개인정보를 묻거나 노출함", "스팸, 홍보", "대화 방해(도배, 소음)", "기타"]
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            BackHeader(onBack: { router.pop() })
+            BackHeader(onBack: { router.close() })
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("딱딱한 나무 스툴12님을 신고할까요?").suit(18, .bold, tracking: -0.36).foregroundStyle(DS.Palette.textPrimary)
@@ -352,7 +351,7 @@ struct ReportView: View {
                 }
                 .padding(.horizontal, 24)
             }
-            PrimaryButton(title: "신고하기") { router.pop() }
+            PrimaryButton(title: "신고하기") { router.close() }
                 .disabled(reason == nil).opacity(reason == nil ? 0.4 : 1)
                 .padding(.horizontal, 24).padding(.bottom, 16)
         }
@@ -366,7 +365,7 @@ struct BlockView: View {
     @State private var alsoReport = false
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6).ignoresSafeArea().onTapGesture { router.pop() }
+            Color.black.opacity(0.6).ignoresSafeArea().onTapGesture { router.close() }
             VStack(spacing: 0) {
                 Text("딱딱한 나무 스툴12님을\n차단할까요?").suit(18, .bold, tracking: -0.36).multilineTextAlignment(.center).foregroundStyle(DS.Palette.textPrimary)
                 VStack(alignment: .leading, spacing: 8) {
@@ -378,7 +377,7 @@ struct BlockView: View {
                 Toggle(isOn: $alsoReport) { Text("신고도 함께 하기").suit(13, .medium).foregroundStyle(DS.Palette.textPrimary) }
                     .tint(DS.Palette.brandPrimary).padding(.top, 16)
                 HStack(spacing: 8) {
-                    Button { router.pop() } label: {
+                    Button { router.close() } label: {
                         Text("취소").suit(15, .bold).foregroundStyle(DS.Palette.textPrimary).frame(maxWidth: .infinity).frame(height: 48)
                             .background(DS.Palette.gray800, in: Capsule())
                     }
@@ -393,7 +392,6 @@ struct BlockView: View {
             .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 24))
             .padding(.horizontal, 24)
         }
-        .background(DS.Palette.bgSurface.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
     }
 }

@@ -2,7 +2,8 @@ import Observation
 import SwiftUI
 
 /// 앱의 모든 화면 이름. 웹 프로토타입 화면 번호와 피그마 프레임에 하나씩 대응한다.
-enum Route: String, Hashable, CaseIterable {
+enum Route: String, Hashable, CaseIterable, Identifiable {
+    var id: String { rawValue }
     /// 네이버 클립에서 들어오는 길
     case clipList, clipPlayer
     // 탭: 홈
@@ -48,6 +49,8 @@ final class Router {
     var path: [Route] = []
     var tab: Tab = .home
     var showSplash = false
+    // 화면 위에 겹쳐 뜨는 시트와 창(미니 프로필, 신고, 차단). 뒤 화면이 그대로 비친다.
+    var modal: Route?
     var enteredApp = false
 
     func push(_ r: Route) {
@@ -62,6 +65,19 @@ final class Router {
 
     func popToRoot() {
         path.removeAll()
+    }
+
+    func present(_ r: Route) {
+        modal = r
+    }
+
+    func dismissModal() {
+        modal = nil
+    }
+
+    /// 겹친 창이면 닫고, 아니면 한 칸 뒤로 간다.
+    func close() {
+        if modal != nil { modal = nil } else { pop() }
     }
 
     func select(_ t: Tab) {
