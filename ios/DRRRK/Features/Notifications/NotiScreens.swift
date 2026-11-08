@@ -79,7 +79,7 @@ private struct NotiHeader: View {
     var body: some View {
         ZStack {
             if let title {
-                Text(title).suit(17, .bold, tracking: -0.68).foregroundStyle(DS.Palette.textPrimary)
+                Text(title).suit(17, .bold, tracking: -0.34).foregroundStyle(DS.Palette.textPrimary)
             }
             HStack {
                 Button { router.pop() } label: {
@@ -155,7 +155,7 @@ struct NotiActivityView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            NotiHeader(title: tab == 1 ? "키워드" : nil)
+            NotiHeader(title: nil)
             NotiTabs(tab: $tab).padding(.top, 2)
             ZStack {
                 if tab == 0 {
@@ -241,7 +241,7 @@ struct NotiActivityView: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 20)
+                .padding(.top, 24).padding(.bottom, 12)
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         Button { keywordFilter = "전체" } label: { FilterChip(title: "전체", on: keywordFilter == "전체") }.buttonStyle(.plain)
@@ -254,15 +254,16 @@ struct NotiActivityView: View {
                 }
                 .contentMargins(.horizontal, 24, for: .scrollContent)
                 .scrollIndicators(.hidden)
-                .padding(.top, 10)
-                Rectangle().fill(DS.Palette.bgBase.opacity(0.5)).frame(height: 8).padding(.top, 20)
+                .frame(height: 36)
+                // 피그마 Divider 390 x 8, #0A0B0C
+                Rectangle().fill(DS.Palette.bgOverlay).frame(height: 8).padding(.top, 12)
                 ForEach(NotiData.sections, id: \.0) { section in
                     let hits = section.1.filter { keywordFilter == "전체" || $0.keyword == keywordFilter }
                     if !hits.isEmpty {
-                        Text(section.0).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textSecondary)
-                            .padding(.horizontal, 24).padding(.top, 24)
+                        Text(section.0).suit(14, .bold).foregroundStyle(DS.Palette.textSecondary)
+                            .padding(.horizontal, 24).padding(.top, 24).padding(.bottom, 4)
                         ForEach(hits) { h in
-                            Button { router.push(.liveWatch) } label: { hitRow(h) }.buttonStyle(.plain)
+                            Button { router.push(.liveWatch) } label: { hitRow(h) }.buttonStyle(.plain).padding(.top, 12)
                         }
                     }
                 }
@@ -271,6 +272,14 @@ struct NotiActivityView: View {
             .animation(DS.Motion.standard, value: keywordFilter)
         }
         .scrollIndicators(.hidden)
+    }
+
+    /// 제목 안의 키워드만 하늘색으로(피그마 Title 글자 구간 색)
+    private func highlighted(_ title: String, _ key: String) -> Text {
+        guard let r = title.range(of: key) else { return Text(title).foregroundColor(DS.Palette.textPrimary) }
+        return Text(title[..<r.lowerBound]).foregroundColor(DS.Palette.textPrimary)
+            + Text(title[r]).foregroundColor(DS.Palette.brandPrimary)
+            + Text(title[r.upperBound...]).foregroundColor(DS.Palette.textPrimary)
     }
 
     private func hitRow(_ h: KeywordHit) -> some View {
@@ -286,18 +295,20 @@ struct NotiActivityView: View {
             }
             .frame(width: 72, height: 72)
             VStack(alignment: .leading, spacing: 4) {
-                Text("‘\(h.keyword)’ 키워드 알림").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.brandPrimary)
-                Text(h.title).suit(15, .bold, tracking: -0.6).foregroundStyle(h.time == nil ? DS.Palette.textSecondary : DS.Palette.textPrimary)
+                Text("‘\(h.keyword)’ 키워드 알림").suit(12, .bold, lineHeight: 17).foregroundStyle(DS.Palette.brandPrimary)
+                highlighted(h.title, h.keyword).suit(15, .bold, lineHeight: 22)
                     .multilineTextAlignment(.leading)
-                Text(h.meta).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
+                Text(h.meta).suit(12, .regular, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
             }
+            // 끝난 방은 글 묶음을 50%로 흐리게(피그마 Body opacity 0.5)
+            .opacity(h.time == nil ? 0.5 : 1)
             Spacer(minLength: 0)
             if h.unread {
-                Circle().fill(DS.Palette.danger).frame(width: 5, height: 5).padding(.top, 4)
+                Circle().fill(DS.Palette.danger).frame(width: 6, height: 6)
             }
         }
         .padding(.horizontal, 24)
-        .padding(.top, 16)
+        .padding(.vertical, 16)
         .contentShape(Rectangle())
     }
 }
@@ -315,52 +326,54 @@ struct NotiKeywordSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             NotiHeader(title: "키워드 관리 (\(store.keywords.count)/\(store.limit))")
+            Rectangle().fill(Color(hex: 0x2A2F32)).frame(height: 1)
             HStack {
                 TextField("", text: $draft, prompt: Text("알림 받을 키워드를 입력해주세요").foregroundStyle(DS.Palette.textSecondary))
-                    .suit(14, .medium, tracking: -0.56)
+                    .suit(14, .regular, tracking: -0.28)
                     .foregroundStyle(DS.Palette.textPrimary)
                     .submitLabel(.done)
                     .onSubmit(register)
-                Button("등록", action: register).suit(14, .bold, tracking: -0.56)
+                Button("등록", action: register).suit(14, .medium, tracking: -0.28)
                     .foregroundStyle(draft.isEmpty ? DS.Palette.textSecondary : DS.Palette.brandPrimary)
-                    .frame(minWidth: 44, minHeight: 44)
+                    .frame(minHeight: 44)
             }
-            .padding(.leading, 20).padding(.trailing, 10)
+            .padding(.horizontal, 20)
             .frame(height: 56)
-            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
+            .background(DS.Palette.bgElevated, in: Capsule())
             .padding(.horizontal, 24)
-            .padding(.top, 8)
+            .padding(.top, 16)
             VStack(spacing: 0) {
                 ForEach(store.keywords, id: \.self) { k in
                     HStack {
-                        Text(k).suit(16, .medium, tracking: -0.64).foregroundStyle(DS.Palette.textPrimary)
+                        Text(k).suit(16, .medium, tracking: -0.32).foregroundStyle(DS.Palette.textPrimary)
                         Spacer()
                         Button { withAnimation(DS.Motion.standard) { store.remove(k) } } label: {
-                            Image("C-close").renderingMode(.template).resizable().frame(width: 18, height: 18)
-                                .foregroundStyle(DS.Palette.textSecondary).frame(width: 44, height: 44)
+                            Image("C-close").renderingMode(.template).resizable().frame(width: 16, height: 16)
+                                .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44)
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(k + " 지우기")
                     }
+                    .padding(.leading, 4).padding(.trailing, -10)
                     .frame(height: 65)
-                    .overlay(alignment: .bottom) { Rectangle().fill(DS.Palette.bgElevated).frame(height: 1) }
+                    .overlay(alignment: .bottom) { Rectangle().fill(Color(hex: 0x2A2F32)).frame(height: 1) }
                     .transition(.opacity.combined(with: .move(edge: .leading)))
                 }
             }
-            .padding(.leading, 28).padding(.trailing, 14)
-            .padding(.top, 8)
+            .padding(.horizontal, 24)
+            .padding(.top, 16)
             (Text("따뜻한 가죽소파29님이 ").foregroundStyle(DS.Palette.textPrimary) + Text("최근 본").foregroundStyle(DS.Palette.brandPrimary) + Text(" 키워드예요.").foregroundStyle(DS.Palette.textPrimary))
-                .suit(15, .bold, tracking: -0.6)
-                .padding(.horizontal, 24).padding(.top, 28)
+                .suit(15, .bold, tracking: -0.3, lineHeight: 21)
+                .padding(.horizontal, 24).padding(.top, 30)
             FlowChips(items: store.suggestions) { k in withAnimation(DS.Motion.standard) { store.add(k) } }
                 .padding(.horizontal, 24).padding(.top, 14)
             Spacer()
-            Rectangle().fill(DS.Palette.bgElevated).frame(height: 1)
-            VStack(alignment: .leading, spacing: 4) {
+            Rectangle().fill(Color(hex: 0x2A2F32)).frame(height: 1)
+            VStack(alignment: .leading, spacing: 16) {
                 CheckRow(title: "내 연령대(20대) 방만 알림 받기", on: $store.sameAge)
                 CheckRow(title: "새벽 시간(00시~06시)에도 알림 받기", on: $store.dawn)
             }
-            .padding(.horizontal, 24).padding(.vertical, 16)
+            .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 24)
         }
         .background(DS.Palette.bgSurface.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
@@ -379,14 +392,15 @@ private struct CheckRow: View {
         Button { withAnimation(DS.Motion.stateIn) { on.toggle() } } label: {
             HStack(spacing: 10) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 4).fill(on ? DS.Palette.brandPrimary : DS.Palette.bgElevated).frame(width: 20, height: 20)
+                    RoundedRectangle(cornerRadius: 5).fill(on ? DS.Palette.brandPrimary : DS.Palette.bgElevated).frame(width: 20, height: 20)
                     if on {
                         Image("C-check").renderingMode(.template).resizable().frame(width: 14, height: 14).foregroundStyle(.black)
                     }
                 }
-                Text(title).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
+                Text(title).suit(14, .medium, tracking: -0.28).foregroundStyle(DS.Palette.textPrimary)
             }
-            .frame(minHeight: 36)
+            .frame(minHeight: 20)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(on ? .isSelected : [])
@@ -401,12 +415,13 @@ private struct FlowChips: View {
             ForEach(items, id: \.self) { k in
                 Button { onAdd(k) } label: {
                     HStack(spacing: 4) {
-                        Text(k).suit(14, .medium, tracking: -0.56)
+                        Text(k).suit(14, .medium, tracking: -0.28)
                         Image("C-plus").renderingMode(.template).resizable().frame(width: 14, height: 14)
                     }
                     .foregroundStyle(DS.Palette.textPrimary)
-                    .padding(.horizontal, 14).frame(height: 36)
-                    .background(DS.Palette.bgElevated, in: Capsule())
+                    .padding(.leading, 14).padding(.trailing, 10).frame(height: 36)
+                    // 피그마 칩: 채움 없이 #3A4045 1px 외곽선
+                    .overlay(Capsule().strokeBorder(Color(hex: 0x3A4045), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
                 .transition(.opacity.combined(with: .scale(scale: 0.9)))

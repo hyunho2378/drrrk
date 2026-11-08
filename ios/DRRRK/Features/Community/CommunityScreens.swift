@@ -120,6 +120,7 @@ struct CommunityDetailView: View {
     private let likes = 48
 
     var body: some View {
+        ZStack(alignment: .bottom) {
         VStack(spacing: 0) {
             HStack {
                 Button { router.pop() } label: {
@@ -141,22 +142,27 @@ struct CommunityDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         post
-                        Rectangle().fill(DS.Palette.bgBase.opacity(0.5)).frame(height: 8).padding(.top, 20)
-                        Text("댓글 \(comments.count + 16)").suit(16, .bold, tracking: -0.64).foregroundStyle(DS.Palette.textPrimary)
-                            .padding(.horizontal, 24).padding(.top, 22)
-                        VStack(alignment: .leading, spacing: 26) {
-                            ForEach(comments) { c in commentRow(c).id(c.id) }
+                        // 피그마 Divider 390 x 8, #222628
+                        Rectangle().fill(DS.Palette.bgElevated).frame(height: 8)
+                        Text("댓글 \(comments.count + 16)").suit(16, .bold).foregroundStyle(DS.Palette.textPrimary)
+                            .padding(.horizontal, 24).padding(.top, 16)
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(comments) { c in commentRow(c).padding(.vertical, 14).id(c.id) }
                         }
                         .padding(.horizontal, 24)
-                        .padding(.top, 18)
-                        .padding(.bottom, 110)
+                        .padding(.bottom, 130)
                     }
                 }
                 .scrollIndicators(.hidden)
                 .onChange(of: comments.count) { _, _ in withAnimation(DS.Motion.standard) { proxy.scrollTo(comments.last?.id, anchor: .bottom) } }
             }
         }
-        .overlay(alignment: .bottom) { inputBar }
+            // 피그마: 아래 212 높이 검은 그라데이션 위에 입력창(342 x 66, 모서리 32), 화면 바닥에서 24
+            LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
+                .frame(height: 212).allowsHitTesting(false)
+            inputBar
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
         .background(DS.Palette.bgSurface.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -165,36 +171,41 @@ struct CommunityDetailView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 ProfileChair(name: CommunityData.detailAuthor, size: 28)
-                Text(CommunityData.detailAuthor).suit(13, .bold, tracking: -0.52).foregroundStyle(DS.Palette.textPrimary)
-                Text("방금").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textTertiary)
+                Text(CommunityData.detailAuthor).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
+                Text("방금").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
             }
-            Text("둘이 찍은 사진인데\n지만 보정해서 올린 여우").suit(20, .bold, tracking: -0.8).foregroundStyle(DS.Palette.textPrimary)
-                .lineSpacing(3).padding(.top, 16)
-            Text(CommunityData.detailBody).suit(15, .medium, tracking: -0.6).foregroundStyle(DS.Palette.textSecondary)
-                .lineSpacing(5).padding(.top, 14)
+            Text("둘이 찍은 사진인데\n지만 보정해서 올린 여우").suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary)
+                .padding(.top, 16)
+            Text(CommunityData.detailBody).suit(15, .regular, lineHeight: 24).foregroundStyle(Color(hex: 0xD9DBDE))
+                .padding(.top, 12)
+            // 대화 다시보기 카드 342 x 150, 모서리 16, #1F2226. 장면 그림은 피그마 scene과 fade를 합쳐 내보냈다.
             ZStack(alignment: .topLeading) {
-                Image(CommunityData.detailScene).resizable().scaledToFill().frame(height: 150).frame(maxWidth: .infinity).clipped()
+                Image("C-detail-scene").resizable().scaledToFill().frame(height: 150).frame(maxWidth: .infinity).clipped()
                 HStack(spacing: 6) {
-                    Image("C-play").renderingMode(.template).resizable().frame(width: 16, height: 16)
-                    Text("대화 다시보기 · 12:32").suit(12, .bold, tracking: -0.48)
+                    Image("C-play").renderingMode(.template).resizable().frame(width: 18, height: 18)
+                    Text("대화 다시보기 · 12:32").suit(12, .medium)
                 }
-                .foregroundStyle(DS.Palette.textPrimary)
-                .padding(.horizontal, 10).frame(height: 28)
-                .background(.black.opacity(0.6), in: Capsule())
+                .foregroundStyle(.white)
+                .padding(.leading, 6).padding(.trailing, 12).padding(.vertical, 4)
+                .background(.black.opacity(0.55), in: Capsule())
                 .padding(12)
-                HStack(spacing: -8) {
-                    ForEach(CommunityData.detailSeats, id: \.self) { img in
-                        Image(img).resizable().scaledToFit().padding(3).frame(width: 30, height: 30)
-                            .background(.white, in: Circle()).overlay(Circle().strokeBorder(DS.Palette.bgElevated, lineWidth: 2))
+                HStack(spacing: 8) {
+                    HStack(spacing: -8) {
+                        ForEach(CommunityData.detailSeats, id: \.self) { img in
+                            Image(img).resizable().scaledToFit().frame(width: 26, height: 26).frame(width: 30, height: 30)
+                                .background(DS.Palette.bgElevated, in: Circle()).clipShape(Circle())
+                                .overlay(Circle().strokeBorder(Color(hex: 0x1F2226), lineWidth: 2))
+                        }
                     }
-                    Text("의자 3").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary).padding(.leading, 14)
+                    Text("의자 3").suit(12, .medium).foregroundStyle(DS.Palette.textPrimary)
                 }
-                .padding(12)
+                .padding(.leading, 12).padding(.bottom, 12)
                 .frame(maxHeight: .infinity, alignment: .bottom)
             }
             .frame(height: 150)
-            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card))
-            .padding(.top, 20)
+            .background(Color(hex: 0x1F2226))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.top, 24)
             HStack(spacing: 6) {
                 Button {
                     withAnimation(DS.Motion.stateIn) { liked.toggle() }
@@ -209,22 +220,24 @@ struct CommunityDetailView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(liked ? "공감 취소" : "공감")
-                Image("C-comment").renderingMode(.template).resizable().frame(width: 16, height: 16).padding(.leading, 12)
-                Text("댓글 \(comments.count + 16)").suit(12, .medium, tracking: -0.48)
+                Image("C-comment").renderingMode(.template).resizable().frame(width: 16, height: 16).padding(.leading, 2)
+                Text("댓글 \(comments.count + 16)").suit(12, .bold, tracking: -0.48)
                 Spacer()
                 ShareLink(item: "둘이 찍은 사진인데 지만 보정해서 올린 여우") {
                     HStack(spacing: 6) {
                         Image("C-share").renderingMode(.template).resizable().frame(width: 16, height: 16)
-                        Text("공유").suit(12, .medium, tracking: -0.48)
+                        Text("공유").suit(12, .bold, tracking: -0.48)
                     }
-                    .frame(minHeight: 44)
+                    .frame(minHeight: 36)
                 }
             }
             .foregroundStyle(DS.Palette.textSecondary)
-            .padding(.top, 4)
+            .frame(height: 36)
+            .padding(.top, 16)
         }
         .padding(.horizontal, 24)
-        .padding(.top, 4)
+        .padding(.top, 2)
+        .padding(.bottom, 24)
     }
 
     private func commentRow(_ c: PostComment) -> some View {
@@ -233,10 +246,10 @@ struct CommunityDetailView: View {
             ProfileChair(name: c.name, size: 32)
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(c.name).suit(13, .bold, tracking: -0.52).foregroundStyle(DS.Palette.textPrimary)
-                    Text(c.time).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textTertiary)
+                    Text(c.name).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
+                    Text(c.time).suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
                 }
-                Text(c.text).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary).lineSpacing(4)
+                Text(c.text).suit(14, .regular, lineHeight: 21).foregroundStyle(DS.Palette.textPrimary)
                 HStack(spacing: 14) {
                     Button {
                         withAnimation(DS.Motion.stateIn) {
@@ -254,7 +267,7 @@ struct CommunityDetailView: View {
                         .foregroundStyle(on ? DS.Palette.brandPrimary : DS.Palette.textTertiary)
                     }
                     .buttonStyle(.plain)
-                    Text("답글 달기").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
+                    Text("답글 달기").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
                 }
             }
         }
@@ -276,10 +289,11 @@ struct CommunityDetailView: View {
             .buttonStyle(PressStyle())
             .accessibilityLabel("댓글 보내기")
         }
-        .padding(8)
-        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.input))
+        .padding(.vertical, 8).padding(.trailing, 8).padding(.leading, 8)
+        .frame(height: 66)
+        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 32))
         .padding(.horizontal, 24)
-        .padding(.bottom, 12)
+        .padding(.bottom, 24)
     }
 
     private func send() {

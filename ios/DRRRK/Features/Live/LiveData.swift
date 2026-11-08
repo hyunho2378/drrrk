@@ -151,7 +151,15 @@ enum CommunityData {
 /// 프로필 의자: 피그마 "프로필용 의자들" 25개(편의점 의자, 스툴, 소파, 바퀴달린 의자, 리클라이너 각 5색). 이름마다 같은 의자를 쓴다.
 enum Avatars {
     static let all = ["C-4fdd18ce8a29", "C-5e85ee935bf4", "C-b5c25c4caef8", "C-33871c043e7c", "C-6bfc511e24bf", "C-51be0a544b5f", "C-bbab91fe747a", "C-450692c4dbd6", "C-d7b0bb5005bf", "C-90255286edc8", "C-eab22a7a4d50", "C-6e90eda49e34", "C-b684e5de0a90", "C-4a2fafbdd2df", "C-66dbe89daeb4", "C-40b4fa7cb4ef", "C-f77c03c1bf89", "C-801d8aedde75", "C-cf2670f44f76", "C-ad12677ce6f5", "C-ef3d01c18073", "C-3ff806dcf77f", "C-ad4a14569046", "C-7c2f0480f099", "C-25629e6f941c"]
+    /// 피그마 커뮤니티 글 상세(1953:12298)에 정해진 사람별 의자
+    static let fixed: [String: String] = [
+        "푹신푹신 리클라이너17": "C-3ff806dcf77f", "딱딱한 나무스툴12": "C-51be0a544b5f", "새벽2시 소파": "C-eab22a7a4d50",
+        "퇴근길 편의점 의자": "C-4fdd18ce8a29", "주말 아침 나무스툴": "C-d7b0bb5005bf", "비 오는 날 바퀴달린의자": "C-f77c03c1bf89",
+        "길거리 편의점 의자": "C-33871c043e7c",
+    ]
+
     static func image(for name: String) -> String {
+        if let f = fixed[name] { return f }
         let groups: [(String, Int)] = [("편의점", 0), ("스툴", 5), ("소파", 10), ("바퀴", 15), ("리클라이너", 20)]
         let seed = name.unicodeScalars.reduce(7) { ($0 &* 31 &+ Int($1.value)) & 0x7FFF_FFFF }
         if let g = groups.first(where: { name.contains($0.0) }) {

@@ -499,186 +499,330 @@ private struct FoundModal: View {
 }
 
 // MARK: - 종료, 아침, 오늘 나눈 대화
+// 피그마 "종료"(1647:26726), "DRRRK / 아침"(1647:26876), "DRRRK / 오늘 나눈 대화"(1647:27027)의 자리와 글자 값을 그대로 옮겼다.
+// 글자는 모두 SUIT, 행간 140%, 자간 -4%다.
 
-private struct SummaryBlock: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("오늘 나눈 대화").suit(20, .bold, tracking: -0.4).foregroundStyle(DS.Palette.textPrimary)
-            HStack(spacing: 6) {
-                Text("오늘의 고민").suit(12, .medium).foregroundStyle(DS.Palette.textSecondary)
-                Text("둘이 찍은 사진, 자기만 보정한 친구").suit(12, .bold).foregroundStyle(DS.Palette.textPrimary)
-            }
-            .padding(.top, 16)
-            VStack(alignment: .leading, spacing: 20) {
-                step(1, "고민을 꺼냈어요", "\"이거 일부러야?\"로 이야기가 시작됐어요")
-                step(2, "서로의 생각을 나눴어요", "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요.")
-                step(3, "다음 행동을 정했어요", "다음엔 한번 직접 말해보기로 했어요")
-            }
-            .padding(.top, 24)
-            Text("오늘의 베스트 댓글").suit(20, .bold, tracking: -0.4).foregroundStyle(DS.Palette.textPrimary).padding(.top, 40)
-            Text("의자들이 가장 많이 공감한 말이에요").suit(12, .medium).foregroundStyle(DS.Palette.textSecondary).padding(.top, 6)
-            VStack(spacing: 12) {
-                best("BEST 1", "따뜻한 가죽소파29", "그 친구 인성 레전드인듯..ㅠ", "24", "B-chair-sofa")
-                best("BEST 2", "새벽2시 택배상자", "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ", "17", "B-chair-box")
-                best("BEST 3", "딱딱한 나무 스툴12", "걍 물어보면 안됨? 나 저런 애들 이해가 안돼", "11", "B-chair-stool")
-            }
-            .padding(.top, 16)
-            Text("도움이 된 의자가 있었나요?").suit(20, .bold, tracking: -0.4).foregroundStyle(DS.Palette.textPrimary).padding(.top, 40)
-            Text("좋은 이야기를 나눠준 유저를 추천해주세요").suit(12, .medium).foregroundStyle(DS.Palette.textSecondary).padding(.top, 6)
-            RecommendPicker().padding(.top, 20)
-        }
-    }
-
-    private func step(_ n: Int, _ t: String, _ d: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Text("\(n)").suit(12, .bold).foregroundStyle(.black).frame(width: 24, height: 24).background(DS.Palette.brandPrimary, in: Circle())
-            VStack(alignment: .leading, spacing: 6) {
-                Text(t).suit(16, .bold, tracking: -0.32).foregroundStyle(DS.Palette.textPrimary)
-                Text(d).suit(12, .medium, tracking: -0.24).foregroundStyle(DS.Palette.textSecondary).fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-
-    private func best(_ rank: String, _ name: String, _ text: String, _ likes: String, _ asset: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(asset).resizable().scaledToFit().frame(width: 18, height: 18).frame(width: 24, height: 24)
-                .background(DS.Palette.bgSurface, in: Circle())
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 6) {
-                    Text(rank).suit(12, .bold).foregroundStyle(DS.Palette.brandPrimary)
-                    Text(name).suit(12, .medium).foregroundStyle(DS.Palette.textSecondary)
-                }
-                Text(text).suit(16, .medium, tracking: -0.32).foregroundStyle(DS.Palette.textPrimary)
-            }
-            Spacer()
-            Text(likes).suit(12, .bold).foregroundStyle(DS.Palette.textSecondary)
-        }
-        .padding(16).background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
+private extension View {
+    /// 피그마 글자 스타일: 크기, 굵기, 행간 140%, 자간 -4%
+    func fig(_ size: CGFloat, _ w: SUITWeight, _ c: Color) -> some View {
+        suit(size, w, tracking: -0.04 * size, lineHeight: size * 1.4).foregroundStyle(c)
     }
 }
 
-private struct RecommendPicker: View {
-    @State private var picked: Set<String> = []
-    private let people = [("새벽2시\n택배상자", "B-chair-box"), ("따뜻한\n가죽소파29", "B-chair-sofa"), ("딱딱한\n나무 스툴12", "B-chair-stool")]
+private enum ReportKind { case end, morning, summary }
+
+/// 00 엉따온도 카드(342 x 188, #222628, 모서리 20, 안쪽 24 / 20)
+private struct WarmthCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 4) {
-                Text("\(picked.count)명 선택").suit(12, .bold).foregroundStyle(DS.Palette.brandPrimary)
-                Text("최대 2명").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
-            }
-            HStack(spacing: 12) {
-                ForEach(people, id: \.0) { p in
-                    let on = picked.contains(p.0)
-                    Button {
-                        withAnimation(DS.Motion.stateIn) {
-                            if on {
-                                picked.remove(p.0)
-                            } else if picked.count < 2 {
-                                picked.insert(p.0)
-                            }
-                        }
-                        UISelectionFeedbackGenerator().selectionChanged()
-                    } label: {
-                        VStack(spacing: 10) {
-                            Image(p.1).resizable().scaledToFit().frame(width: 60, height: 60)
-                                .frame(width: 84, height: 84).background(DS.Palette.bgElevated, in: Circle())
-                                .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(on ? 1 : 0))
-                            Text(p.0).suit(16, .bold, tracking: -0.32).multilineTextAlignment(.center)
-                                .foregroundStyle(on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
-                        }
-                        .frame(maxWidth: .infinity)
+            (Text("오늘 대화에서 의자가\n").foregroundColor(DS.Palette.textPrimary)
+                + Text("1.1°C ").foregroundColor(DS.Palette.brandPrimary)
+                + Text("더 뜨끈해졌어요").foregroundColor(DS.Palette.textPrimary))
+                .suit(24, .bold, tracking: -0.96, lineHeight: 33.6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(spacing: 12) {
+                HStack(alignment: .center, spacing: 0) {
+                    HStack(spacing: 4) {
+                        Text("엉따 온도").fig(16, .bold, DS.Palette.textPrimary)
+                        Image("B-icon-info").renderingMode(.template).resizable().frame(width: 12, height: 12)
+                            .foregroundStyle(DS.Palette.textPrimary)
                     }
-                    .buttonStyle(RoomPressStyle())
+                    Spacer(minLength: 0)
+                    Text("39.2°").fig(24, .bold, DS.Palette.accentOrange)
+                }
+                .frame(height: 36)
+                GeometryReader { g in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(DS.Palette.bgSurface)
+                        Capsule().fill(LinearGradient(colors: [DS.Palette.brandPrimary, DS.Palette.accentOrange], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: g.size.width * 224 / 302)
+                    }
+                }
+                .frame(height: 12)
+            }
+        }
+        .padding(.vertical, 24).padding(.horizontal, 20)
+        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+/// 섹션 머리: 제목 20 굵게, 설명 12
+private struct SectionHead: View {
+    let title: String
+    let desc: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).fig(20, .bold, DS.Palette.textPrimary)
+            Text(desc).fig(12, .regular, DS.Palette.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// 02 오늘 나눈 대화: 칩과 단계 세 줄(번호 원 24, 잇는 선 4 x 40)
+private struct TalkTimeline: View {
+    var gap: CGFloat
+    private let steps = [
+        ("고민을 꺼냈어요", "\"이거 일부러야?\"로 이야기가 시작됐어요"),
+        ("서로의 생각을 나눴어요", "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요."),
+        ("다음 행동을 정했어요", "다음엔 한번 직접 말해보기로 했어요"),
+    ]
+    var body: some View {
+        VStack(alignment: .leading, spacing: gap) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("오늘 나눈 대화").fig(20, .bold, DS.Palette.textPrimary)
+                HStack(spacing: 8) {
+                    Text("오늘의 고민").fig(12, .bold, DS.Palette.brandPrimary)
+                        .padding(.vertical, 4).padding(.horizontal, 8)
+                        .background(DS.Palette.brandSubtle, in: Capsule())
+                    Text("둘이 찍은 사진, 자기만 보정한 친구").fig(12, .medium, DS.Palette.textTertiary)
+                }
+            }
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(steps.indices, id: \.self) { i in
+                    let last = i == steps.count - 1
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(spacing: 4) {
+                            Text("\(i + 1)").fig(12, .bold, DS.Palette.textSecondary)
+                                .frame(width: 24, height: 24).background(DS.Palette.bgElevated, in: Circle())
+                            if !last { Rectangle().fill(DS.Palette.bgElevated).frame(width: 4, height: 40) }
+                        }
+                        .frame(width: 24)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(steps[i].0).fig(16, .bold, DS.Palette.textPrimary)
+                            Text(steps[i].1).fig(12, .regular, DS.Palette.textSecondary)
+                        }
+                        .padding(.top, 4).padding(.bottom, last ? 0 : 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
             }
         }
     }
 }
 
-private struct ResultScaffold<Top: View>: View {
+/// 03 베스트 댓글 카드(#222628, 모서리 16, 안쪽 16)
+private struct BestCard: View {
+    let name: String
+    let text: String
+    let likes: String?
+    let asset: String
+    var dark = true
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(asset).resizable().scaledToFill().frame(width: 24, height: 24)
+                    .background(dark ? DS.Palette.bgSurface : .clear).clipShape(Circle())
+                Text(name).fig(12, .bold, DS.Palette.textSecondary)
+            }
+            HStack(alignment: .center, spacing: 8) {
+                Text(text).fig(16, .medium, DS.Palette.textPrimary).lineLimit(1)
+                Spacer(minLength: 0)
+                if let likes {
+                    HStack(spacing: 4) {
+                        Image(systemName: "hand.thumbsup.fill").font(.system(size: 12)).frame(width: 16, height: 16)
+                        Text(likes).fig(12, .bold, DS.Palette.brandPrimary)
+                    }
+                    .foregroundStyle(DS.Palette.brandPrimary)
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+/// 04 대화 상대 추천: 양쪽 화살표와 의자 세 칸. 최대 두 명까지 고른다.
+private struct RecommendPicker: View {
+    var cell: CGFloat = 80
+    var showCount = true
+    /// 종료 화면: 72 칸, 이름 12, 고른 칸에 하늘색 테두리 2, 첫 칸은 노란 의자 "드르륵 칵"
+    var compact = false
+    @State private var picked: Set<String> = ["sofa"]
+    private var people: [(String, String, String)] {
+        [compact ? ("box", "새벽2시\n드르륵 칵", "B-chair-yellow") : ("box", "새벽2시\n택배상자", "B-chair-box"),
+         ("sofa", "따뜻한\n가죽소파29", "B-chair-sofa"), ("stool", "딱딱한\n나무 스툴12", "B-chair-stool")]
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if showCount {
+                HStack(spacing: 4) {
+                    Text("\(picked.count)명 선택").fig(12, .bold, DS.Palette.brandPrimary)
+                    Text("최대 2명").fig(12, .medium, DS.Palette.textTertiary)
+                }
+            }
+            HStack(alignment: .top, spacing: 8) {
+                arrow(left: true)
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(people, id: \.0) { p in
+                        let on = picked.contains(p.0)
+                        Button {
+                            withAnimation(DS.Motion.stateIn) {
+                                if on { picked.remove(p.0) } else if picked.count < 2 { picked.insert(p.0) }
+                            }
+                            UISelectionFeedbackGenerator().selectionChanged()
+                        } label: {
+                            VStack(spacing: 8) {
+                                Image(p.2).resizable().scaledToFill().frame(width: compact ? cell : cell + 4, height: compact ? cell : cell + 4)
+                                    .frame(width: cell, height: cell).background(DS.Palette.bgSurface).clipShape(Circle())
+                                    .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(compact && on ? 1 : 0))
+                                Text(p.1).fig(compact ? 12 : 16, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
+                                    .multilineTextAlignment(.center).fixedSize()
+                            }
+                            .frame(width: cell)
+                        }
+                        .buttonStyle(RoomPressStyle())
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                arrow(left: false)
+            }
+        }
+    }
+
+    private func arrow(left: Bool) -> some View {
+        let size: CGFloat = compact ? 24 : 28
+        return Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: size, height: size)
+            .foregroundStyle(DS.Palette.textPrimary)
+            .rotationEffect(.degrees(left ? 0 : 180))
+            .opacity(left ? 0.3 : 1)
+            .frame(width: size, height: compact ? 72 : 84)
+    }
+}
+
+/// 리포트 본문(엉따 카드부터 추천까지). 피그마 Report 묶음의 순서와 간격.
+private struct ReportBody: View {
+    let kind: ReportKind
+    var body: some View {
+        VStack(alignment: .leading, spacing: kind == .end ? 36 : 40) {
+            if kind != .summary { WarmthCard() }
+            TalkTimeline(gap: kind == .end ? 12 : 20)
+            VStack(alignment: .leading, spacing: 12) {
+                if kind == .end {
+                    SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요")
+                } else {
+                    SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
+                }
+                VStack(spacing: 8) {
+                    BestCard(name: "따뜻한 가죽소파29", text: kind == .morning ? "그 친구 외모정병 레전드인듯..ㅠ" : "그 친구 인성 레전드인듯..ㅠ",
+                             likes: kind == .morning ? "24" : nil, asset: "B-chair-sofa", dark: false)
+                    BestCard(name: "새벽2시 택배상자", text: kind == .morning ? "다음 사진은 네가 먼저 보정해서 올려버려 ㅋㅋ" : "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ",
+                             likes: kind == .morning ? "17" : nil, asset: "B-chair-box")
+                    BestCard(name: "딱딱한 나무 스툴12", text: kind == .end ? "요즘 쌍수가 성형이냐" : "걍 물어보면 안됨? 나 저런 애들 이해가 안돼",
+                             likes: kind == .end ? nil : "11", asset: "B-chair-stool")
+                }
+            }
+            VStack(alignment: .leading, spacing: kind == .end ? 16 : 12) {
+                SectionHead(title: kind == .end ? "도움이 된 유저가 있었나요?" : "도움이 된 의자가 있었나요?", desc: "좋은 이야기를 나눠준 유저를 추천해주세요")
+                RecommendPicker(cell: kind == .end ? 72 : 80, showCount: kind != .end, compact: kind == .end)
+            }
+        }
+    }
+}
+
+/// 아래 두 버튼(346 x 46 알약, 모서리 28 / 글자 버튼). 피그마 btn과 "새 방 만들기".
+private struct ReportButtons: View {
     let primary: String
     let secondary: String
+    let filled: Bool
     let onPrimary: () -> Void
     let onSecondary: () -> Void
-    @ViewBuilder let top: () -> Top
+    var body: some View {
+        VStack(spacing: 12) {
+            Button(action: onPrimary) {
+                Text(primary).fig(16, .bold, filled ? .black : DS.Palette.textSecondary)
+                    .frame(maxWidth: .infinity).frame(height: 46)
+                    .background(filled ? DS.Palette.brandPrimary : DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 28))
+            }
+            .buttonStyle(RoomPressStyle())
+            Button(action: onSecondary) {
+                Text(secondary).fig(14, .bold, DS.Palette.textSecondary).frame(maxWidth: .infinity).frame(height: 20)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
+/// 결과 화면 틀. 뒤로 가기(24, 79)와 본문 스크롤. 아침과 오늘 나눈 대화는 아래 버튼이 검은 그라데이션 위에 고정되고,
+/// 종료는 긴 화면 맨 끝에 버튼이 붙는다.
+private struct ReportScreen: View {
+    let kind: ReportKind
+    @Environment(Router.self) private var router
+
     var body: some View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    top()
-                    SummaryBlock().padding(.top, 40)
+                    backButton.padding(.top, 79 - 62)
+                    if kind == .summary {
+                        ReportBody(kind: kind).padding(.top, 160 - 103)
+                    } else {
+                        Text("아침이 밝아\n대화가 종료되었어요").fig(28, .bold, DS.Palette.textPrimary).padding(.top, 160 - 103)
+                        hero
+                        ReportBody(kind: kind)
+                    }
+                    if kind == .end {
+                        buttons.padding(.top, 42).padding(.bottom, 40)
+                    } else {
+                        Color.clear.frame(height: 212)
+                    }
                 }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 170)
             }
             .scrollIndicators(.hidden)
-            // 아래 버튼 띠는 스크롤과 상관없이 고정이다.
-            VStack(spacing: 4) {
-                PrimaryButton(title: primary, action: onPrimary)
-                Button(secondary, action: onSecondary).suit(14, .medium).foregroundStyle(DS.Palette.textSecondary).frame(height: 40)
-            }
-            .padding(.horizontal, 24).padding(.top, 24).padding(.bottom, 8)
-            .background(
-                LinearGradient(stops: [.init(color: DS.Palette.bgSurface.opacity(0), location: 0), .init(color: DS.Palette.bgSurface, location: 0.3)], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea(edges: .bottom)
-            )
-        }
-        .background(DS.Palette.bgSurface.ignoresSafeArea())
-        .toolbar(.hidden, for: .navigationBar)
-    }
-}
-
-private struct MorningHero: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("아침이 밝아\n대화가 종료되었어요").suit(28, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary).padding(.top, 60)
-            Image("B-end-hero").resizable().scaledToFit().frame(width: 232, height: 160).frame(maxWidth: .infinity).padding(.top, 40)
-            (Text("오늘 대화에서 의자가 ").foregroundStyle(DS.Palette.textPrimary) + Text("1.1°C").foregroundStyle(DS.Palette.brandPrimary) + Text(" 더 뜨끈해졌어요").foregroundStyle(DS.Palette.textPrimary))
-                .suit(24, .bold, tracking: -0.48).padding(.top, 60)
-            HStack {
-                Text("엉따 온도").suit(16, .medium).foregroundStyle(DS.Palette.textSecondary)
-                Spacer()
-                Text("39.2°").suit(24, .bold).foregroundStyle(DS.Palette.accentOrange)
-            }
-            .padding(.top, 24)
-            GeometryReader { g in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(DS.Palette.textTertiary.opacity(0.4))
-                    Capsule().fill(LinearGradient(colors: [DS.Palette.brandPrimary, DS.Palette.accentOrange], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: g.size.width * 0.8)
+            if kind != .end {
+                ZStack(alignment: .bottom) {
+                    LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 212).allowsHitTesting(false)
+                    buttons.padding(.horizontal, 24).padding(.bottom, 40)
                 }
             }
-            .frame(height: 6).padding(.top, 12)
+        }
+        .background(DS.Palette.bgSurface.ignoresSafeArea())
+        .ignoresSafeArea(edges: .bottom)
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private var backButton: some View {
+        Button { router.pop() } label: {
+            Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
+                .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("뒤로")
+    }
+
+    @ViewBuilder private var hero: some View {
+        if kind == .morning {
+            // 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작
+            Image("B-morning-sun").resizable().scaledToFit().frame(width: 146, height: 146)
+                .frame(maxWidth: .infinity).padding(.top, 273 - 240).padding(.bottom, 452 - 419)
+        } else {
+            Image("B-end-hero").resizable().scaledToFit().frame(width: 224, height: 160)
+                .frame(maxWidth: .infinity).padding(.top, 268 - 240).padding(.bottom, 452 - 428)
+        }
+    }
+
+    @ViewBuilder private var buttons: some View {
+        if kind == .end {
+            ReportButtons(primary: "커뮤니티에 고민 올리기", secondary: "올리지 않고 홈으로", filled: true,
+                          onPrimary: { router.select(.community) }, onSecondary: { router.popToRoot() })
+        } else {
+            ReportButtons(primary: "함께 드르륵 앉기", secondary: "새 방 만들기", filled: false,
+                          onPrimary: { router.popToRoot(); router.push(.room) }, onSecondary: { router.popToRoot() })
         }
     }
 }
 
 struct RoomEndView: View {
-    @Environment(Router.self) private var router
-    var body: some View {
-        ResultScaffold(primary: "커뮤니티에 고민 올리기", secondary: "올리지 않고 홈으로",
-                       onPrimary: { router.select(.community) },
-                       onSecondary: { router.popToRoot() }) { MorningHero() }
-    }
+    var body: some View { ReportScreen(kind: .end) }
 }
 
 struct RoomMorningView: View {
-    @Environment(Router.self) private var router
-    var body: some View {
-        ResultScaffold(primary: "함께 드르륵 앉기", secondary: "새 방 만들기",
-                       onPrimary: { router.popToRoot(); router.push(.room) },
-                       onSecondary: { router.popToRoot() }) { MorningHero() }
-    }
+    var body: some View { ReportScreen(kind: .morning) }
 }
 
 struct RoomSummaryView: View {
-    @Environment(Router.self) private var router
-    var body: some View {
-        ResultScaffold(primary: "함께 드르륵 앉기", secondary: "새 방 만들기",
-                       onPrimary: { router.popToRoot(); router.push(.room) },
-                       onSecondary: { router.popToRoot() })
-        {
-            BackHeader(onBack: { router.pop() }).padding(.horizontal, -24)
-        }
-    }
+    var body: some View { ReportScreen(kind: .summary) }
 }
