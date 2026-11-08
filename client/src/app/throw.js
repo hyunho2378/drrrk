@@ -98,13 +98,13 @@ export function attachThrow(root) {
         if (!ghost) {
           if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < LIVE.dragStart) return;
           ghost = img.cloneNode(true);
-          Object.assign(ghost.style, { position: 'absolute', left: '0px', top: '0px', width: '32px', height: '32px', zIndex: '45', pointerEvents: 'none', willChange: 'transform' });
+          Object.assign(ghost.style, { position: 'absolute', left: '0px', top: '0px', width: '40px', height: '40px', zIndex: '45', pointerEvents: 'none', willChange: 'transform' });
           root.appendChild(ghost);
           slot.style.opacity = '0.45';
           sfx.pick();
         }
         const p = toRoot(ev);
-        ghost.style.transform = 'translate(' + (p.x - 16) + 'px,' + (p.y - 16) + 'px) scale(1.25)';
+        ghost.style.transform = 'translate(' + (p.x - 20) + 'px,' + (p.y - 20) + 'px) scale(1)';
         const on = inTable(p);
         if (on !== hot) {
           hot = on;
@@ -119,7 +119,7 @@ export function attachThrow(root) {
         setGlow(false);
         if (!ghost) { toast(root, LIVE.throwHintText); return; }
         const pt = toRoot(ev);
-        const from = 'translate(' + (pt.x - 16) + 'px,' + (pt.y - 16) + 'px) scale(1.25)';
+        const from = 'translate(' + (pt.x - 20) + 'px,' + (pt.y - 20) + 'px) scale(1)';
         if (!inTable(pt)) {
           const sr = relRect(root, slot);
           const a = ghost.animate([{ transform: from, opacity: 1 }, { transform: 'translate(' + (sr.x + 6) + 'px,' + (sr.y + 6) + 'px) scale(1)', opacity: 0.6 }], { duration: 220, easing: motion.emphasizedDecel, fill: 'forwards' });
@@ -129,19 +129,24 @@ export function attachThrow(root) {
         }
         // 테이블 위 아무 곳에나 떨어진다.
         const t = table();
-        const tx = rand(t.land.x, t.land.x + t.land.w) - 16;
-        const ty = rand(t.land.y, t.land.y + t.land.h) - 16;
+        const tx = rand(t.land.x, t.land.x + t.land.w) - 20;
+        const ty = rand(t.land.y, t.land.y + t.land.h) - 20;
         const rot = rand(-14, 14);
         sfx.throw();
         const a = ghost.animate([
           { transform: from },
-          { transform: 'translate(' + (tx + (pt.x - 16 - tx) * 0.4) + 'px,' + (Math.min(ty, pt.y) - 60) + 'px) scale(1.45) rotate(-16deg)', offset: 0.5 },
+          { transform: 'translate(' + (tx + (pt.x - 20 - tx) * 0.4) + 'px,' + (Math.min(ty, pt.y) - 60) + 'px) scale(1.15) rotate(-16deg)', offset: 0.5 },
           { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' },
         ], { duration: LIVE.throwFlyMs, easing: motion.emphasizedDecel, fill: 'forwards' });
         a.onfinish = () => {
           sfx.land();
           ghost.animate([{ transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + (ty - 12) + 'px) scale(1.1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }], { duration: 240, easing: motion.standard });
-          window.setTimeout(() => ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).onfinish = () => ghost.remove(), LIVE.throwStayMs);
+          // 머무는 시간의 마지막 throwFadeMs 동안 서서히 투명해지며 작아진 뒤 지운다(갑자기 없어지지 않게).
+          const at = 'translate(' + tx + 'px,' + ty + 'px) rotate(' + rot + 'deg) ';
+          window.setTimeout(() => {
+            if (!ghost.isConnected) return;
+            ghost.animate([{ opacity: 1, transform: at + 'scale(1)' }, { opacity: 0, transform: at + 'scale(' + LIVE.throwFadeScale + ')' }], { duration: LIVE.throwFadeMs, easing: 'ease-out', fill: 'forwards' }).onfinish = () => ghost.remove();
+          }, LIVE.throwStayMs - LIVE.throwFadeMs);
         };
         // 개수와 쿨타임
         const name = nameOf(slot);

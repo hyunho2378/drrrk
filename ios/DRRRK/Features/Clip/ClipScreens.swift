@@ -87,6 +87,7 @@ struct ClipListView: View {
             .buttonStyle(ClipPressStyle(radius: 12))
             .offset(x: 8, y: 109)
             .accessibilityLabel("쌍밍아웃 영상")
+            ClipAgentButton()
         }
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -107,7 +108,6 @@ struct ClipPlayerView: View {
     var body: some View {
         let items = ClipData.player(like: st.like, save: st.save, mute: st.mute, comments: st.total)
         ClipCanvas(items: items, background: .black) {
-            agent
             hit("소리", 340, 53, 46, 44, 22) { st.mute.toggle() }
             hit("뒤로", 0, 56, 64, 44, 0) { router.pop() }
             hit("이벤트 댓글 남기기", 333, 410, 52, 56, 26) { open(.comments) }
@@ -119,6 +119,8 @@ struct ClipPlayerView: View {
             hit("댓글 입력", 15, 759, 359, 47, 24) { open(.comments) }
             hit("캡션 더보기", 12, 664, 330, 28, 8) { open(.info) }
             sheets
+            // 에이전트는 시트와 덮개 위에서도 같은 자리(344, 298)에 떠 있다(피그마 클립 화면 네 장 공통).
+            ClipAgentButton(popped: popped)
             if let toast {
                 Text(toast).suit(13.5, .semibold, tracking: -0.27)
                     .foregroundStyle(Color(hex: 0xF2F2F7))
@@ -136,24 +138,6 @@ struct ClipPlayerView: View {
             try? await Task.sleep(for: .seconds(1.0))
             withAnimation(.spring(response: 0.55, dampingFraction: 0.6)) { popped = true }
         }
-    }
-
-    /// 드르륵 에이전트 버튼: 영상이 보인 뒤 오른쪽에서 튀어나오고, 누르면 로고 스플래시를 거쳐 드르륵 홈으로 들어간다.
-    private var agent: some View {
-        Button {
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            withAnimation(.easeOut(duration: 0.3)) { router.enterFromClip() }
-        } label: {
-            Image("A-clip-agent").resizable().scaledToFill()
-                .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 13))
-                .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
-        }
-        .buttonStyle(ClipPressStyle(radius: 13))
-        .scaleEffect(popped ? 1 : 0.7)
-        .offset(x: popped ? 344 : 410, y: 298)
-        .opacity(popped ? 1 : 0)
-        .accessibilityLabel("드르륵 에이전트")
     }
 
     private func hit(_ label: String, _ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat, _ r: CGFloat, _ action: @escaping () -> Void) -> some View {
@@ -218,6 +202,35 @@ struct ClipPlayerView: View {
             }
         case nil:
             EmptyView()
+        }
+    }
+}
+
+/// 드르륵 에이전트 버튼. 네이버 클립 모든 화면(리스트, 영상 보기, 댓글 시트, 더보기 메뉴)에서 오른쪽 끝(344, 298, 60 x 60)에
+/// 걸쳐 위아래로 천천히 떠다닌다. 누르면 로고 스플래시를 거쳐 드르륵 홈으로 들어간다.
+struct ClipAgentButton: View {
+    var popped = true
+    @Environment(Router.self) private var router
+    @State private var bob = false
+
+    var body: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            withAnimation(.easeOut(duration: 0.3)) { router.enterFromClip() }
+        } label: {
+            Image("A-clip-agent").resizable().scaledToFill()
+                .frame(width: 60, height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 13))
+                .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(ClipPressStyle(radius: 13))
+        .offset(y: bob ? -6 : 6)
+        .scaleEffect(popped ? 1 : 0.7)
+        .offset(x: popped ? 344 : 410, y: 298)
+        .opacity(popped ? 1 : 0)
+        .accessibilityLabel("드르륵 에이전트")
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) { bob = true }
         }
     }
 }

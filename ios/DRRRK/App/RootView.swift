@@ -33,6 +33,11 @@ struct RootView: View {
         switch r {
         case .clipList: return
         case .clipPlayer: router.path = [.clipPlayer]
+        case .miniProfile, .report, .block:
+            // 방 위에 겹쳐 뜨는 창은 방을 깔고 연다.
+            router.enteredApp = true
+            router.path = [.roomNormal]
+            router.modal = r
         default:
             router.enteredApp = true
             if let tab = Tab.allCases.first(where: { $0.root == r }) {
@@ -155,7 +160,9 @@ struct SplashView: View {
                 .allowsHitTesting(false)
         }
         .task {
-            player.isMuted = true
+            // 웹과 같게 로고 소리를 원래 크기의 50%로 튼다.
+            player.volume = 0.5
+            player.isMuted = false
             player.playImmediately(atRate: 1.6)
             try? await Task.sleep(for: .seconds(2.3 / 1.6))
             onDone()

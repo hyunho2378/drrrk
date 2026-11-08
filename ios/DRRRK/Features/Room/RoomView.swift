@@ -25,9 +25,23 @@ struct SceneMap {
     }
 }
 
+/// 화면 위쪽 안전 영역 높이(상태 막대). 방 화면들은 머리말을 이 아래에 둔다.
+func roomTopInset() -> CGFloat {
+    (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.safeAreaInsets.top ?? 47
+}
+
 struct RoomView: View {
+    /// 시뮬레이터 확인용(onboardingTogether 라우트): 이미 본 적이 있어도 온보딩을 다시 띄운다.
+    var forceOnboarding = false
     @Environment(Router.self) private var router
     @State private var model = RoomModel()
+    @State private var showOnboarding: Bool
+
+    init(forceOnboarding: Bool = false) {
+        self.forceOnboarding = forceOnboarding
+        _showOnboarding = State(initialValue: forceOnboarding || !OnboardingSeen.together)
+    }
+
     @State private var emojiOpen = false
     @State private var flying: [FlyingEmoji] = []
     @State private var lastMinute = false
@@ -47,7 +61,8 @@ struct RoomView: View {
 
                 sceneLayer(map)
 
-                LinearGradient(colors: [.black.opacity(0), .black.opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                // 피그마 chat fade: 아래 334 높이, 검정 0에서 65% 지점에 100%
+                LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.65)], startPoint: .top, endPoint: .bottom)
                     .frame(height: 334)
                     .frame(maxHeight: .infinity, alignment: .bottom)
                     .allowsHitTesting(false)
@@ -65,8 +80,25 @@ struct RoomView: View {
         }
         .ignoresSafeArea()
         .background(DS.Palette.bgBase)
+        // 함께 드르륵 온보딩: 추천에서 방에 처음 들어오면 이 방 위에 어둡게 깔고 다섯 장을 띄운다. 닫으면 방이 그대로 이어진다.
+        .overlay {
+            if showOnboarding {
+                OnboardingOverlay(pages: OnboardingPages.together) {
+                    withAnimation(DS.Motion.emphasizedAccel) { showOnboarding = false }
+                }
+                .transition(.opacity)
+            }
+        }
+        .onAppear { OnboardingSeen.together = true }
         .task { await rotateSpeakers() }
         .task { await watchClock() }
+        .task(id: showOnboarding) {
+            // 온보딩을 닫은 뒤 7초가 지나면 이야기가 무르익은 장면(1807:22997)으로 넘어간다.
+            guard !showOnboarding, model.stage == 0 else { return }
+            try? await Task.sleep(for: .seconds(7))
+            guard !Task.isCancelled else { return }
+            withAnimation(DS.Motion.emphasizedDecel) { model.stage = 1 }
+        }
         .toolbar(.hidden, for: .navigationBar)
     }
 
@@ -88,16 +120,23 @@ struct RoomView: View {
             let p = map.point(item.point.x, item.point.y)
             LandedSnack(asset: item.asset, angle: item.angle)
                 .position(p)
-                .transition(.opacity)
+                .transition(.identity)
         }
 
         ForEach(model.seats) { seat in
             let speaking = seat.name == model.speaker
             let p = map.point(seat.x, seat.y)
-            SeatLabel(name: seat.name, speaking: speaking)
-                .fixedSize()
-                .position(x: p.x + 40, y: p.y + 7)
-                .animation(DS.Motion.emphasizedDecel, value: model.speaker)
+            // 의자 이름을 누르면 미니 프로필이 방 위에 겹쳐 뜬다(피그마 1972:22293 "이름 칩 (탭하면 미니 프로필)").
+            Button { router.present(.miniProfile) } label: {
+                SeatLabel(name: seat.name, speaking: speaking)
+                    .fixedSize()
+                    .padding(8)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .position(x: p.x + 40, y: p.y + 7)
+            .animation(DS.Motion.emphasizedDecel, value: model.speaker)
+            .accessibilityLabel(seat.name + " 프로필")
         }
     }
 
@@ -105,7 +144,7 @@ struct RoomView: View {
 
     private func chrome(_ map: SceneMap) -> some View {
         VStack(spacing: 0) {
-            Color.clear.frame(height: max(geoTopInset(), 47))
+            Color.clear.frame(height: max(roomTopInset(), 47))
             RoomHeader(model: model, lastMinute: lastMinute, onBack: { router.pop() }, onToggle: { router.push(.roomNormal) })
                 .frame(height: 56)
             TopicBanner(model: model)
@@ -143,10 +182,6 @@ struct RoomView: View {
         }
     }
 
-    private func geoTopInset() -> CGFloat {
-        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.safeAreaInsets.top ?? 47
-    }
-
     @ViewBuilder
     private func dock(_ map: SceneMap) -> some View {
         if model.dockOpen {
@@ -154,12 +189,11 @@ struct RoomView: View {
                 Button {
                     withAnimation(DS.Motion.emphasizedAccel) { model.dockOpen = false }
                 } label: {
-                    RoundedRectangle(cornerRadius: 2).fill(.white.opacity(0.6)).frame(width: 16, height: 3)
-                        .frame(width: 44, height: 20)
-                        .contentShape(Rectangle())
+                    DockHandle()
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("퀵슬롯 접기")
+                .padding(.bottom, 2)
 
                 ForEach(model.snacks) { snack in
                     SnackSlot(snack: snack)
@@ -206,8 +240,9 @@ struct RoomView: View {
                     if let item = model.throwSnack(snack.id) {
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         Task {
-                            try? await Task.sleep(for: .seconds(6))
-                            withAnimation(.easeOut(duration: 0.5)) { model.removeLanded(item.id) }
+                            // 서서히 사라지는 움직임은 LandedSnack이 맡고, 다 사라진 뒤 목록에서만 지운다.
+                            try? await Task.sleep(for: .seconds(LandedSnack.stay))
+                            model.removeLanded(item.id)
                         }
                     }
                 }
@@ -285,27 +320,79 @@ private struct VoiceWave: View {
     }
 }
 
-private struct LandedSnack: View {
+/// 테이블에 떨어진 주전부리. 6초 머무는 동안 마지막 1.2초는 투명해지며 0.9배로 작아진다(웹 throw.js와 같은 값).
+struct LandedSnack: View {
     let asset: String
     let angle: Double
+    static let stay: Double = 6
+    static let fade: Double = 1.2
     @State private var landed = false
+    @State private var fading = false
     var body: some View {
         Image(asset).resizable().scaledToFit()
-            .frame(width: 32, height: 32)
+            .frame(width: 40, height: 40)
             .rotationEffect(.degrees(landed ? angle : -16))
-            .scaleEffect(landed ? 1 : 1.45)
+            .scaleEffect(landed ? (fading ? 0.9 : 1) : 1.15)
             .offset(y: landed ? 0 : -60)
+            .opacity(fading ? 0 : 1)
             .onAppear { withAnimation(DS.Motion.decel(0.62)) { landed = true } }
+            .task {
+                try? await Task.sleep(for: .seconds(Self.stay - Self.fade))
+                guard !Task.isCancelled else { return }
+                withAnimation(.easeOut(duration: Self.fade)) { fading = true }
+            }
     }
 }
 
+/// 펼친 퀵슬롯 맨 위 접기 손잡이(피그마 "접기 핸들" 44 x 20, 검정 45%, 모서리 10)
+struct DockHandle: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 2).fill(.white.opacity(0.6)).frame(width: 16, height: 3)
+            .frame(width: 44, height: 20)
+            .background(.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 10))
+            .contentShape(Rectangle())
+    }
+}
+
+/// 퀵슬롯 한 칸(피그마 "slot" 44 x 44, 검정 45%, 흰 12% 1px 테두리, 모서리 12, 그림 32).
+/// 혼자 방(1647:24874)에서는 남은 개수 배지와, 막 던진 칸의 하늘색 2px 테두리와 쿨타임 덮개가 붙는다.
 struct SnackSlot: View {
     let snack: RoomModel.Snack
+    var showCount = false
+    var selected = false
+    /// 남은 쿨타임 비율(1에서 0으로 줄어든다)
+    var cooldown: Double = 0
     var body: some View {
         Image(snack.asset).resizable().scaledToFit()
             .frame(width: 32, height: 32)
-            .padding(6)
+            .frame(width: 44, height: 44)
             .background(.black.opacity(0.45), in: RoundedRectangle(cornerRadius: DS.Radius.chip))
+            .overlay {
+                if selected {
+                    PieSlice(progress: cooldown, minimum: 0)
+                        .fill(.black.opacity(0.6))
+                        .frame(width: 70.4, height: 70.4)
+                        .frame(width: 44, height: 44)
+                        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.chip))
+                        .allowsHitTesting(false)
+                }
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.chip)
+                    .strokeBorder(selected ? DS.Palette.brandPrimary : .white.opacity(0.12), lineWidth: selected ? 2 : 1)
+            )
+            .overlay(alignment: .topLeading) {
+                if showCount {
+                    Text("\(snack.count)").suit(12, .bold, lineHeight: 16).foregroundStyle(DS.Palette.textPrimary)
+                        .monospacedDigit()
+                        .contentTransition(.numericText(countsDown: true))
+                        .padding(.horizontal, 5)
+                        .frame(minWidth: 20, minHeight: 18)
+                        .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.white.opacity(0.2), lineWidth: 1))
+                        .offset(x: 28, y: 30)
+                }
+            }
             .opacity(snack.count > 0 ? 1 : 0.4)
     }
 }
@@ -320,18 +407,19 @@ struct CollapsedDock: View {
                     .frame(width: 20, height: 20)
                     .frame(width: 28, height: 28)
                     .background(DS.Palette.bgElevated, in: Circle())
-                    .overlay(Circle().strokeBorder(.black, lineWidth: 1.5))
+                    .overlay(Circle().strokeBorder(.black, lineWidth: 2))
                     .matchedGeometryEffect(id: snack.id, in: ns, isSource: false)
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 6)
+        // 피그마 "퀵슬롯 · 접힘" 42 x 82, 안쪽 8 / 6, 칸 28이 10씩 겹친다.
+        .padding(.vertical, 9)
+        .padding(.horizontal, 7)
         .background(.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(.white.opacity(0.12), lineWidth: 1))
     }
 }
 
-private struct RoomHeader: View {
+struct RoomHeader: View {
     let model: RoomModel
     var lastMinute = false
     var onBack: () -> Void = {}
@@ -373,7 +461,8 @@ private struct RoomHeader: View {
             .buttonStyle(.plain)
             .accessibilityLabel("일반 모드로 보기")
         }
-        .padding(.leading, 14).padding(.trailing, 24)
+        // 피그마 Header: 뒤로 아이콘 x 24, 모드 토글 오른쪽 끝 24
+        .padding(.leading, 24).padding(.trailing, 24)
     }
 }
 
@@ -388,8 +477,9 @@ private struct SunClock: View {
     }
 }
 
-private struct PieSlice: Shape {
+struct PieSlice: Shape {
     var progress: Double
+    var minimum: Double = 0.08
     var animatableData: Double {
         get { progress } set { progress = newValue }
     }
@@ -398,13 +488,13 @@ private struct PieSlice: Shape {
         var p = Path()
         let c = CGPoint(x: rect.midX, y: rect.midY)
         p.move(to: c)
-        p.addArc(center: c, radius: rect.width / 2, startAngle: .degrees(-90), endAngle: .degrees(-90 + 360 * max(0.08, progress)), clockwise: false)
+        p.addArc(center: c, radius: rect.width / 2, startAngle: .degrees(-90), endAngle: .degrees(-90 + 360 * max(minimum, progress)), clockwise: false)
         p.closeSubpath()
         return p
     }
 }
 
-private struct TopicBanner: View {
+struct TopicBanner: View {
     @Bindable var model: RoomModel
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -412,7 +502,8 @@ private struct TopicBanner: View {
                 HStack {
                     HStack(spacing: 8) {
                         Text("고민").suit(11, .bold, tracking: -0.44).foregroundStyle(DS.Palette.brandPrimary)
-                        Text("나 의 고민").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
+                        (Text("나 ").foregroundColor(.white) + Text("의 고민").foregroundColor(DS.Palette.textSecondary))
+                            .suit(12, .medium, tracking: -0.48)
                     }
                     Spacer()
                     Image("icon-chevron-up").renderingMode(.template).resizable()
@@ -460,7 +551,7 @@ private struct ChatColumn: View {
     let model: RoomModel
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(model.chats) { line in
+            ForEach(model.visibleChats) { line in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(line.name).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary.opacity(0.5))
                     Text(line.text).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
@@ -469,7 +560,7 @@ private struct ChatColumn: View {
                 }
                 .opacity(line.opacity)
             }
-            ForEach(model.myChats, id: \.self) { text in
+            ForEach(model.visibleMine, id: \.self) { text in
                 Text(text).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
                     .padding(.horizontal, 12).padding(.vertical, 8)
                     .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
@@ -583,39 +674,60 @@ struct SystemLine: View {
     }
 }
 
-/// 퀵슬롯(펼침과 접힘). 현장 모드 밖의 방(혼자 드르륵)에서도 같은 모양과 움직임으로 쓴다.
-struct QuickSlotDock: View {
-    let model: RoomModel
-    @State private var open = true
+/// 혼자 방 퀵슬롯(피그마 1647:25199 접힘, 1647:24874 펼침). 펼치면 칸마다 남은 개수가 붙고,
+/// 칸을 누르면 그 주전부리가 장면 속 테이블로 떨어진 뒤 3초 쿨타임 동안 하늘색 테두리와 어두운 덮개가 줄어든다.
+struct SoloQuickSlot: View {
+    @Bindable var model: RoomModel
+    let onThrow: (RoomModel.Snack) -> Void
+    @State private var cooling: String?
+    @State private var cooldown: Double = 0
     @Namespace private var ns
 
+    static let cooldownSeconds: Double = 3
+
     var body: some View {
-        if open {
+        if model.dockOpen {
             VStack(spacing: 6) {
                 Button {
-                    withAnimation(DS.Motion.emphasizedAccel) { open = false }
+                    withAnimation(DS.Motion.emphasizedAccel) { model.dockOpen = false }
                 } label: {
-                    RoundedRectangle(cornerRadius: 2).fill(.white.opacity(0.6)).frame(width: 16, height: 3)
-                        .frame(width: 44, height: 20).contentShape(Rectangle())
+                    DockHandle()
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("퀵슬롯 접기")
+                .padding(.bottom, 2)
                 ForEach(model.snacks) { snack in
-                    SnackSlot(snack: snack)
-                        .matchedGeometryEffect(id: snack.id, in: ns, isSource: open)
-                        .accessibilityLabel(snack.name)
+                    Button { tap(snack) } label: {
+                        SnackSlot(snack: snack, showCount: true, selected: cooling == snack.id, cooldown: cooling == snack.id ? cooldown : 0)
+                    }
+                    .buttonStyle(RoomPressStyle())
+                    .disabled(snack.count == 0 || cooling != nil)
+                    .matchedGeometryEffect(id: snack.id, in: ns, isSource: model.dockOpen)
+                    .accessibilityLabel("\(snack.name) \(snack.count)개")
                 }
             }
             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.9, anchor: .top)), removal: .opacity))
         } else {
             Button {
-                withAnimation(DS.Motion.emphasizedDecel) { open = true }
+                withAnimation(DS.Motion.emphasizedDecel) { model.dockOpen = true }
             } label: {
                 CollapsedDock(snacks: model.pillSnacks, ns: ns)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("퀵슬롯 열기")
             .transition(.opacity)
+        }
+    }
+
+    private func tap(_ snack: RoomModel.Snack) {
+        guard cooling == nil, snack.count > 0 else { return }
+        onThrow(snack)
+        cooling = snack.id
+        cooldown = 1
+        withAnimation(.linear(duration: Self.cooldownSeconds)) { cooldown = 0 }
+        Task {
+            try? await Task.sleep(for: .seconds(Self.cooldownSeconds))
+            withAnimation(DS.Motion.stateIn) { cooling = nil }
         }
     }
 }

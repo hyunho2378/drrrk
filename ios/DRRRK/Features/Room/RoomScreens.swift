@@ -145,6 +145,14 @@ struct RoomNormalView: View {
             }
             .padding(.horizontal, 24).padding(.top, 16)
 
+            // 피그마 Page Dots: 지금 칸 16 x 6 #F8F8F8, 다른 칸 6 #6E767C, 사이 6
+            HStack(spacing: 6) {
+                Capsule().fill(DS.Palette.textPrimary).frame(width: 16, height: 6)
+                Circle().fill(DS.Palette.textTertiary).frame(width: 6, height: 6)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 20)
+
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: 8) {
@@ -243,70 +251,154 @@ private struct SpeakingBars: View {
 
 // MARK: - 미니 프로필(시트), 신고, 차단
 
+/// 미니 프로필(피그마 1972:22293, 1972:22875 "캐릭터 카드" 개선안). 방 위에 겹쳐 뜨는 바텀시트다.
+/// 시트 390 x 278(#121415, 위 모서리 24) 위로 의자 그림 132가 62만큼 걸쳐 올라오고, 이름 옆에는 말하는 중 막대가 붙는다.
+/// 오른쪽 위 점 세 개를 누르면 신고하기와 차단하기가 나온다.
 struct MiniProfileView: View {
     @Environment(Router.self) private var router
     @State private var recommended = false
     @State private var shown = false
+    @State private var menuOpen = false
+
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black.opacity(shown ? 0.6 : 0).ignoresSafeArea().onTapGesture { router.close() }
-            VStack(spacing: 0) {
-                Capsule().fill(DS.Palette.textTertiary).frame(width: 40, height: 4).padding(.top, 10)
+            Color.black.opacity(shown ? 0.6 : 0).ignoresSafeArea().onTapGesture { close() }
+            VStack(spacing: 12) {
                 if recommended {
-                    Text("딱딱한 나무 스툴12님의 엉따 지수가 0.3°\n올라갔어요")
+                    Text("딱딱한 나무 스툴12님의 엉따 지수가 0.1°\n올라갔어요")
                         .suit(12, .medium, tracking: -0.48).multilineTextAlignment(.center)
                         .foregroundStyle(DS.Palette.textPrimary)
                         .padding(.horizontal, 16).padding(.vertical, 10)
                         .background(DS.Palette.gray800, in: RoundedRectangle(cornerRadius: 12))
-                        .padding(.top, 12)
-                        .transition(.opacity.combined(with: .offset(y: -6)))
+                        .transition(.opacity.combined(with: .offset(y: 6)))
+                        .padding(.bottom, 74)
                 }
-                Image("B-chair-stool").resizable().scaledToFit().frame(width: 51, height: 51)
-                    .frame(width: 84, height: 84).background(DS.Palette.bgElevated, in: Circle())
-                    .padding(.top, 20)
-                Text("딱딱한 나무 스툴12").suit(19, .bold, tracking: -0.38).foregroundStyle(DS.Palette.textPrimary).padding(.top, 12)
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("엉따 지수").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
-                        Text("41.5°").suit(22, .bold, tracking: -0.44).foregroundStyle(DS.Palette.accentOrange)
+                sheet
+            }
+            .offset(y: shown ? 0 : 520)
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear { withAnimation(DS.Motion.decel(0.3)) { shown = true } }
+    }
+
+    private var sheet: some View {
+        VStack(spacing: 0) {
+            // 카드 헤더: 위 74, 이름 줄 27, 아래 20
+            HStack(spacing: 8) {
+                Text("딱딱한 나무 스툴12").suit(19, .bold, tracking: -0.38, lineHeight: 26.6).foregroundStyle(DS.Palette.textPrimary)
+                MiniVoiceWave()
+            }
+            .frame(height: 27)
+            .padding(.top, 74)
+            .padding(.bottom, 20)
+            VStack(spacing: 20) {
+                HStack(alignment: .center, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("엉따 지수").suit(13, .medium, lineHeight: 18).foregroundStyle(DS.Palette.textSecondary)
+                        Text("41.5°").suit(22, .bold, tracking: -0.44, lineHeight: 30.8).foregroundStyle(DS.Palette.accentOrange)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading).padding(14)
-                    .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("대표 업적 편의점").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
-                        HStack(spacing: 4) {
-                            Image("snack-shrimp").resizable().scaledToFit().frame(width: 25, height: 25)
-                            Image("snack-soju").resizable().scaledToFit().frame(width: 30, height: 30)
+                    Spacer(minLength: 0)
+                    HStack(spacing: 8) {
+                        ForEach(["snack-peanut", "snack-shrimp", "snack-drrra"], id: \.self) { asset in
+                            Image(asset).resizable().scaledToFit().frame(width: 34, height: 34)
+                                .frame(width: 44, height: 44)
+                                .background(Color(hex: 0x1F2226), in: RoundedRectangle(cornerRadius: 12))
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading).padding(14)
-                    .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
+                    .accessibilityLabel("대표 업적 오징어땅콩, 새우깡, 드르라")
                 }
-                .padding(.top, 16)
                 Button {
                     withAnimation(DS.Motion.emphasizedDecel) { recommended.toggle() }
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 } label: {
-                    Text(recommended ? "추천했어요" : "추천하기").suit(16, .bold, tracking: -0.32)
-                        .foregroundStyle(recommended ? DS.Palette.brandPrimary : .black)
-                        .frame(maxWidth: .infinity).frame(height: 52)
-                        .background(recommended ? DS.Palette.brandSubtle : DS.Palette.brandPrimary, in: Capsule())
+                    HStack(spacing: 10) {
+                        Text(recommended ? "추천했어요" : "추천하기").suit(16, .bold, lineHeight: 22.4)
+                            .foregroundStyle(recommended ? DS.Palette.brandPrimary : .black)
+                        if !recommended {
+                            Text("엉따 +0.1°").suit(12, .medium, lineHeight: 18).foregroundStyle(Color(hex: 0x0D4054))
+                        }
+                    }
+                    .frame(maxWidth: .infinity).frame(height: 46)
+                    .background(recommended ? DS.Palette.brandSubtle : DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 28))
                 }
-                .buttonStyle(RoomPressStyle()).padding(.top, 20)
-                HStack(spacing: 24) {
-                    Button("신고하기") { router.present(.report) }
-                    Button("차단하기") { router.present(.block) }
-                }
-                .suit(13, .medium, tracking: -0.26).foregroundStyle(DS.Palette.textSecondary)
-                .padding(.top, 14).padding(.bottom, 12)
+                .buttonStyle(RoomPressStyle())
             }
             .padding(.horizontal, 24)
-            .frame(maxWidth: .infinity)
-            .background(DS.Palette.bgSurface, in: UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24))
-            .offset(y: shown ? 0 : 500)
+            .padding(.bottom, 40)
         }
-        .toolbar(.hidden, for: .navigationBar)
-        .onAppear { withAnimation(DS.Motion.decel(0.3)) { shown = true } }
+        .frame(maxWidth: .infinity)
+        .background {
+            UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24).fill(DS.Palette.bgSurface).ignoresSafeArea(edges: .bottom)
+        }
+        // 의자(크게) 132, 시트 위로 62 걸침, 그림자 검정 45% 아래 10 흐림 18
+        .overlay(alignment: .top) {
+            Image("B-chair-stool").resizable().scaledToFit().frame(width: 132, height: 132)
+                .shadow(color: .black.opacity(0.45), radius: 9, y: 10)
+                .offset(y: -62)
+                .allowsHitTesting(false)
+        }
+        .overlay(alignment: .topTrailing) {
+            VStack(alignment: .trailing, spacing: 6) {
+                Button { withAnimation(DS.Motion.stateIn) { menuOpen.toggle() } } label: {
+                    HStack(spacing: 3) {
+                        ForEach(0 ..< 3, id: \.self) { _ in Circle().fill(DS.Palette.textPrimary).frame(width: 4, height: 4) }
+                    }
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("더보기")
+                if menuOpen {
+                    VStack(alignment: .leading, spacing: 0) {
+                        menuRow("신고하기") { router.present(.report) }
+                        menuRow("차단하기") { router.present(.block) }
+                    }
+                    .padding(.vertical, 4)
+                    .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: .black.opacity(0.4), radius: 12, y: 6)
+                    .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .topTrailing)))
+                }
+            }
+            // 피그마 btn_더보기: 오른쪽 16, 위 16에 34 x 24(누르는 자리는 44로 넓힘)
+            .padding(.top, 6).padding(.trailing, 11)
+        }
+        .ignoresSafeArea(edges: .bottom)
+    }
+
+    private func menuRow(_ title: String, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title).suit(14, .medium, tracking: -0.28).foregroundStyle(DS.Palette.textPrimary)
+                .frame(width: 120, height: 40, alignment: .leading)
+                .padding(.horizontal, 16)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func close() {
+        withAnimation(DS.Motion.emphasizedAccel) { shown = false }
+        Task {
+            try? await Task.sleep(for: .seconds(0.3))
+            router.close()
+        }
+    }
+}
+
+/// 미니 프로필 이름 옆 말하는 중 막대(피그마 voice wave 23 x 14, 막대 3, 간격 2, #2EE59D)
+private struct MiniVoiceWave: View {
+    @State private var on = false
+    private let heights: [CGFloat] = [5, 10, 14, 10, 5]
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(heights.indices, id: \.self) { i in
+                RoundedRectangle(cornerRadius: 2).fill(DS.Palette.success)
+                    .frame(width: 3, height: heights[i])
+                    .scaleEffect(y: on ? ([0.5, 1.2, 0.7, 1.15, 0.6] as [CGFloat])[i] : 1)
+                    .animation(.easeInOut(duration: 0.62 + Double(i) * 0.11).repeatForever(autoreverses: true), value: on)
+            }
+        }
+        .frame(width: 23, height: 14)
+        .onAppear { on = true }
     }
 }
 
@@ -397,104 +489,245 @@ struct BlockView: View {
 }
 
 // MARK: - 혼자 드르륵(AI 드르륵 의자)
+// 피그마 흐름: 방을 찾지 못함(1647:25167)에서 "혼자 드르륵 앉기"를 누르면 혼자 방(영상 1647:25199)에 앉는다.
+// 처음 들어오면 혼자 드르륵 온보딩 두 장(1647:22976, 1647:23028)이 이 방 위에 겹쳐 뜬다.
+// 고민 배너를 누르면 펼쳐지고(1647:25052), 퀵슬롯을 펼치면 개수 배지와 쿨타임이 보인다(1647:24874).
+// 이야기가 이어지다 비슷한 고민의 사람들을 찾으면 안내 창이 뜨고(1804:12770), "함께 드르륵 앉기"는 함께 방으로 옮긴다.
+
+private struct SoloLine: Identifiable, Hashable {
+    let id = UUID()
+    let text: String
+    let opacity: Double
+}
 
 struct RoomSoloView: View {
+    var forceOnboarding = false
     @Environment(Router.self) private var router
-    @State private var model = RoomModel()
+    @State private var model = RoomModel.solo()
+    @State private var stage = 0
+    @State private var mine: String?
     @State private var found = false
     @State private var emojiOpen = false
-    private let lines: [(String, Bool)] = [("조금씩 해가 뜨고있어", false), ("좀 괜찮아졌어?", false), ("푹자고 일어나서 학교 가!", false), ("고마워. 덕분에 마음이 조금 나아졌어.", true)]
+    @State private var flying: [FlyingEmoji] = []
+    @State private var showOnboarding: Bool
+
+    init(forceOnboarding: Bool = false) {
+        self.forceOnboarding = forceOnboarding
+        _showOnboarding = State(initialValue: forceOnboarding || !OnboardingSeen.solo)
+    }
+
+    /// 처음 인사(1647:25199)와 이야기가 이어진 뒤(1647:24874)의 AI 드르륵 의자 말
+    private let firstLines = [SoloLine(text: "많이 당황했겠다. 지금은 좀 어때?", opacity: 1)]
+    private let laterLines = [
+        SoloLine(text: "그 친구가 널 좀 질투하나봐", opacity: 0.3),
+        SoloLine(text: "속상한 마음은 좀 괜찮아졌어?", opacity: 0.7),
+        SoloLine(text: "푹자고 일어나서 학교 가!", opacity: 1),
+    ]
 
     var body: some View {
         GeometryReader { geo in
-            ZStack(alignment: .top) {
-                LinearGradient(colors: [.black.opacity(0), .black.opacity(0.7)], startPoint: .top, endPoint: .bottom)
-                    .frame(height: 334).frame(maxHeight: .infinity, alignment: .bottom).allowsHitTesting(false)
-                    .ignoresSafeArea()
-                QuickSlotDock(model: model)
-                    .padding(.top, 129)
-                    .padding(.trailing, 24)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                VStack(spacing: 0) {
-                    HStack {
-                        Button { router.pop() } label: {
-                            Image("icon-chevron-left").renderingMode(.template).resizable().foregroundStyle(DS.Palette.textPrimary)
-                                .frame(width: 24, height: 24).frame(width: 44, height: 44, alignment: .leading).contentShape(Rectangle())
-                        }.buttonStyle(.plain).accessibilityLabel("나가기")
-                        Spacer()
-                        ClockPill(model: model)
-                        Spacer()
-                        Color.clear.frame(width: 46, height: 32)
-                    }
-                    .padding(.leading, 14).padding(.trailing, 24).frame(height: 56)
-                    TopicLine(text: "오늘 자다가, 엄마 아빠 싸우는 소리에 잠이 깼…")
-                    HStack(spacing: 5) {
-                        Circle().fill(DS.Palette.success).frame(width: 7, height: 7)
-                        Text("AI 드르륵 의자").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
-                    }
-                    .padding(.top, 100)
-                    Spacer()
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(lines.indices, id: \.self) { i in
-                            Text(lines[i].0).suit(14, .medium, tracking: -0.56)
-                                .foregroundStyle(lines[i].1 ? .black : DS.Palette.textPrimary)
-                                .padding(.horizontal, 12).padding(.vertical, 8)
-                                .background(lines[i].1 ? DS.Palette.brandPrimary : DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
-                                .frame(maxWidth: .infinity, alignment: lines[i].1 ? .trailing : .leading)
-                                .opacity(i == 0 ? 0.4 : 1)
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                    RoomInputBar(emojiOpen: $emojiOpen).padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 12)
+            let map = SceneMap(size: geo.size)
+            ZStack(alignment: .topLeading) {
+                Image("B-field-scene").resizable().scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height).clipped()
+                ForEach(model.landed) { item in
+                    LandedSnack(asset: item.asset, angle: item.angle)
+                        .position(map.point(item.point.x, item.point.y))
+                        .transition(.identity)
                 }
-                .frame(width: geo.size.width, height: geo.size.height)
+                LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.65)], startPoint: .top, endPoint: .bottom)
+                    .frame(height: 334).frame(maxHeight: .infinity, alignment: .bottom).allowsHitTesting(false)
+                chrome
                 if found {
-                    FoundModal(onStay: { withAnimation(DS.Motion.emphasizedAccel) { found = false } }, onJoin: { router.push(.room) })
+                    FoundModal(
+                        onStay: { withAnimation(DS.Motion.emphasizedAccel) { found = false } },
+                        onJoin: {
+                            router.pop()
+                            router.push(.room)
+                        }
+                    )
+                    .transition(.opacity)
+                    .zIndex(5)
                 }
             }
         }
-        .background {
-            Image("B-field-scene").resizable().scaledToFill().ignoresSafeArea()
-        }
+        .ignoresSafeArea()
         .background(DS.Palette.bgBase)
+        .overlay {
+            if showOnboarding {
+                OnboardingOverlay(pages: OnboardingPages.solo) {
+                    withAnimation(DS.Motion.emphasizedAccel) { showOnboarding = false }
+                }
+                .transition(.opacity)
+            }
+        }
+        .onAppear { OnboardingSeen.solo = true }
         .toolbar(.hidden, for: .navigationBar)
-        .task {
-            // 혼자 이야기하다 보면 비슷한 고민의 사람들을 찾았다는 안내가 뜬다.
-            try? await Task.sleep(for: .seconds(8))
-            withAnimation(DS.Motion.emphasizedDecel) { found = true }
+        .task(id: showOnboarding) { await play() }
+        .task { await watchClock() }
+    }
+
+    private var chrome: some View {
+        VStack(spacing: 0) {
+            Color.clear.frame(height: max(roomTopInset(), 47))
+            RoomHeader(model: model, onBack: { router.pop() }, onToggle: {
+                UISelectionFeedbackGenerator().selectionChanged()
+            })
+            .frame(height: 56)
+            TopicBanner(model: model)
+                .padding(.horizontal, 24)
+                .padding(.top, 5)
+            HStack {
+                Spacer()
+                SoloQuickSlot(model: model) { snack in throwSnack(snack) }
+            }
+            .padding(.trailing, 24)
+            .padding(.top, 28)
+            Spacer(minLength: 0)
+            chat
+                .padding(.horizontal, 24)
+                .overlay(alignment: .bottomLeading) {
+                    if emojiOpen {
+                        EmojiMenu { pick in sendEmoji(pick) }
+                            .padding(.leading, 24).padding(.bottom, -14)
+                            .transition(.opacity.combined(with: .scale(scale: 0.86, anchor: .bottomLeading)).combined(with: .offset(y: 18)))
+                    }
+                }
+                .overlay { ForEach(flying) { FlyingEmojiView(item: $0) } }
+            RoomInputBar(emojiOpen: $emojiOpen)
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 24)
+        }
+    }
+
+    /// 채팅 줄(피그마 row: 이름 12 흰 50%, 말풍선 #222628 모서리 14, 안쪽 8 / 12, 글자 14). 내 말은 하늘색.
+    private var chat: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if stage == 0 {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("AI 드르륵 의자").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary.opacity(0.5))
+                        .shadow(color: .black.opacity(0.4), radius: 2)
+                    bubble(firstLines[0].text)
+                }
+                .transition(.opacity)
+            } else {
+                ForEach(laterLines) { line in
+                    bubble(line.text).opacity(line.opacity)
+                        .transition(.opacity.combined(with: .offset(y: 10)))
+                }
+            }
+            if let mine {
+                Text(mine).suit(14, .medium, tracking: -0.56, lineHeight: 19.6).foregroundStyle(.black)
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .transition(.opacity.combined(with: .offset(y: 8)))
+            }
+        }
+    }
+
+    private func bubble(_ text: String) -> some View {
+        Text(text).suit(14, .medium, tracking: -0.56, lineHeight: 19.6).foregroundStyle(DS.Palette.textPrimary)
+            .padding(.horizontal, 12).padding(.vertical, 8)
+            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+    }
+
+    /// 대화 흐름. 온보딩을 닫은 뒤부터 흐른다.
+    /// 1초 뒤 내 말이 잠깐 떴다 사라지고, 6초에 AI 말이 이어지고, 7.2초에 내 답, 10초에 사람을 찾았다는 안내가 뜬다.
+    private func play() async {
+        guard !showOnboarding, stage == 0 else { return }
+        func wait(_ s: Double) async -> Bool {
+            try? await Task.sleep(for: .seconds(s))
+            return !Task.isCancelled
+        }
+        guard await wait(1.0) else { return }
+        withAnimation(DS.Motion.emphasizedDecel) { mine = "원래부터 걔가 나한테 좀…" }
+        guard await wait(2.6) else { return }
+        withAnimation(DS.Motion.standard) { mine = nil }
+        guard await wait(2.4) else { return }
+        withAnimation(DS.Motion.emphasizedDecel) { stage = 1 }
+        guard await wait(1.2) else { return }
+        withAnimation(DS.Motion.emphasizedDecel) { mine = "고마워. 덕분에 마음이 조금 나아졌어." }
+        guard await wait(2.8) else { return }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(DS.Motion.emphasizedDecel) { found = true }
+    }
+
+    private func throwSnack(_ snack: RoomModel.Snack) {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        withAnimation(DS.Motion.decel(0.62)) {
+            if let item = model.throwSnack(snack.id) {
+                Task {
+                    try? await Task.sleep(for: .seconds(LandedSnack.stay))
+                    model.removeLanded(item.id)
+                }
+            }
+        }
+    }
+
+    private func sendEmoji(_ asset: String) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let item = FlyingEmoji(asset: asset)
+        flying.append(item)
+        withAnimation(DS.Motion.emphasizedAccel) { emojiOpen = false }
+        Task {
+            try? await Task.sleep(for: .seconds(1.1))
+            flying.removeAll { $0.id == item.id }
+        }
+    }
+
+    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 180초). 0이 되면 아침 화면으로 넘어간다.
+    private func watchClock() async {
+        while !Task.isCancelled {
+            if model.remaining(at: .now) <= 0 {
+                router.push(.roomMorning)
+                return
+            }
+            try? await Task.sleep(for: .seconds(0.5))
         }
     }
 }
 
+/// 비슷한 고민의 사람들을 찾았다는 안내 창(피그마 1804:12770 "모달": 326 폭, #121415, #222628 1px 테두리, 모서리 24).
 private struct FoundModal: View {
     let onStay: () -> Void
     let onJoin: () -> Void
+    @State private var shown = false
     var body: some View {
         ZStack {
-            Color.black.opacity(0.5).ignoresSafeArea().onTapGesture(perform: onStay)
-            VStack(spacing: 0) {
-                Image("tab-home").renderingMode(.template).resizable().foregroundStyle(DS.Palette.brandPrimary)
-                    .frame(width: 28, height: 28).frame(width: 56, height: 56).background(DS.Palette.brandSubtle, in: Circle())
-                Text("비슷한 고민의 사람들을\n발견했어요!").suit(18, .bold, tracking: -0.36).multilineTextAlignment(.center)
-                    .foregroundStyle(DS.Palette.textPrimary).padding(.top, 16)
-                Text("지금 바로 함께 앉아서 이야기 할까요?").suit(13, .medium, tracking: -0.26).foregroundStyle(DS.Palette.textSecondary).padding(.top, 8)
-                HStack(spacing: 8) {
+            Color.black.opacity(0.35).ignoresSafeArea().onTapGesture(perform: onStay)
+            VStack(spacing: 16) {
+                Image("tab-home").renderingMode(.template).resizable().scaledToFit().foregroundStyle(DS.Palette.brandPrimary)
+                    .frame(width: 32, height: 32).frame(width: 56, height: 56).background(DS.Palette.brandSubtle, in: Circle())
+                VStack(spacing: 4) {
+                    Text("비슷한 고민의 사람들을\n발견했어요!").suit(18, .bold, tracking: -0.36, lineHeight: 25.2).multilineTextAlignment(.center)
+                        .foregroundStyle(DS.Palette.textPrimary)
+                    Text("지금 바로 함께 앉아서 이야기 할까요?").suit(13, .regular, tracking: -0.26, lineHeight: 18.2)
+                        .foregroundStyle(DS.Palette.textSecondary)
+                }
+                HStack(spacing: 10) {
                     Button(action: onStay) {
-                        Text("마저 얘기하기").suit(15, .bold).foregroundStyle(DS.Palette.textPrimary).frame(maxWidth: .infinity).frame(height: 48)
-                            .background(DS.Palette.gray800, in: Capsule())
+                        Text("마저 얘기하기").suit(15, .bold, tracking: -0.3).foregroundStyle(DS.Palette.textPrimary)
+                            .frame(maxWidth: .infinity).frame(height: 46)
+                            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 26))
                     }
                     Button(action: onJoin) {
-                        Text("함께 드르륵 앉기").suit(15, .bold).foregroundStyle(.black).frame(maxWidth: .infinity).frame(height: 48)
-                            .background(DS.Palette.brandPrimary, in: Capsule())
+                        Text("함께 드르륵 앉기").suit(15, .bold, tracking: -0.3).foregroundStyle(.black)
+                            .frame(maxWidth: .infinity).frame(height: 46)
+                            .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 26))
                     }
                 }
-                .buttonStyle(RoomPressStyle()).padding(.top, 24)
+                .buttonStyle(RoomPressStyle())
             }
-            .padding(24)
+            .padding(.top, 28).padding(.horizontal, 24).padding(.bottom, 24)
+            .frame(width: 326)
             .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 24))
-            .padding(.horizontal, 24)
-            .transition(.opacity.combined(with: .scale(scale: 0.92)))
+            .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(DS.Palette.bgElevated, lineWidth: 1))
+            .scaleEffect(shown ? 1 : 0.92)
+            .opacity(shown ? 1 : 0)
         }
+        .onAppear { withAnimation(DS.Motion.emphasizedDecel) { shown = true } }
     }
 }
 

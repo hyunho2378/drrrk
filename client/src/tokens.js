@@ -156,6 +156,9 @@ export const live = {
   throwTable: { x: 96, y: 425, w: 198, h: 172 },
   throwLand: { x: 139, y: 475, w: 112, h: 44 },
   throwStayMs: 6000,
+  // 테이블에 올라간 주전부리는 머무는 6초의 마지막 1.2초 동안 투명해지며 조금 작아진다(1 → 0.9).
+  throwFadeMs: 1200,
+  throwFadeScale: 0.9,
   throwHintText: '가운데 테이블로 끌어서 던져요',
   throwDoneText: '주전부리를 테이블에 올렸어요',
   throwEmptyText: '남은 주전부리가 없어요',

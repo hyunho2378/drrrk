@@ -1,0 +1,8 @@
+// 기본값. 각자 컴퓨터에서 Team.local.xcconfig 를 만들어 덮어쓴다(깃에 올리지 않음).
+// 무료 개인 팀은 번들 ID가 전 세계에서 하나여야 해서, 팀원은 끝에 자기 이름을 붙인다.
+// 예) Team.local.xcconfig
+//   DEVELOPMENT_TEAM = ABCDE12345
+//   PRODUCT_BUNDLE_IDENTIFIER = app.drrrk.ios.binna
+PRODUCT_BUNDLE_IDENTIFIER = app.drrrk.ios
+DEVELOPMENT_TEAM =
+#include? "Team.local.xcconfig"

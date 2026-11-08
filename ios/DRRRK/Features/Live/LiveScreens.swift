@@ -249,15 +249,17 @@ struct SortSheet: View {
 struct TimerBadge: View {
     let time: String
     var large = false
+    /// 곧 끝나는 방(5분 이하): 빨간 바탕(#FF4D6A)에 검정 글자(피그마 1972:22375 ④)
+    var urgent = false
     var body: some View {
         HStack(spacing: 4) {
             Image("C-clock").renderingMode(.template).resizable().frame(width: large ? 16 : 13, height: large ? 16 : 13)
-            Text(time).suit(large ? 13.75 : 11, .bold, tracking: -0.4).monospacedDigit()
+            Text(time).suit(large ? 13.75 : 11, .bold, tracking: urgent ? 0 : -0.4).monospacedDigit()
         }
-        .foregroundStyle(DS.Palette.brandPrimary)
+        .foregroundStyle(urgent ? Color.black : DS.Palette.brandPrimary)
         .padding(.horizontal, large ? 8 : 6)
         .frame(height: large ? 26 : 20)
-        .background(.black.opacity(0.6), in: Capsule())
+        .background(urgent ? AnyShapeStyle(DS.Palette.danger) : AnyShapeStyle(Color.black.opacity(0.6)), in: Capsule())
     }
 }
 
@@ -275,31 +277,124 @@ struct ViewersPill: View {
     }
 }
 
+/// 라이브 목록 카드(피그마 1972:22375 "라이브 · 리스트 시안 v2", 상태 정의 1972:22488). 342 x 112, #222628, 모서리 16.
+/// 왼쪽은 제목(16 굵게, 196 폭)과 보는 수, 남은 시간. 오른쪽은 앉은 의자 원(큰 원 48, 작은 원 32, 남는 수는 +N).
+/// 상태: 말하는 중(큰 원 초록 테두리와 말하는 표시), 조용함, 혼자 있는 방(빈 자리 +, 첫 대화 상대를 기다려요), 곧 끝(5분 이하, 빨간 시계), 막 열린 방(방금 열림, 하늘색 점).
 struct LiveRoomCard: View {
     let room: LiveRoom
+
+    private enum Phase { case speaking, quiet, alone, ending, fresh }
+
+    private var phase: Phase {
+        if room.seconds > 0, room.seconds <= 300 { return .ending }
+        if room.talkers <= 1 { return .alone }
+        if room.seconds >= 17 * 60 + 30 { return .fresh }
+        return room.talkers >= 4 ? .speaking : .quiet
+    }
+
+    /// 방마다 같은 의자가 앉도록 제목으로 고른다(투명판 의자 그림).
+    private static let chairs = ["D-chairt-4fdd18ce8a", "D-chairt-51be0a544b", "D-chairt-cf2670f44f", "D-chairt-eab22a7a4d",
+                                 "D-chairt-d7b0bb5005", "D-chairt-66dbe89dae", "D-chairt-6e90eda49e", "D-chairt-33871c043e"]
+    private var seats: [String] {
+        let seed = room.title.unicodeScalars.reduce(0) { ($0 &* 31 &+ Int($1.value)) & 0xFFFF }
+        return (0 ..< 3).map { Self.chairs[(seed + $0 * 3) % Self.chairs.count] }
+    }
+
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
+        let p = phase
+        ZStack(alignment: .topLeading) {
+            if p == .fresh {
+                Circle().fill(DS.Palette.brandPrimary).frame(width: 6, height: 6).offset(x: 8, y: 20)
+            }
             VStack(alignment: .leading, spacing: 0) {
-                Text(room.title).suit(16, .bold, tracking: -0.64).foregroundStyle(DS.Palette.textPrimary)
-                    .multilineTextAlignment(.leading).lineSpacing(2)
-                Spacer(minLength: 8)
-                HStack(spacing: 6) {
-                    Image("C-voice").renderingMode(.template).resizable().frame(width: 16, height: 10).foregroundStyle(DS.Palette.success)
-                    Text(room.talk).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
-                    Circle().fill(DS.Palette.textTertiary).frame(width: 3, height: 3)
-                    Image("C-view").renderingMode(.template).resizable().frame(width: 14, height: 14).foregroundStyle(DS.Palette.textTertiary)
-                    Text(room.viewers).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textTertiary)
+                Text(room.title).suit(16, .bold, lineHeight: 22.4).foregroundStyle(DS.Palette.textPrimary)
+                    .multilineTextAlignment(.leading).lineLimit(2)
+                    .frame(width: 196, alignment: .leading)
+                Spacer(minLength: 0)
+                meta(p)
+            }
+            .padding(.leading, 16).padding(.top, 16).padding(.bottom, 13)
+            .frame(maxHeight: .infinity, alignment: .topLeading)
+
+            if p == .ending {
+                TimerBadge(time: room.time, urgent: true).offset(x: 269, y: 16)
+            }
+            avatars(p)
+                .frame(width: 342 - 16, height: 112 - 18, alignment: .bottomTrailing)
+        }
+        .frame(width: 342, height: 112, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func meta(_ p: Phase) -> some View {
+        HStack(spacing: 6) {
+            HStack(spacing: 4) {
+                Image("C-view").renderingMode(.template).resizable().frame(width: 16, height: 16)
+                Text(room.viewers).suit(12, .bold, tracking: -0.48)
+            }
+            .foregroundStyle(DS.Palette.textTertiary)
+            if p != .ending {
+                Circle().fill(DS.Palette.textSecondary).frame(width: 3, height: 3)
+                switch p {
+                case .alone:
+                    Text("첫 대화 상대를 기다려요").suit(12, .medium, lineHeight: 17).foregroundStyle(DS.Palette.brandPrimary)
+                case .fresh:
+                    Text("방금 열림").suit(12, .medium, lineHeight: 17).foregroundStyle(DS.Palette.brandPrimary)
+                default:
+                    Text("\(room.time) 남음").suit(12, .medium, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            ZStack(alignment: .bottomTrailing) {
-                Image(room.thumb).resizable().scaledToFill().frame(width: 80, height: 80).clipShape(RoundedRectangle(cornerRadius: 12))
-                TimerBadge(time: room.time).offset(x: -3, y: -4)
-            }
         }
-        .padding(16)
-        .frame(height: 112)
-        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
+        .frame(height: 23)
+    }
+
+    /// 오른쪽 아래 의자 원 묶음. 작은 원은 22씩 겹치고, 큰 원(48)이 맨 앞 오른쪽이다.
+    private func avatars(_ p: Phase) -> some View {
+        let count = p == .alone ? 1 : min(3, max(2, room.talkers))
+        let extra = max(0, room.talkers - 3)
+        let speaking = p == .speaking || (p == .ending && room.talkers >= 4) || p == .fresh
+        return HStack(alignment: .bottom, spacing: -10) {
+            if extra > 0 {
+                Text("+\(extra)").suit(9.72, .bold, lineHeight: 13.8).foregroundStyle(Color(hex: 0xD9DEE3))
+                    .frame(width: 26, height: 26)
+                    .background(Color(hex: 0x33383D), in: Circle())
+                    .overlay(Circle().strokeBorder(DS.Palette.bgElevated, lineWidth: 2))
+                    .padding(.trailing, -3)
+                    .padding(.bottom, 3)
+            }
+            if p == .alone {
+                Text("+").suit(16, .bold, lineHeight: 22).foregroundStyle(.white.opacity(0.5))
+                    .frame(width: 32, height: 32)
+                    .background(DS.Palette.bgElevated, in: Circle())
+                    .overlay(Circle().strokeBorder(.white.opacity(0.35), lineWidth: 1.5))
+            }
+            ForEach(0 ..< count - 1, id: \.self) { i in
+                chair(seats[i + 1], 32, ring: nil)
+            }
+            chair(seats[0], 48, ring: speaking ? DS.Palette.success : nil)
+                .overlay(alignment: .bottomTrailing) {
+                    if speaking {
+                        HStack(alignment: .center, spacing: 2) {
+                            ForEach([4.0, 8.0, 5.0], id: \.self) { h in
+                                RoundedRectangle(cornerRadius: 1).fill(Color(hex: 0x0D331F)).frame(width: 2, height: h)
+                            }
+                        }
+                        .frame(width: 20, height: 16)
+                        .background(DS.Palette.success, in: Capsule())
+                        .overlay(Capsule().strokeBorder(DS.Palette.bgElevated, lineWidth: 2))
+                        .offset(x: 6, y: 3)
+                    }
+                }
+        }
+    }
+
+    private func chair(_ img: String, _ size: CGFloat, ring: Color?) -> some View {
+        Image(img).resizable().scaledToFit()
+            .frame(width: size * 0.8, height: size * 0.8)
+            .frame(width: size, height: size)
+            .background(Color(hex: 0x33383D), in: Circle())
+            .overlay(Circle().strokeBorder(ring ?? DS.Palette.bgElevated, lineWidth: ring == nil ? 2 : 2.5))
     }
 }
 
@@ -379,34 +474,25 @@ struct LiveWatchView: View {
             Image(WatchData.scene).resizable().scaledToFill().frame(height: 440).frame(maxWidth: .infinity).clipped()
             LinearGradient(colors: [.black.opacity(0.5), .clear], startPoint: .top, endPoint: .init(x: 0.5, y: 0.3))
             LinearGradient(colors: [DS.Palette.bgSurface.opacity(0), DS.Palette.bgSurface], startPoint: .init(x: 0.5, y: 0.6), endPoint: .init(x: 0.5, y: 0.9))
-            GeometryReader { g in
-                let s = g.size.width / 390
-                ForEach(Array(WatchData.floorNames.enumerated()), id: \.offset) { i, f in
-                    let on = i == speaker
-                    VStack(spacing: 6) {
-                        Image("C-voice").renderingMode(.template).resizable().frame(width: 31, height: 20)
-                            .foregroundStyle(DS.Palette.success).opacity(on ? 1 : 0)
-                        Text(f.0).suit(on ? 12 : 11, on ? .bold : .medium, tracking: -0.44)
-                            .foregroundStyle(on ? DS.Palette.textPrimary : DS.Palette.textPrimary.opacity(0.6)).fixedSize()
-                    }
-                    .position(x: (f.1 + 46) * s, y: (f.2 - 6) * s)
-                }
-            }
-            .frame(height: 440)
+            // 피그마 1943:12838 장면에는 의자 이름표가 없다.
             VStack(alignment: .leading, spacing: 12) {
                 Text(WatchData.title).suit(21, .bold, tracking: -0.84).foregroundStyle(DS.Palette.textPrimary).lineSpacing(3)
                 HStack(spacing: 6) {
                     Image("C-voice").renderingMode(.template).resizable().frame(width: 16, height: 12).foregroundStyle(DS.Palette.brandPrimary)
                     Text("대화 중 \(WatchData.seats.count)").suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
                 }
-                HStack(alignment: .top, spacing: 16) {
+                // 피그마 1943:12838 Seats: 칸 58, 사이 14, 원 54(#222628 바탕에 투명판 의자 그림), 빈 자리는 #06303C 바탕 하늘색 실선 1.5
+                HStack(alignment: .top, spacing: 14) {
                     ForEach(WatchData.seats) { seat in
                         VStack(spacing: 6) {
-                            Image(seat.image).resizable().scaledToFit().padding(6).frame(width: 54, height: 54)
-                                .background(.white, in: Circle())
-                            Text(seat.name).suit(11, .medium, tracking: -0.44).foregroundStyle(DS.Palette.textSecondary)
-                                .lineLimit(1).frame(width: 60)
+                            // 피그마처럼 흰 원 바탕. 그림은 투명판이라 원 가장자리가 깨끗하다(흰 배경 원본은 원 밖이 뾰족했다).
+                            Image(seat.image).resizable().scaledToFit().padding(4).frame(width: 54, height: 54)
+                                .background(Color.white)
+                                .clipShape(Circle())
+                            Text(seat.name).suit(11, .medium).foregroundStyle(DS.Palette.textSecondary)
+                                .lineLimit(1).frame(width: 58)
                         }
+                        .frame(width: 58)
                     }
                     Button { router.push(.room) } label: {
                         VStack(spacing: 6) {
@@ -414,8 +500,8 @@ struct LiveWatchView: View {
                                 .foregroundStyle(DS.Palette.brandPrimary)
                                 .frame(width: 54, height: 54)
                                 .background(DS.Palette.brandSubtle, in: Circle())
-                                .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, style: StrokeStyle(lineWidth: 1.5, dash: [4, 3])))
-                            Text("앉기").suit(11, .bold, tracking: -0.44).foregroundStyle(DS.Palette.brandPrimary)
+                                .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 1.5))
+                            Text("앉기").suit(11, .bold).foregroundStyle(DS.Palette.brandPrimary)
                         }
                     }
                     .buttonStyle(PressStyle())

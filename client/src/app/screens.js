@@ -26,14 +26,14 @@ export const SCREENS = [
   "n": 5,
   "id": "1952:15659",
   "name": "DRRRK · 드르륵 · 해뜨기",
-  "file": "ChatMiniProfile",
+  "file": "MiniProfile",
   "h": 844
  },
  {
   "n": 6,
   "id": "1952:15800",
   "name": "DRRRK · 드르륵 · 해뜨기",
-  "file": "ChatMiniProfile2",
+  "file": "MiniProfile2",
   "h": 844
  },
  {
@@ -108,9 +108,9 @@ export const SCREENS = [
  },
  {
   "n": 19,
-  "id": "1804:20299",
+  "id": "1972:22149",
   "name": "MY · 스킨 획득 팝업",
-  "file": "MySkin",
+  "file": "SkinPopup",
   "h": 844
  },
  {
@@ -220,9 +220,9 @@ export const SCREENS = [
  },
  {
   "n": 36,
-  "id": "1804:20170",
-  "name": "MY · 메인",
-  "file": "MyMain",
+  "id": "1972:22735",
+  "name": "MY · 리디자인 (히어로 + 엉따 밴드 + 업적 편의점)",
+  "file": "MyHome",
   "h": 844
  },
  {
@@ -341,7 +341,7 @@ export const SCREENS = [
   "n": 54,
   "id": "1790:10988",
   "name": "MY · 나의 편의점 (아이템 상세)",
-  "file": "MY3",
+  "file": "MyItem",
   "h": 844
  },
  {
@@ -397,7 +397,10 @@ const modules = {
   'ChatNameTap': () => import('../figma/screens/ChatNameTap.jsx'),
   'ChatMiniProfile2': () => import('../figma/screens/ChatMiniProfile2.jsx'),
   'ChatMiniProfile': () => import('../figma/screens/ChatMiniProfile.jsx'),
+  'MiniProfile': () => import('./MiniProfile.jsx'),
+  'MiniProfile2': () => import('./MiniProfile2.jsx'),
   'MySkin': () => import('../figma/screens/MySkin.jsx'),
+  'SkinPopup': () => import('./SkinPopup.jsx'),
   'MyMain': () => import('../figma/screens/MyMain.jsx'),
   'LiveAll': () => import('../figma/screens/LiveAll.jsx'),
   'LiveWatch': () => import('../figma/screens/LiveWatch.jsx'),
@@ -406,7 +409,7 @@ const modules = {
   'SoloField1': () => import('../figma/screens/SoloField1.jsx'),
   'SoloField2': () => import('../figma/screens/SoloField2.jsx'),
   'SoloField3': () => import('../figma/screens/SoloField3.jsx'),
-  'SoloNoRoom': () => import('../figma/screens/SoloNoRoom.jsx'),
+  'SoloNoRoom': () => import('./SoloNoRoom.jsx'),
   'SoloVideo': () => import('../figma/screens/SoloVideo.jsx'),
   'LiveFriend': () => import('../figma/screens/LiveFriend.jsx'),
   'LiveLove': () => import('../figma/screens/LiveLove.jsx'),
@@ -434,6 +437,8 @@ const modules = {
   'DRRRK6': () => import('../figma/screens/DRRRK6.jsx'),
   'MY39': () => import('../figma/screens/MY39.jsx'),
   'ChairStudio': () => import('./ChairStudio.jsx'),
+  'MyHome': () => import('./MyHome.jsx'),
+  'MyItem': () => import('./MyItem.jsx'),
   'Onboarding': () => import('./Onboarding.jsx'),
   'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
   'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),
