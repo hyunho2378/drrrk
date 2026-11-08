@@ -234,15 +234,18 @@ function initAnalysis(root) {
     };
     ring.__rots = [mk(false), mk(true)];
   }
-  // 세 단계는 모두 체크 없이, 글자는 흐리게 시작한다. 줄 높이가 변하지 않게 한 줄로 고정한다.
+  // 세 단계는 모두 체크 없이 시작한다. 글자는 첫 단계만 흐리게 보이고, 나머지 단계는 차례가 올 때 하나씩 나타난다. 줄 높이가 변하지 않게 한 줄로 고정한다.
   const list = root.querySelector('[data-figma="progress steps"]');
   if (list) list.style.overflow = 'visible';
   q(root, '[data-figma^="step ·"]').forEach((st) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
     if (icon) icon.style.opacity = '0';
-    if (label) { label.style.opacity = String(LIVE.stepDim); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
     st.style.opacity = '1';
+  });
+  q(root, '[data-figma^="step ·"]').forEach((st, i) => {
+    const label = st.querySelector('p[data-outline]');
+    if (label) { label.style.opacity = i === 0 ? String(LIVE.stepDim) : '0'; Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
   });
 }
 function playAnalysis(root, ms) {
@@ -261,9 +264,16 @@ function playAnalysis(root, ms) {
   const tpl = steps[0] && steps[0].querySelector('[data-figma="check"]');
   const lab0 = steps[0] && steps[0].querySelector('p[data-outline]');
   const color0 = lab0 ? getComputedStyle(lab0).color : '';
+  const slot = ms / (steps.length + 0.4);
   steps.forEach((st, i) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
+    // 앞 단계가 끝나는 때에 이 단계 글이 흐리게 나타난다(첫 단계는 처음부터 보인다).
+    if (i > 0 && label) window.setTimeout(() => {
+      if (!root.isConnected) return;
+      label.style.opacity = String(LIVE.stepDim);
+      label.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: LIVE.stepDim, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+    }, i * slot);
     window.setTimeout(() => {
       if (!root.isConnected) return;
       // 둘째 단계의 어두운 체크와 셋째 단계의 돌아가는 아이콘은 맨 위 단계와 같은 밝은 체크 그림으로 바꾼다.
@@ -277,7 +287,7 @@ function playAnalysis(root, ms) {
         label.style.opacity = '';
         label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn });
       }
-    }, ((i + 1) * ms) / (steps.length + 0.4));
+    }, (i + 1) * slot);
   });
 }
 

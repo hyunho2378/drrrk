@@ -20,12 +20,17 @@ export function fixWraps(root) {
     node = walker.nextNode();
   }
   hits.forEach((n) => {
-    const el = n.parentElement;
+    const el = (n.parentElement && n.parentElement.closest('p')) || n.parentElement;
     n.nodeValue = MAP[n.nodeValue];
     if (el) {
       el.style.whiteSpace = 'normal';
       el.style.wordBreak = 'keep-all';
       el.style.overflowWrap = 'break-word';
+      // 피그마 윤곽 글자 덮개는 옛 줄바꿈으로 그려져 있으므로 숨기고 실제 글자를 보이게 한다.
+      el.querySelectorAll(':scope > span[aria-hidden]').forEach((o) => (o.style.display = 'none'));
+      el.style.webkitTextFillColor = 'currentColor';
+      el.style.whiteSpace = 'normal';
+      el.querySelectorAll('span').forEach((s) => { if (!s.hasAttribute('aria-hidden')) s.style.whiteSpace = 'normal'; });
     }
   });
 }

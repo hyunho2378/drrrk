@@ -109,7 +109,7 @@ export function attachBanner(root) {
   // 배너가 펼쳐지면 그 아래 퀵슬롯(접힌 알약이나 열린 목록)이 펼쳐진 만큼 부드럽게 내려간다.
   const dockEls = () => q(root, ':scope > [data-figma="주전부리 퀵슬롯"], :scope > [data-figma="퀵슬롯 · 접힘"]');
   const pushDock = (down, instant) => {
-    const dy = down ? LIVE.bannerOpenH - LIVE.bannerClosedH : 0;
+    const dy = down ? LIVE.dockShift : 0;
     dockEls().forEach((d) => {
       d.style.transition = instant ? 'none' : 'transform ' + LIVE.bannerMs + 'ms ' + (down ? motion.emphasizedDecel : motion.emphasizedAccel);
       d.style.transform = 'translateY(' + dy + 'px)';
@@ -427,7 +427,8 @@ export function attachSpeakers(root) {
 export function fixNames(root) {
   q(root, 'p[data-outline]').forEach((p) => {
     const t = p.textContent;
-    if (!/택배상자/.test(t)) return;
+    // 이름 칸(글자 전체가 이름)만 바꾼다. 채팅 글 속 '택배상자님' 같은 원문은 그대로 둔다.
+    if (!/^\s*새벽2시 (택배상자|드르륵 칵)\s*$/.test(t)) return;
     // 원문 끝에 줄바꿈이 붙어 있어서 그대로 쓰면 이름 칸 밖으로 글자가 밀려난다. 끝 공백은 지운다.
     setText(p, t.replace(/택배상자/g, '피시방').replace(/드르륵 칵/g, '피시방').replace(/\s+$/, ''));
   });
@@ -439,6 +440,8 @@ export function fixCommentBar(root) {
   if (!bar) return;
   const btns = q(bar, '[data-figma="btn_드르륵 칵"]');
   if (!btns.length) return;
+  // 팀 피그마 최신(11. 9.)은 이 자리에 따봉, 싫어요 아이콘 버튼을 두었다. 글자 DRR, KAK이 있는 옛 버튼만 숨긴다.
+  if (!btns.some((b) => /DRR|KAK/i.test(b.textContent))) return;
   const wrap = btns[0].parentElement;
   wrap.style.display = 'none';
   const cm = bar.querySelector(':scope > [data-figma="댓글"]');
