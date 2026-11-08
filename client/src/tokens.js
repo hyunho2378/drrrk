@@ -43,6 +43,11 @@ export const motion = {
   splashStill: 1200,
   // 로고 모션 영상(4초)은 2.1초에 움직임이 끝나고 나머지는 거의 멈춰 있다(프레임 차이 실측). 2.6초에서 끊고 옅어지게 한다.
   splashCut: 2600,
+  // 휴대폰은 같은 영상을 1.6배 빠르게 틀고, 움직임이 끝나는 자리(영상 시간 2.3초)에서 바로 끊는다. 합쳐서 약 1.7초.
+  splashMobileRate: 1.6,
+  splashMobileCut: 2300,
+  splashMobileOut: 280,
+  splashMobileMax: 2200,
 };
 
 export const layout = { screenWidth: 390, screenHeight: 844, touchMin: 44, listWidth: 560, logoWidth: 180 };
@@ -105,7 +110,7 @@ export const live = {
   bannerTags: ['#친구관계', '#연애'],
   // 마이크
   micThreshold: 0.07,
-  micOnText: '마이크가 켜졌어요. 말하면 내 의자가 빛나요',
+  micOnText: '마이크가 켜졌어요',
   micMutedText: '마이크를 껐어요',
   micDeniedText: '마이크 사용을 허용해야 목소리가 전달돼요',
   micUnsupportedText: '이 브라우저는 마이크를 쓸 수 없어요. 사파리나 크롬에서 열어 주세요',
@@ -115,6 +120,17 @@ export const live = {
   speakFirst: 1600,
   speakMin: 2200,
   speakMax: 4600,
+  // 라운지 카테고리 화면(48 친구): 전체 화면(10)과 같은 틀에서 선택 탭과 카드 내용만 다르다. 값은 팀 피그마 친구 프레임(1810:12798)의 글자다.
+  lounge: {
+    48: {
+      tab: '친구',
+      cards: [
+        ['둘이 찍은 사진인데\n지만 보정해서 올린 여우', '2명 이야기 중', '11', '16:32'],
+        ['생일에 나만 선물\n안 챙겨준 베프', '5명 이야기 중', '10', '02:41'],
+        ['맨날 얻어먹고 한 번도 안 사는\n친구 손절할까요?\n잡았대요..', '2명 이야기 중', '7', '09:05'],
+      ],
+    },
+  },
   // 온보딩(13): 팀 제목은 그대로 두고 DRR, KAK 대신 이모지를 중심에 둔다
   onboardScreen: 13,
   onboardSlots: ['새우깡', '소주', '오징어땅콩'],
@@ -132,9 +148,9 @@ export const live = {
   throwFlyMs: 620,
   dragStart: 6,
   // 던지는 곳은 방 한가운데 테이블이다(피그마 390x844 기준 좌표). nameGroupAt는 의자 이름표 묶음의 피그마 위치로, 휴대폰에서 배경이 옮겨진 만큼을 구하는 기준이다.
-  nameGroupAt: [-16, 233],
-  throwTable: { x: 96, y: 388, w: 198, h: 172 },
-  throwLand: { x: 138, y: 438, w: 112, h: 44 },
+  nameGroupAt: [-16, 288],
+  throwTable: { x: 96, y: 425, w: 198, h: 172 },
+  throwLand: { x: 139, y: 475, w: 112, h: 44 },
   throwStayMs: 6000,
   throwHintText: '가운데 테이블로 끌어서 던져요',
   throwDoneText: '주전부리를 테이블에 올렸어요',

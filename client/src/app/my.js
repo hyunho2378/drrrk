@@ -23,15 +23,28 @@ export function attachTabs(root, n) {
 }
 
 // 엉따 온도 막대가 왼쪽에서 오른쪽으로 부드럽게 찬다(색은 그대로 두고 드러내기만 한다).
+// 보이기 전에 막대를 0으로 비워 두고(prepGauge), 화면이 자리를 잡으면 채운다(animateGauge).
+const EMPTY = 'inset(0 100% 0 0 round 99px)';
+export function prepGauge(root) {
+  q(root, '[data-figma="gauge"] [data-figma="fill"]').forEach((f) => (f.style.clipPath = EMPTY));
+}
 export function animateGauge(root) {
   q(root, '[data-figma="gauge"] [data-figma="fill"]').forEach((f) => {
-    const h = f.getBoundingClientRect().height / (root.getBoundingClientRect().width / LIVE.screenW || 1);
-    f.animate([{ clipPath: 'inset(0 100% 0 0 round ' + h / 2 + 'px)' }, { clipPath: 'inset(0 0 0 0 round ' + h / 2 + 'px)' }], { duration: LIVE.gaugeMs, delay: LIVE.gaugeDelay, easing: motion.emphasizedDecel, fill: 'backwards' });
+    const a = f.animate([{ clipPath: EMPTY }, { clipPath: 'inset(0 0 0 0 round 99px)' }], { duration: LIVE.gaugeMs, delay: LIVE.gaugeDelay, easing: motion.emphasizedDecel, fill: 'both' });
+    a.onfinish = () => { f.style.clipPath = ''; a.cancel(); };
   });
+}
+
+// 라운지 카테고리의 빨간 점: 이미 연애를 열어 본 뒤에는 처음부터 없는 모습으로 그린다.
+export function prepTabs(root, n) {
+  const dot = root.querySelector('[data-figma="Tab Dot"]');
+  if (dot && state.love && n !== LIVE.loveScreen) dot.style.display = 'none';
 }
 
 // 아이템 상세(54): 누른 아이템의 이름, 개수, 그림으로 바꾼다. 새우깡이면 피그마 그대로다.
 export async function fillItem(root) {
+  if (root.dataset.itemFilled) return;
+  root.dataset.itemFilled = '1';
   // 설명 문구는 피그마 원문이 사람에게 던지는 것으로 적혀 있어서, 던지는 곳이 가운데 테이블이라는 문구로 바꾼다.
   const desc = q(root, 'p[data-figma^="라이브에서 던지면"]')[0];
   if (desc) { setText(desc, LIVE.itemDesc); Object.assign(desc.style, { width: 'auto', whiteSpace: 'pre', textAlign: 'center' }); }

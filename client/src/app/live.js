@@ -8,9 +8,13 @@ import { motion, live as LIVE } from '../tokens.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
-import { attachTabs, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
-import { warm } from './donor.js';
+import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
+import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
+import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
+import { attachPost } from './post.js';
+import { attachSort } from './sort.js';
+import { fixWraps } from './wrapFix.js';
 
 export { setText };
 
@@ -27,6 +31,9 @@ export function resolveTo(l) {
     window.dispatchEvent(new Event('drrrk:splash'));
     return Object.assign({}, l, { t: 'none' });
   }
+  // 의자 꾸미기: 열 때 보여 줄 의자(새로 얻은 의자 또는 지금 의자)와 확정을 링크의 act로 정한다.
+  if (l.act === 'commit') commitDraft();
+  if (l.to === 20) openStudio(l.act === 'fresh');
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
   return l;
@@ -204,7 +211,8 @@ function halfRing(side) {
     : 'M100 0 A100 100 0 0 1 100 200 L100 195 A95 95 0 0 0 100 5 Z';
   return '<svg width="200" height="200" viewBox="0 0 200 200" style="display:block"><path d="' + d + '" fill="' + LIVE.ringColor + '"/></svg>' + (R && r ? '' : '');
 }
-function runAnalysis(root, ms) {
+// 고민 분석은 보이기 전에 0에서 시작하는 모습(initAnalysis)을 만들어 두고, 화면이 자리를 잡은 뒤(playAnalysis) 차오른다.
+function initAnalysis(root) {
   const ring = root.querySelector('[data-figma^="ring progress"]');
   if (ring && !ring.dataset.live) {
     ring.dataset.live = 'ring';
@@ -220,30 +228,48 @@ function runAnalysis(root, ms) {
       ring.appendChild(clip);
       return rot;
     };
-    const first = mk(false), second = mk(true);
+    ring.__rots = [mk(false), mk(true)];
+  }
+  // 세 단계는 모두 체크 없이, 글자는 흐리게 시작한다. 줄 높이가 변하지 않게 한 줄로 고정한다.
+  const list = root.querySelector('[data-figma="progress steps"]');
+  if (list) list.style.overflow = 'visible';
+  q(root, '[data-figma^="step ·"]').forEach((st) => {
+    const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
+    const label = st.querySelector('p[data-outline]');
+    if (icon) icon.style.opacity = '0';
+    if (label) { label.style.opacity = String(LIVE.stepDim); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
+    st.style.opacity = '1';
+  });
+}
+function playAnalysis(root, ms) {
+  const ring = root.querySelector('[data-figma^="ring progress"]');
+  if (ring && ring.__rots && !ring.dataset.played) {
+    ring.dataset.played = '1';
+    const [first, second] = ring.__rots;
     const half = ms / 2;
     first.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, easing: 'linear', fill: 'forwards' });
     second.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, delay: half, easing: 'linear', fill: 'forwards' });
   }
-  // 세 단계가 끝나면 모두 맨 위 단계와 같은 밝은 체크가 된다(피그마의 어두운 체크와 돌아가는 아이콘은 쓰지 않는다).
+  // 세 단계가 끝나면 모두 맨 위 단계와 같은 밝은 체크가 된다. 돌아가는 아이콘 칸은 비우고 체크 그림만 같은 크기로 넣는다(칸 크기와 자리는 그대로).
   const steps = q(root, '[data-figma^="step ·"]');
+  if (root.dataset.analysisPlayed) return;
+  root.dataset.analysisPlayed = '1';
   const tpl = steps[0] && steps[0].querySelector('[data-figma="check"]');
   const lab0 = steps[0] && steps[0].querySelector('p[data-outline]');
   const color0 = lab0 ? getComputedStyle(lab0).color : '';
   steps.forEach((st, i) => {
     const icon = st.querySelector('[data-figma="check"], [data-figma="spinner"]');
     const label = st.querySelector('p[data-outline]');
-    if (icon) icon.style.opacity = '0';
-    if (label) label.style.opacity = String(LIVE.stepDim);
     window.setTimeout(() => {
-      let ic = icon;
-      if (i > 0 && icon && tpl) {
-        ic = tpl.cloneNode(true);
-        icon.replaceWith(ic);
+      if (!root.isConnected) return;
+      // 둘째 단계의 어두운 체크와 셋째 단계의 돌아가는 아이콘은 맨 위 단계와 같은 밝은 체크 그림으로 바꾼다.
+      if (icon && tpl && i > 0) {
+        icon.innerHTML = tpl.innerHTML;
+        icon.setAttribute('data-figma', 'check');
       }
-      if (ic) { ic.style.opacity = ''; ic.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
+      if (icon) { icon.style.opacity = ''; icon.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: motion.modalIn, easing: motion.emphasizedDecel }); }
       if (label) {
-        if (i > 0 && color0) { label.style.color = color0; setText(label, label.textContent); }
+        if (i > 0 && color0) { label.style.color = color0; setText(label, label.textContent); Object.assign(label.style, { whiteSpace: 'nowrap', width: 'auto' }); }
         label.style.opacity = '';
         label.animate([{ opacity: LIVE.stepDim }, { opacity: 1 }], { duration: motion.stateIn });
       }
@@ -270,14 +296,11 @@ function carouselOf(layer, root) {
   const stops = cards.map((c) => r0.x - relRect(root, c).x);
   const hot = q(layer, '[data-hotspot]').filter((b) => Math.abs(parseFloat(b.style.top) - r0.y) < 1 && Math.abs(parseFloat(b.style.height) - r0.h) < 1);
   const els = cards.concat(hot);
-  const c = { x: 0, base: 0, band: [r0.y, r0.y + r0.h] };
+  const c = { x: 0, base: 0, i: 0, band: [r0.y, r0.y + r0.h] };
   c.drag = (dx) => els.forEach((el) => move(el, 'x', Math.max(Math.min(...stops) - 40, Math.min(40, c.base + dx)), 0));
-  c.end = (dx) => {
-    const want = c.base + dx;
-    const near = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
-    const cur = stops.indexOf(c.base);
-    const dir = dx < -LIVE.swipeMin ? 1 : dx > LIVE.swipeMin ? -1 : 0;
-    const j = dir && cur >= 0 ? Math.max(0, Math.min(stops.length - 1, cur + dir)) : near;
+  c.go = (j) => {
+    j = Math.max(0, Math.min(stops.length - 1, j));
+    c.i = j;
     c.x = c.base = stops[j];
     els.forEach((el) => move(el, 'x', c.x, motion.stateIn + 150));
     const dots = root.querySelector('[data-figma="Page Dots"]');
@@ -291,6 +314,13 @@ function carouselOf(layer, root) {
         left += d.getBoundingClientRect().width / scaleOf(root) + LIVE.dotGap;
       });
     }
+  };
+  c.step = (dir) => c.go(c.i + dir);
+  c.end = (dx) => {
+    const want = c.base + dx;
+    const near = stops.reduce((bi, s, k) => (Math.abs(s - want) < Math.abs(stops[bi] - want) ? k : bi), 0);
+    const dir = dx < -LIVE.swipeMin ? 1 : dx > LIVE.swipeMin ? -1 : 0;
+    c.go(dir ? c.i + dir : near);
   };
   return c;
 }
@@ -368,6 +398,12 @@ function scrollerOf(layer, root, n) {
     place(0);
   };
   s.inRegion = (y) => y >= top && y <= bottom;
+  // 카드가 자리를 바꾼 뒤(정렬) 새 자리를 다시 잰다.
+  s.remeasure = () => {
+    items.forEach((el) => y0.set(el, relRect(root, el).y + s.y));
+    place(0);
+  };
+  root.__scroller = s;
   // 라이브 댓글 화면은 입력창 바로 위 댓글이 보이도록 맨 아래에서 시작한다.
   if (generic && fit.input) s.y = s.base = max;
   place(0);
@@ -391,6 +427,10 @@ function shelfOf(layer, root) {
   s.end = () => {
     s.x = s.base = Math.max(min, Math.min(0, s.x));
     els.forEach((el) => move(el, 'x', s.x, motion.stateIn + 150));
+  };
+  s.wheel = (dx) => {
+    s.x = s.base = Math.max(min, Math.min(0, s.x - dx));
+    els.forEach((el) => move(el, 'x', s.x, 0));
   };
   return s;
 }
@@ -439,46 +479,258 @@ function attachDrag(layer, root, n) {
   };
   layer.addEventListener('pointerup', up);
   layer.addEventListener('pointercancel', up);
-  if (scr) {
-    layer.style.touchAction = 'none';
-    layer.addEventListener('wheel', (e) => {
-      if (!scr.inRegion(yOf(e))) return;
+  if (scr) layer.style.touchAction = 'none';
+  else layer.style.touchAction = 'pan-y';
+  // 휠과 트랙패드: 가로로 굴리면(또는 Shift와 함께 굴리면) 카드 줄과 선반이 터치 없이 넘어간다. 세로로 굴리면 목록이 움직인다.
+  let acc = 0, armed = true, lastWheel = 0;
+  layer.addEventListener('wheel', (e) => {
+    const y = yOf(e);
+    const sy = y + (scr ? scr.y : 0);
+    const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.shiftKey ? e.deltaY : 0;
+    if (dx && ((car && sy >= car.band[0] && sy <= car.band[1]) || (sh && y >= sh.band[0] && y <= sh.band[1]))) {
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheel > 160) { armed = true; acc = 0; }
+      lastWheel = now;
+      if (car && sy >= car.band[0] && sy <= car.band[1]) {
+        acc += dx;
+        if (armed && Math.abs(acc) > 24) { armed = false; car.step(acc > 0 ? 1 : -1); }
+      } else sh.wheel(dx / scaleOf(root));
+      return;
+    }
+    if (scr && scr.inRegion(y)) {
       e.preventDefault();
       scr.wheel(e.deltaY / scaleOf(root));
-    }, { passive: false });
-  } else layer.style.touchAction = sh ? 'pan-y' : 'pan-y';
+    }
+  }, { passive: false });
   // 끌어서 움직인 직후의 누름은 화면 이동으로 보지 않는다.
   layer.addEventListener('click', (e) => {
     if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
   }, true);
 }
 
-// ---------- 붙이기 ----------
+// ---------- 보이기 전에 맞추기 ----------
+// 화면은 투명하게 먼저 그려지고 그림이 준비되면 보인다. 피그마 기본 모습이 잠깐 보였다가 바뀌는 깜빡임이 없도록,
+// 글자와 그림을 바꾸는 일과 처음 모습(고민 분석 0, 채팅 숨김, 시계, 엉따 막대 0, 가로 카드 위치)은 보이기 전에 끝낸다.
+// 의자 그림: 작게 줄여 저장했던 옛 그림은 일러스트 자산 원본에서 만든 그림으로 바꾼다(chairs.js). 큰 자리(170px)는 원본 PNG, 작은 자리는 256px 무손실이다.
+// 박스 의자는 없앴다. 박스 그림이 '나'의 자리인 화면(1, 2, 3, 22, 23)은 내가 고른 의자로, 그 밖의 자리는 편의점 의자로 바꾼다.
+const IMG = {
+  box: '3ce7017af2e5445570968a1ddfceafe220f58ff8.webp',
+  sofa: 'eab22a7a4d5070b5801bb3367d4f0342e5726543.webp',
+  stool: '51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017.webp',
+  recl: 'ef3d01c1807348609019737b6ad41d82875319aa.webp',
+  yellow: '68313ae4f5a7ed9ed1fc3186bcbbe79e0d0726ba.webp',
+  myOld: 'f76f40b49cba6dd89cb0cf61935be0f11b55cfcc.webp',
+};
+const MINE_BOX = [1, 2, 3, 22, 23];
+const MINE_YELLOW = [1, 32, 33];
+// 28, 30, 31은 팀 피그마 최신 장면(라임 의자, 회색 리클라이너, 흰 의자)으로 바꾼다.
+export const SCREEN_SWAP = { 28: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 30: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' }, 31: { '320c986cd0c78068b7b4f0ec16d590deb18de99b.webp': 'cd3fdccd27308a2b644497352f7d37f7dc3a5de7.webp' } };
+export function swapMap(n) {
+  const map = Object.assign({}, SCREEN_SWAP[n] || {});
+  map[IMG.sofa] = fixedRel('sofa', 1, n === 19);
+  map[IMG.stool] = n === 19 ? mineRel(true) : fixedRel('stool', 1, false);
+  map[IMG.recl] = fixedRel('recl', 1, false);
+  map[IMG.box] = MINE_BOX.includes(n) ? mineRel(false) : fixedRel('conv', 1, false);
+  if (MINE_YELLOW.includes(n)) map[IMG.yellow] = mineRel(false);
+  map[IMG.myOld] = mineRel(true);
+  return map;
+}
+export function swapAssets(el, n) {
+  const map = swapMap(n);
+  const keys = Object.keys(map);
+  el.querySelectorAll('[style]').forEach((e) => {
+    const st = e.getAttribute('style') || '';
+    if (st.indexOf('url(') < 0) return;
+    for (const k of keys) {
+      if (st.indexOf(k) >= 0) e.setAttribute('style', st.split(k).join(map[k]));
+    }
+  });
+}
+
+// 목록 카드의 눈 아이콘: 팀 피그마의 현재 아이콘(carbon:view-filled, 16 x 16, #6E767C)이다. 옛 그림은 원본이 지워져 비어 있었다.
+const EYE_SVG = '<svg style="display:block" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" fill="#6E767C"/><path d="M15.47 7.83C14.8819 6.30882 13.861 4.99331 12.5334 4.04604C11.2058 3.09878 9.62971 2.56129 7.99997 2.5C6.37023 2.56129 4.79416 3.09878 3.46657 4.04604C2.13898 4.99331 1.11805 6.30882 0.52997 7.83C0.490254 7.93985 0.490254 8.06015 0.52997 8.17C1.11805 9.69118 2.13898 11.0067 3.46657 11.954C4.79416 12.9012 6.37023 13.4387 7.99997 13.5C9.62971 13.4387 11.2058 12.9012 12.5334 11.954C13.861 11.0067 14.8819 9.69118 15.47 8.17C15.5097 8.06015 15.5097 7.93985 15.47 7.83ZM7.99997 11.25C7.35718 11.25 6.72883 11.0594 6.19437 10.7023C5.65991 10.3452 5.24335 9.83758 4.99736 9.24372C4.75138 8.64986 4.68702 7.99639 4.81242 7.36596C4.93782 6.73552 5.24735 6.15642 5.70187 5.7019C6.15639 5.24738 6.73549 4.93785 7.36593 4.81245C7.99637 4.68705 8.64983 4.75141 9.24369 4.99739C9.83755 5.24338 10.3451 5.65994 10.7022 6.1944C11.0594 6.72886 11.25 7.35721 11.25 8C11.2486 8.86155 10.9058 9.68743 10.2966 10.2966C9.6874 10.9058 8.86152 11.2487 7.99997 11.25Z" fill="#6E767C"/></svg>';
+function fixIcons(root) {
+  q(root, '[data-figma="icon/eye"]').forEach((el) => {
+    if (el.dataset.fixed) return;
+    el.dataset.fixed = '1';
+    el.innerHTML = EYE_SVG;
+    Object.assign(el.style, { width: '16px', height: '16px' });
+    const meta = el.closest('[data-figma="meta"]');
+    if (meta) Object.assign(meta.style, { width: 'auto' });
+  });
+}
+
+// 라운지 카테고리 화면(48 친구)은 전체 화면 틀에서 선택된 탭과 카드 내용을 바꾼다.
+function patchLounge(root, n) {
+  const spec = LIVE.lounge && LIVE.lounge[n];
+  if (!spec || root.dataset.lounge) return;
+  root.dataset.lounge = '1';
+  q(root, '[data-figma^="Tab / "]').forEach((p) => {
+    const on = p.getAttribute('data-figma') === 'Tab / ' + spec.tab;
+    setText(p, p.textContent.trim());
+    Object.assign(p.style, { color: on ? '#F8F8F8' : '#9AA1A6', fontWeight: on ? '700' : '500' });
+    if (on) {
+      const ul = root.querySelector('[data-figma="Tab Underline"]');
+      if (ul) Object.assign(ul.style, { left: parseFloat(getComputedStyle(p).left) + 'px' });
+    }
+  });
+  [1, 2, 3].forEach((i) => {
+    const card = root.querySelector('[data-figma="List Card / ' + i + '"]');
+    const c = spec.cards[i - 1];
+    if (!card || !c) return;
+    const title = card.querySelector('[data-figma="List Title"]');
+    if (title) { setText(title, c[0]); Object.assign(title.style, { height: 'auto', width: '214px' }); }
+    const who = [...card.querySelectorAll('p')].find((p) => /이야기 중/.test(p.textContent));
+    if (who) { setText(who, c[1]); Object.assign(who.style, { width: 'auto' }); }
+    const view = card.querySelector('[data-figma="보는 중"] p');
+    if (view) { setText(view, c[2]); Object.assign(view.style, { width: 'auto' }); }
+    const time = card.querySelector('[data-figma^="Timer Badge"] [data-figma="time"]');
+    if (time) setText(time, c[3]);
+  });
+}
+
+// 새 장면(28, 30, 31)에서 팀 피그마가 옮긴 이름표 묶음 위치를 맞춘다(피그마 값: 묶음 y 288, 높이 115, 안쪽 +25).
+const SCENE_FIX = [28, 30, 31];
+function patchScene(root, n) {
+  if (!SCENE_FIX.includes(n) || root.dataset.sceneFix) return;
+  root.dataset.sceneFix = '1';
+  const g = root.querySelector(':scope > [data-figma="Group 2147229349"]');
+  if (g) {
+    g.style.top = '288px';
+    g.style.height = '115px';
+    [...g.children].forEach((k) => {
+      const top = parseFloat(getComputedStyle(k).top);
+      if (!Number.isNaN(top)) k.style.top = top + 25 + 'px';
+    });
+  }
+}
+
+// 해 뜬 순간(35)의 시계 알약: 팀 피그마의 해 뜸 변형(바탕 #FFC24D 18%, 해 모양 아이콘)이다. 옛 생성 화면은 아이콘 그림이 비어 있었다.
+const SUN_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="2.33" stroke="#FFC24D" stroke-width="1.8"/><path d="M7 1.2V2.6M7 11.4V12.8M1.2 7H2.6M11.4 7H12.8M3.9 3.9L2.9 2.9M10.1 3.9L11.1 2.9M3.9 10.1L2.9 11.1M10.1 10.1L11.1 11.1" stroke="#FFC24D" stroke-width="1.7" stroke-linecap="round"/></svg>';
+function patchPill(root, n) {
+  if (n !== 35 || root.dataset.pill) return;
+  root.dataset.pill = '1';
+  const pill = root.querySelector('[data-figma="Timer Pill"]');
+  if (!pill) return;
+  Object.assign(pill.style, { background: 'rgba(255, 194, 77, 0.18)', width: 'auto', padding: '0 14px 0 12px', gap: '6px' });
+  const icon = pill.querySelector('[data-figma="timer"]');
+  if (icon) {
+    icon.innerHTML = SUN_SVG;
+    Object.assign(icon.style, { width: '14px', height: '14px', overflow: 'visible' });
+  }
+}
+
+// 아침(2)과 오늘 나눈 대화(3): 스크롤하면 내용이 머리말(상태바, 뒤로 가기) 밑으로 올라가 글자와 겹쳤고, 맨 끝 내용은 아래 버튼 띠에 가렸다.
+// 머리말 높이만큼 바탕색 띠를 두고, 맨 끝에는 버튼 띠 높이만큼 여백을 더한다.
+function patchReport(root, n) {
+  if ((n !== 2 && n !== 3) || root.dataset.report) return;
+  const scroll = root.querySelector(':scope > [data-scroll]');
+  if (!scroll) return;
+  root.dataset.report = '1';
+  const bg = getComputedStyle(root).backgroundColor || '#121415';
+  const mask = document.createElement('div');
+  mask.setAttribute('aria-hidden', 'true');
+  Object.assign(mask.style, { position: 'absolute', left: '0px', top: '0px', width: '390px', height: '112px', pointerEvents: 'none', background: 'linear-gradient(to bottom, ' + bg + ' 0, ' + bg + ' 98px, transparent 112px)' });
+  scroll.after(mask);
+  const content = scroll.querySelector(':scope > [data-scroll-content]') || scroll;
+  const pad = document.createElement('div');
+  pad.setAttribute('aria-hidden', 'true');
+  // 내용 칸은 높이가 고정이고 안쪽이 모두 절대 위치라서, 여백은 내용 맨 아래(칸 높이 자리)에 절대 위치로 둔다.
+  Object.assign(pad.style, { position: 'absolute', left: '0px', top: parseFloat(getComputedStyle(content).height) + 'px', width: '1px', height: '204px' });
+  content.appendChild(pad);
+  // 아래 버튼 띠(함께 드르륵 앉기, 새 방 만들기)는 피그마에서 화면 바닥에 고정이다. 생성 화면에서는 스크롤 칸 안에 들어 있어 내용과 같이 올라가 겹쳤다. 칸 밖으로 옮겨 바닥에 고정한다.
+  const cta = [...content.children].find((c) => c !== pad && c.getAttribute('data-figma') !== 'Report' && /함께 드르륵 앉기/.test(c.textContent) && c.textContent.length < 60);
+  if (cta) {
+    const rr = relRect(root, cta);
+    root.appendChild(cta);
+    Object.assign(cta.style, { position: 'absolute', left: rr.x + 'px', top: rr.y + 'px' });
+  }
+}
+
+// 새 의자 팝업(19) 뒤 화면: 옛 뱃지 시트(불꽃 드륵 등)는 쓰지 않는다. MY 화면(36)의 나의 업적 편의점 시트로 바꾼다.
+async function patchSkinPopup(root, n) {
+  if (n !== 19 || root.dataset.skin) return;
+  root.dataset.skin = '1';
+  const old = root.querySelector(':scope > [data-figma="bottom sheet · 뱃지"]');
+  if (!old) return;
+  const sheet = await cloneOf(36, ':scope > [data-figma="bottom sheet · 나의 편의점"]');
+  if (!sheet || !root.isConnected) return;
+  old.replaceWith(sheet);
+}
+
+function prepareChat(root, n) {
+  const sc = sceneOf(n);
+  if (!sc || (room.scene === sc && room.chatDone)) return;
+  root.dataset.chatHide = '1';
+  q(root, CHAT_SEL).filter((el) => !el.closest('[data-figma^="input"]')).forEach((el) => (el.style.opacity = '0'));
+}
+function prepareRoomClock(root, n) {
+  const sc = sceneOf(n);
+  if (!sc) return;
+  const same = room.scene === sc && room.kind === timerKind(root);
+  const txt = fmtMMSS(same ? remaining() : LIVE.roomSeconds);
+  timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
+}
+
+export async function prepare(layer, n, prevN) {
+  const root = rootOf(layer);
+  if (!root || root.dataset.prepared) return;
+  root.dataset.prepared = '1';
+  applySync(root);
+  fixWraps(root);
+  showEmptyOutlines(root);
+  patchScene(root, n);
+  attachRoom(root, n);
+  attachThrow(root);
+  attachSort(root, n, true);
+  attachDrag(layer, root, n);
+  prepTabs(root, n);
+  fixIcons(root);
+  patchLounge(root, n);
+  if ([19, 36, 53, 54].includes(n)) patchMyChair(root);
+  attachPost(root);
+  patchPill(root, n);
+  patchReport(root, n);
+  if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
+  if (n === LIVE.itemScreen) await fillItem(root);
+  await patchSkinPopup(root, n);
+  if (n === LIVE.analysisScreen) initAnalysis(root);
+  prepareRoomClock(root, n);
+  prepareChat(root, n);
+}
+
+// ---------- 붙이기(전환이 끝난 뒤) ----------
 let ticker = 0;
 let current = { n: 0, go: null, layer: null };
 export function attach(layer, n, go, prevN) {
   const root = rootOf(layer);
   if (!root) return;
   current = { n, go, layer };
+  // 클립 영상 보기가 다 보이면 에이전트 버튼이 오른쪽에서 튀어나온다(ClipPlayer.jsx).
+  if (n === 56) window.dispatchEvent(new Event('drrrk:clip-shown'));
+  // prepare가 못 한 경우(예: 준비 중에 오류)를 위해 같은 일을 한 번 더 한다. 모두 두 번 해도 같은 결과가 되도록 만들어져 있다.
   applySync(root);
   showEmptyOutlines(root);
+  patchScene(root, n);
   attachRoom(root, n);
   attachThrow(root);
   attachInputs(root, n, go);
+  attachSort(root, n, false);
   attachDrag(layer, root, n);
   attachTabs(root, n);
-  if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) animateGauge(root);
-  if (n === LIVE.itemScreen) fillItem(root);
+  attachPost(root);
+  fixIcons(root);
+  patchLounge(root, n);
+  if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);
   if (sc) {
     const kind = timerKind(root);
     if (room.scene !== sc || room.kind !== kind) {
-      const t = timerTexts(root)[0];
       if (room.scene !== sc) room.chatDone = false;
       room.scene = sc;
       room.kind = kind;
-      void t;
       room.left = LIVE.roomSeconds;
       room.at = performance.now();
       room.fired = {};
@@ -486,9 +738,11 @@ export function attach(layer, n, go, prevN) {
     if (!room.chatDone) {
       room.chatDone = true;
       staggerChat(root);
+    } else if (root.dataset.chatHide === '1') {
+      q(root, CHAT_SEL).forEach((el) => { if (!el.closest('[data-figma^="input"]') && el.style.opacity === '0') el.style.opacity = ''; });
     }
   } else room.scene = null;
-  if (n === LIVE.analysisScreen) runAnalysis(root, LIVE.analysisMs);
+  if (n === LIVE.analysisScreen) { initAnalysis(root); playAnalysis(root, LIVE.analysisMs); }
   if (!ticker) ticker = window.setInterval(tick, 250);
   tick();
 }

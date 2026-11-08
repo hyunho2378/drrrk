@@ -78,11 +78,12 @@ export function attachEmoji(root) {
       plus.className = x.className;
       plus.innerHTML = x.innerHTML;
     }
-    menu.animate([{ opacity: 0, transform: 'translateY(12px) scale(0.92)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: motion.modalIn + 50, easing: motion.emphasizedDecel });
+    // 열리는 속도: 너무 빠르지 않게 420ms, 이모지는 아래부터 60ms 간격으로 올라온다.
+    menu.animate([{ opacity: 0, transform: 'translateY(18px) scale(0.86)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: 420, easing: motion.emphasizedDecel });
     const items = q(menu, '[data-figma^="emoji ·"]');
     items.forEach((it, i) => {
       it.style.cursor = 'pointer';
-      it.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, delay: (items.length - 1 - i) * 35, easing: motion.emphasizedDecel, fill: 'backwards' });
+      it.animate([{ opacity: 0, transform: 'translateY(14px) scale(0.9)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: 340, delay: 80 + (items.length - 1 - i) * 60, easing: motion.emphasizedDecel, fill: 'backwards' });
       it.addEventListener('click', (e) => { e.stopPropagation(); fly(it); close(); });
     });
     document.addEventListener('pointerdown', onDoc, true);
@@ -123,10 +124,18 @@ export function attachBanner(root) {
       setText(body, LIVE.bannerBody);
       Object.assign(body.style, { whiteSpace: 'pre-wrap', wordBreak: 'keep-all', height: 'auto' });
       const tags = ps.filter((p) => /^#/.test(p.textContent.trim()));
-      tags.forEach((t, i) => LIVE.bannerTags[i] && setText(t, LIVE.bannerTags[i]));
+      // 키워드 칩: 팀 글자 길이에 맞춘 고정 폭을 풀고 글자 길이대로 늘어나게 한다(좌우 여백이 같아야 한다).
+      tags.forEach((t, i) => {
+        if (!LIVE.bannerTags[i]) return;
+        setText(t, LIVE.bannerTags[i]);
+        Object.assign(t.style, { width: 'auto', whiteSpace: 'nowrap' });
+        if (t.parentElement) Object.assign(t.parentElement.style, { width: 'auto', flex: '0 0 auto' });
+      });
+      const ctx = tags[0] && tags[0].closest('[data-figma="AI 맥락"]');
+      if (ctx) ctx.style.width = 'auto';
     }
     const r = relRect(root, col);
-    Object.assign(e.style, { left: r.x + 'px', top: r.y + 'px', zIndex: '15', cursor: 'pointer' });
+    Object.assign(e.style, { left: r.x + 'px', top: r.y + 'px', zIndex: '35', cursor: 'pointer' });
     root.appendChild(e);
     exp = e;
     const h = LIVE.bannerOpenH, c = LIVE.bannerClosedH;
@@ -222,24 +231,7 @@ export function attachMic(root) {
     });
   });
   paint();
-  // 말할 때 마이크 버튼 둘레가 목소리 크기대로 커진다.
-  const loop = () => {
-    if (!root.isConnected) return;
-    const on = mic.live && !mic.muted;
-    btns.forEach((b) => {
-      let r = b.querySelector(':scope > div[data-mic-ring]');
-      if (on && !r) {
-        r = document.createElement('div');
-        r.setAttribute('data-mic-ring', '');
-        Object.assign(r.style, { position: 'absolute', inset: '0', borderRadius: '50%', pointerEvents: 'none', transition: 'box-shadow 80ms linear' });
-        b.style.overflow = 'visible';
-        b.appendChild(r);
-      }
-      if (r) r.style.boxShadow = on && mic.speaking ? '0 0 0 ' + (4 + mic.level * 10).toFixed(1) + 'px rgba(46,229,157,0.38)' : '0 0 0 0 rgba(46,229,157,0)';
-    });
-    window.setTimeout(loop, 80);
-  };
-  loop();
+  // 말할 때 내 마이크 버튼이나 내 의자에는 초록 테두리와 번짐을 붙이지 않는다(팀 지시). 켜짐과 꺼짐 색만 바뀐다.
 }
 
 // ---------- 4) 말하는 사람 돌리기 ----------
@@ -329,7 +321,8 @@ export function fixNames(root) {
   q(root, 'p[data-outline]').forEach((p) => {
     const t = p.textContent;
     if (!/택배상자/.test(t)) return;
-    setText(p, t.replace(/택배상자/g, '드르륵 칵'));
+    // 원문 끝에 줄바꿈이 붙어 있어서 그대로 쓰면 이름 칸 밖으로 글자가 밀려난다. 끝 공백은 지운다.
+    setText(p, t.replace(/택배상자/g, '드르륵 칵').replace(/\s+$/, ''));
   });
 }
 

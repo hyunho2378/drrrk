@@ -3,6 +3,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { loadScreen } from './screens.js';
+import { fixWraps } from './wrapFix.js';
 
 const donors = new Map();
 
@@ -18,6 +19,7 @@ export function donor(n) {
     createRoot(host).render(React.createElement(Comp));
     for (let i = 0; i < 60 && !host.querySelector('[data-node]'); i++) await new Promise((r) => window.setTimeout(r, 50));
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    fixWraps(host);
     return host.querySelector('[data-node]');
   })();
   donors.set(n, p);
