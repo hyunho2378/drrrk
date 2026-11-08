@@ -44,6 +44,7 @@
 		28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRegistry.swift; sourceTree = "<group>"; };
 		355454814EF792BE3C446D3C /* ChairStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStore.swift; sourceTree = "<group>"; };
 		37CF8AE0BD5CC76AEC12E9B2 /* SUIT-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-ExtraBold.otf"; sourceTree = "<group>"; };
+		40F105367036182C7BD07158 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		4533C63C25CFFB9BEEE5F247 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		501E8B9CBA004BB542AF4AF8 /* SUIT-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-SemiBold.otf"; sourceTree = "<group>"; };
 		57D150C196D9839A3AC05BC6 /* LiveData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveData.swift; sourceTree = "<group>"; };
@@ -139,6 +140,7 @@
 		6EC1409DFCE3EF7F3B5FDBF3 = {
 			isa = PBXGroup;
 			children = (
+				C5EBE366E3F7CE012694ACB6 /* Config */,
 				A22FD495643447D4A04818A4 /* DRRRK */,
 				759EE558370784A52997008D /* Products */,
 			);
@@ -213,6 +215,14 @@
 				39177511A360980883721DA0 /* Media */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		C5EBE366E3F7CE012694ACB6 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				40F105367036182C7BD07158 /* Signing.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 		CD30D884D2ED469B2462D832 /* My */ = {
@@ -375,7 +385,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -435,7 +444,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -468,6 +476,7 @@
 		};
 		988E6C9566EBC002616DC051 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 40F105367036182C7BD07158 /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -476,7 +485,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = app.drrrk.ios;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -484,6 +492,7 @@
 		};
 		9F8C9006D194262249A77090 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 40F105367036182C7BD07158 /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -492,7 +501,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = app.drrrk.ios;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -15,7 +15,9 @@ struct LiveCard: Identifiable, Hashable {
 
     var fresh: Bool { meta == "방금 열림" }
     var remaining: Int {
-        if let t = els.compactMap({ if case let .timer(_, _, v) = $0 { v } else { nil } }).first { return LiveCard.secs(t) }
+        for el in els {
+            if case let .timer(_, _, v) = el { return LiveCard.secs(v) }
+        }
         return LiveCard.secs(meta.replacingOccurrences(of: " 남음", with: ""))
     }
 
