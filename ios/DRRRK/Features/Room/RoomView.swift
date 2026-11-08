@@ -26,7 +26,11 @@ struct SceneMap {
 }
 
 struct RoomView: View {
+    @Environment(Router.self) private var router
     @State private var model = RoomModel()
+    @State private var emojiOpen = false
+    @State private var flying: [FlyingEmoji] = []
+    @State private var lastMinute = false
     @State private var drag: (id: String, asset: String, at: CGPoint)?
     @State private var overTable = false
     @Namespace private var dockSpace
@@ -62,6 +66,8 @@ struct RoomView: View {
         .ignoresSafeArea()
         .background(DS.Palette.bgBase)
         .task { await rotateSpeakers() }
+        .task { await watchClock() }
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     // MARK: 장면 위에 얹는 것
@@ -100,7 +106,7 @@ struct RoomView: View {
     private func chrome(_ map: SceneMap) -> some View {
         VStack(spacing: 0) {
             Color.clear.frame(height: max(geoTopInset(), 47))
-            RoomHeader(model: model)
+            RoomHeader(model: model, lastMinute: lastMinute, onBack: { router.pop() }, onToggle: { router.push(.roomNormal) })
                 .frame(height: 56)
             TopicBanner(model: model)
                 .padding(.horizontal, 24)
@@ -112,9 +118,25 @@ struct RoomView: View {
             .padding(.trailing, 24)
             .padding(.top, 28)
             Spacer(minLength: 0)
+            if lastMinute {
+                SystemLine(text: "해 뜨기 1분 전!")
+                    .padding(.bottom, 12)
+                    .transition(.opacity.combined(with: .offset(y: 8)))
+            }
             ChatColumn(model: model)
                 .padding(.horizontal, 24)
-            RoomInputBar()
+                .overlay(alignment: .bottomLeading) {
+                    if emojiOpen {
+                        EmojiMenu { pick in sendEmoji(pick) }
+                            .padding(.leading, 24)
+                            .padding(.bottom, -14)
+                            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.86, anchor: .bottomLeading)).combined(with: .offset(y: 18)), removal: .opacity.combined(with: .offset(y: 8))))
+                    }
+                }
+                .overlay {
+                    ForEach(flying) { e in FlyingEmojiView(item: e) }
+                }
+            RoomInputBar(emojiOpen: $emojiOpen)
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
                 .padding(.bottom, 24)
@@ -192,6 +214,32 @@ struct RoomView: View {
             }
     }
 
+    private func sendEmoji(_ asset: String) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let item = FlyingEmoji(asset: asset)
+        flying.append(item)
+        withAnimation(DS.Motion.emphasizedAccel) { emojiOpen = false }
+        Task {
+            try? await Task.sleep(for: .seconds(1.1))
+            flying.removeAll { $0.id == item.id }
+        }
+    }
+
+    /// 해 뜨기 1분(화면 시계) 전에는 시계가 빨개지고 안내가 한 줄 뜬다. 0이 되면 아침 화면으로 넘어간다.
+    private func watchClock() async {
+        while !Task.isCancelled {
+            let left = model.remaining(at: .now)
+            if left <= 60, !lastMinute {
+                withAnimation(DS.Motion.emphasizedDecel) { lastMinute = true }
+            }
+            if left <= 0 {
+                router.push(.roomMorning)
+                return
+            }
+            try? await Task.sleep(for: .seconds(0.25))
+        }
+    }
+
     private func rotateSpeakers() async {
         try? await Task.sleep(for: .seconds(1.6))
         while !Task.isCancelled {
@@ -251,7 +299,7 @@ private struct LandedSnack: View {
     }
 }
 
-private struct SnackSlot: View {
+struct SnackSlot: View {
     let snack: RoomModel.Snack
     var body: some View {
         Image(snack.asset).resizable().scaledToFit()
@@ -262,7 +310,7 @@ private struct SnackSlot: View {
     }
 }
 
-private struct CollapsedDock: View {
+struct CollapsedDock: View {
     let snacks: [RoomModel.Snack]
     let ns: Namespace.ID
     var body: some View {
@@ -285,11 +333,20 @@ private struct CollapsedDock: View {
 
 private struct RoomHeader: View {
     let model: RoomModel
+    var lastMinute = false
+    var onBack: () -> Void = {}
+    var onToggle: () -> Void = {}
     var body: some View {
         HStack {
-            Image("icon-chevron-left").renderingMode(.template).resizable()
-                .foregroundStyle(DS.Palette.textPrimary)
-                .frame(width: 24, height: 24)
+            Button(action: onBack) {
+                Image("icon-chevron-left").renderingMode(.template).resizable()
+                    .foregroundStyle(DS.Palette.textPrimary)
+                    .frame(width: 24, height: 24)
+                    .frame(width: 44, height: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("나가기")
             Spacer()
             TimelineView(.periodic(from: .now, by: 0.25)) { ctx in
                 HStack(spacing: 8) {
@@ -297,21 +354,26 @@ private struct RoomHeader: View {
                         .frame(width: 16, height: 16)
                     Text("해 뜨기까지").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
                     Text(model.clockText(at: ctx.date)).suit(12, .bold, tracking: -0.48).monospacedDigit()
-                        .foregroundStyle(DS.Palette.brandPrimary)
+                        .foregroundStyle(lastMinute ? DS.Palette.danger : DS.Palette.brandPrimary)
                         .contentTransition(.numericText(countsDown: true))
                 }
                 .padding(.leading, 12).padding(.trailing, 16)
                 .frame(height: 32)
                 .background(DS.Palette.bgElevated, in: Capsule())
+                .overlay(Capsule().strokeBorder(DS.Palette.danger, lineWidth: 1.5).opacity(lastMinute ? 1 : 0))
             }
             Spacer()
-            Image("icon-view-grid").renderingMode(.template).resizable()
-                .foregroundStyle(DS.Palette.textPrimary)
-                .frame(width: 16, height: 16)
-                .frame(width: 46, height: 32)
-                .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
+            Button(action: onToggle) {
+                Image("icon-view-grid").renderingMode(.template).resizable()
+                    .foregroundStyle(DS.Palette.textPrimary)
+                    .frame(width: 16, height: 16)
+                    .frame(width: 46, height: 32)
+                    .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("일반 모드로 보기")
         }
-        .padding(.horizontal, 24)
+        .padding(.leading, 14).padding(.trailing, 24)
     }
 }
 
@@ -417,14 +479,22 @@ private struct ChatColumn: View {
     }
 }
 
-private struct RoomInputBar: View {
+struct RoomInputBar: View {
+    @Binding var emojiOpen: Bool
     @State private var text = ""
     @State private var micOn = true
     var body: some View {
         HStack(spacing: 8) {
-            Image("icon-plus").renderingMode(.template).foregroundStyle(DS.Palette.textPrimary)
-                .frame(width: 48, height: 48)
-                .background(.black, in: Circle())
+            Button {
+                withAnimation(emojiOpen ? DS.Motion.emphasizedAccel : DS.Motion.decel(0.42)) { emojiOpen.toggle() }
+            } label: {
+                Image("icon-plus").renderingMode(.template).foregroundStyle(DS.Palette.textPrimary)
+                    .rotationEffect(.degrees(emojiOpen ? 45 : 0))
+                    .frame(width: 48, height: 48)
+                    .background(.black, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(emojiOpen ? "이모지 닫기" : "이모지 열기")
             TextField("", text: $text, prompt: Text("채팅으로 한마디...").foregroundStyle(DS.Palette.textSecondary))
                 .suit(16, .regular, tracking: -0.64)
                 .foregroundStyle(DS.Palette.textPrimary)
@@ -447,5 +517,105 @@ private struct RoomInputBar: View {
 }
 
 #Preview {
-    RoomView()
+    RoomView().environment(Router())
+}
+
+// MARK: - 이모지 메뉴(피그마 "플러스 메뉴 · 이모지" 62 x 230, 검정 알약, 칸 48, 간격 8)
+
+struct FlyingEmoji: Identifiable {
+    let id = UUID()
+    let asset: String
+}
+
+struct EmojiMenu: View {
+    let onPick: (String) -> Void
+    static let items = ["B-emoji-laugh", "B-emoji-pat", "B-emoji-cheer", "B-emoji-agree"]
+    @State private var shown = false
+    var body: some View {
+        VStack(spacing: 8) {
+            ForEach(Array(Self.items.enumerated()), id: \.offset) { i, asset in
+                Button { onPick(asset) } label: {
+                    Image(asset).resizable().scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .frame(width: 48, height: 48)
+                        .background(DS.Palette.bgElevated, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .opacity(shown ? 1 : 0)
+                .offset(y: shown ? 0 : 14)
+                .scaleEffect(shown ? 1 : 0.9)
+                // 아래 칸부터 60ms 간격으로 올라온다.
+                .animation(DS.Motion.decel(0.34).delay(0.08 + Double(Self.items.count - 1 - i) * 0.06), value: shown)
+                .accessibilityLabel(["웃김", "토닥", "응원", "공감"][i])
+            }
+        }
+        .padding(6)
+        .background(.black, in: Capsule())
+        .onAppear { shown = true }
+    }
+}
+
+struct FlyingEmojiView: View {
+    let item: FlyingEmoji
+    @State private var go = false
+    var body: some View {
+        Image(item.asset).resizable().scaledToFit()
+            .frame(width: 24, height: 24)
+            .scaleEffect(go ? 2.4 : 1)
+            .offset(x: go ? 52 : 0, y: go ? -190 : 0)
+            .opacity(go ? 0 : 1)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            .padding(.leading, 36)
+            .allowsHitTesting(false)
+            .onAppear { withAnimation(DS.Motion.decel(1.0)) { go = true } }
+    }
+}
+
+/// 카카오톡 관리자 메시지처럼 가운데 한 줄로 뜨는 시스템 안내.
+struct SystemLine: View {
+    let text: String
+    var body: some View {
+        Text(text).suit(12, .medium, tracking: -0.48)
+            .foregroundStyle(DS.Palette.textPrimary)
+            .padding(.horizontal, 12).padding(.vertical, 6)
+            .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
+            .frame(maxWidth: .infinity)
+    }
+}
+
+/// 퀵슬롯(펼침과 접힘). 현장 모드 밖의 방(혼자 드르륵)에서도 같은 모양과 움직임으로 쓴다.
+struct QuickSlotDock: View {
+    let model: RoomModel
+    @State private var open = true
+    @Namespace private var ns
+
+    var body: some View {
+        if open {
+            VStack(spacing: 6) {
+                Button {
+                    withAnimation(DS.Motion.emphasizedAccel) { open = false }
+                } label: {
+                    RoundedRectangle(cornerRadius: 2).fill(.white.opacity(0.6)).frame(width: 16, height: 3)
+                        .frame(width: 44, height: 20).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("퀵슬롯 접기")
+                ForEach(model.snacks) { snack in
+                    SnackSlot(snack: snack)
+                        .matchedGeometryEffect(id: snack.id, in: ns, isSource: open)
+                        .accessibilityLabel(snack.name)
+                }
+            }
+            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.9, anchor: .top)), removal: .opacity))
+        } else {
+            Button {
+                withAnimation(DS.Motion.emphasizedDecel) { open = true }
+            } label: {
+                CollapsedDock(snacks: model.pillSnacks, ns: ns)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("퀵슬롯 열기")
+            .transition(.opacity)
+        }
+    }
 }

@@ -4,7 +4,7 @@ import SwiftUI
 struct DRRRKApp: App {
     var body: some Scene {
         WindowGroup {
-            RoomView()
+            RootView()
                 .preferredColorScheme(.dark)
                 .statusBarHidden(false)
         }
