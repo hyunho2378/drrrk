@@ -636,41 +636,20 @@ struct ObSoloAI: View {
         }
     }
 
-    /// AI 말풍선 173 x 37: 입력 중 점 셋으로 시작해 1.2초 뒤 글이 타자처럼 나타난다. 칸 크기는 처음부터 고정한다.
+    /// AI 말풍선 173 x 37: 스켈레톤 줄이 반짝이다가 1.2초 뒤 글이 타자처럼 나타난다(화면 규칙상 점 모양은 쓰지 않는다, 웹과 같음). 칸 크기는 처음부터 고정한다.
     private var aiBubble: some View {
         ZStack(alignment: .leading) {
             (Text(String(aiLine.prefix(typed))).foregroundStyle(DS.Palette.textPrimary)
                 + Text(String(aiLine.dropFirst(typed))).foregroundStyle(Color.clear))
                 .suit(12, .medium, tracking: -0.48)
                 .fixedSize()
-            ObTypingDots()
+            ObSkeleton(width: 104, height: 12, radius: 6, shimmerDelay: 0)
                 .opacity(typing ? 1 : 0)
                 .animation(ObMotion.quick, value: typing)
         }
         .padding(.horizontal, 12)
         .frame(width: 173, height: 37, alignment: .leading)
         .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 14))
-    }
-}
-
-/// 입력 중 점 셋. 차례로 위아래로 움직인다(한 바퀴 900ms).
-struct ObTypingDots: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var bob = false
-
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(0 ..< 3, id: \.self) { i in
-                Circle().fill(DS.Palette.textSecondary)
-                    .frame(width: 5, height: 5)
-                    .offset(y: bob ? -3 : 0)
-                    .animation(bob ? ObMotion.standard(0.45).repeatForever(autoreverses: true).delay(Double(i) * 0.15) : nil, value: bob)
-            }
-        }
-        .task {
-            guard !reduceMotion else { return }
-            bob = true
-        }
     }
 }
 
