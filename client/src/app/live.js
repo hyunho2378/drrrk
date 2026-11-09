@@ -814,7 +814,7 @@ function tick() {
   if (!rule || !current.go) return;
   for (const step of rule) {
     // 그 단계의 화면(1분 전 40)에 이미 와 있으면 지나간 것으로 센다. 안 그러면 40에서 일반 모드로 갈 때 0.5초 뒤 40으로 되돌아왔다(11/09 QA).
-    if (left <= step.at && step.to === current.n) room.fired[step.at] = true;
+    if (step.to === current.n) room.fired[step.at] = true;
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
       room.fired[step.at] = true;
       current.go({ to: step.to, t: 'fade' });

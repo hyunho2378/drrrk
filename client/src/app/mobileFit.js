@@ -105,9 +105,15 @@ export function fitMobile(container, root, visibleH) {
     // 바닥 요소는 스크롤되는 내용 위에 놓는다.
     if (pinned.has(k) && rest > 0) k.el.style.zIndex = String(M.pinZ);
   });
+  // 창이 피그마 화면보다 길면(delta가 음수) 화면 바닥을 그만큼 늘려 바닥 요소가 잘리지 않게 한다. 늘어난 칸은 같은 바탕색이다.
+  if (delta < 0) {
+    root.style.height = H0 - delta + 'px';
+    if (!root.style.backgroundColor) root.style.backgroundColor = '#121415';
+  }
   // 피그마 스크롤 칸은 보이는 높이까지만 남긴다(안쪽 내용은 그대로 스크롤된다).
   native.forEach((k) => {
     if (delta > 0) k.el.style.height = Math.max(0, H0 - delta - k.t) + 'px';
+    else if (delta < 0 && k.b >= H0 - 100) k.el.style.height = k.h - delta + 'px';
   });
   // 누르는 자리도 그 아래 요소와 같이 옮긴다.
   container.querySelectorAll('[data-hotspot]').forEach((b) => {
