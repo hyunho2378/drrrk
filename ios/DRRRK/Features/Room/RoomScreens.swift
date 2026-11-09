@@ -1,7 +1,7 @@
 import SwiftUI
 
 // 방 묶음 화면. 값은 팀 피그마(일반 모드 1647:23954, 이름 탭 1952:16328, 미니 프로필 1952:15659 / 15800,
-// 신고 1647:22101, 차단 1647:22209, 혼자 드르륵 1647:24874 / 1804:12770, 종료 1647:26726, 아침 1647:26876,
+// 신고 1647:22101, 차단 1647:22209, 혼자 드르륵 1647:24874 / 1804:12770, 종료 2023:30658, 아침 1647:26876,
 // 오늘 나눈 대화 1647:27027)에서 읽었다. 동작은 웹 room.js와 live.js를 따른다.
 
 // MARK: - 공용
@@ -909,7 +909,7 @@ private struct FoundModal: View {
 }
 
 // MARK: - 종료, 아침, 오늘 나눈 대화
-// 피그마 "종료"(1647:26726), "DRRRK / 아침"(1647:26876), "DRRRK / 오늘 나눈 대화"(1647:27027)의 자리와 글자 값을 그대로 옮겼다.
+// 피그마 "종료"(2023:30658, 옛 1647:26726을 대신함), "DRRRK / 아침"(1647:26876), "DRRRK / 오늘 나눈 대화"(1647:27027)의 자리와 글자 값을 그대로 옮겼다.
 // 글자는 모두 SUIT, 행간 140%, 자간 -4%다.
 
 private extension View {
@@ -1022,6 +1022,9 @@ private struct BestCard: View {
     let likes: String?
     let asset: String
     var dark = true
+    /// 종료(2023:30715, 30723, 30729)와 오늘 나눈 대화(2023:30479, 30487, 30493)의 "의자 프로필" 24 원은
+    /// 피그마에서 원째(#121415 바탕과 28 x 28 그림을 원으로 자른 모양) 내보낸 M-end-avatar 그림을 그대로 쓴다.
+    var exported = false
     /// 웹 taps.js thumbs와 같이 따봉을 누르면 수가 하나 오르고 다시 누르면 내려간다.
     @State private var liked = false
     @State private var pop = false
@@ -1029,9 +1032,13 @@ private struct BestCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 // 피그마 Thumb 24 원 안에서 의자 그림(Chair 24 x 24)이 4 아래로 내려가 있다(1647:26800, 26815, 26828).
-                Image(asset).resizable().scaledToFill().frame(width: 24, height: 24).offset(y: 4)
-                    .frame(width: 24, height: 24)
-                    .background(dark ? DS.Palette.bgSurface : .clear).clipShape(Circle())
+                if exported {
+                    Image(asset).resizable().frame(width: 24, height: 24)
+                } else {
+                    Image(asset).resizable().scaledToFill().frame(width: 24, height: 24).offset(y: 4)
+                        .frame(width: 24, height: 24)
+                        .background(dark ? DS.Palette.bgSurface : .clear).clipShape(Circle())
+                }
                 Text(name).fig(12, .bold, DS.Palette.textSecondary)
             }
             HStack(alignment: .center, spacing: 8) {
@@ -1067,27 +1074,43 @@ private struct BestCard: View {
 }
 
 /// 04 대화 상대 추천: 양쪽 화살표와 의자 세 칸. 최대 두 명까지 고른다.
-/// 아침(1647:26978)과 오늘 나눈 대화(1647:27114): 화살표 28 x 84, 칸 80, 이름 16, 줄은 왼쪽 붙임(24에서 360까지).
+/// 아침(1647:26978): 화살표 28 x 84(왼쪽 30%), 칸 80, 이름 16, 줄은 왼쪽 붙임(24에서 360까지), "1명 선택 · 최대 2명".
 /// 피그마 그대로 택배상자와 스툴의 얼굴은 80 x 84, 소파 얼굴은 80 x 80이고 의자 그림 84 x 84를 얼굴 왼쪽 위에 맞춰 자른다.
-/// 종료(1647:26845): 화살표 24 x 72, 칸 72, 이름 12, 줄은 가운데(43에서 347까지), 고른 칸에 하늘색 테두리 2, 첫 칸은 노란 의자 "새벽2시 드르륵 칵".
+/// compact는 오늘 나눈 대화 04 묶음(2023:30497): 화살표 24 x 72(왼쪽 30%), 칸 72, 이름 12, 줄은 가운데(43에서 347까지),
+/// 칸은 "진실의 의자10", "새벽2시 피시방"(고른 상태, 하늘색), "딱딱한 나무 스툴12". 칸 그림은 72 원(#222628)과 의자 56을
+/// 한 장으로 내보낸 M-end-pick 그림이다.
 /// 웹 taps.js chairPicker와 같은 동작: 의자를 누르면 이름이 하늘색이 되고 그림이 살짝(1.06배) 튄다. 세 번째를 고르면 처음 고른 의자가 빠진다.
 /// 오른쪽 화살표는 줄을 한 칸 왼쪽으로 밀며(300ms) 첫 칸을 옅게 빼서 맨 뒤에 다시 들이고(160ms), 왼쪽 화살표는 그 반대다.
 private struct RecommendPicker: View {
-    var cell: CGFloat = 80
-    var showCount = true
-    var compact = false
+    let cell: CGFloat
+    let showCount: Bool
+    let compact: Bool
     /// 고른 순서대로 쌓는다. 맨 앞이 처음 고른 의자다.
-    @State private var picked: [String] = ["sofa"]
+    @State private var picked: [String]
     /// 지금 줄에 놓인 순서
-    @State private var order: [String] = ["box", "sofa", "stool"]
+    @State private var order: [String]
     @State private var shift: CGFloat = 0
     @State private var hidden: String?
     @State private var bump: String?
     @State private var busy = false
     private let gap: CGFloat = 12
+
+    init(cell: CGFloat = 80, showCount: Bool = true, compact: Bool = false) {
+        self.cell = cell
+        self.showCount = showCount
+        self.compact = compact
+        _picked = State(initialValue: compact ? ["swivel"] : ["sofa"])
+        _order = State(initialValue: compact ? ["lime", "swivel", "stool"] : ["box", "sofa", "stool"])
+    }
+
     private var people: [String: (String, String)] {
-        ["box": compact ? ("새벽2시\n드르륵 칵", "B-chair-yellow") : ("새벽2시\n택배상자", "B-chair-box"),
-         "sofa": ("따뜻한\n가죽소파29", "B-chair-sofa"), "stool": ("딱딱한\n나무 스툴12", "B-chair-stool")]
+        compact
+            ? ["lime": ("진실의\n의자10", "M-end-pick-lime"),
+               "swivel": ("새벽2시\n피시방", "M-end-pick-swivel"),
+               "stool": ("딱딱한\n나무 스툴12", "M-end-pick-stool")]
+            : ["box": ("새벽2시\n택배상자", "B-chair-box"),
+               "sofa": ("따뜻한\n가죽소파29", "B-chair-sofa"),
+               "stool": ("딱딱한\n나무 스툴12", "B-chair-stool")]
     }
 
     private var stepWidth: CGFloat {
@@ -1095,7 +1118,7 @@ private struct RecommendPicker: View {
     }
 
     private func faceHeight(_ key: String) -> CGFloat {
-        compact || key == "sofa" ? cell : cell + 4
+        key == "sofa" ? cell : cell + 4
     }
 
     private func toggle(_ key: String) {
@@ -1159,12 +1182,17 @@ private struct RecommendPicker: View {
                         let on = picked.contains(key)
                         Button { toggle(key) } label: {
                             VStack(spacing: 8) {
-                                Image(p.1).resizable().scaledToFill()
-                                    .frame(width: compact ? cell : cell + 4, height: compact ? cell : cell + 4)
-                                    .frame(width: cell, height: faceHeight(key), alignment: .topLeading)
-                                    .background(DS.Palette.bgSurface).clipShape(Capsule())
-                                    .overlay(Capsule().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(compact && on ? 1 : 0))
-                                    .scaleEffect(bump == key ? 1.06 : 1)
+                                Group {
+                                    if compact {
+                                        Image(p.1).resizable().frame(width: cell, height: cell)
+                                    } else {
+                                        Image(p.1).resizable().scaledToFill()
+                                            .frame(width: cell + 4, height: cell + 4)
+                                            .frame(width: cell, height: faceHeight(key), alignment: .topLeading)
+                                            .background(DS.Palette.bgSurface).clipShape(Capsule())
+                                    }
+                                }
+                                .scaleEffect(bump == key ? 1.06 : 1)
                                 Text(p.0).fig(compact ? 12 : 16, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
                                     .multilineTextAlignment(.center).fixedSize()
                             }
@@ -1200,25 +1228,109 @@ private struct RecommendPicker: View {
     }
 }
 
-/// 리포트 본문(엉따 카드부터 추천까지). 피그마 Report 묶음의 순서와 간격.
+/// 종료 04 대화 상대 추천(2023:30737): 가운데 의자 한 개를 크게 보여 주고 좌우 화살표로 한 칸씩 넘긴다.
+/// 피그마 값: 줄 304(43에서 347까지) = 화살표 24 x 72, 사이 8, 칸 자리 240, 사이 8, 화살표 24 x 72. 칸 72 x 116은 240 가운데(159).
+/// 그림은 72 원(#222628)과 의자 56(8, 8)을 한 장으로 내보낸 M-end-pick 그림, 이름 12 Medium 가운데.
+/// 피그마 첫 모습은 "차가운 새벽의자92"이고 왼쪽 화살표가 또렷하고 오른쪽 화살표가 30%다. 그래서 이 의자를 줄의 마지막 칸으로 두고
+/// 끝에 닿은 쪽 화살표를 30%로 흐리게 한다. 나머지 칸은 같은 방 의자(오늘 나눈 대화 2023:30510, 30515, 30520 칸)다.
+/// 가운데 의자를 누르면 이름이 하늘색으로 켜지고 꺼진다(피그마에 고른 상태 그림이 없어 이름 색만 바꾼다). 최대 두 명이고,
+/// 세 번째를 고르면 처음 고른 의자가 빠진다(웹 taps.js chairPicker와 같은 규칙).
+private struct SingleChairPicker: View {
+    private let chairs: [(key: String, name: String, asset: String)] = [
+        ("lime", "진실의\n의자10", "M-end-pick-lime"),
+        ("swivel", "새벽2시\n피시방", "M-end-pick-swivel"),
+        ("stool", "딱딱한\n나무 스툴12", "M-end-pick-stool"),
+        ("white", "차가운\n새벽의자92", "M-end-pick-white"),
+    ]
+    @State private var index = 3
+    @State private var picked: [String] = []
+    @State private var forward = true
+    @State private var bump = false
+
+    private func go(_ dir: Int) {
+        let next = index + dir
+        guard chairs.indices.contains(next) else { return }
+        UISelectionFeedbackGenerator().selectionChanged()
+        forward = dir > 0
+        withAnimation(DS.Motion.standard) { index = next }
+    }
+
+    private func toggle(_ key: String) {
+        withAnimation(DS.Motion.stateIn) {
+            if let i = picked.firstIndex(of: key) {
+                picked.remove(at: i)
+            } else {
+                picked.append(key)
+                if picked.count > 2 { picked.removeFirst() }
+            }
+        }
+        UISelectionFeedbackGenerator().selectionChanged()
+        guard picked.contains(key) else { return }
+        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = true }
+        Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = false }
+        }
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            arrow(left: true)
+            ZStack(alignment: .top) {
+                let chair = chairs[index]
+                let on = picked.contains(chair.key)
+                Button { toggle(chair.key) } label: {
+                    VStack(spacing: 8) {
+                        Image(chair.asset).resizable().frame(width: 72, height: 72)
+                            .scaleEffect(bump ? 1.06 : 1)
+                        Text(chair.name).fig(12, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
+                            .multilineTextAlignment(.center).fixedSize()
+                    }
+                    .frame(width: 72, height: 116, alignment: .top)
+                }
+                .buttonStyle(PressStyle())
+                .accessibilityAddTraits(on ? .isSelected : [])
+                .id(chair.key)
+                .transition(.asymmetric(
+                    insertion: .offset(x: forward ? 84 : -84).combined(with: .opacity),
+                    removal: .offset(x: forward ? -84 : 84).combined(with: .opacity)
+                ))
+            }
+            .frame(width: 240, height: 116)
+            .clipped()
+            arrow(left: false)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    /// 화살표 24 x 72(아이콘 24가 세로 가운데). 끝에 닿은 쪽은 피그마처럼 30%로 흐리고 누르지 않는다.
+    private func arrow(left: Bool) -> some View {
+        let atEnd = left ? index == 0 : index == chairs.count - 1
+        return Button { go(left ? -1 : 1) } label: {
+            Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
+                .foregroundStyle(DS.Palette.textPrimary)
+                .rotationEffect(.degrees(left ? 0 : 180))
+                .opacity(atEnd ? 0.3 : 1)
+                .frame(width: 24, height: 72)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(PressStyle())
+        .disabled(atEnd)
+        .accessibilityLabel(left ? "이전 의자" : "다음 의자")
+    }
+}
+
+/// 리포트 본문. 피그마 Report 묶음의 순서와 간격.
+/// 종료(2023:30661): 엉따 카드, 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(머리와 줄 사이 24, 의자 한 개), 묶음 사이 36.
+/// 오늘 나눈 대화(2023:30425): 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(24, 의자 세 칸), 묶음 사이 36.
+/// 아침(1647:26878): 엉따 카드, 오늘 나눈 대화(20), 오늘의 베스트 댓글, 도움이 된 의자(12, 선택 수, 의자 세 칸), 묶음 사이 40.
 private struct ReportBody: View {
     let kind: ReportKind
     var body: some View {
-        VStack(alignment: .leading, spacing: kind == .end ? 36 : 40) {
+        VStack(alignment: .leading, spacing: kind == .morning ? 40 : 36) {
             if kind != .summary { WarmthCard() }
-            TalkTimeline(gap: kind == .end ? 12 : 20, morning: kind == .morning)
-            // 오늘 나눈 대화(1647:27028)에는 댓글 묶음이 없다. 종료(1647:26791)와 아침(1647:26924)만 있다.
-            if kind == .end {
-                VStack(alignment: .leading, spacing: 12) {
-                    SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요")
-                    // 종료 1647:26796, 26810, 26825: 이름과 그림 짝은 피그마 그대로(첫 카드 이름 "진실의 의자10"에 소파 그림, 둘째 "따딱한 나무 스툴12"에 택배상자 그림, 셋째 "새벽2시 피시방"에 스툴 그림)
-                    VStack(spacing: 8) {
-                        BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "B-chair-sofa", dark: false)
-                        BestCard(name: "따딱한 나무 스툴12", text: "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ", likes: nil, asset: "B-chair-box")
-                        BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "B-chair-stool")
-                    }
-                }
-            } else if kind == .morning {
+            TalkTimeline(gap: kind == .morning ? 20 : 12, morning: kind == .morning)
+            if kind == .morning {
                 VStack(alignment: .leading, spacing: 12) {
                     SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
                     VStack(spacing: 8) {
@@ -1227,16 +1339,34 @@ private struct ReportBody: View {
                         BestCard(name: "딱딱한 나무 스툴12", text: "걍 물어보면 안됨? 나 저런 애들 이해가 안돼", likes: "11", asset: "B-chair-stool")
                     }
                 }
-            }
-            VStack(alignment: .leading, spacing: kind == .end ? 16 : 12) {
-                SectionHead(title: kind == .end ? "도움이 된 유저가 있었나요?" : "도움이 된 의자가 있었나요?", desc: "좋은 이야기를 나눠준 유저를 추천해주세요")
-                RecommendPicker(cell: kind == .end ? 72 : 80, showCount: kind != .end, compact: kind == .end)
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionHead(title: "도움이 된 의자가 있었나요?", desc: "좋은 이야기를 나눠준 유저를 추천해주세요")
+                    RecommendPicker(cell: 80, showCount: true, compact: false)
+                }
+            } else {
+                // 종료 2023:30711과 오늘 나눈 대화 2023:30475: 아바타는 연두 의자(33871c043e), 나무 스툴(51be0a544b), 회색 바퀴 의자(f77c03c1bf).
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요")
+                    VStack(spacing: 8) {
+                        BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "M-end-avatar-lime", exported: true)
+                        BestCard(name: "따딱한 나무 스툴12", text: "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ", likes: nil, asset: "M-end-avatar-stool", exported: true)
+                        BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "M-end-avatar-swivel", exported: true)
+                    }
+                }
+                VStack(alignment: .leading, spacing: 24) {
+                    SectionHead(title: "도움이 된 유저가 있었나요?", desc: "좋은 이야기를 나눠준 유저를 추천해주세요")
+                    if kind == .end {
+                        SingleChairPicker()
+                    } else {
+                        RecommendPicker(cell: 72, showCount: false, compact: true)
+                    }
+                }
             }
         }
     }
 }
 
-/// 아래 두 버튼(346 x 46 알약, 모서리 28 / 글자 버튼). 피그마 btn과 "새 방 만들기".
+/// 아래 두 버튼(342 x 46, 모서리 28 / 글자 버튼, 사이 12). 피그마 btn과 둘째 글자.
 private struct ReportButtons: View {
     let primary: String
     let secondary: String
@@ -1259,8 +1389,9 @@ private struct ReportButtons: View {
     }
 }
 
-/// 결과 화면 틀. 뒤로 가기(24, 79)와 본문 스크롤. 아침과 오늘 나눈 대화는 아래 버튼이 검은 그라데이션 위에 고정되고,
-/// 종료는 긴 화면 맨 끝에 버튼이 붙는다.
+/// 결과 화면 틀. 뒤로 가기(24, 79)와 본문 스크롤. 아침과 오늘 나눈 대화는 아래 버튼이 검은 그라데이션(632에서 844, 높이 212) 위에 고정되고,
+/// 종료는 긴 화면(1708) 맨 끝에 버튼이 붙는다(본문 끝 1548, 버튼 1590, 아래 여백 40).
+/// 고정 버튼 화면은 본문 끝에 그라데이션 높이(212)만큼 빈 자리를 두어 맨 아래까지 밀면 마지막 줄이 버튼 묶음(위 726) 위로 올라온다.
 private struct ReportScreen: View {
     let kind: ReportKind
     @Environment(Router.self) private var router
@@ -1308,7 +1439,7 @@ private struct ReportScreen: View {
         .accessibilityLabel("뒤로")
     }
 
-    /// 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작. 아침(1951:20746)과 종료(2023:11803)가 같은 그림(해시 23749c04da)이다.
+    /// 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작. 아침(1951:20746)과 종료(2023:30769)가 같은 그림(해시 23749c04da)이다.
     private var hero: some View {
         Image("B-morning-sun").resizable().scaledToFit().frame(width: 146, height: 146)
             .frame(maxWidth: .infinity).padding(.top, 273 - 240).padding(.bottom, 452 - 419)
