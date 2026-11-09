@@ -20,12 +20,13 @@ export function V1() {
             <Txt x={36} y={6} w={91} h={14} size={11} weight={500} color={WHITE}><Typed text="둘이 찍은 사진인데…" t={400} /></Txt>
           </div>
         </div>
-        {AVATARS.map((a, k) => <Avatar key={a} x={11 + k * 43} y={66} src={OB2 + a + '.webp'} t={540 + k * 80} />)}
-        <Skel x={30} y={124} w={170} h={14} r={7} t={940} />
-        <Skel x={55} y={148} w={120} h={14} r={7} t={1000} />
+        {/* 11/10 사용자: 한꺼번에 튀어나오는 것이 많고 끝이 급하다. 아바타는 팝 없이 한 묶음으로 올라오고, 글 줄은 같이, 칩은 한 박자 뒤에 나온다. */}
+        {AVATARS.map((a, k) => <Avatar key={a} x={11 + k * 43} y={66} src={OB2 + a + '.webp'} t={720 + k * 40} pop={false} />)}
+        <Skel x={30} y={124} w={170} h={14} r={7} t={1200} />
+        <Skel x={55} y={148} w={120} h={14} r={7} t={1240} />
       </Panel>
-      <Chip x={194} y={168} w={104} h={32} bg={DARK} t={1080}>
-        <div style={{ ...abs(12, 8, 16, 16), ...an('obTilt', 1440, 360, ST) }}><Icon name="home-chair-1620-22984" color={SKY} style={{ width: 16, height: 16 }} /></div>
+      <Chip x={194} y={168} w={104} h={32} bg={DARK} t={1700}>
+        <div style={{ ...abs(12, 8, 16, 16), ...an('obTilt', 2060, 360, ST) }}><Icon name="home-chair-1620-22984" color={SKY} style={{ width: 16, height: 16 }} /></div>
         <Txt x={34} y={8.5} w={56} h={15} size={12} weight={700} color={WHITE}>함께 드르륵</Txt>
       </Chip>
     </>

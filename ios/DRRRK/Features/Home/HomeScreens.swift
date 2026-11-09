@@ -288,8 +288,11 @@ struct AnalysisView: View {
     var body: some View {
         Canvas390(background: DS.Palette.bgOverlay) {
             BackChevron { router.pop() }.at(14, 69)
-            // 피그마 1647:23519 의자 그림 133 x 133(114.1, 232.5). 링 아래에 깔리고 원으로 자르지 않는다.
-            Image("A-analysis-chair").resizable().frame(width: 133, height: 133).at(114.1, 232.5)
+            // 피그마 1647:23519 의자 그림 133 x 133, 반시계 15도 회전(왼쪽 위 모서리 기준 114.05, 232.48). 회전 후 중심이 링 중심(195, 280)에 오는데,
+            // 회전 없이 왼쪽 위 모서리만 맞추면 중심이 (180.6, 299)로 어긋난다. 그래서 중심(195.49, 279.50)에 맞추고 중심을 기준으로 돌린다. 링 아래에 깔리고 원으로 자르지 않는다.
+            Image("A-analysis-chair").resizable().frame(width: 133, height: 133)
+                .rotationEffect(.degrees(-15), anchor: .center)
+                .at(195.49 - 66.5, 279.50 - 66.5)
             // 피그마 1647:23520, 1647:23521 링 200 x 200, 안쪽 반지름 95%(두께 5). 선 가운데 지름 195.
             ZStack {
                 Circle().stroke(DS.Palette.bgElevated, lineWidth: 5)

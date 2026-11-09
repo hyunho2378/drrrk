@@ -707,7 +707,7 @@ struct LiveWatchView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { left = Double(router.watch?.left ?? 372) }
-        .onReceive(clock) { _ in left = max(0, left - 0.25 * (1200.0 / 180.0)) }
+        .onReceive(clock) { _ in left = max(0, left - 0.25 * (RoomModel.shownSeconds / RoomModel.realSeconds)) }
     }
 
     /// 고민 묶음(24, 321): 제목 21 굵게 행간 28, "대화 중 3"(12 아래), 의자 자리 58 칸 사이 14(12 아래), 원 54 흰 바탕, 이름 11 #9AA1A6, 빈 자리 #06303C 하늘색 점선 1.5.
