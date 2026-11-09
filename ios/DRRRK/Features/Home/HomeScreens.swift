@@ -110,6 +110,8 @@ struct HomeView: View {
     /// 마지막으로 본 키보드 높이(pt). 처음에는 피그마 키보드 2047:14061 높이 303을 화면 배율로 키운 값
     @State private var lastKeyboardHeight: CGFloat = 303 * HomeView.scale
     @FocusState private var focused: Bool
+    /// 고민 분석으로 넘어가는 중(완료 키와 화살표가 겹쳐 두 번 넘어가지 않게 막는다)
+    @State private var sending = false
 
     private static var screen: CGSize {
         UIScreen.main.bounds.size
@@ -191,6 +193,7 @@ struct HomeView: View {
             withTransaction(t) { router.navLocal = now }
         }
         .onAppear {
+            sending = false
             if startUp {
                 open = true
                 focused = true
@@ -215,7 +218,8 @@ struct HomeView: View {
                 .foregroundStyle(DS.Palette.textPrimary)
                 .tint(DS.Palette.brandPrimary)
                 .focused($focused)
-                .submitLabel(.send)
+                // 시스템 키보드의 체크(완료) 키 한 번으로 키보드를 내리고 고민 분석으로 바로 넘어간다(글이 비어도, 한글 조합 중에도).
+                .submitLabel(.done)
                 .onSubmit(send)
                 .padding(.trailing, 16)
                 .frame(width: 256, height: 48)
@@ -256,6 +260,8 @@ struct HomeView: View {
     }
 
     private func send() {
+        guard !sending, router.path.last != .analysis else { return }
+        sending = true
         close()
         router.push(.analysis)
     }

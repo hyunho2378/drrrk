@@ -5,7 +5,8 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { BottomNavigation } from '../figma/components/BottomNavigation';
 import { getSaved, subscribe, big, KINDS } from './chairs.js';
-import { pickItem } from './my.js';
+import { pickItem, itemFrom, pickedSlot } from './my.js';
+import { cameFrom } from './lastScreen.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const EASE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
@@ -18,23 +19,24 @@ const ITEMS = [
   { name: '노가리', img: 's-nogari', count: 4 },
   { name: '드르라', img: 's-drrra', count: 2 },
   { name: '오징어', img: 's-squid', count: 1 },
-  { name: '몬스타', img: 's-monster', locked: true },
-  { name: '마지막처럼', img: 's-soju', locked: true },
+  // 잠긴 두 칸도 나의 편의점(53, 피그마 MY2)에서는 보유 칸(몬스타 5개, 마지막처럼 1개)이라 상세에 그 개수를 쓴다.
+  { name: '몬스타', img: 's-monster', locked: true, count: 5 },
+  { name: '마지막처럼', img: 's-soju', locked: true, count: 1 },
 ];
 
 const CSS = `
 @keyframes mhGauge{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes mhDim{from{opacity:0}to{opacity:1}}
-@keyframes mhUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .mh-btn{border:0;background:none;padding:0;margin:0;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;font-family:${FONT};transition:transform 120ms cubic-bezier(.2,0,0,1)}
 .mh-btn:active{transform:scale(.96)}
 .mh-btn:focus-visible{outline:2px solid #36D2FF;outline-offset:2px;border-radius:12px}
 .mh-nav [data-figma="name=my, state=selected"]{position:absolute!important;left:312px!important;top:12px!important;margin:0!important}
 `;
 
-// 마지막으로 누른 아이템 이름(54 아이템 상세가 이 이름으로 시트를 연다)
-let picked = '새우깡';
 const DESC = '라이브에서 던지면 가운데 테이블 위에 바삭하게 올라가요.';
+
+// 마이 안의 화면(나의 편의점 53, 아이템 상세 54, 스킨 팝업 19, 의자 꾸미기 20)에서 돌아오면 엉따 막대를 다시 채우지 않는다.
+const INSIDE = [36, 53, 54, 19, 20];
+const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function go(to, t = 'fade') {
   window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t } }));
@@ -50,19 +52,81 @@ function Title({ text }) {
 }
 
 /// 아이템 상세 시트(iOS MyItemSheet와 같은 값): 높이 411, #121415, 위 모서리 24. 바깥을 누르면 마이로 돌아간다.
-function ItemSheet({ name }) {
-  const it = ITEMS.find((x) => x.name === name && !x.locked) || ITEMS[0];
+// 시트는 처음부터 끝까지 불투명 단색이다. 올라올 때와 내려갈 때 모두 translateY로만 움직이고, 뒤 딤 덮개만 투명도로 나타나고 사라진다.
+// 화면 전환(페이드)이 시트를 반투명으로 섞지 않게 36과 54 사이는 전환 없이 바로 바꾸고, 시트가 스스로 올라오고 내려간다.
+function ItemSheet({ slot }) {
+  const it = ITEMS[slot] || ITEMS[0];
   const [y0, setY0] = useState(null);
   const [dy, setDy] = useState(0);
-  const close = () => go(36);
+  const sheetRef = useRef(null);
+  const dimRef = useRef(null);
+  const closing = useRef(false);
+  const [up, setUp] = useState(false);
+  const close = () => {
+    if (closing.current) return;
+    closing.current = true;
+    const sh = sheetRef.current, dm = dimRef.current;
+    const back = itemFrom() === 53 ? 53 : 36;
+    const t = back === 36 ? 'none' : 'fade';
+    if (!sh || !dm) { go(back, t); return; }
+    const r = reducedMotion();
+    const from = getComputedStyle(sh).transform;
+    const dimFrom = getComputedStyle(dm).opacity;
+    sh.getAnimations().forEach((a) => a.cancel());
+    dm.getAnimations().forEach((a) => a.cancel());
+    const a = sh.animate([{ transform: from }, { transform: 'translateY(100%)' }], { duration: r ? 120 : 260, easing: 'cubic-bezier(0.3, 0, 0.8, 0.15)', fill: 'forwards' });
+    dm.animate([{ opacity: dimFrom }, { opacity: 0 }], { duration: r ? 120 : 260, easing: 'linear', fill: 'forwards' });
+    a.onfinish = () => go(back, t);
+  };
+  // 화면이 실제로 보이는 순간(미리 그리는 동안의 opacity 0이 풀린 뒤)부터 시트를 올린다.
+  // 딜 위를 덮는 화면 이동 칸(아이템 닫기)은 페이드 전환을 쓰므로 그 누름을 가로채 시트를 내린 뒤 돌아간다.
+  useEffect(() => {
+    const sh = sheetRef.current, dm = dimRef.current;
+    if (!sh || !dm) return undefined;
+    const layer = sh.closest('.will-change-transform');
+    let raf = 0;
+    const start = () => {
+      const r = reducedMotion();
+      sh.animate([{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], { duration: r ? 120 : 340, easing: EASE, fill: 'forwards' }).onfinish = (e) => {
+        sh.style.transform = 'translateY(0px)';
+        setUp(true);
+        e.target.cancel();
+      };
+      dm.animate([{ opacity: 0 }, { opacity: 1 }], { duration: r ? 120 : 260, easing: 'linear', fill: 'forwards' }).onfinish = (e) => {
+        dm.style.opacity = '1';
+        e.target.cancel();
+      };
+    };
+    const wait = () => {
+      if (!layer || (layer.style.opacity !== '0' && getComputedStyle(layer).opacity === '1')) start();
+      else raf = requestAnimationFrame(wait);
+    };
+    wait();
+    const grab = (e) => {
+      const h = e.target.closest && e.target.closest('[data-hotspot][aria-label="아이템 닫기"]');
+      if (!h) return;
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    };
+    if (layer) layer.addEventListener('click', grab, true);
+    return () => {
+      cancelAnimationFrame(raf);
+      if (layer) layer.removeEventListener('click', grab, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
-      <div onClick={close} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.6)', animation: `mhDim 260ms ${EASE} both`, zIndex: 10 }} />
+      <div ref={dimRef} onClick={close} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.6)', opacity: up ? 1 : 0, zIndex: 10 }} />
+      {/* 이름표의 bottom sheet: 53에서 페이드 전환(morph)으로 열릴 때 전환이 이 칸을 시트로 보고 위치만 옮기게 한다(투명도로 섞지 않는다). */}
       <div
-        onPointerDown={(e) => setY0(e.clientY)}
+        data-figma="bottom sheet · 아이템 상세"
+        ref={sheetRef}
+        onPointerDown={(e) => { if (up && !closing.current) setY0(e.clientY); }}
         onPointerMove={(e) => { if (y0 != null) setDy(Math.max(0, e.clientY - y0)); }}
-        onPointerUp={() => { if (dy > 120) close(); setY0(null); setDy(0); }}
-        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 411, background: '#121415', borderRadius: '24px 24px 0 0', zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 24px', boxSizing: 'border-box', transform: dy ? 'translateY(' + dy + 'px)' : undefined, animation: dy ? undefined : `mhUp 340ms ${EASE} both`, touchAction: 'none' }}>
+        onPointerUp={() => { if (dy > 120) close(); else setDy(0); setY0(null); }}
+        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 411, background: '#121415', borderRadius: '24px 24px 0 0', zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 24px', boxSizing: 'border-box', transform: !up ? 'translateY(100%)' : 'translateY(' + dy + 'px)', touchAction: 'none' }}>
         <span style={{ width: 40, height: 4, borderRadius: 2, background: '#6E767C', marginTop: 10 }} />
         <span style={{ marginTop: 24, width: 132, height: 132, borderRadius: 28, background: 'rgba(255,255,255,.06)', display: 'grid', placeItems: 'center' }}>
           <img alt="" src={A + it.img + '.png'} style={{ width: 112, height: 112, objectFit: 'contain' }} />
@@ -79,15 +143,17 @@ function ItemSheet({ name }) {
   );
 }
 
-// 54 아이템 상세가 열 아이템 이름. 화면 함수(MyItem)를 이 파일에서 내보내면 화면 목록이 36번에도 MyItem을 골라
-// 마이가 늘 시트가 열린 채로 떴다(11/09). 그래서 MyItem은 MyItem.jsx에 두고 여기서는 이름만 내보낸다.
-export const pickedItem = () => picked;
+// 54 아이템 상세가 열 칸 번호(0~7). 36에서 누른 칸과 53에서 누른 칸 모두 my.js 한곳에 적고 여기서 읽는다.
+// 화면 함수(MyItem)를 이 파일에서 내보내면 화면 목록이 36번에도 MyItem을 골라 마이가 늘 시트가 열린 채로 떴다(11/09). 그래서 MyItem은 MyItem.jsx에 둔다.
+export const pickedItem = () => pickedSlot();
 
 export default function MyHome({ item }) {
   const saved = useSyncExternalStore(subscribe, getSaved, getSaved);
   const [chairOk, setChairOk] = useState(true);
   useEffect(() => setChairOk(true), [saved.k, saved.c]);
   const kind = KINDS[saved.k];
+  // 엉따 막대는 다른 화면에서 마이로 들어올 때만 채운다. 마이 안의 화면에서 돌아오면 처음부터 최종 길이다.
+  const [fillGauge] = useState(() => !INSIDE.includes(cameFrom(item != null ? 54 : 36)));
   const step = (342 - 76) / 3;
   // 생성된 아래 탭은 마이 칸이 오른쪽 밖으로 밀리고 글자가 MY로 나온다. 피그마 자리(312, 12)와 글자 "마이"로 맞춘다.
   const navRef = useRef(null);
@@ -138,7 +204,7 @@ export default function MyHome({ item }) {
           </svg>
         </span>
         <div style={{ position: 'relative', marginTop: 12, width: 342, height: 6, borderRadius: 3, background: 'rgba(110,118,124,.4)', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', left: 0, top: 0, width: 244.8, height: 6, borderRadius: 3, background: 'linear-gradient(90deg,#36D2FF,#FF9A4D)', transformOrigin: '0 50%', animation: `mhGauge 1000ms ${EASE} 200ms both` }} />
+          <div style={{ position: 'absolute', left: 0, top: 0, width: 244.8, height: 6, borderRadius: 3, background: 'linear-gradient(90deg,#36D2FF,#FF9A4D)', transformOrigin: '0 50%', animation: fillGauge ? `mhGauge 1000ms ${EASE} 200ms both` : undefined }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 40, marginTop: 12 }}>
           <img alt="" src={A + 'next.png'} style={{ width: 40, height: 40 }} />
@@ -164,7 +230,7 @@ export default function MyHome({ item }) {
       <div style={{ position: 'absolute', left: 24, top: 534, width: 342, height: 198 }}>
         {ITEMS.map((it, i) => (
           <button key={i} className="mh-btn" aria-label={it.locked ? '잠긴 칸' : it.name}
-            onClick={() => { if (it.locked) return; picked = it.name; pickItem(it.name, 36); go(54); }}
+            onClick={() => { if (it.locked) return; pickItem(it.name, 36, i); go(54, 'none'); }}
             style={{ position: 'absolute', left: (i % 4) * step, top: Math.floor(i / 4) * 105, width: 76, height: 93, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, cursor: it.locked ? 'default' : 'pointer' }}>
             <span style={{ position: 'relative', width: 72, height: 72, display: 'grid', placeItems: 'center' }}>
               <img alt="" src={A + it.img + '.png'} style={{ width: 68, height: 68, objectFit: 'contain', opacity: it.locked ? 0.35 : 1 }} />
@@ -178,7 +244,7 @@ export default function MyHome({ item }) {
       <div ref={navRef} className="mh-nav" style={{ position: 'absolute', left: 0, top: 760, width: 390, height: 84, overflow: 'hidden' }}>
         <BottomNavigation active="my" />
       </div>
-      {item && <ItemSheet name={item} />}
+      {item != null && <ItemSheet slot={item} />}
     </div>
   );
 }

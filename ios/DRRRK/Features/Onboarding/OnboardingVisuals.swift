@@ -92,7 +92,7 @@ struct ObTogetherMatch: View {
     }
 }
 
-// MARK: - 함께 드르륵 2(1829:11227): 말풍선 스켈레톤, 이모지 메뉴, + 버튼, 날아가는 하트
+// MARK: - 함께 드르륵 2(원본 이모지 버전 1955:12271, Visual 1955:12292): 말풍선 스켈레톤, 이모지 메뉴(세로) 넷, + 버튼, 이모지 궤적
 
 struct ObTogetherEmoji: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -100,9 +100,14 @@ struct ObTogetherEmoji: View {
     @State private var selected = 1
     @State private var flights: [ObEmojiFlight] = []
     @State private var nextID = 0
-    /// emoji 웃음, 하트(선택), 놀람. 메뉴 안 y 4, 34, 65
-    private let glyphs = ["N-ob-glyph-smile", "N-ob-glyph-heart", "N-ob-glyph-wow"]
-    private let rowY: [CGFloat] = [4, 34, 65]
+    /// emoji / 웃김(1955:12365), 토닥(선택, 1955:12372), 응원(1955:12379), 공감(1955:12388). 안쪽 Reaction Emoji 18 x 18을 SVG로 내보냄
+    private let glyphs = ["P-ob-emoji-funny", "P-ob-emoji-pat", "P-ob-emoji-cheer", "P-ob-emoji-empathy"]
+    /// 공감 그림은 피그마 내보내기 폭이 19(그룹 18.03)라 폭만 19로 둔다.
+    private let glyphWidth: [CGFloat] = [18, 18, 18, 19]
+    /// 메뉴 안 y(세로 오토레이아웃 위 여백 3.3, 간격 4.4에서 나온 피그마 값)
+    private let rowY: [CGFloat] = [3.85, 34.25, 64.65, 95.05]
+    /// 메뉴 자리(패널 기준 16, 8)
+    private let menuOrigin = CGPoint(x: 16, y: 8)
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -113,20 +118,17 @@ struct ObTogetherEmoji: View {
                 ObSkeleton(width: 96, height: 24, radius: 12, shimmerDelay: 0.78)
                     .offset(x: 72, y: 54)
                     .obEnter(on, 0.28, sx: 0, anchor: .leading)
-                menu.offset(x: 16, y: 10)
-                    .obEnter(on, 0.45, sy: 0.4, anchor: .bottom)
-                plusButton.offset(x: 16, y: 114)
+                plusButton.offset(x: 16, y: 135)
                     .obEnter(on, 0.3, scale: 0.6, animation: ObMotion.pop)
-                // 하트 날아가는 반응(166, 96, 36 x 36): 선택한 하트 자리에서 날아와 멈춘다.
-                Image("N-ob-heart-fly").resizable().frame(width: 30, height: 26)
-                    .shadow(color: DS.Palette.bgSurface.opacity(0.14), radius: 6, x: 0, y: 6)
-                    .frame(width: 36, height: 36, alignment: .topLeading)
-                    .offset(x: 3, y: 6)
-                    .offset(x: 166, y: 96)
-                    .obEnter(on, 0.95, scale: 0.5, dx: -151, dy: -57, animation: ObMotion.decel(0.5))
+                menu.offset(x: menuOrigin.x, y: menuOrigin.y)
+                    .obEnter(on, 0.45, sy: 0.4, anchor: .bottom)
+                // 가만히 있을 때의 궤적(피그마 1969:18581, 1969:18587, 1969:18593). 날아가는 동안에는 숨기고 끝나면 다시 보인다.
+                ObEmojiTrailRest()
+                    .opacity(on && flights.isEmpty ? 1 : 0)
+                    .animation(reduceMotion ? nil : ObMotion.standard(0.3), value: flights.isEmpty)
+                    .animation(reduceMotion ? nil : ObMotion.standard(0.4).delay(0.9), value: on)
                 ForEach(flights) { flight in
-                    ObFlyingEmoji(glyph: glyphs[flight.emoji])
-                        .offset(x: 20, y: 10 + rowY[flight.emoji])
+                    ObEmojiTrail(origin: origin(of: flight.emoji))
                 }
             }
             .offset(x: 48, y: 44)
@@ -134,7 +136,7 @@ struct ObTogetherEmoji: View {
         }
         .task {
             on = true
-            guard !reduceMotion, await obWait(1.8) else { return }
+            guard !reduceMotion, await obWait(2.6) else { return }
             fly(selected)
             // 15초마다 한 번씩 이모지 날리기를 다시 보여 준다.
             while await obWait(15) {
@@ -143,7 +145,7 @@ struct ObTogetherEmoji: View {
         }
     }
 
-    /// 플러스 메뉴 이모지(세로) 34 x 96, 검정, 반경 17, 안쪽 선 #222628 0.55
+    /// 플러스 메뉴 이모지(세로) 34 x 121, 검정, 반경 17, 안쪽 선 #222628 0.55. 이모지는 아래부터 60ms씩 올라온다.
     private var menu: some View {
         ZStack(alignment: .topLeading) {
             ForEach(glyphs.indices, id: \.self) { i in
@@ -158,18 +160,21 @@ struct ObTogetherEmoji: View {
                 .obEnter(on, 0.55 + Double(glyphs.count - 1 - i) * 0.06, dy: 10)
             }
         }
-        .frame(width: 34, height: 96, alignment: .topLeading)
+        .frame(width: 34, height: 121, alignment: .topLeading)
         .background {
             RoundedRectangle(cornerRadius: 17).fill(DS.Palette.bgBase)
                 .overlay(RoundedRectangle(cornerRadius: 17).strokeBorder(DS.Palette.bgElevated, lineWidth: 0.55))
         }
     }
 
+    /// emoji 26 x 26(#222628 원) 안 4, 4 자리에 Reaction Emoji 18 x 18. 선택 표시는 바깥 선 1.5, 하늘색
     private func emojiChip(_ i: Int) -> some View {
-        Image(glyphs[i]).resizable().frame(width: 26, height: 26)
+        Image(glyphs[i]).resizable().frame(width: glyphWidth[i], height: 18)
+            .frame(width: 18, height: 18, alignment: .topLeading)
+            .offset(x: 4, y: 4)
+            .frame(width: 26, height: 26, alignment: .topLeading)
             .background(DS.Palette.bgElevated, in: Circle())
             .overlay {
-                // 선택 표시(바깥 선 1.5, 하늘색)
                 Circle().inset(by: -0.75).stroke(DS.Palette.brandPrimary, lineWidth: 1.5)
                     .opacity(selected == i ? 1 : 0)
                     .animation(reduceMotion ? nil : ObMotion.quick, value: selected)
@@ -188,11 +193,16 @@ struct ObTogetherEmoji: View {
         .buttonStyle(PressStyle())
     }
 
+    /// 누른 이모지 칸의 가운데(패널 기준)
+    private func origin(of emoji: Int) -> CGPoint {
+        CGPoint(x: menuOrigin.x + 4 + 13, y: menuOrigin.y + rowY[emoji] + 13)
+    }
+
     private func fly(_ emoji: Int) {
         guard !reduceMotion else { return }
         nextID += 1
         flights.append(ObEmojiFlight(id: nextID, emoji: emoji))
-        if flights.count > 6 { flights.removeFirst(flights.count - 6) }
+        if flights.count > 4 { flights.removeFirst(flights.count - 4) }
         let id = nextID
         Task { @MainActor in
             guard await obWait(1.05) else { return }
@@ -206,21 +216,78 @@ struct ObEmojiFlight: Identifiable {
     let emoji: Int
 }
 
-/// 누른 이모지가 위로 날아가며 두 배로 커졌다 사라진다(translate 36, -120, scale 2, 1000ms).
-struct ObFlyingEmoji: View {
-    let glyph: String
-    @State private var flown = false
+/// 이모지 궤적 1(60, 138, 18, 투명 20%), 궤적 2(80, 114, 26, 45%), 날아가는 이모지 / 웃음(106, 82, 48, 그림자)의 가만히 있는 모습.
+struct ObEmojiTrailRest: View {
+    private struct Stop {
+        let x: CGFloat
+        let y: CGFloat
+        let size: CGFloat
+        let alpha: Double
+        let shadow: Bool
+    }
+
+    private let stops = [
+        Stop(x: 60, y: 138, size: 18, alpha: 0.2, shadow: false),
+        Stop(x: 80, y: 114, size: 26, alpha: 0.45, shadow: false),
+        Stop(x: 106, y: 82, size: 48, alpha: 1, shadow: true),
+    ]
 
     var body: some View {
-        Image(glyph).resizable().frame(width: 26, height: 26)
-            .background(DS.Palette.bgElevated, in: Circle())
-            .scaleEffect(flown ? 2 : 1)
-            .offset(x: flown ? 36 : 0, y: flown ? -120 : 0)
-            .opacity(flown ? 0 : 1)
-            .allowsHitTesting(false)
-            .onAppear {
-                withAnimation(ObMotion.standard(1.0)) { flown = true }
+        ZStack(alignment: .topLeading) {
+            ForEach(stops.indices, id: \.self) { i in
+                let s = stops[i]
+                Image("P-ob-emoji-fly-face").resizable().frame(width: s.size, height: s.size)
+                    .shadow(color: DS.Palette.bgSurface.opacity(s.shadow ? 0.14 : 0), radius: 6, x: 0, y: 6)
+                    .opacity(s.alpha)
+                    .offset(x: s.x, y: s.y)
             }
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+/// 이모지 궤적 1(60, 138, 18, 투명 20%), 궤적 2(80, 114, 26, 45%), 날아가는 이모지 / 웃음(106, 82, 48, 그림자)이
+/// 작은 것부터 80ms씩 차례로 누른 이모지 자리에서 커지며 제자리로 날아가고, 1.0초가 되면 모두 사라진다.
+/// 피그마 궤적 얼굴은 웃는 얼굴 하나뿐이라 어떤 이모지를 눌러도 같은 얼굴(1969:18629)이 날아간다.
+struct ObEmojiTrail: View {
+    let origin: CGPoint
+    @State private var flown = false
+    @State private var gone = false
+
+    private struct Stop {
+        let x: CGFloat
+        let y: CGFloat
+        let size: CGFloat
+        let alpha: Double
+        let shadow: Bool
+    }
+
+    private let stops = [
+        Stop(x: 60, y: 138, size: 18, alpha: 0.2, shadow: false),
+        Stop(x: 80, y: 114, size: 26, alpha: 0.45, shadow: false),
+        Stop(x: 106, y: 82, size: 48, alpha: 1, shadow: true),
+    ]
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(stops.indices, id: \.self) { i in
+                let s = stops[i]
+                Image("P-ob-emoji-fly-face").resizable().frame(width: s.size, height: s.size)
+                    .shadow(color: DS.Palette.bgSurface.opacity(s.shadow ? 0.14 : 0), radius: 6, x: 0, y: 6)
+                    .scaleEffect(flown ? 1 : 18 / s.size)
+                    .offset(x: flown ? 0 : origin.x - (s.x + s.size / 2), y: flown ? 0 : origin.y - (s.y + s.size / 2))
+                    .opacity(gone ? 0 : (flown ? s.alpha : 0))
+                    .offset(x: s.x, y: s.y)
+                    .animation(ObMotion.decel(0.42).delay(Double(i) * 0.08), value: flown)
+                    .animation(ObMotion.standard(0.3), value: gone)
+            }
+        }
+        .allowsHitTesting(false)
+        .task {
+            flown = true
+            guard await obWait(0.7) else { return }
+            gone = true
+        }
     }
 }
 

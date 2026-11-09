@@ -1,5 +1,5 @@
 // 온보딩 카드 위쪽 Visual(326 x 220)을 부품으로 다시 그린다. 팀 피그마 카드 프레임
-// 함께 드르륵 1~5(1829:11174, 11227, 11275, 11323, 11366)와 혼자 드르륵 5, 6(1647:22976, 1647:23028)의 Visual 트리 값 그대로다.
+// 함께 드르륵 1~5(1829:11174, 2장은 원본 이모지 버전 1955:12292, 1829:11275, 11323, 11366)와 혼자 드르륵 5, 6(1647:22976, 1647:23028)의 Visual 트리 값 그대로다.
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../../figma/Icon.jsx';
 import { ED, ST, OB2, IMG, SHADOW, an, abs, noop, useRM, useAfter, Txt, Typed, Skel, Panel, Avatar, Svg, RotImg, Chip } from './parts.jsx';
@@ -32,61 +32,93 @@ export function V1() {
   );
 }
 
-// 함께 드르륵 2: 이모지 반응. 이모지를 누르면 방 화면과 같은 값으로 날아간다(translate(36px, -120px) scale(2), 1000ms).
+// 함께 드르륵 2: 이모지 반응. 피그마 "함께 드르륵 2 이모지 (원본 이모지 버전)"(1955:12271) Visual(1955:12292) 값 그대로다.
+// 플러스 메뉴 이모지(세로, 1955:12297) 4개 중 누른 이모지가 선택되고, 그 얼굴이 궤적 1(1969:18581), 궤적 2(1969:18587),
+// 날아가는 이모지 / 웃음(1969:18593) 자리로 작은 것부터 커지며 날아간 뒤 1.0초에 사라진다.
+// 피그마 궤적 얼굴 벡터는 토닥 얼굴(face, feat, mouth, tear) 하나뿐이라 쉬는 모습은 fly-face, 날아가는 얼굴은 누른 이모지의 Reaction Emoji 그림을 쓴다(토닥은 fly-face).
 const EMOJI = [
-  { k: 'smile', y: 3.9 },
-  { k: 'heart', y: 34.3, on: true },
-  { k: 'surprise', y: 64.7 },
+  { k: 'funny', y: 3.9 },
+  { k: 'pat', y: 34.3 },
+  { k: 'cheer', y: 64.7 },
+  { k: 'empathy', y: 95.1, w: 19 },
 ];
+const TRAIL = [
+  { x: 60, y: 138, s: 18, op: 0.2, d: 0 },
+  { x: 80, y: 114, s: 26, op: 0.45, d: 70 },
+  { x: 106, y: 82, s: 48, op: 1, d: 140, shadow: true },
+];
+const FACE_SHADOW = 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.14))';
+const MENU = { x: 16, y: 8 };
+function Face({ k, s, shadow }) {
+  const style = shadow ? { filter: FACE_SHADOW } : undefined;
+  if (!k || k === 'pat') return <Svg name="fly-face" w={s} h={s} style={style} />;
+  // Reaction Emoji(18 x 18)는 얼굴이 0.8 안쪽에 16.5 크기로 있어 얼굴이 s를 채우게 키운다.
+  const z = s / 16.5;
+  return <Svg name={'emo-' + k} x={-0.8 * z} y={-0.8 * z} w={(k === 'empathy' ? 19 : 18) * z} h={18 * z} style={style} />;
+}
 export function V2() {
   const reduced = useRM();
-  const [flights, setFlights] = useState([]);
-  const [menu, setMenu] = useState(0);
+  const [sel, setSel] = useState('pat');
+  const [flight, setFlight] = useState(null);
+  const selRef = useRef('pat');
   const seq = useRef(0);
+  const timer = useRef(0);
   const fly = (k) => {
+    selRef.current = k;
+    setSel(k);
     if (reduced) return;
-    // 피그마 "하트 날아가는 반응"(166, 96, 36 x 36) 자리에서 떠오른다. 메뉴 자리는 Visual 위쪽 끝이라 바로 잘려 보이지 않는다.
     seq.current += 1;
-    setFlights((f) => [...f, { id: seq.current, k, x: 166 + 5, y: 96 + 5 }]);
+    const e = EMOJI.find((m) => m.k === k);
+    setFlight({ id: seq.current, k, cx: MENU.x + 4 + 13, cy: MENU.y + e.y + 13 });
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setFlight(null), 1000);
   };
   useEffect(() => {
     if (reduced) return undefined;
-    const first = window.setTimeout(() => fly('heart'), 2600);
-    const loop = window.setInterval(() => fly('heart'), 15000);
-    return () => { window.clearTimeout(first); window.clearInterval(loop); };
+    const first = window.setTimeout(() => fly(selRef.current), 2600);
+    const loop = window.setInterval(() => fly(selRef.current), 15000);
+    return () => { window.clearTimeout(first); window.clearInterval(loop); window.clearTimeout(timer.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced]);
-  const base = menu ? 0 : 420;
   return (
-    <>
-      <Panel t={60}>
-        <Skel x={72} y={20} w={120} h={24} r={12} t={300} />
-        <Skel x={72} y={54} w={96} h={24} r={12} t={360} />
-        <div key={'menu' + menu} data-figma="플러스 메뉴 이모지" style={{ ...abs(16, 10, 34, 96), transformOrigin: '50% 100%', ...an('obRise', base, 300) }}>
-          <div style={{ position: 'absolute', inset: 0, borderRadius: 17, background: '#000000', boxShadow: 'inset 0 0 0 0.55px #222628' }} />
+    <Panel t={60}>
+      <Skel x={72} y={20} w={120} h={24} r={12} t={300} />
+      <Skel x={72} y={54} w={96} h={24} r={12} t={360} />
+      <div data-figma="플러스 메뉴 이모지 (세로)" style={{ ...abs(MENU.x, MENU.y, 34, 121), transformOrigin: '50% 100%', ...an('obRise', 420, 300) }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 17, background: '#000000', boxShadow: 'inset 0 0 0 0.55px #222628', overflow: 'hidden' }}>
           {EMOJI.map((e, n) => (
-            <div key={e.k} style={{ ...abs(4, e.y, 26, 26), ...an('obRiseS', base + 60 + (EMOJI.length - 1 - n) * 60, 260) }}>
-              <div className="obp" onClick={() => fly(e.k)} onTouchStart={noop} style={{ position: 'relative', width: 26, height: 26, borderRadius: 13, background: '#222628', boxShadow: e.on ? 'inset 0 0 0 1.5px ' + SKY : 'none' }}>
-                <Svg name={'emo-' + e.k} w={26} h={26} />
+            <div key={e.k} data-figma={'emoji ' + e.k} style={{ ...abs(4, e.y, 26, 26), ...an('obRiseS', 480 + (EMOJI.length - 1 - n) * 60, 260) }}>
+              <div className="obp" onClick={() => fly(e.k)} onTouchStart={noop}
+                style={{ position: 'relative', width: 26, height: 26, borderRadius: 13, background: '#222628', boxShadow: sel === e.k ? '0 0 0 1.5px ' + SKY : '0 0 0 0 rgba(54, 210, 255, 0)', transition: 'box-shadow 120ms ' + ST }}>
+                <Svg name={'emo-' + e.k} x={4} y={4} w={e.w || 18} h={18} />
               </div>
             </div>
           ))}
         </div>
-        <div data-figma="btn_더보기" style={{ ...abs(16, 114, 34, 34), ...an('obPop', 340, 420) }}>
-          <div className="obp" onClick={() => setMenu((m) => m + 1)} onTouchStart={noop} style={{ position: 'relative', width: 34, height: 34, borderRadius: 24, background: '#000000' }}>
-            <div style={abs(5, 5, 24, 24)}><Icon name="plus-1620-23225" color={WHITE} style={{ width: 24, height: 24 }} /></div>
-          </div>
+      </div>
+      <div data-figma="btn_더보기" style={{ ...abs(16, 135, 34, 34), ...an('obPop', 340, 420) }}>
+        <div className="obp" onTouchStart={noop} style={{ position: 'relative', width: 34, height: 34, borderRadius: 24, background: '#000000' }}>
+          <div style={abs(5, 5, 24, 24)}><Icon name="plus-1620-23225" color={WHITE} style={{ width: 24, height: 24 }} /></div>
         </div>
-        <div data-figma="하트 날아가는 반응" style={{ ...abs(157, 95.7, 54, 50), ...an('obPop', 760, 420) }}>
-          <Svg name="fly-heart" w={54} h={50} />
-        </div>
-        {flights.map((f) => (
-          <div key={f.id} onAnimationEnd={() => setFlights((l) => l.filter((x) => x.id !== f.id))}
-            style={{ ...abs(f.x, f.y, 26, 26), zIndex: 5, pointerEvents: 'none', ...an('obFly', 0, 1000, ED) }}>
-            <div style={{ position: 'relative', width: 26, height: 26, borderRadius: 13, background: '#222628' }}><Svg name={'emo-' + f.k} w={26} h={26} /></div>
+      </div>
+      {/* 쉬는 모습: 피그마 궤적 1, 2와 큰 얼굴. 날아가는 동안은 숨겼다가 끝나면 다시 보인다. */}
+      <div style={{ ...abs(0, 0, 230, 200), pointerEvents: 'none', opacity: flight ? 0 : 1, transition: 'opacity ' + (flight ? 90 : 240) + 'ms ' + ST }}>
+        {TRAIL.map((t, n) => (
+          <div key={n} data-figma={n === 2 ? '날아가는 이모지 / 웃음' : '이모지 궤적 ' + (n + 1)} style={{ ...abs(t.x, t.y, t.s, t.s), ...an('obPop', 760 + n * 80, 420) }}>
+            <div style={{ position: 'relative', width: t.s, height: t.s, opacity: t.op }}><Face s={t.s} shadow={t.shadow} /></div>
           </div>
         ))}
-      </Panel>
-    </>
+      </div>
+      {flight && TRAIL.map((t, n) => (
+        <div key={flight.id + '-' + n} style={{
+          ...abs(t.x, t.y, t.s, t.s), zIndex: 5, pointerEvents: 'none',
+          '--dx': (flight.cx - (t.x + t.s / 2)) + 'px', '--dy': (flight.cy - (t.y + t.s / 2)) + 'px', '--s0': 16.5 / t.s,
+          animation: `obFace ${1000 - t.d}ms ${ED} ${t.d}ms both`,
+        }}>
+          <div style={{ position: 'relative', width: t.s, height: t.s, opacity: t.op }}><Face k={flight.k} s={t.s} shadow={t.shadow} /></div>
+        </div>
+      ))}
+    </Panel>
   );
 }
 

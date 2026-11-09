@@ -87,11 +87,26 @@ export default function HomeScene({ startOpen = false, style, className }) {
     setOpen(false);
     setHash(25);
   };
+  // 보내기(화살표 버튼, 시스템 키보드 완료 키, 엔터, 화면 키보드 엔터). 글이 비어 있어도 바로 26으로 간다.
+  // 한 번 누름에 keydown, beforeinput, form submit이 함께 올 수 있어 한 번만 이동하게 막는다.
+  const sentRef = React.useRef(false);
   const send = () => {
+    if (sentRef.current) return;
+    sentRef.current = true;
+    window.setTimeout(() => { sentRef.current = false; }, 1500);
     const inp = inputRef.current;
     if (inp) inp.blur();
     window.setTimeout(() => goTo(26, 'push'), motion.press);
   };
+  // React의 onBeforeInput은 inputType을 주지 않아 진짜 beforeinput을 직접 듣는다(한글 조합 중 완료 키가 줄바꿈으로 올 때).
+  React.useEffect(() => {
+    const inp = inputRef.current;
+    if (!inp) return undefined;
+    const on = (e) => { if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph') { e.preventDefault(); send(); } };
+    inp.addEventListener('beforeinput', on);
+    return () => inp.removeEventListener('beforeinput', on);
+  }, []);
+  const isEnter = (e) => e.key === 'Enter' || e.keyCode === 13 || (e.nativeEvent && e.nativeEvent.keyCode === 13);
 
   // 터치 기기: 진짜 키보드가 올라오면 보이는 창(visualViewport) 바닥 바로 위에 입력칸을 붙인다.
   React.useEffect(() => {
@@ -138,7 +153,7 @@ export default function HomeScene({ startOpen = false, style, className }) {
     } else if (key.k === 'shift') { setShift((s) => !s); return; }
     else if (key.k === 'space') nv = v + ' ';
     else if (key.k === 'back') { nv = backJamo(v, composing); on = composing && nv.length === v.length; }
-    else if (key.k === 'enter') { if (v.trim()) send(); return; }
+    else if (key.k === 'enter') { send(); return; }
     else return;
     inp.value = nv;
     comp.current = { on, val: nv };
@@ -304,10 +319,11 @@ export default function HomeScene({ startOpen = false, style, className }) {
         <span aria-hidden="true" style={{ position: 'absolute', left: '-1px', top: '-1px', width: 0, height: 0, overflow: 'visible', zIndex: -1, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: "<svg data-box=\"\" width=\"342\" height=\"66\" viewBox=\"0 0 342 66\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"342\" height=\"66\" rx=\"32\" style=\"fill:#222628\"/><defs><clipPath id=\"chome_input\"><rect width=\"342\" height=\"66\" rx=\"32\"/></clipPath></defs><g clip-path=\"url(#chome_input)\"><path d=\"M32 0 L32 1 L310 1 L310 0 L310 -1 L32 -1 L32 0 Z M342 32 L341 32 L341 34 L342 34 L343 34 L343 32 L342 32 Z M310 66 L310 65 L32 65 L32 66 L32 67 L310 67 L310 66 Z M0 34 L1 34 L1 32 L0 32 L-1 32 L-1 34 L0 34 Z M32 66 L32 65 C14.8792 65 1 51.1208 1 34 L0 34 L-1 34 C-1 52.2254 13.7746 67 32 67 L32 66 Z M342 34 L341 34 C341 51.1208 327.121 65 310 65 L310 66 L310 67 C328.225 67 343 52.2254 343 34 L342 34 Z M310 0 L310 1 C327.121 1 341 14.8792 341 32 L342 32 L343 32 C343 13.7746 328.225 -1 310 -1 L310 0 Z M32 0 L32 -1 C13.7746 -1 -1 13.7746 -1 32 L0 32 L1 32 C1 14.8792 14.8792 1 32 1 L32 0 Z\" fill-rule=\"nonzero\" style=\"fill:#222628\"/></g></svg>" }} />
         <div data-figma="채팅 입력" data-live="home" data-node="I2045:11658;1620:43934" className="[display:flex] [height:48px] [padding-right:16px] [align-items:center] [flex:1_0_0] [border-radius:24px] [overflow:hidden] [position:relative]">
           <p data-figma="편하게 고민을 꺼내보아요" data-node="I2045:11658;1620:43935" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:22px] [letter-spacing:-0.64px] [flex-shrink:0] [width:154px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]" style={{ opacity: hasText ? 0 : 1 }}><span style={{ position: 'relative', top: '0.176px', left: '0px' }}>{"편하게 고민을 꺼내보아요"}</span><span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0, overflow: 'visible', lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: svg["I1671:45255;1620:43935"] }} /></p>
+          <form action="" noValidate onSubmit={(e) => { e.preventDefault(); send(); }} style={{ display: 'contents' }}>
           <input
             ref={inputRef}
             type="text"
-            enterKeyHint="send"
+            enterKeyHint="done"
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
@@ -317,8 +333,9 @@ export default function HomeScene({ startOpen = false, style, className }) {
             readOnly={!open && fine}
             style={{ ...LIVE.inputStyle, fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', letterSpacing: '-0.64px', lineHeight: '22px', pointerEvents: open ? 'auto' : 'none', userSelect: 'text', WebkitUserSelect: 'text' }}
             onInput={() => { comp.current.on = false; refreshText(); }}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing) { e.preventDefault(); if (e.currentTarget.value.trim()) send(); } }}
+            onKeyDown={(e) => { if (isEnter(e)) { e.preventDefault(); send(); } }}
           />
+          </form>
         </div>
         <div ref={btnRef} data-figma="btn_전송" data-node="I2045:11658;1671:44260" data-instance-of="btn_전송" role="button" aria-label="보내기" onPointerDown={(e) => { e.stopPropagation(); pressOn(btnRef.current); }} onPointerUp={() => pressOff(btnRef.current)} onPointerCancel={() => pressOff(btnRef.current)} onPointerLeave={() => pressOff(btnRef.current)} onMouseDown={(e) => e.preventDefault()} onClick={(e) => { e.stopPropagation(); send(); }} className="[display:flex] [width:48px] [height:48px] [justify-content:center] [align-items:center] [flex-shrink:0] [border-radius:24px] [background:#36D2FF] [overflow:hidden] [cursor:pointer] [touch-action:manipulation]">
           <Icon data-figma="arrow-right" data-node="I2045:11658;1671:44260;1620:43796" name="arrow-right-1620-23215" color="#000000" className="[width:24px] [height:24px] [flex-shrink:0] [position:relative]" />

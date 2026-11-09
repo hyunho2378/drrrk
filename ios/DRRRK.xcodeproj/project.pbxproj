@@ -33,6 +33,7 @@
 		C337B1A6C586DC8ADD91ADF0 /* SUIT-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 14456F248BBE7E155D47906C /* SUIT-Heavy.otf */; };
 		C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */; };
 		C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */; };
+		C7F69FEB9B42A8902644FB38 /* LoveDotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */; };
 		D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B487C08A1B7EC0175936B1F /* RoomModel.swift */; };
 		DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 501E8B9CBA004BB542AF4AF8 /* SUIT-SemiBold.otf */; };
 		E901701EBADC7258D253319F /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AE12650DE60F318392041F22 /* SUIT-Regular.otf */; };
@@ -73,6 +74,7 @@
 		EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStudioView.swift; sourceTree = "<group>"; };
 		FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScreens.swift; sourceTree = "<group>"; };
 		FD5D62597EB5736F98D562A0 /* NotiScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiScreens.swift; sourceTree = "<group>"; };
+		FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveDotStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -104,6 +106,7 @@
 			children = (
 				57D150C196D9839A3AC05BC6 /* LiveData.swift */,
 				FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */,
+				FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */,
 			);
 			path = Live;
 			sourceTree = "<group>";
@@ -348,6 +351,7 @@
 				35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */,
 				2B4D99386681E340CDB6F331 /* LiveData.swift in Sources */,
 				2086FB2D2C7FC1046CDB9399 /* LiveScreens.swift in Sources */,
+				C7F69FEB9B42A8902644FB38 /* LoveDotStore.swift in Sources */,
 				856CF2631A345DE00B0E82B2 /* MyScreens.swift in Sources */,
 				5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */,
 				C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */,

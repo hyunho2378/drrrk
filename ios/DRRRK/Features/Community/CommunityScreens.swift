@@ -8,6 +8,7 @@ struct CommunityView: View {
     @State private var page = 0
     @State private var sort: LiveSort = .popular
     @State private var showSort = false
+    @State private var loveDots = LoveDotStore.shared
 
     private var featured: [LiveFeatured] {
         zip(CommunityData.featuredTitles, CommunityData.scenes).map { .init(title: $0, versus: "", time: "", viewers: "", scene: $1) }
@@ -35,7 +36,10 @@ struct CommunityView: View {
                     FeaturedCarousel(items: featured, page: $page) { router.push(.communityDetail) }
                         .padding(.top, 18)
                     PageDots(count: 5, index: page).frame(maxWidth: .infinity).padding(.top, 12)
-                    CategoryTabs(selected: $category, showDot: true).padding(.top, 18)
+                    CategoryTabs(selected: $category, showDot: !loveDots.communityLoveSeen).padding(.top, 18)
+                        .onChange(of: category, initial: true) { _, new in
+                            if new == "연애" { loveDots.markCommunity() }
+                        }
                     HStack {
                         Text("지난 밤 이야기").suit(18, .bold, tracking: -0.72).foregroundStyle(DS.Palette.textPrimary)
                         Spacer()
