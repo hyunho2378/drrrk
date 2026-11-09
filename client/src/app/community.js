@@ -9,6 +9,7 @@ import { motion } from '../tokens.js';
 import { setText } from './dom.js';
 import { sceneUrl } from './scene.js';
 import { toast } from './room.js';
+import { patchRest } from './patchRest.js';
 
 const A = (import.meta.env.BASE_URL || '/') + 'assets/community2/';
 const IMG = {
@@ -153,13 +154,15 @@ function commentAvatars(root) {
 
 export function patchCommunity(root, n) {
   if (!root) return;
+  patchRest(root, n);
   const imgs = IMG[n];
   if (imgs) Object.keys(imgs).forEach((id) => { const el = root.querySelector('[data-node="' + id + '"]'); if (el) setImg(el, imgs[id]); });
   const texts = TEXT[n];
   if (texts) Object.keys(texts).forEach((id) => {
     const p = root.querySelector('[data-node="' + id + '"]');
-    if (p && p.textContent.replace(/\s+/g, '') !== texts[id].replace(/\s+/g, '')) setText(p, texts[id]);
-    if (p && texts[id].includes('\n')) p.style.whiteSpace = 'pre-line';
+    // 줄바꿈 자리까지 피그마와 같아야 한다. 글자가 같아도 줄바꿈이 다르면 다시 넣는다(첫 댓글은 "질투하는듯"에서 끊는다).
+    if (p && p.textContent.replace(/[ \t]+/g, ' ').trim() !== texts[id]) setText(p, texts[id]);
+    if (p && texts[id].includes('\n')) { p.style.whiteSpace = 'pre-line'; const sp = p.querySelector(':scope > span'); if (sp) sp.style.whiteSpace = 'pre-line'; }
   });
   if (n === 39) watchCards(root);
   if (n === 38) {

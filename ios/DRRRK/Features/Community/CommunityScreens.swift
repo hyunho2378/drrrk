@@ -98,14 +98,16 @@ private struct PostCard: View {
     }
 }
 
+/// 피그마 "의자 프로필"(1953:20583 계열): 32 원, 바탕 #33383D, 안쪽 의자 그림 28.5(사방 1.75).
 struct ProfileChair: View {
     let name: String
     var size: CGFloat = 32
+    var image: String? = nil
     var body: some View {
-        Image(Avatars.image(for: name)).resizable().scaledToFit()
-            .padding(size * 0.12)
+        Image(image ?? Avatars.image(for: name)).resizable().scaledToFill()
+            .frame(width: size * 28.5 / 32, height: size * 28.5 / 32)
             .frame(width: size, height: size)
-            .background(.white, in: Circle())
+            .background(Color(hex: 0x33383D), in: Circle())
             .clipShape(Circle())
     }
 }
@@ -170,17 +172,21 @@ struct CommunityDetailView: View {
     private var post: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
-                ProfileChair(name: CommunityData.detailAuthor, size: 28)
+                // 피그마 1953:12302: 28 원, 바탕 #222628, 그림 FIT
+                Image(CommunityData.detailAuthorAvatar).resizable().scaledToFit()
+                    .frame(width: 28, height: 28)
+                    .background(DS.Palette.bgElevated, in: Circle())
+                    .clipShape(Circle())
                 Text(CommunityData.detailAuthor).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
-                Text("방금").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
+                Text("· 방금").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
             }
             Text("둘이 찍은 사진인데\n지만 보정해서 올린 여우").suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary)
                 .padding(.top, 16)
             Text(CommunityData.detailBody).suit(15, .regular, lineHeight: 24).foregroundStyle(Color(hex: 0xD9DBDE))
                 .padding(.top, 12)
-            // 대화 다시보기 카드 342 x 150, 모서리 16, #1F2226. 장면 그림은 피그마 scene과 fade를 합쳐 내보냈다.
+            // 대화 다시보기 카드 342 x 150, 모서리 16, #1F2226. 장면 그림은 피그마 fade(1953:12313, 편의점 장면)가 scene을 모두 덮은 모습 그대로다.
             ZStack(alignment: .topLeading) {
-                Image("C-detail-scene").resizable().scaledToFill().frame(height: 150).frame(maxWidth: .infinity).clipped()
+                Image(CommunityData.detailScene).resizable().scaledToFill().frame(height: 150).frame(maxWidth: .infinity).clipped()
                 HStack(spacing: 6) {
                     Image("C-play").renderingMode(.template).resizable().frame(width: 18, height: 18)
                     Text("대화 다시보기 · 12:32").suit(12, .medium)
@@ -192,7 +198,7 @@ struct CommunityDetailView: View {
                 HStack(spacing: 8) {
                     HStack(spacing: -8) {
                         ForEach(CommunityData.detailSeats, id: \.self) { img in
-                            Image(img).resizable().scaledToFit().frame(width: 26, height: 26).frame(width: 30, height: 30)
+                            Image(img).resizable().scaledToFit().frame(width: 30, height: 30)
                                 .background(DS.Palette.bgElevated, in: Circle()).clipShape(Circle())
                                 .overlay(Circle().strokeBorder(Color(hex: 0x1F2226), lineWidth: 2))
                         }
@@ -201,6 +207,9 @@ struct CommunityDetailView: View {
                 }
                 .padding(.leading, 12).padding(.bottom, 12)
                 .frame(maxHeight: .infinity, alignment: .bottom)
+                // 피그마 1971:22954: 카드 아래 32 높이 #222628 판이 참여 의자 줄 위를 덮는다.
+                Rectangle().fill(DS.Palette.bgElevated).frame(height: 32)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
             }
             .frame(height: 150)
             .background(Color(hex: 0x1F2226))
@@ -243,7 +252,7 @@ struct CommunityDetailView: View {
     private func commentRow(_ c: PostComment) -> some View {
         let on = likedComments.contains(c.id)
         return HStack(alignment: .top, spacing: 10) {
-            ProfileChair(name: c.name, size: 32)
+            ProfileChair(name: c.name, size: 32, image: c.avatar)
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Text(c.name).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
@@ -261,10 +270,10 @@ struct CommunityDetailView: View {
                         }
                     } label: {
                         HStack(spacing: 4) {
-                            Image(on ? "C-thumb-up" : "C-thumb-up-outline").renderingMode(.template).resizable().frame(width: 14, height: 14)
+                            Image(on ? "C-thumb-up" : "C-thumb-up-outline").renderingMode(.template).resizable().frame(width: 16, height: 16)
                             Text("\(c.likes + (on ? 1 : 0))").suit(12, .medium, tracking: -0.48)
                         }
-                        .foregroundStyle(on ? DS.Palette.brandPrimary : DS.Palette.textTertiary)
+                        .foregroundStyle(on ? DS.Palette.brandPrimary : DS.Palette.textSecondary)
                     }
                     .buttonStyle(.plain)
                     Text("답글 달기").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)

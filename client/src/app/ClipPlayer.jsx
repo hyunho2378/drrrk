@@ -69,7 +69,7 @@ export function ClipPlayer(props) {
     else no();
   };
   const share = () => {
-    const data = { title: '쌍수일기 클립', text: '친구가 썸남 앞에서 내 쌍밍아웃함...', url: window.location.href };
+    const data = { title: '흔한 웹드 클립', text: '베프가 내 비밀을 까발린다 ep.01...', url: window.location.href };
     if (navigator.share) {
       navigator.share(data).then(closeSheet, (e) => { if (e && e.name === 'AbortError') closeSheet(); else copy(data.url); });
       return;
@@ -89,7 +89,7 @@ export function ClipPlayer(props) {
     if (kind === 'immersive') later(() => setSt((s) => ({ ...s, imm: true })), 380);
     else if (kind === 'play') say('반복 재생으로 설정했어요');
     else if (kind === 'hide') say('이 콘텐츠를 숨겼어요');
-    else if (kind === 'hideCreator') say('쌍수일기 콘텐츠를 숨겼어요');
+    else if (kind === 'hideCreator') say('웹드플리 콘텐츠를 숨겼어요');
     else if (kind === 'report') say('신고가 접수됐어요');
     return undefined;
   };

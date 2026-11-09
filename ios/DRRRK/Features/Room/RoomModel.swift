@@ -1,12 +1,14 @@
 import Observation
 import SwiftUI
 
-/// 현장 모드 방의 상태. 팀 피그마 "주전부리 · 퀵슬롯 (기본)"(1807:23107)과 웹 프로토타입 동작을 따른다.
+/// 현장 모드 방의 상태. 팀 피그마 "주전부리 · 퀵슬롯 (기본)"(1979:27515)과 웹 프로토타입 동작을 따른다.
 @Observable
 final class RoomModel {
     // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어들고, 실제로는 3분(180초)에 끝난다.
     static let shownSeconds: Double = 20 * 60
     static let realSeconds: Double = 180
+    /// 화면 시계가 01:12에 닿으면 해 뜨기 1분 전 장면(피그마 1979:27780)으로 바뀐다.
+    static let lastMinuteShown: Double = 72
 
     struct Snack: Identifiable, Hashable {
         let id: String
@@ -18,7 +20,7 @@ final class RoomModel {
     struct Seat: Identifiable, Hashable {
         let id: String
         let name: String
-        // 피그마 390 x 844 화면 좌표(이름표 자리)
+        // 피그마 390 x 844 화면 좌표. 이름 글자 상자의 가운데
         let x: CGFloat
         let y: CGFloat
         let isMe: Bool
@@ -38,13 +40,28 @@ final class RoomModel {
         let opacity: Double
     }
 
+    /// 현장 모드 채팅 칸에 위에서부터 놓이는 줄. 해 뜨기 1분 전에는 안내 한 줄이 채팅 사이에 끼어든다(1979:27780).
+    enum ChatEntry: Identifiable, Hashable {
+        case other(ChatLine)
+        case mine(String)
+        case system(String)
+
+        var id: String {
+            switch self {
+            case let .other(line): "o" + line.id.uuidString
+            case let .mine(text): "m" + text
+            case let .system(text): "s" + text
+            }
+        }
+    }
+
     var startedAt = Date()
     var bannerOpen = false
     // 방에 처음 들어오면 퀵슬롯은 접혀 있다(피그마 1807:23214 "주전부리 · 퀵슬롯 (접힘)").
     var dockOpen = false
-    /// 대화 흐름 단계. 0은 들어온 직후(피그마 1807:23214), 1은 이야기가 무르익은 뒤(1807:22997, 1971:21253).
+    /// 대화 흐름 단계. 0은 들어온 직후(피그마 1979:27708), 1은 이야기가 무르익은 뒤(1979:27515), 2는 해 뜨기 1분 전(1979:27780).
     var stage = 0
-    var speaker: String = "새벽2시 피시방"
+    var speaker: String = "보라돌이 의자71"
     var landed: [Landed] = []
     var myChats: [String] = ["나만 예민한 거 아니지?"]
 
@@ -63,12 +80,44 @@ final class RoomModel {
         ["shrimp", "drrra", "soju"].compactMap { id in snacks.first { $0.id == id } }
     }
 
+    /// 장면 속 의자 이름표(피그마 1979:27517). 피그마에 "나" 칸이 없어 네 사람이 돌아가며 말한다.
     let seats: [Seat] = [
-        .init(id: "truth", name: "진실의 의자10", x: 27, y: 389, isMe: false),
-        .init(id: "stool", name: "딱딱한 나무 스툴12", x: 107, y: 375, isMe: false),
-        .init(id: "pcbang", name: "새벽2시 피시방", x: 227, y: 324, isMe: false),
-        .init(id: "cold", name: "차가운 새벽의자92", x: 305, y: 389, isMe: false),
+        .init(id: "sofa", name: "폭신폭신 소파38", x: 52, y: 383, isMe: false),
+        .init(id: "wheel", name: "바퀴 달린 의자26", x: 143, y: 343, isMe: false),
+        .init(id: "purple", name: "보라돌이 의자71", x: 260, y: 349.5, isMe: false),
+        .init(id: "store", name: "편의점 드르륵71", x: 341, y: 366, isMe: false),
     ]
+
+    /// 들어온 직후(피그마 1979:27708)
+    static let fieldOpening: [ChatEntry] = [
+        .other(.init(name: "폭신폭신 소파38", text: "제목보고 들어옴", opacity: 0.8)),
+        .other(.init(name: "바퀴 달린 의자26", text: "댓글 단 사람들 미쳤나???", opacity: 1)),
+        .mine("아니 진짜 선 넘는다 아니야?"),
+    ]
+
+    /// 이야기가 무르익은 뒤(피그마 1979:27515)
+    static let fieldTalk: [ChatEntry] = [
+        .other(.init(name: "바퀴 달린 의자26", text: "헐 자기 얼굴만 보정한 거 실화?", opacity: 0.4)),
+        .other(.init(name: "보라돌이 의자71", text: "그건 서운할 만하지 ㅠㅠ", opacity: 0.8)),
+        .other(.init(name: "편의점 드르륵71", text: "지만 쏙 빼고 보정한건 진짜 선넘는다", opacity: 1)),
+        .mine("나만 예민한 거 아니지?"),
+    ]
+
+    /// 해 뜨기 1분 전(피그마 1979:27780)
+    static let fieldLastMinute: [ChatEntry] = [
+        .other(.init(name: "바퀴 달린 의자26", text: "근데 진짜 신경 ㄴㄴ", opacity: 0.8)),
+        .mine("응 그냥 무시하려고 ㅎㅎ"),
+        .system("해 뜨기 1분 전!"),
+        .other(.init(name: "폭신폭신 소파38", text: "맞아여 앞으로 그런 애한테 신경쓰지 마요", opacity: 1)),
+    ]
+
+    var visibleEntries: [ChatEntry] {
+        switch stage {
+        case 0: Self.fieldOpening
+        case 1: Self.fieldTalk
+        default: Self.fieldLastMinute
+        }
+    }
 
     let chats: [ChatLine] = [
         .init(name: "진실의 의자10", text: "엥? 미친거 아님?", opacity: 0.4),
@@ -76,26 +125,22 @@ final class RoomModel {
         .init(name: "새벽2시 피시방", text: "나도 비슷한 일 있었음.. 그거 완전 여우짓임", opacity: 1),
     ]
 
-    /// 들어온 직후의 대화(피그마 1807:23214)
-    let openingChats: [ChatLine] = [
-        .init(name: "진실의 의자10", text: "잼얘 없음?", opacity: 0.8),
-        .init(name: "차가운 새벽의자92", text: "님선 ㄱㄱ", opacity: 1),
-    ]
-
-    var visibleChats: [ChatLine] {
-        stage == 0 ? openingChats : chats
-    }
-
-    var visibleMine: [String] {
-        stage == 0 ? ["아니 오늘 나 뭔일 있었냐면"] : myChats
-    }
-
     var topicShort = "친구가 썸남 앞에서 내 쌍밍아웃함. 셋이…"
     var topicBody = "친구가 썸남 앞에서 내 쌍밍아웃함. 셋이 떡볶이 먹으러 가고 있었는데 나보고 볼 때마다 00이 쌍수 참 예쁘게 잘되지 않았냐고 그러는거야. 걔 완전 미친거 아니야? 하.."
     var topicTags = ["#가족관계", "#가정사"]
 
     /// 던진 주전부리가 떨어지는 자리. 혼자 방은 장면 속 흰 테이블 위로 바꾼다.
     var landRect: CGRect = RoomModel.tableLand
+
+    /// 함께 드르륵 현장 모드 방(피그마 1979:27515, 1979:27613). 일반 모드는 아직 옛 이야기를 쓰므로 기본값은 그대로 둔다.
+    static func field() -> RoomModel {
+        let m = RoomModel()
+        m.topicShort = "오늘 친구랑 인생네컷을 찍었는데, 글쎄 친구가…"
+        // 피그마 1979:27707 본문 글자의 줄바꿈 그대로
+        m.topicBody = "오늘 친구랑 인생네컷을 찍었는데, 글쎄 친구가 인스타\n게시글에 자기 얼굴만 보정을 해서 올렸더라고.. 다들 엄청\n이쁘다고 비교된다는 식으로 댓글 달리는데 너무 속상해..."
+        m.topicTags = ["#친구관계", "#외모고민"]
+        return m
+    }
 
     /// 혼자 드르륵 방(피그마 1647:25199, 1647:25052, 1647:24874). 고민 글과 AI가 읽은 맥락이 다르다.
     static func solo() -> RoomModel {
@@ -117,9 +162,9 @@ final class RoomModel {
         return m
     }
 
-    // 테이블(피그마 화면 좌표): 놓을 수 있는 자리와 떨어지는 자리
-    static let tableDrop = CGRect(x: 120, y: 440, width: 150, height: 120)
-    static let tableLand = CGRect(x: 150, y: 462, width: 90, height: 30)
+    // 테이블(피그마 화면 좌표, 새 장면 E-room-scene-new의 흰 테이블 윗면 x 129~258, y 496~537): 놓을 수 있는 자리와 떨어지는 자리
+    static let tableDrop = CGRect(x: 124, y: 466, width: 150, height: 120)
+    static let tableLand = CGRect(x: 145, y: 506, width: 100, height: 20)
 
     func remaining(at date: Date) -> Double {
         let real = date.timeIntervalSince(startedAt)
@@ -131,7 +176,7 @@ final class RoomModel {
         return String(format: "%02d:%02d", s / 60, s % 60)
     }
 
-    /// 말하는 사람은 마이크를 쓰는 다른 사람 중에서 돌아가며 바뀐다(나는 빠진다).
+    /// 말하는 사람은 장면 속 네 사람 중에서 돌아가며 바뀐다(나는 이름표가 없어 말하는 표시가 붙지 않는다).
     func nextSpeaker() {
         let pool = seats.filter { !$0.isMe && $0.name != speaker }
         if let next = pool.randomElement() {

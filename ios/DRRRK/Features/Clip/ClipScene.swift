@@ -1,7 +1,8 @@
 import SwiftUI
 
 // 네이버 클립 모방 두 화면을 그리는 도구. 팀 피그마 섹션 "네이버 클립 모방"(1843:40426)의 값을 웹 프로토타입과 같은 데이터
-// (Resources/Data/clip-scenes.json)에서 읽어 390 x 844 좌표 그대로 그린다. 아이콘은 SVG 벡터 에셋(A-clipsvg-*), 그림은 A-clip-*다.
+// (Resources/Data/clip-scenes.json)에서 읽어 390 x 844 좌표 그대로 그린다. 아이콘은 SVG 벡터 에셋(A-clipsvg-*), 그림은 G-clip-*다
+// (2026. 11. 9. 피그마 1843:40980, 1843:40911 사진 교체분).
 
 struct ClipFill: Decodable {
     var c: String?
@@ -58,6 +59,8 @@ final class ClipItem: Decodable, Identifiable {
     var cx: Double?
     var cy: Double?
     var lh: Double?
+    /// 자간(퍼센트). 없으면 피그마 기본 -2%.
+    var ls: Double?
     var sp: [[ClipValue]]?
     var sh: [Double]?
     var ml: Double?
@@ -74,7 +77,7 @@ final class ClipItem: Decodable, Identifiable {
     var pill: ClipPillText?
     var right: Double?
 
-    enum Key: String, CodingKey { case k, n, x, y, w, h, r, f, s, size, wt, c, a, cx, cy, lh, sp, sh, ml, img, asset, items, ch, clip, blur, pad, gap, px, rad, text, right }
+    enum Key: String, CodingKey { case k, n, x, y, w, h, r, f, s, size, wt, c, a, cx, cy, lh, ls, sp, sh, ml, img, asset, items, ch, clip, blur, pad, gap, px, rad, text, right }
 
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: Key.self)
@@ -106,6 +109,7 @@ final class ClipItem: Decodable, Identifiable {
         cx = try? c.decode(Double.self, forKey: .cx)
         cy = try? c.decode(Double.self, forKey: .cy)
         lh = try? c.decode(Double.self, forKey: .lh)
+        ls = try? c.decode(Double.self, forKey: .ls)
         sp = try? c.decode([[ClipValue]].self, forKey: .sp)
         sh = try? c.decode([Double].self, forKey: .sh)
         ml = try? c.decode(Double.self, forKey: .ml)
@@ -155,7 +159,7 @@ func suitWeight(_ wt: Int?) -> SUITWeight {
 func clipFillView(_ f: ClipFill?) -> some View {
     if let f {
         if let img = f.img {
-            Image("A-clip-" + img).resizable().scaledToFill()
+            Image("G-clip-" + img).resizable().scaledToFill()
         } else if let g = f.g {
             LinearGradient(stops: g.map { .init(color: clipColor($0[0].str, $0[1].num), location: $0[2].num) }, startPoint: .top, endPoint: .bottom)
         } else {
@@ -178,7 +182,7 @@ struct ClipTextView: View {
         let lh = it.lh ?? (size * 1.4).rounded()
         Text(attributed)
             .font(.custom(suitWeight(it.wt).rawValue, fixedSize: size))
-            .tracking(-0.02 * size)
+            .tracking((it.ls ?? -2) / 100 * size)
             .lineSpacing(max(0, lh - size * 1.25))
             .foregroundStyle(clipColor(it.c, it.a))
             .shadow(color: .black.opacity(it.sh?[3] ?? 0), radius: (it.sh?[2] ?? 0) / 2, x: it.sh?[0] ?? 0, y: it.sh?[1] ?? 0)
@@ -242,7 +246,7 @@ struct ClipItemView: View {
 
     private var avatar: some View {
         place(
-            Image("A-clip-" + (it.img ?? "")).resizable().scaledToFill()
+            Image("G-clip-" + (it.img ?? "")).resizable().scaledToFill()
                 .frame(width: it.w ?? 0, height: it.h ?? 0)
                 .background(Color(hex: 0x2D2D2D))
                 .clipShape(Circle()),

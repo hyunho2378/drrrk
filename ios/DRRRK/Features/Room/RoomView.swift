@@ -34,7 +34,7 @@ struct RoomView: View {
     /// 시뮬레이터 확인용(onboardingTogether 라우트): 이미 본 적이 있어도 온보딩을 다시 띄운다.
     var forceOnboarding = false
     @Environment(Router.self) private var router
-    @State private var model = RoomModel()
+    @State private var model = RoomModel.field()
     @State private var showOnboarding: Bool
 
     init(forceOnboarding: Bool = false) {
@@ -53,7 +53,8 @@ struct RoomView: View {
         GeometryReader { geo in
             let map = SceneMap(size: geo.size)
             ZStack(alignment: .topLeading) {
-                Image("room-scene")
+                // 피그마 1979:27516 "image 1208091463"(해시 eadc5541)을 3배로 받은 장면
+                Image("E-room-scene-new")
                     .resizable()
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
@@ -93,7 +94,7 @@ struct RoomView: View {
         .task { await rotateSpeakers() }
         .task { await watchClock() }
         .task(id: showOnboarding) {
-            // 온보딩을 닫은 뒤 7초가 지나면 이야기가 무르익은 장면(1807:22997)으로 넘어간다.
+            // 온보딩을 닫은 뒤 7초가 지나면 이야기가 무르익은 장면(1979:27515)으로 넘어간다.
             guard !showOnboarding, model.stage == 0 else { return }
             try? await Task.sleep(for: .seconds(7))
             guard !Task.isCancelled else { return }
@@ -118,13 +119,15 @@ struct RoomView: View {
 
         ForEach(model.landed) { item in
             let p = map.point(item.point.x, item.point.y)
-            LandedSnack(asset: item.asset, angle: item.angle)
+            // 피그마 1979:27497: 테이블에 놓인 주전부리 24 x 24
+            LandedSnack(asset: item.asset, angle: item.angle, size: 24)
                 .position(p)
                 .transition(.identity)
         }
 
         ForEach(model.seats) { seat in
             let speaking = seat.name == model.speaker
+            // 이름 글자 상자의 가운데를 피그마 좌표에 맞춘다. 초록 점과 파동은 글자 밖에 겹쳐 그린다.
             let p = map.point(seat.x, seat.y)
             // 의자 이름을 누르면 미니 프로필이 방 위에 겹쳐 뜬다(피그마 1972:22293 "이름 칩 (탭하면 미니 프로필)").
             Button { router.present(.miniProfile) } label: {
@@ -134,7 +137,7 @@ struct RoomView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .position(x: p.x + 40, y: p.y + 7)
+            .position(p)
             .animation(DS.Motion.emphasizedDecel, value: model.speaker)
             .accessibilityLabel(seat.name + " 프로필")
         }
@@ -157,11 +160,6 @@ struct RoomView: View {
             .padding(.trailing, 24)
             .padding(.top, 28)
             Spacer(minLength: 0)
-            if lastMinute {
-                SystemLine(text: "해 뜨기 1분 전!")
-                    .padding(.bottom, 12)
-                    .transition(.opacity.combined(with: .offset(y: 8)))
-            }
             ChatColumn(model: model)
                 .padding(.horizontal, 24)
                 .overlay(alignment: .bottomLeading) {
@@ -264,8 +262,11 @@ struct RoomView: View {
     private func watchClock() async {
         while !Task.isCancelled {
             let left = model.remaining(at: .now)
-            if left <= 60, !lastMinute {
-                withAnimation(DS.Motion.emphasizedDecel) { lastMinute = true }
+            if left <= RoomModel.lastMinuteShown, !lastMinute {
+                withAnimation(DS.Motion.emphasizedDecel) {
+                    lastMinute = true
+                    model.stage = 2
+                }
             }
             if left <= 0 {
                 router.push(.roomMorning)
@@ -286,19 +287,25 @@ struct RoomView: View {
 
 // MARK: - 부품
 
+/// 장면 속 의자 이름표(피그마 1979:27517). 글자만 자리를 차지하고, 말하는 중에는 글자 왼쪽 4 떨어진 곳에 초록 점 7,
+/// 글자 가운데 위(글자 위 끝에서 16 위)에 파동 31 x 20이 붙는다.
 private struct SeatLabel: View {
     let name: String
     let speaking: Bool
     var body: some View {
-        VStack(spacing: 6) {
-            VoiceWave().opacity(speaking ? 1 : 0)
-            HStack(spacing: 5) {
-                Circle().fill(DS.Palette.success).frame(width: 7, height: 7).opacity(speaking ? 1 : 0)
-                Text(name)
-                    .suit(speaking ? 12 : 11, speaking ? .bold : .medium, tracking: speaking ? -0.48 : -0.44)
-                    .foregroundStyle(speaking ? DS.Palette.textPrimary : DS.Palette.textPrimary.opacity(0.5))
+        Text(name)
+            .suit(speaking ? 12 : 11, speaking ? .bold : .medium, tracking: speaking ? -0.48 : -0.44)
+            .foregroundStyle(speaking ? DS.Palette.textPrimary : DS.Palette.textPrimary.opacity(0.5))
+            .overlay(alignment: .leading) {
+                Circle().fill(DS.Palette.success).frame(width: 7, height: 7)
+                    .offset(x: -11)
+                    .opacity(speaking ? 1 : 0)
             }
-        }
+            .overlay(alignment: .top) {
+                VoiceWave()
+                    .offset(y: -36)
+                    .opacity(speaking ? 1 : 0)
+            }
     }
 }
 
@@ -324,13 +331,14 @@ private struct VoiceWave: View {
 struct LandedSnack: View {
     let asset: String
     let angle: Double
+    var size: CGFloat = 40
     static let stay: Double = 6
     static let fade: Double = 1.2
     @State private var landed = false
     @State private var fading = false
     var body: some View {
         Image(asset).resizable().scaledToFit()
-            .frame(width: 40, height: 40)
+            .frame(width: size, height: size)
             .rotationEffect(.degrees(landed ? angle : -16))
             .scaleEffect(landed ? (fading ? 0.9 : 1) : 1.15)
             .offset(y: landed ? 0 : -60)
@@ -447,8 +455,9 @@ struct RoomHeader: View {
                 }
                 .padding(.leading, 12).padding(.trailing, 16)
                 .frame(height: 32)
-                .background(DS.Palette.bgElevated, in: Capsule())
-                .overlay(Capsule().strokeBorder(DS.Palette.danger, lineWidth: 1.5).opacity(lastMinute ? 1 : 0))
+                // 피그마 1979:27584(평소 #222628)와 2009:12512(1분 전: 빨강 18% 바탕, 빨강 1 안쪽 선)
+                .background(lastMinute ? DS.Palette.danger.opacity(0.18) : DS.Palette.bgElevated, in: Capsule())
+                .overlay(Capsule().strokeBorder(DS.Palette.danger, lineWidth: 1).opacity(lastMinute ? 1 : 0))
             }
             Spacer()
             Button(action: onToggle) {
@@ -502,8 +511,10 @@ struct TopicBanner: View {
                 HStack {
                     HStack(spacing: 8) {
                         Text("고민").suit(11, .bold, tracking: -0.44).foregroundStyle(DS.Palette.brandPrimary)
-                        (Text("나 ").foregroundColor(.white) + Text("의 고민").foregroundColor(DS.Palette.textSecondary))
-                            .suit(12, .medium, tracking: -0.48)
+                        // 피그마 1979:27707 "나 "는 SemiBold 흰색, "의 고민"은 Medium #9AA1A6
+                        (Text("나 ").font(.custom(SUITWeight.semibold.rawValue, size: 12)).foregroundColor(.white)
+                            + Text("의 고민").font(.custom(SUITWeight.medium.rawValue, size: 12)).foregroundColor(DS.Palette.textSecondary))
+                            .tracking(-0.48)
                     }
                     Spacer()
                     Image("icon-chevron-up").renderingMode(.template).resizable()
@@ -547,24 +558,32 @@ struct TopicBanner: View {
     }
 }
 
+/// 현장 모드 채팅 칸(피그마 1979:27515, 1979:27708, 1979:27780). 줄 사이 8, 이름과 말풍선 사이 4.
 private struct ChatColumn: View {
     let model: RoomModel
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(model.visibleChats) { line in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(line.name).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary.opacity(0.5))
-                    Text(line.text).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
+            ForEach(model.visibleEntries) { entry in
+                switch entry {
+                case let .other(line):
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(line.name).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary.opacity(0.5))
+                        Text(line.text).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                    }
+                    .opacity(line.opacity)
+                    .transition(.opacity)
+                case let .mine(text):
+                    Text(text).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
                         .padding(.horizontal, 12).padding(.vertical, 8)
-                        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                        .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .transition(.opacity)
+                case let .system(text):
+                    SystemLine(text: text)
+                        .transition(.opacity.combined(with: .offset(y: 8)))
                 }
-                .opacity(line.opacity)
-            }
-            ForEach(model.visibleMine, id: \.self) { text in
-                Text(text).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
-                    .padding(.horizontal, 12).padding(.vertical, 8)
-                    .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
-                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
     }
@@ -594,8 +613,9 @@ struct RoomInputBar: View {
                 withAnimation(DS.Motion.stateIn) { micOn.toggle() }
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
             } label: {
+                // 피그마 1979:27492: 끈 상태도 검정 아이콘, 바탕만 빨강
                 Image(micOn ? "icon-mic" : "icon-mic-off").renderingMode(.template)
-                    .foregroundStyle(micOn ? .black : DS.Palette.textPrimary)
+                    .foregroundStyle(.black)
                     .frame(width: 48, height: 48)
                     .background(micOn ? DS.Palette.success : DS.Palette.danger, in: Circle())
             }
@@ -662,15 +682,21 @@ struct FlyingEmojiView: View {
     }
 }
 
-/// 카카오톡 관리자 메시지처럼 가운데 한 줄로 뜨는 시스템 안내.
+/// 카카오톡 관리자 메시지처럼 가운데 한 줄로 뜨는 시스템 안내(피그마 2009:12527 "System / 1분 전" 116 x 28,
+/// 안내 아이콘 16, 사이 6, 안쪽 6 / 12, 모서리 14, #0A0B0C 60%).
 struct SystemLine: View {
     let text: String
     var body: some View {
-        Text(text).suit(12, .medium, tracking: -0.48)
-            .foregroundStyle(DS.Palette.textPrimary)
-            .padding(.horizontal, 12).padding(.vertical, 6)
-            .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
-            .frame(maxWidth: .infinity)
+        HStack(spacing: 6) {
+            Image("E-icon-information").renderingMode(.template).resizable()
+                .foregroundStyle(DS.Palette.textPrimary)
+                .frame(width: 16, height: 16)
+            Text(text).suit(12, .medium, tracking: -0.48)
+                .foregroundStyle(DS.Palette.textPrimary)
+        }
+        .padding(.horizontal, 12).padding(.vertical, 6)
+        .background(DS.Palette.bgOverlay.opacity(0.6), in: RoundedRectangle(cornerRadius: 14))
+        .frame(maxWidth: .infinity)
     }
 }
 

@@ -38,12 +38,12 @@ private enum NotiData {
         ("오늘", [
             .init(keyword: "썸", title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", meta: "연애 · 방금 전 · 4명 이야기 중", time: "19:00", thumb: "C-7db688548ef3", unread: true),
             .init(keyword: "전남친", title: "친구 전남친이랑 썸 타는 중…\n괜찮음?", meta: "연애 · 6분 전 · 3명 이야기 중", time: "14:12", thumb: "C-42487f59e8cf", unread: true),
-            .init(keyword: "조별과제", title: "조별과제 무임승차한 동기\n이름 빼버릴까?", meta: "학교 · 7분 전 · 4명 이야기 중", time: "13:01", thumb: "C-8ae1794643d8", unread: false),
+            .init(keyword: "조별과제", title: "조별과제 무임승차한 동기\n이름 빼버릴까?", meta: "학교 · 7분 전 · 4명 이야기 중", time: "13:01", thumb: "F-noti-thumb-3", unread: false),
         ]),
         ("어제", [
             .init(keyword: "부모님", title: "부모님 싸우는 소리에\n잠을 못 자겠어", meta: "가족 · 어제 오후 11:42 · 6명 참여", time: nil, thumb: "C-ac5b50b3432d", unread: false),
-            .init(keyword: "급식", title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", meta: "학교 · 어제 오후 12:30 · 6명 참여", time: nil, thumb: "C-9820410bac5a", unread: false),
-            .init(keyword: "썸", title: "친구가 썸남 앞에서\n내 쌍밍아웃함", meta: "학교 · 어제 오전 9:15 · 4명 참여", time: nil, thumb: "C-7e1a4cbf18b3", unread: false),
+            .init(keyword: "급식", title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", meta: "학교 · 어제 오후 12:30 · 6명 참여", time: nil, thumb: "F-noti-thumb-5", unread: false),
+            .init(keyword: "썸", title: "친구가 썸남 앞에서\n내 쌍밍아웃함", meta: "학교 · 어제 오전 9:15 · 4명 참여", time: nil, thumb: "F-noti-thumb-6", unread: false),
         ]),
         ("이번 주", [
             .init(keyword: "남친", title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", meta: "연애 · 11월 5일 · 3명 참여", time: nil, thumb: "C-935b1b80a260", unread: false),

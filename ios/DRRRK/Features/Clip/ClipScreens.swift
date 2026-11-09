@@ -2,10 +2,16 @@ import SwiftUI
 
 extension ClipData {
     /// 장면 데이터를 새로 읽어 상태(좋아요, 저장, 소리, 댓글 수)에 맞게 바꾼 목록. 웹 ClipPlayer.jsx decorate와 같다.
-    static func player(like: Bool, save: Bool, mute: Bool, comments: Int) -> [ClipItem] {
+    /// 더보기 시트가 열리면 피그마 1870:19873처럼 영상과 아래 검정 영역, 뒤로, 소리 아이콘만 남긴다.
+    static let bareNames: Set<String> = ["영상 / 쌍밍아웃", "아래 검정 영역", "Icon / 뒤로", "Icon / 소리"]
+
+    static func player(like: Bool, save: Bool, mute: Bool, comments: Int, bare: Bool = false) -> [ClipItem] {
         let url = Bundle.main.url(forResource: "clip-scenes", withExtension: "json")!
         let items = (try? JSONDecoder().decode(File.self, from: Data(contentsOf: url)).player) ?? []
         return items.compactMap { it in
+            if bare, !bareNames.contains(it.n) {
+                return nil
+            }
             switch it.n {
             case "드르륵 에이전트 버튼": return nil
             case "Icon / 좋아요": if like {
@@ -55,8 +61,8 @@ struct ClipComment: Identifiable, Hashable {
     var likes: Int
 
     static let seed: [ClipComment] = [
-        .init(id: 1, name: "유니별84", avatar: "A-clip-av2", text: "앗.. 이거 완전 내 얘기잖아. 셋이 있는 자리에서 말하는 건 진짜 선 넘었다", when: "3일 전", order: 3, likes: 355),
-        .init(id: 2, name: "inflection", avatar: "A-clip-av1", text: "얼굴 화끈거리는 마음 너무 알아서 두 번 봤어", when: "2일 전", order: 2, likes: 128),
+        .init(id: 1, name: "먼작귀더쿠", avatar: "G-clip-av-mjg", text: "와 이번꺼 공감 100000% 나도 꼭 저렇게\n여우짓하는 애 있었는데 손절한지 4년됨", when: "3일 전", order: 3, likes: 355),
+        .init(id: 2, name: "럭키비키", avatar: "G-clip-av-lucky", text: "얼굴 화끈거리는 마음 너무 알아서 두 번 봤어", when: "2일 전", order: 2, likes: 128),
         .init(id: 3, name: "모카빵굽는밤", avatar: nil, text: "일단 그 친구한테 바로 따지지 말고 마음 정리부터 해 보자", when: "1일 전", order: 1, likes: 76),
         .init(id: 4, name: "새벽세시", avatar: nil, text: "이럴 땐 드르륵에서 비슷한 고민 방을 열어 보는 것도 방법이야", when: "20시간 전", order: 0, likes: 41),
     ]
@@ -106,7 +112,7 @@ struct ClipPlayerView: View {
     enum ClipSheetKind { case comments, info, more }
 
     var body: some View {
-        let items = ClipData.player(like: st.like, save: st.save, mute: st.mute, comments: st.total)
+        let items = ClipData.player(like: st.like, save: st.save, mute: st.mute, comments: st.total, bare: sheet == .more && sheetOpen)
         ClipCanvas(items: items, background: .black) {
             hit("소리", 340, 53, 46, 44, 22) { st.mute.toggle() }
             hit("뒤로", 0, 56, 64, 44, 0) { router.pop() }
@@ -194,7 +200,7 @@ struct ClipPlayerView: View {
                 case "comments": close { open(.comments) }
                 case "play": close(); say("반복 재생으로 설정했어요")
                 case "hide": close(); say("이 콘텐츠를 숨겼어요")
-                case "hideCreator": close(); say("쌍수일기 콘텐츠를 숨겼어요")
+                case "hideCreator": close(); say("웹드플리 콘텐츠를 숨겼어요")
                 case "report": close(); say("신고가 접수됐어요")
                 case "share": close(); say("링크를 복사했어요")
                 default: close()
@@ -218,7 +224,7 @@ struct ClipAgentButton: View {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             withAnimation(.easeOut(duration: 0.3)) { router.enterFromClip() }
         } label: {
-            Image("A-clip-agent").resizable().scaledToFill()
+            Image("G-clip-agent").resizable().scaledToFill()
                 .frame(width: 60, height: 60)
                 .clipShape(RoundedRectangle(cornerRadius: 13))
                 .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)

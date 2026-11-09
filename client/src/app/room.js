@@ -122,7 +122,7 @@ export function attachBanner(root) {
     exp = null;
     bannerOpen = false;
     pushDock(false);
-    const h = LIVE.bannerOpenH, c = LIVE.bannerClosedH;
+    const h = Number(e.dataset.openH) || LIVE.bannerOpenH, c = LIVE.bannerClosedH;
     const a = e.animate([{ clipPath: 'inset(0 0 0 0 round ' + radius() + ')' }, { clipPath: 'inset(0 0 ' + (h - c) + 'px 0 round ' + radius() + ')' }], { duration: LIVE.bannerMs, easing: motion.emphasizedAccel, fill: 'forwards' });
     col.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.stateIn, delay: LIVE.bannerMs - 90, fill: 'both' });
     a.onfinish = () => { e.remove(); col.style.opacity = ''; busy = false; };
@@ -133,15 +133,20 @@ export function attachBanner(root) {
     const e = await cloneOf(43, '[data-figma="고민 주제"]');
     if (!e || !root.isConnected) { busy = false; return; }
     if (!solo) {
+      // 새 방 장면(scene.js patchRoom2가 바꾼 화면)은 새 고민 글을, 그 밖의 방은 옛 글을 쓴다.
+      const B = root.dataset.room2 ? LIVE.bannerRoom2 : { title: null, body: LIVE.bannerBody, tags: LIVE.bannerTags };
       const ps = q(e, 'p[data-outline]');
       const body = ps.slice().sort((a, b) => b.textContent.length - a.textContent.length)[0];
-      setText(body, LIVE.bannerBody);
+      setText(body, B.body);
       Object.assign(body.style, { whiteSpace: 'pre-wrap', wordBreak: 'keep-all', height: 'auto' });
+      // 제목 줄: 팀 피그마 배너 펼침(1979:27613, 고민 주제 I1979:27707;56:389)의 글자 그대로다.
+      const title = ps.find((p) => /님의 고민$|의 고민$/.test(p.textContent.trim()));
+      if (title && B.title) { setText(title, B.title); Object.assign(title.style, { width: 'auto', whiteSpace: 'pre' }); }
       const tags = ps.filter((p) => /^#/.test(p.textContent.trim()));
       // 키워드 칩: 팀 글자 길이에 맞춘 고정 폭을 풀고 글자 길이대로 늘어나게 한다(좌우 여백이 같아야 한다).
       tags.forEach((t, i) => {
-        if (!LIVE.bannerTags[i]) return;
-        setText(t, LIVE.bannerTags[i]);
+        if (!B.tags[i]) return;
+        setText(t, B.tags[i]);
         Object.assign(t.style, { width: 'auto', whiteSpace: 'nowrap' });
         if (t.parentElement) Object.assign(t.parentElement.style, { width: 'auto', flex: '0 0 auto' });
       });
@@ -154,7 +159,9 @@ export function attachBanner(root) {
     exp = e;
     bannerOpen = true;
     pushDock(true, instant === true);
-    const h = LIVE.bannerOpenH, c = LIVE.bannerClosedH;
+    // 펼친 배너 높이는 실제 그려진 높이를 쓴다(함께 드르륵 방 144, 현장 모드 162).
+    const h = Math.round(e.getBoundingClientRect().height / ((root.getBoundingClientRect().width / LIVE.screenW) || 1)) || LIVE.bannerOpenH, c = LIVE.bannerClosedH;
+    e.dataset.openH = String(h);
     col.style.opacity = '0';
     if (instant === true) { busy = false; } else {
       const a = e.animate([{ clipPath: 'inset(0 0 ' + (h - c) + 'px 0 round ' + radius() + ')', opacity: 0.4 }, { clipPath: 'inset(0 0 0 0 round ' + radius() + ')', opacity: 1 }], { duration: LIVE.bannerMs, easing: motion.emphasizedDecel });
@@ -397,11 +404,15 @@ export function attachSpeakers(root) {
     const labels = q(group, ':scope > p[data-outline]');
     if (!dot || !wave || labels.length < 4) return;
     root.dataset.speakers = 'floor';
-    const meLabel = labels.find((p) => /새벽2시/.test(p.textContent)) || labels[0];
+    // 새 방 장면(팀 피그마 1979:27515, 11. 9.)에는 "나" 이름표가 없다. 이름표 4명이 모두 돌아가며 말한다.
+    // 초록 점과 파동이 처음 붙어 있는 이름표(피그마의 말하는 사람, 보라돌이 의자71)를 기준 자리로 삼고 거기서 시작한다.
     const rects = labels.map((p) => relRect(root, p));
-    const d0 = relRect(root, dot), w0 = relRect(root, wave), m0 = relRect(root, meLabel);
-    const meIdx = labels.indexOf(meLabel);
-    let cur = (meIdx + 1) % labels.length;
+    const d0 = relRect(root, dot), w0 = relRect(root, wave);
+    const homeIdx = rects.reduce((b, r, i) => (Math.abs(r.y - d0.y) + Math.abs(r.x - d0.x) < Math.abs(rects[b].y - d0.y) + Math.abs(rects[b].x - d0.x) ? i : b), 0);
+    const m0 = rects[homeIdx];
+    // 옛 장면(새벽2시 이름표가 나인 화면)은 나를 빼고 돌린다. 말하는 표시는 나에게 붙지 않는다.
+    const meIdx = labels.findIndex((p) => /새벽2시/.test(p.textContent));
+    let cur = meIdx >= 0 ? (meIdx + 1) % labels.length : homeIdx;
     [dot, wave].forEach((e) => (e.style.transition = 'transform 320ms ' + motion.emphasizedDecel + ', opacity 200ms'));
     const place = (i) => {
       const r = rects[i];
