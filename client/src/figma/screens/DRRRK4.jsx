@@ -103,7 +103,7 @@ export function DRRRK4({ style, className }) {
         <Icon data-figma="chevron-left" data-node="1671:45338" name="chevron-left-1620-23175" color="#FFFFFF" className="[width:24px] [height:24px] [position:absolute] [left:24px] [top:16px]" />
         <div data-figma="x-02" data-node="1671:45339" data-empty-instance="" className="[width:24px] [height:24px] [position:absolute] [left:342px] [top:16px]" />
       </div>
-      <img data-figma="btn" data-node="1755:11138" data-missing-component="btn" data-px="" data-hires="" alt="" src="assets/raster/1755-11138.png" className="[width:342px] [position:absolute] [left:24px] [top:726px] [height:46px] [display:block]" />
+      <img data-figma="btn" data-node="1755:11138" data-missing-component="btn" data-px="" data-hires="" alt="" src="assets/end3/r-1755-11138.webp" className="[width:342px] [position:absolute] [left:24px] [top:726px] [height:46px] [display:block]" />
       <p data-figma="혼자 드르륵 앉기" data-node="1671:45359" data-outline="" className="[width:342px] [color:#9AA1A6] [text-align:center] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:14px] [font-style:normal] [font-weight:700] [line-height:20px] [letter-spacing:-0.56px] [position:absolute] [left:24px] [top:784px] [height:20px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent]"><span style={{ position: 'relative', top: '-0.096px', left: '-0.28px' }}>{"혼자 드르륵 앉기"}</span><span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0, overflow: 'visible', lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: svg["1671:45359"] }} /></p>
     </div>
   );

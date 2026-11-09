@@ -115,9 +115,9 @@ function chairPicker(root) {
   if (!list || list.dataset.tap) return;
   list.dataset.tap = '1';
   const strips = q(list, '[data-figma="cells"]');
-  const strip = strips.find((s) => s.querySelector('[data-figma^="cell / "]') && !s.querySelector('[data-figma="cells"]'));
+  const strip = strips.find((s) => s.querySelector('[data-figma^="cell / "], [data-figma="의자 셀"]') && !s.querySelector('[data-figma="cells"]'));
   if (!strip) return;
-  const cells = () => q(strip, ':scope > [data-figma^="cell / "]');
+  const cells = () => q(strip, ':scope > [data-figma^="cell / "], :scope > [data-figma="의자 셀"]');
   const nameOf = (c) => c.querySelector('[data-figma="name"]') || c.querySelector('p');
   const all = cells();
   if (!all.length) return;
@@ -166,6 +166,72 @@ function chairPicker(root) {
     const r = relRect(root, a), lr = relRect(root, list);
     pressable(a, () => step(r.x + r.w / 2 > lr.x + lr.w / 2 ? 1 : -1));
   });
+}
+
+// ---------- 1-2) 도움이 된 의자, 한 개씩 넘기기(1번 종료, 피그마 2023:30658) ----------
+// 가운데 의자 한 개와 좌우 화살표. 피그마 첫 상태는 맨 끝 의자(차가운 새벽의자92)이고 오른쪽 화살표가 흐리다(0.3).
+// 앞 칸의 의자는 옛 종료 프레임(1647:26726) 추천 줄의 이름과 그림을 그대로 쓴다. 가운데 의자를 누르면 이름이 하늘색으로 켜지고 꺼지며 최대 2명이다.
+const IMG = (h) => 'url(assets/images/' + h + '.webp)';
+const PREV_CHAIRS = [
+  { name: '진실의\n의자10', img: IMG('33871c043e7c4e9145ae99a02d9e4f55d741e136') },
+  { name: '새벽2시\n피시방', img: IMG('f77c03c1bf89bd6ce2986f11ecd9d7660e2d2ad0') },
+  { name: '딱딱한\n나무 스툴12', img: IMG('51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017') },
+];
+function chairStepper(root) {
+  const list = root.querySelector('[data-figma="Vote List"]');
+  if (!list || list.dataset.tap) return false;
+  const cellsEl = q(list, '[data-figma="의자 셀"]');
+  if (cellsEl.length !== 1) return false;
+  list.dataset.tap = '1';
+  const cell = cellsEl[0];
+  const name = cell.querySelector('[data-figma="name"]');
+  const pic = q(cell, '[data-figma]').find((e) => /url\(/.test(e.style.backgroundImage || ''));
+  if (!name || !pic) return true;
+  const first = { name: name.textContent.replace(/\s+$/, ''), img: pic.style.backgroundImage, live: true };
+  const chairs = [...PREV_CHAIRS, first];
+  let at = chairs.length - 1;
+  let picked = [];
+  const arrows = q(list, '[data-figma="arrow"]');
+  const lr = relRect(root, list);
+  const sideOf = (a) => { const r = relRect(root, a); return r.x + r.w / 2 > lr.x + lr.w / 2 ? 1 : -1; };
+  const icon = (a) => a.querySelector('[data-figma="Icon / Line"]') || a;
+  const sync = () => {
+    arrows.forEach((a) => {
+      const can = sideOf(a) > 0 ? at < chairs.length - 1 : at > 0;
+      const ic = icon(a);
+      ic.style.transition = 'opacity 150ms ' + motion.standard;
+      ic.style.opacity = can ? '1' : '0.3';
+    });
+    const on = picked.includes(at);
+    if (!chairs[at].live || name.dataset.live) {
+      setText(name, chairs[at].name);
+      name.dataset.live = '1';
+      name.style.color = on ? SKY : '#F8F8F8';
+    } else paint(name, on ? SKY : '#F8F8F8');
+    pic.style.backgroundImage = chairs[at].img;
+  };
+  sync();
+  let busy = false;
+  const step = (dir) => {
+    const nx = at + dir;
+    if (busy || nx < 0 || nx >= chairs.length) return;
+    busy = true;
+    const out = cell.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(' + (-16 * dir) + 'px)', opacity: 0 }], { duration: 150, easing: motion.standard, fill: 'forwards' });
+    out.onfinish = () => {
+      at = nx;
+      sync();
+      const back = cell.animate([{ transform: 'translateX(' + (16 * dir) + 'px)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 150, easing: motion.standard });
+      back.onfinish = () => { out.cancel(); busy = false; };
+    };
+  };
+  arrows.forEach((a) => pressable(a, () => step(sideOf(a)), icon(a)));
+  pressable(cell, () => {
+    if (picked.includes(at)) picked = picked.filter((x) => x !== at);
+    else { picked.push(at); if (picked.length > 2) picked.shift(); }
+    sync();
+    if (picked.includes(at)) pic.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duration: 300, easing: motion.standard });
+  });
+  return true;
 }
 
 // ---------- 2) 따봉 ----------
@@ -394,7 +460,9 @@ function roomPick(root) {
 // ---------- 붙이기 ----------
 export function attachTaps(root, n, go, prevN) {
   if (!root) return;
-  if ([1, 2, 3].includes(n)) { chairPicker(root); thumbs(root); }
+  // 1번은 의자 한 개씩 넘기는 구조(2023:30658), 2번과 3번은 의자 3칸 줄(3번 칸 이름은 "의자 셀"과 "cell / sofa")이다.
+  if (n === 1) { chairStepper(root); thumbs(root); }
+  if (n === 2 || n === 3) { chairPicker(root); thumbs(root); }
   if (n === 7) {
     reasons(root);
     detailInput(root);

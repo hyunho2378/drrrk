@@ -671,7 +671,8 @@ function patchReport(root, n) {
   const pad = document.createElement('div');
   pad.setAttribute('aria-hidden', 'true');
   // 내용 칸은 높이가 고정이고 안쪽이 모두 절대 위치라서, 여백은 내용 맨 아래(칸 높이 자리)에 절대 위치로 둔다.
-  Object.assign(pad.style, { position: 'absolute', left: '0px', top: parseFloat(getComputedStyle(content).height) + 'px', width: '1px', height: '204px' });
+  Object.assign(pad.style, { position: 'absolute', left: '0px', top: parseFloat(getComputedStyle(content).height) + 'px', width: '1px', height: (n === 3 ? 0 : 204) + 'px' });
+  // 3번(W-END2, 11. 10.): 내용 칸 1256 안에서 마지막 줄(의자 이름 끝 y1016)이 맨 아래 스크롤(412)에서 604에 서서 버튼(726)보다 위라 여백을 더하지 않는다. 2번은 그대로 204.
   content.appendChild(pad);
   // 아래 버튼 띠(함께 드르륵 앉기, 새 방 만들기)는 피그마에서 화면 바닥에 고정이다. 생성 화면에서는 스크롤 칸 안에 들어 있어 내용과 같이 올라가 겹쳤다. 칸 밖으로 옮겨 바닥에 고정한다.
   const cta = [...content.children].find((c) => c !== pad && c.getAttribute('data-figma') !== 'Report' && /함께 드르륵 앉기/.test(c.textContent) && c.textContent.length < 60);
