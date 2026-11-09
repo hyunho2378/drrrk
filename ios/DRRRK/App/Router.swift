@@ -44,8 +44,16 @@ enum Tab: String, CaseIterable {
     }
 }
 
+/// 라이브 목록에서 누른 카드. 방 구경 화면의 제목, 보는 수, 시계 시작 값에 쓴다.
+struct WatchPick: Hashable {
+    let title: String
+    let viewers: String
+    let left: Int
+}
+
 @Observable
 final class Router {
+    var watch: WatchPick?
     var path: [Route] = []
     var tab: Tab = .home
     var showSplash = false

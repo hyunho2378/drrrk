@@ -61,16 +61,32 @@ struct LiveView: View {
     private var cards: [LiveCard] {
         let list = LiveData.cards[category] ?? []
         switch sort {
-        // 인기순: 피그마 프레임 순서 그대로
-        case .popular: return list
-        // 최신순: 방금 열린 방, 그다음 남은 시간이 긴 방부터
-        case .latest: return list.sorted { ($0.fresh ? 1 : 0, $0.remaining) > ($1.fresh ? 1 : 0, $1.remaining) }
-        // 맞춤순: 내 고민(친구 사이)과 가까운 방부터, 나머지는 인기순
-        case .match:
-            let near = ["친구", "베프", "사진", "손민수", "따라"]
+        // 인기순: 보는 수가 큰 방부터(같으면 피그마 프레임 순서)
+        case .popular:
             return list.enumerated().sorted { a, b in
-                let x = near.contains { a.element.title.contains($0) }, y = near.contains { b.element.title.contains($0) }
-                return x != y ? x : a.offset < b.offset
+                let x = Int(a.element.viewers) ?? 0, y = Int(b.element.viewers) ?? 0
+                return x != y ? x > y : a.offset < b.offset
+            }.map(\.element)
+        // 최신순: 방금 열린 방, 첫 대화 상대를 기다리는 방, 그다음 남은 시간이 긴 방부터
+        case .latest:
+            func rank(_ c: LiveCard) -> Int { c.fresh ? 0 : (c.meta.contains("기다려요") ? 1 : 2) }
+            return list.enumerated().sorted { a, b in
+                let x = rank(a.element), y = rank(b.element)
+                if x != y { return x < y }
+                if a.element.remaining != b.element.remaining { return a.element.remaining > b.element.remaining }
+                return a.offset < b.offset
+            }.map(\.element)
+        // 맞춤순: 친구 이야기와 썸, 연애 이야기가 둘 다 있는 글이 먼저, 그다음 한쪽, 나머지는 피그마 순서(웹 liveV2.js와 같은 규칙)
+        case .match:
+            func score(_ t: String) -> Int {
+                var n = 0
+                if t.range(of: "친구|베프|동기", options: .regularExpression) != nil { n += 1 }
+                if t.range(of: "썸|남친|애인|여친", options: .regularExpression) != nil { n += 1 }
+                return n
+            }
+            return list.enumerated().sorted { a, b in
+                let x = score(a.element.title), y = score(b.element.title)
+                return x != y ? x > y : a.offset < b.offset
             }.map(\.element)
         }
     }
@@ -84,7 +100,7 @@ struct LiveView: View {
         FigmaScroll(height: contentHeight) {
             ZStack(alignment: .topLeading) {
                 LiveHeader()
-                LiveCarousel(items: LiveData.featured, page: $page) { router.push(.liveWatch) }
+                LiveCarousel(items: LiveData.featured, page: $page) { router.watch = nil; router.push(.liveWatch) }
                     .offset(y: 128)
                 LiveDots(index: page).offset(x: 163, y: 372)
                 LiveTabs(selected: $category, showDot: !loveLeft)
@@ -108,7 +124,7 @@ struct LiveView: View {
                 .accessibilityLabel("정렬 " + sort.rawValue)
                 VStack(spacing: 12) {
                     ForEach(cards) { card in
-                        Button { router.push(.liveWatch) } label: { LiveCardView(card: card) }
+                        Button { router.watch = WatchPick(title: card.title, viewers: card.viewers, left: card.remaining > 0 ? card.remaining : 1200); router.push(.liveWatch) } label: { LiveCardView(card: card) }
                             .buttonStyle(PressStyle())
                             .transition(.opacity)
                     }
@@ -645,6 +661,13 @@ struct LiveWatchView: View {
     @State private var draft = ""
     @State private var mine = WatchData.myComments
     @FocusState private var focused: Bool
+    /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 빠르기(20분이 실제 3분)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
+    @State private var left: Double = 372
+    private let clock = Timer.publish(every: 0.25, on: .main, in: .common).autoconnect()
+    private var watchClock: String {
+        let v = max(0, Int(left.rounded(.up)))
+        return String(format: "%02d:%02d", v / 60, v % 60)
+    }
 
     /// 피그마 단위 내용 높이: 내 댓글 하나(658~690) 뒤로 새 댓글마다 40, 입력창(754부터) 위로 띄운다.
     private var contentHeight: CGFloat {
@@ -676,12 +699,14 @@ struct LiveWatchView: View {
                 .ignoresSafeArea(.container, edges: .bottom)
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear { left = Double(router.watch?.left ?? 372) }
+        .onReceive(clock) { _ in left = max(0, left - 0.25 * (1200.0 / 180.0)) }
     }
 
     /// 고민 묶음(24, 321): 제목 21 굵게 행간 28, "대화 중 3"(12 아래), 의자 자리 58 칸 사이 14(12 아래), 원 54 흰 바탕, 이름 11 #9AA1A6, 빈 자리 #06303C 하늘색 점선 1.5.
     private var room: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(WatchData.title).suit(21, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary).fixedSize()
+            Text(router.watch?.title ?? WatchData.title).suit(21, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary).fixedSize()
             HStack(spacing: 6) {
                 Image("C-voice").renderingMode(.template).resizable().scaledToFit().frame(width: 18, height: 18)
                     .foregroundStyle(DS.Palette.brandPrimary)
@@ -750,8 +775,8 @@ struct LiveWatchView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("뒤로")
                 .offset(x: 14, y: 69)
-                LiveViewersPill(count: "22").offset(x: 313, y: 78)
-                LiveTimerPill(time: "06:12").frame(width: 71, alignment: .leading).offset(x: 266, y: 120)
+                LiveViewersPill(count: router.watch?.viewers ?? "22").offset(x: 313, y: 78)
+                LiveTimerPill(time: watchClock).offset(x: 266, y: 120)
             }
         }
         .ignoresSafeArea(.container, edges: .top)
