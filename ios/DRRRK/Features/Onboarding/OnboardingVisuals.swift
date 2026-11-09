@@ -48,28 +48,29 @@ struct ObTogetherMatch: View {
                         Button {
                             if !reduceMotion { taps[i] += 1 }
                         } label: {
-                            ObAvatar(asset: avatars[i], size: 36, imageDelay: 0.62 + Double(i) * 0.08)
+                            ObAvatar(asset: avatars[i], size: 36, imageDelay: 0.85 + Double(i) * 0.04)
                         }
                         .buttonStyle(PressStyle())
                         .obBounce(taps[i])
-                        .obEnter(on, 0.5 + Double(i) * 0.08, scale: 0.6, animation: ObMotion.pop)
+                        // 11/10 사용자: 한꺼번에 튜어나오는 것이 많다. 아바타는 팝 없이 한 묶음으로 올라온다.
+                        .obEnter(on, 0.72 + Double(i) * 0.04, dy: 8)
                     }
                 }
                 .offset(x: 11, y: 66)
-                ObSkeleton(width: 170, height: 14, radius: 7, shimmerDelay: 1.3)
+                ObSkeleton(width: 170, height: 14, radius: 7, shimmerDelay: 1.9)
                     .offset(x: 30, y: 124)
-                    .obEnter(on, 0.95, sx: 0, anchor: .leading)
-                ObSkeleton(width: 120, height: 14, radius: 7, shimmerDelay: 1.38)
+                    .obEnter(on, 1.2, sx: 0, anchor: .leading)
+                ObSkeleton(width: 120, height: 14, radius: 7, shimmerDelay: 1.95)
                     .offset(x: 55, y: 148)
-                    .obEnter(on, 1.03, sx: 0, anchor: .leading)
+                    .obEnter(on, 1.24, sx: 0, anchor: .leading)
             }
             .offset(x: 48, y: 44)
             .obEnter(on, 0, dy: 16)
             ObChip(label: "함께 드르륵", fontSize: 12, dark: true, width: 104, height: 32) {
-                ObTiltIcon(asset: "N-ob-icon-home-chair", size: 16, delay: 1.55)
+                ObTiltIcon(asset: "N-ob-icon-home-chair", size: 16, delay: 2.06)
             }
             .offset(x: 194, y: 168)
-            .obEnter(on, 1.2, dx: 10, dy: 12)
+            .obEnter(on, 1.7, dx: 10, dy: 12)
         }
         .task { on = true }
     }
@@ -474,7 +475,7 @@ struct ObTogetherSunrise: View {
         .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 20))
     }
 
-    /// 20:00에서 00:00까지 2.4초 동안 빠르게 줄고, 그동안 타이머 아이콘이 천천히 한 바퀴 돈다. 00:00에서 해 칩이 떠오른다.
+    /// 20:00에서 00:00까지 1.3초 동안 빠르게 줄고(웹과 같은 값), 그동안 타이머 아이콘이 천천히 한 바퀴 돈다. 00:00에서 해 칩이 떠오른다.
     private func play() async {
         var reset = Transaction()
         reset.disablesAnimations = true
@@ -489,12 +490,12 @@ struct ObTogetherSunrise: View {
             sunUp = true
             return
         }
-        guard await obWait(round == 0 ? 0.8 : 0.25) else { return }
-        withAnimation(ObMotion.standard(2.4)) {
+        guard await obWait(round == 0 ? 0.55 : 0.2) else { return }
+        withAnimation(ObMotion.standard(1.3)) {
             seconds = 0
             spin = true
         }
-        guard await obWait(2.4) else { return }
+        guard await obWait(1.3) else { return }
         sunUp = true
     }
 }
