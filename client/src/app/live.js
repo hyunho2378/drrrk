@@ -4,6 +4,7 @@
 // 3) 채팅: 방에 처음 들어가면 대화가 하나씩 올라온다.
 // 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
+import { watchStart } from './liveV2.js';
 import { motion, live as LIVE } from '../tokens.js';
 import { patchLiveV2, patchWatchSeats } from './liveV2.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
@@ -700,7 +701,7 @@ function prepareRoomClock(root, n) {
   const sc = sceneOf(n);
   if (!sc) return;
   const same = room.scene === sc && room.kind === timerKind(root);
-  const txt = fmtMMSS(same ? remaining() : LIVE.roomSeconds);
+  const txt = fmtMMSS(same ? remaining() : n === 37 ? watchStart() : LIVE.roomSeconds);
   timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
 }
 
@@ -777,7 +778,7 @@ export function attach(layer, n, go, prevN) {
       if (room.scene !== sc) room.chatDone = false;
       room.scene = sc;
       room.kind = kind;
-      room.left = LIVE.roomSeconds;
+      room.left = n === 37 ? watchStart() : LIVE.roomSeconds;
       room.at = performance.now();
       room.fired = {};
     }

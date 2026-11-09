@@ -117,6 +117,12 @@ function metaRow(state, views, left) {
 
 // 목록에서 누른 카드(방 구경 37의 제목과 보는 수에 쓴다). 한 번 쓰면 비운다(위 가로 카드로 들어가면 37 기본 글자 그대로).
 let picked = null;
+// 방 구경(37)의 시계가 시작할 초. 누른 카드의 남은 시간(카드 글 "12:32 남음", 곧 끝 카드는 03:00 배지)에서 시작한다. 방금 열린 방과 기다리는 방은 20:00.
+// 위 가로 카드로 들어오면 피그마 값 06:12.
+let watchLeft = 372;
+export const watchStart = () => watchLeft;
+const secOf = (s) => { const m = /(\d{1,2}):(\d{2})/.exec(s || ''); return m ? +m[1] * 60 + +m[2] : null; };
+const leftOf = (c) => (c.st === 'soon' ? secOf(c.timer || '03:00') : secOf(c.meta)) ?? 1200;
 
 // 정렬 순서. 인기순: 피그마 목록 순서. 최신순: 방금 열린 방, 첫 상대를 기다리는 방, 그다음 남은 시간이 긴 방.
 // 맞춤순: 기본 고민(친구가 썸남 앞에서 내 쌍밍아웃함)과 가까운 친구와 연애 고민이 먼저(친구 48, 연애 49 탭에 있는 글).
@@ -128,8 +134,8 @@ function orderList(list, mode) {
     if (mode === 'new') return [x.c.st === 'fresh' ? 0 : x.c.st === 'alone' ? 1 : 2, -secsOf(x.c), x.i];
     // 친구 이야기와 썸, 연애 이야기가 둘 다 있는 글이 가장 가깝고, 그다음 한쪽만 있는 글, 친구와 연애 탭 글, 나머지 순이다.
     if (mode === 'match') { const t = x.c.title; const sc = (/친구|베프|동기/.test(t) ? 1 : 0) + (/썸|남친|애인|여친/.test(t) ? 1 : 0); return [-sc, MATCH_TITLES.has(t) ? 0 : 1, x.i]; }
-    // 인기순은 피그마 목록 순서 그대로다(팀이 인기순 화면으로 그린 순서, iOS와 같음).
-    return [x.i];
+    // 인기순은 보는 수가 큰 방부터다(같으면 피그마 목록 순서). 시트 설명 "보는 사람과 공감이 많은 방부터"와 맞춘다(11/09 QA: 목록 순서 그대로 쓰면 11, 7, 10, 22 순이라 인기순이 아니었다).
+    return [-(parseInt(x.c.views, 10) || 0), x.i];
   };
   a.sort((p, q) => { const kp = key(p), kq = key(q); for (let k = 0; k < kp.length; k++) if (kp[k] !== kq[k]) return kp[k] - kq[k]; return 0; });
   return a;
@@ -154,7 +160,7 @@ function cardOf(c) {
   }
   if (c.st === 'fresh') card.appendChild(el('span', { position: 'absolute', left: '8px', top: '24px', width: '6px', height: '6px', borderRadius: '50%', background: '#36D2FF' }));
   card.addEventListener('click', () => {
-    picked = { title: c.title.replace(/ \n/g, '\n'), views: c.views };
+    picked = { title: c.title.replace(/ \n/g, '\n'), views: c.views, left: leftOf(c) };
     window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 37, t: 'push' } }));
   });
   return card;
@@ -229,14 +235,26 @@ function patchWatchTitle(root) {
   root.dataset.watchTitle = '1';
   const p = picked;
   picked = null;
+  watchLeft = p ? p.left : 372;
   if (!p) return;
   const title = [...root.querySelectorAll('p[data-figma]')].find((e) => e.getAttribute('data-figma').indexOf('둘이 찍은 사진인데') === 0);
   if (title) { setText(title, p.title); Object.assign(title.style, { whiteSpace: 'pre', width: 'auto' }); }
   const view = root.querySelector('[data-figma="보는 중"] p');
   if (view) { setText(view, p.views); Object.assign(view.style, { width: 'auto', whiteSpace: 'nowrap' }); }
 }
+// 방 구경 장면: 생성 화면은 옛 장면(길거리)과 바닥 이름표 4개를 그대로 담고 있다. 팀 피그마 1943:12838은 새 장면(편의점 앞 밤)이고 이름표가 없다(11/09 QA).
+const OLD_FLOOR = ['부드러운 리클라이너21', '아기자기 나무스툴12', '새로 산 가죽소파19', '새벽2시 편의점 의자', 'Group 2147229021'];
+function patchWatchScene(root) {
+  if (root.dataset.watchScene) return;
+  const sc = root.querySelector('[data-figma="scene (방 미리보기)"]');
+  if (!sc) return;
+  root.dataset.watchScene = '1';
+  sc.style.setProperty('background-image', 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/watch-scene.webp)', 'important');
+  sc.style.setProperty('background-size', '100% 100%', 'important');
+  OLD_FLOOR.forEach((name) => root.querySelectorAll(':scope > [data-figma="' + name + '"]').forEach((e) => (e.style.display = 'none')));
+}
 export function patchWatchSeats(root, n) {
-  if (n === 37 && root) patchWatchTitle(root);
+  if (n === 37 && root) { patchWatchScene(root); patchWatchTitle(root); }
   if (n !== 37 || !root || root.dataset.watchSeats) return;
   const imgs = [...root.querySelectorAll('[data-figma="avatar"]')];
   if (!imgs.length) return;
