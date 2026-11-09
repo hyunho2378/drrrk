@@ -45,12 +45,15 @@ final class RoomModel {
         case other(ChatLine)
         case mine(String)
         case system(String)
+        /// 입력줄에서 내가 보낸 말(같은 글을 두 번 보내도 따로 쌓이게 번호를 붙인다)
+        case sent(Int, String)
 
         var id: String {
             switch self {
             case let .other(line): "o" + line.id.uuidString
             case let .mine(text): "m" + text
             case let .system(text): "s" + text
+            case let .sent(n, _): "n\(n)"
             }
         }
     }
@@ -111,12 +114,22 @@ final class RoomModel {
         .other(.init(name: "폭신폭신 소파38", text: "맞아여 앞으로 그런 애한테 신경쓰지 마요", opacity: 1)),
     ]
 
+    /// 입력줄에서 보낸 내 말. 단계 글 뒤에 이어 붙고, 채팅 칸에는 최근 네 줄만 남는다.
+    var sentChats: [String] = []
+
     var visibleEntries: [ChatEntry] {
-        switch stage {
+        let base: [ChatEntry] = switch stage {
         case 0: Self.fieldOpening
         case 1: Self.fieldTalk
         default: Self.fieldLastMinute
         }
+        guard !sentChats.isEmpty else { return base }
+        let sent = sentChats.enumerated().map { ChatEntry.sent($0.offset, $0.element) }
+        return Array((base + sent).suffix(4))
+    }
+
+    func send(_ text: String) {
+        sentChats.append(text)
     }
 
     let chats: [ChatLine] = [

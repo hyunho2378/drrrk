@@ -86,7 +86,7 @@ private struct NotiHeader: View {
                     Image("C-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .accessibilityLabel("뒤로")
                 Spacer()
             }
@@ -124,7 +124,7 @@ private struct NotiTabs: View {
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
             }
         }
         .padding(.horizontal, 24)
@@ -186,7 +186,7 @@ struct NotiActivityView: View {
                     HStack(spacing: 8) {
                         ForEach(NotiData.filters, id: \.self) { f in
                             Button { withAnimation(DS.Motion.stateIn) { filter = f } } label: { FilterChip(title: f, on: f == filter) }
-                                .buttonStyle(.plain)
+                                .buttonStyle(PressStyle())
                         }
                     }
                 }
@@ -195,29 +195,14 @@ struct NotiActivityView: View {
                 .padding(.top, 18)
                 VStack(spacing: 0) {
                     ForEach(NotiData.activity.filter { filter == "전체" || $0.kind == filter }) { a in
-                        HStack(alignment: .top, spacing: 12) {
-                            Image(a.icon).resizable().frame(width: 40, height: 40)
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack(spacing: 6) {
-                                    Text(a.title).suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
-                                    Spacer()
-                                    Text(a.ago).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
-                                    if a.unread {
-                                        Circle().fill(DS.Palette.danger).frame(width: 5, height: 5)
-                                    }
-                                }
-                                Text(a.body).suit(15, .medium, tracking: -0.6).foregroundStyle(DS.Palette.textPrimary).lineSpacing(4)
-                                if let more = a.more {
-                                    Text(more).suit(13, .medium, tracking: -0.52).foregroundStyle(DS.Palette.textPrimary)
-                                        .padding(.horizontal, 14).frame(height: 32)
-                                        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 8))
-                                        .padding(.top, 6)
-                                }
-                            }
+                        // 알림 줄과 "N건 더보기"를 누르면 그 알림이 가리키는 화면으로 간다. 신고 결과 알림은 갈 화면이 없어 줄만 보인다.
+                        if let go = destination(a) {
+                            Button(action: go) { activityRow(a) }
+                                .buttonStyle(PressStyle())
+                                .transition(.opacity)
+                        } else {
+                            activityRow(a).transition(.opacity)
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 20)
-                        .transition(.opacity)
                     }
                 }
                 .padding(.top, 10)
@@ -225,6 +210,48 @@ struct NotiActivityView: View {
             }
         }
         .scrollIndicators(.hidden)
+    }
+
+    /// 알림 종류별 갈 곳: 엉따지수는 마이, 댓글은 글 상세, 업적 편의점은 나의 편의점, 의자 꾸미기는 의자 꾸미기
+    private func destination(_ a: ActivityItem) -> (() -> Void)? {
+        switch a.kind {
+        case "엉따지수": { router.select(.my) }
+        case "댓글": { router.push(.communityDetail) }
+        case "업적 편의점": { router.push(.myShelf) }
+        case "의자꾸미기": {
+                ChairStore.shared.openStudio(fresh: false)
+                router.push(.chairStudio)
+            }
+        default: nil
+        }
+    }
+
+    private func activityRow(_ a: ActivityItem) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(a.icon).resizable().frame(width: 40, height: 40)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Text(a.title).suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
+                    Spacer()
+                    Text(a.ago).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
+                    if a.unread {
+                        Circle().fill(DS.Palette.danger).frame(width: 5, height: 5)
+                    }
+                }
+                Text(a.body).suit(15, .medium, tracking: -0.6).foregroundStyle(DS.Palette.textPrimary).lineSpacing(4)
+                    .multilineTextAlignment(.leading)
+                if let more = a.more {
+                    Text(more).suit(13, .medium, tracking: -0.52).foregroundStyle(DS.Palette.textPrimary)
+                        .padding(.horizontal, 14).frame(height: 32)
+                        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 8))
+                        .padding(.top, 6)
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 
     private var keywordList: some View {
@@ -242,17 +269,17 @@ struct NotiActivityView: View {
                         .foregroundStyle(DS.Palette.textSecondary)
                         .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 24).padding(.bottom, 12)
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        Button { keywordFilter = "전체" } label: { FilterChip(title: "전체", on: keywordFilter == "전체") }.buttonStyle(.plain)
+                        Button { keywordFilter = "전체" } label: { FilterChip(title: "전체", on: keywordFilter == "전체") }.buttonStyle(PressStyle())
                         ForEach(store.keywords, id: \.self) { k in
                             let n = NotiData.sections.flatMap(\.1).filter { $0.keyword == k }.count
                             Button { withAnimation(DS.Motion.stateIn) { keywordFilter = k } } label: { FilterChip(title: "#" + k, on: keywordFilter == k, count: n) }
-                                .buttonStyle(.plain)
+                                .buttonStyle(PressStyle())
                         }
                     }
                 }
@@ -268,7 +295,7 @@ struct NotiActivityView: View {
                         Text(section.0).suit(14, .bold, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
                             .padding(.horizontal, 24).padding(.top, 32).padding(.bottom, 4)
                         ForEach(hits) { h in
-                            Button { router.push(.liveWatch) } label: { hitRow(h) }.buttonStyle(.plain).padding(.top, 12)
+                            Button { router.push(.liveWatch) } label: { hitRow(h) }.buttonStyle(PressStyle()).padding(.top, 12)
                         }
                     }
                 }
@@ -360,6 +387,7 @@ struct NotiKeywordSettingsView: View {
                 Button("등록", action: register).suit(14, .medium, tracking: -0.28)
                     .foregroundStyle(draft.isEmpty ? DS.Palette.textSecondary : DS.Palette.brandPrimary)
                     .frame(minHeight: 44)
+                    .buttonStyle(PressStyle())
             }
             .padding(.horizontal, 20)
             .frame(height: 56)
@@ -375,7 +403,7 @@ struct NotiKeywordSettingsView: View {
                             Image("C-close").renderingMode(.template).resizable().frame(width: 16, height: 16)
                                 .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressStyle())
                         .accessibilityLabel(k + " 지우기")
                     }
                     .padding(.leading, 4).padding(.trailing, -10)
@@ -426,7 +454,7 @@ private struct CheckRow: View {
             .frame(minHeight: 20)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
         .accessibilityAddTraits(on ? .isSelected : [])
     }
 }
@@ -447,7 +475,7 @@ private struct FlowChips: View {
                     // 피그마 칩: 채움 없이 #3A4045 1px 외곽선
                     .overlay(Capsule().strokeBorder(Color(hex: 0x3A4045), lineWidth: 1))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .transition(.opacity.combined(with: .scale(scale: 0.9)))
             }
         }

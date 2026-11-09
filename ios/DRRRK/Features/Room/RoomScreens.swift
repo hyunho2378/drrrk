@@ -37,7 +37,7 @@ private struct BackHeader: View {
                     .frame(width: 44, height: 44, alignment: .leading)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel("뒤로")
             Spacer()
         }
@@ -60,12 +60,10 @@ private struct PrimaryButton: View {
     }
 }
 
+/// 앱 전체 눌림 반응(PressStyle)과 같다. 예전 이름을 쓰는 자리를 위해 남겨 둔다.
 struct RoomPressStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .opacity(configuration.isPressed ? 0.85 : 1)
-            .animation(DS.Motion.press, value: configuration.isPressed)
+        PressStyle().makeBody(configuration: configuration)
     }
 }
 
@@ -86,21 +84,6 @@ private struct ClockPill: View {
     }
 }
 
-private struct TopicLine: View {
-    let text: String
-    var body: some View {
-        HStack(spacing: 8) {
-            Text("고민").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.brandPrimary)
-            Text(text).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
-            Spacer(minLength: 0)
-            Image("icon-chevron-down").renderingMode(.template).resizable().foregroundStyle(DS.Palette.textPrimary).frame(width: 16, height: 16)
-        }
-        .padding(.horizontal, 14).padding(.vertical, 10)
-        .background(DS.Palette.bgOverlay.opacity(0.6), in: RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal, 24).padding(.top, 5)
-    }
-}
-
 // MARK: - 일반 모드
 
 struct RoomNormalView: View {
@@ -109,6 +92,7 @@ struct RoomNormalView: View {
     @State private var speaker = "진실의 의자10"
     @State private var emojiOpen = false
     @State private var flying: [FlyingEmoji] = []
+    @State private var sent: [String] = []
     private let people = RoomPeople.normal
 
     var body: some View {
@@ -119,7 +103,7 @@ struct RoomNormalView: View {
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 24, height: 24)
                         .frame(width: 44, height: 44, alignment: .leading).contentShape(Rectangle())
                 }
-                .buttonStyle(.plain).accessibilityLabel("나가기")
+                .buttonStyle(PressStyle()).accessibilityLabel("나가기")
                 Spacer()
                 ClockPill(model: model)
                 Spacer()
@@ -128,11 +112,13 @@ struct RoomNormalView: View {
                         .frame(width: 18, height: 18).frame(width: 46, height: 32)
                         .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
                 }
-                .buttonStyle(.plain).accessibilityLabel("현장 모드로 보기")
+                .buttonStyle(PressStyle()).accessibilityLabel("현장 모드로 보기")
             }
             .padding(.leading, 14).padding(.trailing, 24).frame(height: 56)
 
-            TopicLine(text: model.topicShort)
+            // 접힌 고민 줄(아래 화살표)을 누르면 현장 모드와 같이 그 자리에서 펼쳐진다. 접힌 모양은 예전 줄과 같은 값이다.
+            TopicBanner(model: model)
+                .padding(.horizontal, 24).padding(.top, 5)
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 14) {
                 ForEach(people) { p in
@@ -168,6 +154,14 @@ struct RoomNormalView: View {
                     .padding(.horizontal, 12).padding(.vertical, 8)
                     .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
                     .frame(maxWidth: .infinity, alignment: .trailing)
+                // 입력줄에서 보낸 말은 최근 두 줄까지 내 말풍선으로 이어 붙는다.
+                ForEach(Array(sent.suffix(2).enumerated()), id: \.offset) { _, t in
+                    Text(t).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .transition(.opacity.combined(with: .offset(y: 8)))
+                }
             }
             .padding(.horizontal, 24)
             .overlay(alignment: .bottomLeading) {
@@ -184,10 +178,13 @@ struct RoomNormalView: View {
             }
             .overlay { ForEach(flying) { FlyingEmojiView(item: $0) } }
 
-            RoomInputBar(emojiOpen: $emojiOpen)
+            RoomInputBar(emojiOpen: $emojiOpen) { t in
+                withAnimation(DS.Motion.emphasizedDecel) { sent.append(t) }
+            }
                 .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 24)
         }
         .background(DS.Palette.bgSurface.ignoresSafeArea())
+        .overlay { RoomToastLayer() }
         .toolbar(.hidden, for: .navigationBar)
         .task {
             try? await Task.sleep(for: .seconds(1.6))
@@ -346,7 +343,7 @@ struct MiniProfileView: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .accessibilityLabel("더보기")
                 if menuOpen {
                     VStack(alignment: .leading, spacing: 0) {
@@ -372,7 +369,7 @@ struct MiniProfileView: View {
                 .padding(.horizontal, 16)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
     }
 
     private func close() {
@@ -436,7 +433,7 @@ private struct ReportCheckBox: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
         .accessibilityAddTraits(on ? .isSelected : [])
     }
 }
@@ -456,7 +453,9 @@ private struct CheckMark: Shape {
 /// 신고(피그마 1647:22101 "바텀시트 · 신고"). 방 위에 Dim 60%를 깔고 아래에서 올라오는 시트(390 x 657, #121415, 위 모서리 24).
 struct ReportView: View {
     @Environment(Router.self) private var router
-    @State private var reason = 0
+    /// 고른 사유. 피그마와 웹처럼 첫 줄이 골라진 채로 열리고, 다른 줄을 누르면 그 줄만 켜진다.
+    /// 고른 사유가 없을 때(nil)는 신고하기가 흐리고 눌리지 않는다.
+    @State private var reason: Int? = 0
     @State private var alsoBlock = false
     @State private var detail = ""
     @State private var shown = false
@@ -484,6 +483,7 @@ struct ReportView: View {
                 ForEach(reasons.indices, id: \.self) { i in
                     let on = reason == i
                     Button {
+                        guard !on else { return }
                         withAnimation(DS.Motion.stateIn) { reason = i }
                         UISelectionFeedbackGenerator().selectionChanged()
                     } label: {
@@ -501,7 +501,7 @@ struct ReportView: View {
                         .background(on ? DS.Palette.brandSubtle : .clear, in: RoundedRectangle(cornerRadius: 12))
                         .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     .accessibilityAddTraits(on ? .isSelected : [])
                 }
             }
@@ -539,6 +539,10 @@ struct ReportView: View {
                     .background(reportRed, in: RoundedRectangle(cornerRadius: 28))
             }
             .buttonStyle(RoomPressStyle())
+            // 사유를 고르기 전에는 흐리고 눌리지 않는다.
+            .disabled(reason == nil)
+            .opacity(reason == nil ? 0.4 : 1)
+            .animation(DS.Motion.stateIn, value: reason)
         }
         .padding(.top, 14).padding(.horizontal, 24).padding(.bottom, 36)
         .frame(maxWidth: .infinity)
@@ -549,13 +553,15 @@ struct ReportView: View {
         .ignoresSafeArea(.container, edges: .bottom)
     }
 
+    /// 신고하기: 시트를 닫고 방에 "신고가 접수됐어요"를 띄운다. 차단도 함께 하기를 켰어도 따로 창을 띄우지 않는다.
     private func submit() {
+        guard reason != nil else { return }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         typing = false
-        if alsoBlock {
-            router.present(.block)
-        } else {
-            close()
+        close()
+        Task {
+            try? await Task.sleep(for: .seconds(0.32))
+            RoomToastCenter.shared.show("신고가 접수됐어요")
         }
     }
 
@@ -629,13 +635,10 @@ struct BlockView: View {
         .onAppear { withAnimation(DS.Motion.emphasizedDecel) { shown = true } }
     }
 
+    /// 차단하기: 신고도 함께 하기를 켰든 안 켰든 창만 닫는다(차단해도 나는 이 방에 남는다).
     private func block() {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        if alsoReport {
-            router.present(.report)
-        } else {
-            close()
-        }
+        close()
     }
 
     private func close() {
@@ -724,6 +727,7 @@ struct RoomSoloView: View {
         }
         .ignoresSafeArea()
         .background(DS.Palette.bgBase)
+        .overlay { RoomToastLayer().ignoresSafeArea() }
         .overlay {
             if showOnboarding {
                 OnboardingOverlay(pages: OnboardingPages.solo) {
@@ -765,7 +769,9 @@ struct RoomSoloView: View {
                     }
                 }
                 .overlay { ForEach(flying) { FlyingEmojiView(item: $0) } }
-            RoomInputBar(emojiOpen: $emojiOpen)
+            RoomInputBar(emojiOpen: $emojiOpen) { t in
+                withAnimation(DS.Motion.emphasizedDecel) { mine = t }
+            }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
                 .padding(.bottom, 24)
@@ -1016,6 +1022,9 @@ private struct BestCard: View {
     let likes: String?
     let asset: String
     var dark = true
+    /// 웹 taps.js thumbs와 같이 따봉을 누르면 수가 하나 오르고 다시 누르면 내려간다.
+    @State private var liked = false
+    @State private var pop = false
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -1029,11 +1038,25 @@ private struct BestCard: View {
                 Text(text).fig(16, .medium, DS.Palette.textPrimary).lineLimit(1)
                 Spacer(minLength: 0)
                 if let likes {
-                    HStack(spacing: 4) {
-                        Image(systemName: "hand.thumbsup.fill").font(.system(size: 12)).frame(width: 16, height: 16)
-                        Text(likes).fig(12, .bold, DS.Palette.brandPrimary)
+                    Button {
+                        withAnimation(DS.Motion.stateIn) { liked.toggle() }
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { pop = true }
+                        Task {
+                            try? await Task.sleep(for: .milliseconds(150))
+                            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { pop = false }
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "hand.thumbsup.fill").font(.system(size: 12)).frame(width: 16, height: 16)
+                                .scaleEffect(pop ? 1.25 : 1)
+                            Text("\((Int(likes) ?? 0) + (liked ? 1 : 0))").fig(12, .bold, DS.Palette.brandPrimary)
+                                .contentTransition(.numericText())
+                        }
+                        .foregroundStyle(DS.Palette.brandPrimary)
                     }
-                    .foregroundStyle(DS.Palette.brandPrimary)
+                    .buttonStyle(PressStyle())
+                    .accessibilityLabel(liked ? "따봉 취소" : "따봉")
                 }
             }
         }
@@ -1047,18 +1070,76 @@ private struct BestCard: View {
 /// 아침(1647:26978)과 오늘 나눈 대화(1647:27114): 화살표 28 x 84, 칸 80, 이름 16, 줄은 왼쪽 붙임(24에서 360까지).
 /// 피그마 그대로 택배상자와 스툴의 얼굴은 80 x 84, 소파 얼굴은 80 x 80이고 의자 그림 84 x 84를 얼굴 왼쪽 위에 맞춰 자른다.
 /// 종료(1647:26845): 화살표 24 x 72, 칸 72, 이름 12, 줄은 가운데(43에서 347까지), 고른 칸에 하늘색 테두리 2, 첫 칸은 노란 의자 "새벽2시 드르륵 칵".
+/// 웹 taps.js chairPicker와 같은 동작: 의자를 누르면 이름이 하늘색이 되고 그림이 살짝(1.06배) 튄다. 세 번째를 고르면 처음 고른 의자가 빠진다.
+/// 오른쪽 화살표는 줄을 한 칸 왼쪽으로 밀며(300ms) 첫 칸을 옅게 빼서 맨 뒤에 다시 들이고(160ms), 왼쪽 화살표는 그 반대다.
 private struct RecommendPicker: View {
     var cell: CGFloat = 80
     var showCount = true
     var compact = false
-    @State private var picked: Set<String> = ["sofa"]
-    private var people: [(String, String, String)] {
-        [compact ? ("box", "새벽2시\n드르륵 칵", "B-chair-yellow") : ("box", "새벽2시\n택배상자", "B-chair-box"),
-         ("sofa", "따뜻한\n가죽소파29", "B-chair-sofa"), ("stool", "딱딱한\n나무 스툴12", "B-chair-stool")]
+    /// 고른 순서대로 쌓는다. 맨 앞이 처음 고른 의자다.
+    @State private var picked: [String] = ["sofa"]
+    /// 지금 줄에 놓인 순서
+    @State private var order: [String] = ["box", "sofa", "stool"]
+    @State private var shift: CGFloat = 0
+    @State private var hidden: String?
+    @State private var bump: String?
+    @State private var busy = false
+    private let gap: CGFloat = 12
+    private var people: [String: (String, String)] {
+        ["box": compact ? ("새벽2시\n드르륵 칵", "B-chair-yellow") : ("새벽2시\n택배상자", "B-chair-box"),
+         "sofa": ("따뜻한\n가죽소파29", "B-chair-sofa"), "stool": ("딱딱한\n나무 스툴12", "B-chair-stool")]
+    }
+
+    private var stepWidth: CGFloat {
+        cell + gap
     }
 
     private func faceHeight(_ key: String) -> CGFloat {
         compact || key == "sofa" ? cell : cell + 4
+    }
+
+    private func toggle(_ key: String) {
+        withAnimation(DS.Motion.stateIn) {
+            if let i = picked.firstIndex(of: key) {
+                picked.remove(at: i)
+            } else {
+                picked.append(key)
+                if picked.count > 2 { picked.removeFirst() }
+            }
+        }
+        UISelectionFeedbackGenerator().selectionChanged()
+        guard picked.contains(key) else { return }
+        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = key }
+        Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { if bump == key { bump = nil } }
+        }
+    }
+
+    private func step(_ dir: Int) {
+        guard !busy, order.count > 1 else { return }
+        busy = true
+        UISelectionFeedbackGenerator().selectionChanged()
+        let quiet: Transaction = { var t = Transaction(); t.disablesAnimations = true; return t }()
+        if dir > 0 {
+            let first = order[0]
+            withAnimation(DS.Motion.standard) { shift = -stepWidth; hidden = first }
+            Task {
+                try? await Task.sleep(for: .milliseconds(300))
+                withTransaction(quiet) { order.append(order.removeFirst()); shift = 0 }
+                withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.16)) { hidden = nil }
+                busy = false
+            }
+        } else {
+            let last = order[order.count - 1]
+            withTransaction(quiet) { order.insert(order.removeLast(), at: 0); shift = -stepWidth; hidden = last }
+            Task {
+                try? await Task.sleep(for: .milliseconds(16))
+                withAnimation(DS.Motion.standard) { shift = 0; hidden = nil }
+                try? await Task.sleep(for: .milliseconds(300))
+                busy = false
+            }
+        }
     }
 
     var body: some View {
@@ -1066,47 +1147,56 @@ private struct RecommendPicker: View {
             if showCount {
                 HStack(spacing: 4) {
                     Text("\(picked.count)명 선택").fig(12, .bold, DS.Palette.brandPrimary)
+                        .contentTransition(.numericText())
                     Text("· 최대 2명").fig(12, .medium, DS.Palette.textTertiary)
                 }
             }
             HStack(alignment: .top, spacing: 8) {
                 arrow(left: true)
-                HStack(alignment: .top, spacing: 12) {
-                    ForEach(people, id: \.0) { p in
-                        let on = picked.contains(p.0)
-                        Button {
-                            withAnimation(DS.Motion.stateIn) {
-                                if on { picked.remove(p.0) } else if picked.count < 2 { picked.insert(p.0) }
-                            }
-                            UISelectionFeedbackGenerator().selectionChanged()
-                        } label: {
+                HStack(alignment: .top, spacing: gap) {
+                    ForEach(order, id: \.self) { key in
+                        let p = people[key] ?? ("", "")
+                        let on = picked.contains(key)
+                        Button { toggle(key) } label: {
                             VStack(spacing: 8) {
-                                Image(p.2).resizable().scaledToFill()
+                                Image(p.1).resizable().scaledToFill()
                                     .frame(width: compact ? cell : cell + 4, height: compact ? cell : cell + 4)
-                                    .frame(width: cell, height: faceHeight(p.0), alignment: .topLeading)
+                                    .frame(width: cell, height: faceHeight(key), alignment: .topLeading)
                                     .background(DS.Palette.bgSurface).clipShape(Capsule())
                                     .overlay(Capsule().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(compact && on ? 1 : 0))
-                                Text(p.1).fig(compact ? 12 : 16, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
+                                    .scaleEffect(bump == key ? 1.06 : 1)
+                                Text(p.0).fig(compact ? 12 : 16, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
                                     .multilineTextAlignment(.center).fixedSize()
                             }
                             .frame(width: cell)
                         }
-                        .buttonStyle(RoomPressStyle())
+                        .buttonStyle(PressStyle())
+                        .opacity(hidden == key ? 0 : 1)
+                        .allowsHitTesting(!busy)
+                        .accessibilityAddTraits(on ? .isSelected : [])
                     }
                 }
+                .offset(x: shift)
+                .frame(width: cell * 3 + gap * 2, alignment: .leading)
+                .clipped()
                 arrow(left: false)
             }
             .frame(maxWidth: .infinity, alignment: compact ? .center : .leading)
         }
     }
 
+    /// 화살표 모양과 흐림(왼쪽 30%)은 피그마 그대로 두고, 누르면 줄을 한 칸씩 돌린다.
     private func arrow(left: Bool) -> some View {
         let size: CGFloat = compact ? 24 : 28
-        return Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: size, height: size)
-            .foregroundStyle(DS.Palette.textPrimary)
-            .rotationEffect(.degrees(left ? 0 : 180))
-            .opacity(left ? 0.3 : 1)
-            .frame(width: size, height: compact ? 72 : 84)
+        return Button { step(left ? -1 : 1) } label: {
+            Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: size, height: size)
+                .foregroundStyle(DS.Palette.textPrimary)
+                .rotationEffect(.degrees(left ? 0 : 180))
+                .opacity(left ? 0.3 : 1)
+                .frame(width: size, height: compact ? 72 : 84)
+        }
+        .buttonStyle(PressStyle())
+        .accessibilityLabel(left ? "이전 의자" : "다음 의자")
     }
 }
 
@@ -1164,7 +1254,7 @@ private struct ReportButtons: View {
             Button(action: onSecondary) {
                 Text(secondary).fig(14, .bold, DS.Palette.textSecondary).frame(maxWidth: .infinity).frame(height: 20)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
         }
     }
 }
@@ -1214,7 +1304,7 @@ private struct ReportScreen: View {
             Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
                 .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
         .accessibilityLabel("뒤로")
     }
 

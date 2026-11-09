@@ -29,7 +29,7 @@ private struct BackChevron: View {
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
         .accessibilityLabel("뒤로")
     }
 }
@@ -47,7 +47,7 @@ private struct CloseX: View {
             .frame(width: 44, height: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
         .accessibilityLabel("닫기")
     }
 }
@@ -63,21 +63,26 @@ private struct HomeBackdrop: View {
             // 피그마 1647:23476, 1647:23437 배경 한 장(Drrrk 간판 편의점, 파란 의자와 흰 테이블이 그림에 들어 있음)
             Image("I-home-bg").resizable().scaledToFill().frame(width: 390, height: 761).clipped()
             Image("logo-wordmark").resizable().frame(width: 90, height: 34).at(24, 64)
-            HStack(spacing: 8) {
-                Circle().fill(DS.Palette.brandPrimary).frame(width: 8, height: 8)
-                    .scaleEffect(pulse ? 1 : 0.7).opacity(pulse ? 1 : 0.5)
-                Text("지금 23개 방에서 드르륵 중").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
+            // "지금 23개 방에서 드르륵 중" 칩을 누르면 그 방들이 있는 라이브 탭으로 간다.
+            Button { router.select(.live) } label: {
+                HStack(spacing: 8) {
+                    Circle().fill(DS.Palette.brandPrimary).frame(width: 8, height: 8)
+                        .scaleEffect(pulse ? 1 : 0.7).opacity(pulse ? 1 : 0.5)
+                    Text("지금 23개 방에서 드르륵 중").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
+                }
+                .padding(.vertical, 8).padding(.horizontal, 14)
+                .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 20))
+                .fixedSize()
             }
-            .padding(.vertical, 8).padding(.horizontal, 14)
-            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 20))
-            .fixedSize()
+            .buttonStyle(PressStyle())
+            .accessibilityLabel("지금 드르륵 중인 방 보러 라이브로 가기")
             .at(24, 118)
             // 피그마 1647:23513, 1647:23442 의자 얼굴 프로필(339, 69, 26 x 26). 누르면 지금처럼 알림으로 간다.
             Button { router.push(.notiActivity) } label: {
                 Image("A-home-bell").resizable().frame(width: 26, height: 26)
                     .frame(width: 40, height: 40).contentShape(Rectangle())
             }
-            .buttonStyle(ClipPressStyle(radius: 20))
+            .buttonStyle(PressStyle())
             .at(332, 62)
             .accessibilityLabel("알림")
         }
@@ -170,7 +175,7 @@ struct HomeView: View {
                     .frame(width: 48, height: 48)
                     .background(DS.Palette.brandPrimary, in: Circle())
             }
-            .buttonStyle(ClipPressStyle(radius: 24))
+            .buttonStyle(PressStyle())
             .accessibilityLabel("고민 보내기")
         }
         // 펼친 홈 1671:45255: 342 x 66, 반경 32, 글 왼쪽 21, 버튼 둘레 9.
@@ -322,13 +327,13 @@ struct RecommendView: View {
                     .frame(width: 342, height: 46)
                     .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 28))
             }
-            .buttonStyle(ClipPressStyle(radius: 28))
+            .buttonStyle(PressStyle())
             .at(24, 726)
             Button { router.push(.roomSolo) } label: {
                 Text("혼자 드르륵 앉기").suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textSecondary)
                     .frame(width: 342, height: 44).contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .at(24, 772)
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -363,7 +368,7 @@ struct RecommendView: View {
             }
             .frame(width: 342, height: 112)
         }
-        .buttonStyle(ClipPressStyle(radius: 16))
+        .buttonStyle(PressStyle())
         .accessibilityAddTraits(on ? .isSelected : [])
     }
 }
@@ -428,13 +433,13 @@ struct NoRoomView: View {
                     .frame(width: 342, height: 46)
                     .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 28))
             }
-            .buttonStyle(ClipPressStyle(radius: 28))
+            .buttonStyle(PressStyle())
             .at(24, 726)
             Button { router.select(.live) } label: {
                 Text("라이브 둘러보기").suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textSecondary)
                     .frame(width: 342, height: 44).contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .at(24, 772)
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -528,7 +533,7 @@ struct OnboardingOverlay: View {
                         Text("건너뛰기").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textTertiary)
                             .frame(height: 44).padding(.horizontal, 20).contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     .opacity(last ? 0 : 1)
                     .disabled(last)
                     Spacer()
@@ -543,7 +548,7 @@ struct OnboardingOverlay: View {
                         Text(last ? "시작하기" : "다음").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.brandPrimary)
                             .frame(height: 44).padding(.horizontal, 26).contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                 }
                 .padding(.horizontal, 4)
             }

@@ -118,6 +118,7 @@ struct CommunityDetailView: View {
     @State private var likedComments: Set<UUID> = []
     @State private var comments = CommunityData.comments
     @State private var draft = ""
+    @FocusState private var typing: Bool
 
     private let likes = 48
 
@@ -129,13 +130,14 @@ struct CommunityDetailView: View {
                     Image("C-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .accessibilityLabel("뒤로")
                 Spacer()
                 ShareLink(item: "둘이 찍은 사진인데 지만 보정해서 올린 여우") {
                     Image("C-share").renderingMode(.template).resizable().frame(width: 24, height: 24)
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44)
                 }
+                .buttonStyle(PressStyle())
                 .accessibilityLabel("공유")
             }
             .padding(.horizontal, 14)
@@ -227,10 +229,18 @@ struct CommunityDetailView: View {
                     .foregroundStyle(liked ? DS.Palette.brandPrimary : DS.Palette.textSecondary)
                     .frame(minHeight: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .accessibilityLabel(liked ? "공감 취소" : "공감")
-                Image("C-comment").renderingMode(.template).resizable().frame(width: 16, height: 16).padding(.leading, 2)
-                Text("댓글 \(comments.count + 16)").suit(12, .bold, tracking: -0.48)
+                // 댓글 수를 누르면 아래 댓글 입력칸에 바로 커서가 간다(같은 화면).
+                Button { typing = true } label: {
+                    HStack(spacing: 6) {
+                        Image("C-comment").renderingMode(.template).resizable().frame(width: 16, height: 16).padding(.leading, 2)
+                        Text("댓글 \(comments.count + 16)").suit(12, .bold, tracking: -0.48)
+                    }
+                    .frame(minHeight: 36)
+                }
+                .buttonStyle(PressStyle())
+                .accessibilityLabel("댓글 달기")
                 Spacer()
                 ShareLink(item: "둘이 찍은 사진인데 지만 보정해서 올린 여우") {
                     HStack(spacing: 6) {
@@ -239,6 +249,7 @@ struct CommunityDetailView: View {
                     }
                     .frame(minHeight: 36)
                 }
+                .buttonStyle(PressStyle())
             }
             .foregroundStyle(DS.Palette.textSecondary)
             .frame(height: 36)
@@ -275,8 +286,15 @@ struct CommunityDetailView: View {
                         }
                         .foregroundStyle(on ? DS.Palette.brandPrimary : DS.Palette.textSecondary)
                     }
-                    .buttonStyle(.plain)
-                    Text("답글 달기").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
+                    .buttonStyle(PressStyle())
+                    // 답글 달기: 아래 입력칸에 커서를 두고 그 사람 이름을 앞에 붙여 둔다.
+                    Button {
+                        if !draft.hasPrefix("@" + c.name) { draft = "@" + c.name + " " + draft }
+                        typing = true
+                    } label: {
+                        Text("답글 달기").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
+                    }
+                    .buttonStyle(PressStyle())
                 }
             }
         }
@@ -288,6 +306,7 @@ struct CommunityDetailView: View {
             TextField("", text: $draft, prompt: Text("댓글 달기").foregroundStyle(DS.Palette.textSecondary))
                 .suit(14, .medium, tracking: -0.56)
                 .foregroundStyle(DS.Palette.textPrimary)
+                .focused($typing)
                 .submitLabel(.send)
                 .onSubmit(send)
                 .padding(.leading, 13)
