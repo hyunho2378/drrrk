@@ -41,13 +41,13 @@ function Wave() {
   );
 }
 
-export function MiniProfileScreen({ startRecommended = false }) {
+export function MiniProfileScreen({ startRecommended = false, Base = Gen }) {
   const [rec, setRec] = useState(startRecommended);
   const [menu, setMenu] = useState(false);
   return (
     <div data-mini="" style={{ position: 'relative', width: 390, height: 844, fontFamily: FONT }}>
       <style>{CSS}</style>
-      <Gen />
+      <Base />
       {rec && (
         <div className="mp-in" style={{ position: 'absolute', left: 0, right: 0, top: 566 - 62 - 12 - 54, display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 6 }}>
           <div style={{ background: '#30363A', color: '#F8F8F8', fontSize: 12, fontWeight: 500, letterSpacing: '-0.48px', lineHeight: '17px', textAlign: 'center', padding: '10px 16px', borderRadius: 12, whiteSpace: 'pre' }}>

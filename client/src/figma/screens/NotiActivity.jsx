@@ -1,4 +1,4 @@
-// 자동 생성: figma-to-code. 피그마 FRAME 1952:14673 "활동 알림" (해시 1117fbc7)
+// 자동 생성: figma-to-code. 피그마 FRAME 1952:14673 "활동 알림" (해시 6138a9ee)
 // 손으로 고치지 말고 피그마를 고친 뒤 다시 생성한다. 다듬은 코드는 별도 파일에서 이 컴포넌트를 감싼다.
 import React from 'react';
 
@@ -57,12 +57,7 @@ export function NotiActivity({ style, className }) {
         <div data-figma="Activity / 엉따지수" data-node="1958:11523" className="[display:flex] [padding:14px_16px_14px_24px] [align-items:flex-start] [gap:12px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
           <div data-figma="icon" data-node="1958:11524" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#222628] [flex-shrink:0] [overflow:hidden]">
             <div data-figma="Icon / Emoji" data-node="1958:11525" data-instance-of="Icon / Emoji" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative]">
-              <div data-figma="fire" data-node="I1958:11525;1620:16663" data-instance-of="fire" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-                <div data-figma="artwork" data-node="I1958:11525;1620:16663;2532:7868" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px] [overflow:hidden]">
-                  <span data-figma="shape" data-node="I1958:11525;1620:16663;2532:7869" className="[width:18.4px] [height:20.17px] [position:absolute] [left:2.68px] [top:2.03px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11525;1620:16663;2532:7869"] }} />
-                  <span data-figma="shape" data-node="I1958:11525;1620:16663;2532:7870" className="[width:6.61px] [height:7.91px] [position:absolute] [left:8.7px] [top:12.04px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11525;1620:16663;2532:7870"] }} />
-                </div>
-              </div>
+              <Icon data-figma="fire" data-node="I1958:11525;1620:16663" name="fire-1620-12827" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
             </div>
           </div>
           <div data-figma="content" data-node="1958:11530" className="[display:flex] [flex-direction:column] [align-items:flex-start] [gap:4px] [flex:1_0_0] [overflow:hidden]">
@@ -88,9 +83,7 @@ export function NotiActivity({ style, className }) {
         <div data-figma="Activity / 댓글" data-node="1958:11544" className="[display:flex] [padding:14px_16px_14px_24px] [align-items:flex-start] [gap:12px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
           <div data-figma="icon" data-node="1958:11545" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#222628] [flex-shrink:0] [overflow:hidden]">
             <div data-figma="Icon / Line" data-node="1958:11546" data-instance-of="Icon / Line" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative]">
-              <div data-figma="community" data-node="I1958:11546;1620:15798" data-instance-of="community" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-                <span data-figma="shape" data-node="I1958:11546;1620:15798;2532:7275" className="[width:20px] [height:20px] [position:absolute] [left:2px] [top:2px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11546;1620:15798;2532:7275"] }} />
-              </div>
+              <Icon data-figma="community" data-node="I1958:11546;1620:15798" name="community-1620-12632" color="#5C5C5C" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
             </div>
           </div>
           <div data-figma="content" data-node="1958:11549" className="[display:flex] [flex-direction:column] [align-items:flex-start] [gap:4px] [flex:1_0_0] [overflow:hidden]">
@@ -110,11 +103,7 @@ export function NotiActivity({ style, className }) {
         </div>
         <div data-figma="Activity / 나의 업적" data-node="1958:11559" className="[display:flex] [padding:14px_16px_14px_24px] [align-items:flex-start] [gap:12px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
           <div data-figma="icon" data-node="1958:11560" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#222628] [flex-shrink:0] [overflow:hidden]">
-            <div data-figma="Icon / Line" data-node="1958:11561" data-instance-of="Icon / Line" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative]">
-              <div data-figma="badge-star" data-node="I1958:11561;1620:16231" data-instance-of="badge-star" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-                <span data-figma="shape" data-node="I1958:11561;1620:16231;2532:7546" className="[width:20px] [height:19.37px] [position:absolute] [left:2px] [top:2.32px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11561;1620:16231;2532:7546"] }} />
-              </div>
-            </div>
+            <Icon data-figma="convenience-store" data-node="2023:11909" name="convenience-store" color="#5C5C5C" className="[width:24px] [height:24px] [flex-shrink:0] [position:relative]" />
           </div>
           <div data-figma="content" data-node="1958:11564" className="[display:flex] [flex-direction:column] [align-items:flex-start] [gap:4px] [flex:1_0_0] [overflow:hidden]">
             <div data-figma="title row" data-node="1958:11565" className="[display:flex] [justify-content:space-between] [align-items:center] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
@@ -138,9 +127,7 @@ export function NotiActivity({ style, className }) {
         <div data-figma="Activity / 신고 결과 · 중요 알림" data-node="1958:11577" className="[display:flex] [padding:14px_16px_14px_24px] [align-items:flex-start] [gap:12px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
           <div data-figma="icon" data-node="1958:11578" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#222628] [flex-shrink:0] [overflow:hidden]">
             <div data-figma="Icon / Line" data-node="1958:11579" data-instance-of="Icon / Line" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative]">
-              <div data-figma="information" data-node="I1958:11579;1620:15982" data-instance-of="information" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-                <span data-figma="shape" data-node="I1958:11579;1620:15982;2532:7526" className="[width:20px] [height:20px] [position:absolute] [left:2px] [top:2px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11579;1620:15982;2532:7526"] }} />
-              </div>
+              <Icon data-figma="information" data-node="I1958:11579;1620:15982" name="information-1620-12678" color="#5C5C5C" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
             </div>
           </div>
           <div data-figma="content" data-node="1958:11582" className="[display:flex] [flex-direction:column] [align-items:flex-start] [gap:4px] [flex:1_0_0] [overflow:hidden]">
@@ -161,9 +148,7 @@ export function NotiActivity({ style, className }) {
         <div data-figma="Activity / 의자 꾸미기" data-node="1958:11592" className="[display:flex] [padding:14px_16px_14px_24px] [align-items:flex-start] [gap:12px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
           <div data-figma="icon" data-node="1958:11593" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#222628] [flex-shrink:0] [overflow:hidden]">
             <div data-figma="Icon / Line" data-node="1958:11594" data-instance-of="Icon / Line" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative]">
-              <div data-figma="home-chair" data-node="I1958:11594;1620:15782" data-instance-of="home-chair" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-                <span data-figma="shape" data-node="I1958:11594;1620:15782;2532:7255" className="[width:20px] [height:20.02px] [position:absolute] [left:2px] [top:2px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11594;1620:15782;2532:7255"] }} />
-              </div>
+              <Icon data-figma="home-chair" data-node="I1958:11594;1620:15782" name="home-chair-1620-12628" color="#5C5C5C" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
             </div>
           </div>
           <div data-figma="content" data-node="1958:11597" className="[display:flex] [flex-direction:column] [align-items:flex-start] [gap:4px] [flex:1_0_0] [overflow:hidden]">
@@ -184,9 +169,7 @@ export function NotiActivity({ style, className }) {
         <div data-figma="Activity / 댓글" data-node="1958:11607" className="[display:flex] [padding:14px_16px_14px_24px] [align-items:flex-start] [gap:12px] [align-self:stretch] [flex-shrink:0] [overflow:hidden]">
           <div data-figma="icon" data-node="1958:11608" className="[display:flex] [width:40px] [height:40px] [justify-content:center] [align-items:center] [border-radius:999px] [background:#222628] [flex-shrink:0] [overflow:hidden]">
             <div data-figma="Icon / Line" data-node="1958:11609" data-instance-of="Icon / Line" className="[display:flex] [width:24px] [height:24px] [justify-content:center] [align-items:center] [flex-shrink:0] [position:relative]">
-              <div data-figma="thumb-up" data-node="I1958:11609;1620:15846" data-instance-of="thumb-up" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]">
-                <span data-figma="shape" data-node="I1958:11609;1620:15846;2532:7335" className="[width:20px] [height:17.14px] [position:absolute] [left:2px] [top:3.43px] [line-height:0]" dangerouslySetInnerHTML={{ __html: svg["I1958:11609;1620:15846;2532:7335"] }} />
-              </div>
+              <Icon data-figma="thumb-up" data-node="I1958:11609;1620:15846" name="thumb-up-1620-12644" color="var(--white, #FFFFFF)" className="[width:24px] [height:24px] [flex-shrink:0] [position:absolute] [left:0px] [top:0px]" />
             </div>
           </div>
           <div data-figma="content" data-node="1958:11612" className="[display:flex] [flex-direction:column] [align-items:flex-start] [gap:4px] [flex:1_0_0] [overflow:hidden]">

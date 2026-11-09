@@ -832,6 +832,54 @@ export const glyphs = {
     "vw": 24,
     "vh": 24,
     "mono": true
+  },
+  "fire-1620-12827": {
+    "file": "fire-1620-12827.svg",
+    "w": 32,
+    "h": 32,
+    "vw": 32,
+    "vh": 32,
+    "mono": false
+  },
+  "community-1620-12632": {
+    "file": "community-1620-12632.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
+  },
+  "convenience-store": {
+    "file": "convenience-store.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
+  },
+  "information-1620-12678": {
+    "file": "information-1620-12678.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
+  },
+  "home-chair-1620-12628": {
+    "file": "home-chair-1620-12628.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
+  },
+  "thumb-up-1620-12644": {
+    "file": "thumb-up-1620-12644.svg",
+    "w": 24,
+    "h": 24,
+    "vw": 24,
+    "vh": 24,
+    "mono": true
   }
 };
 export function Icon({

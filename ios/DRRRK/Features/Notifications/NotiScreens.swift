@@ -1,6 +1,6 @@
 import SwiftUI
 
-// 알림: 활동(피그마 1952:14673), 키워드 알림(1952:14700, 풀버전 1952:14617), 키워드 관리(1952:14693).
+// 알림: 활동(피그마 1952:14673), 키워드 알림(1952:14700), 키워드 관리(1952:14693).
 // 활동과 키워드 알림은 한 화면 안 탭이다. 탭을 바꾸면 아래 목록만 바뀐다.
 
 private struct ActivityItem: Identifiable {
@@ -36,18 +36,18 @@ private enum NotiData {
     ]
     static let sections: [(String, [KeywordHit])] = [
         ("오늘", [
-            .init(keyword: "썸", title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", meta: "연애 · 방금 전 · 4명 이야기 중", time: "19:00", thumb: "C-7db688548ef3", unread: true),
-            .init(keyword: "전남친", title: "친구 전남친이랑 썸 타는 중…\n괜찮음?", meta: "연애 · 6분 전 · 3명 이야기 중", time: "14:12", thumb: "C-42487f59e8cf", unread: true),
-            .init(keyword: "조별과제", title: "조별과제 무임승차한 동기\n이름 빼버릴까?", meta: "학교 · 7분 전 · 4명 이야기 중", time: "13:01", thumb: "F-noti-thumb-3", unread: false),
+            .init(keyword: "썸", title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", meta: "연애 · 방금 전 · 4명 이야기 중", time: "19:00", thumb: "H-noti-thumb-1", unread: true),
+            .init(keyword: "전남친", title: "친구 전남친이랑 썸 타는 중…\n나 이대로 괜찮을까", meta: "연애 · 6분 전 · 3명 이야기 중", time: "14:12", thumb: "H-noti-thumb-2", unread: true),
+            .init(keyword: "조별과제", title: "조별과제 무임승차한 동기\n이름 빼버리고 싶은데", meta: "학교 · 7분 전 · 4명 이야기 중", time: "13:01", thumb: "H-noti-thumb-3", unread: false),
         ]),
         ("어제", [
-            .init(keyword: "부모님", title: "부모님 싸우는 소리에\n잠을 못 자겠어", meta: "가족 · 어제 오후 11:42 · 6명 참여", time: nil, thumb: "C-ac5b50b3432d", unread: false),
-            .init(keyword: "급식", title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", meta: "학교 · 어제 오후 12:30 · 6명 참여", time: nil, thumb: "F-noti-thumb-5", unread: false),
-            .init(keyword: "썸", title: "친구가 썸남 앞에서\n내 쌍밍아웃함", meta: "학교 · 어제 오전 9:15 · 4명 참여", time: nil, thumb: "F-noti-thumb-6", unread: false),
+            .init(keyword: "부모님", title: "부모님 싸우는 소리에\n잠을 못 자겠어", meta: "가족 · 어제 오후 11:42 · 6명 참여", time: nil, thumb: "H-noti-thumb-4", unread: false),
+            .init(keyword: "급식", title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", meta: "학교 · 어제 오후 12:30 · 6명 참여", time: nil, thumb: "H-noti-thumb-5", unread: false),
+            .init(keyword: "썸", title: "친구가 아무래도 썸남을\n좋아하는 것 같은데..", meta: "학교 · 어제 오전 9:15 · 4명 참여", time: nil, thumb: "H-noti-thumb-6", unread: false),
         ]),
         ("이번 주", [
             .init(keyword: "남친", title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", meta: "연애 · 11월 5일 · 3명 참여", time: nil, thumb: "C-935b1b80a260", unread: false),
-            .init(keyword: "남친", title: "남친이 1주년 선물로\n다이소 틴트 사줌", meta: "연애 · 11월 4일 · 8명 참여", time: nil, thumb: "C-1864c996939e", unread: false),
+            .init(keyword: "남친", title: "남친이 1주년 선물로\n다이소 틴트 사줌", meta: "연애 · 11월 4일 · 8명 참여", time: nil, thumb: "H-noti-thumb-8", unread: false),
         ]),
     ]
 }
@@ -100,15 +100,18 @@ private struct NotiTabs: View {
     @Binding var tab: Int
     @Namespace private var ns
     var body: some View {
-        HStack(spacing: 0) {
+        // 피그마: 탭 칸 165 두 개, 사이 12, 글자 15(행간 19, 자간 0), 글자와 밑줄 사이 8.
+        // 글자 굵기는 활동 화면(1952:14676)에서 고른 "활동"만 Bold, 키워드 알림 화면(1952:14704)에서 고른 "키워드 알림"은 Medium이다.
+        // 빨간 점 6 x 6은 "키워드 알림" 글자 오른쪽 끝에서 2 띄우고 글자 위 1에 놓는다(1952:14707).
+        HStack(spacing: 12) {
             ForEach(Array(["활동", "키워드 알림"].enumerated()), id: \.offset) { i, t in
                 Button { withAnimation(DS.Motion.emphasizedDecel) { tab = i } } label: {
-                    VStack(spacing: 10) {
-                        Text(t).suit(15, i == tab ? .bold : .medium, tracking: -0.6)
+                    VStack(spacing: 8) {
+                        Text(t).suit(15, i == 0 && tab == 0 ? .bold : .medium, lineHeight: 19)
                             .foregroundStyle(i == tab ? DS.Palette.textPrimary : DS.Palette.textSecondary)
                             .overlay(alignment: .topTrailing) {
                                 if i == 1 {
-                                    Circle().fill(DS.Palette.danger).frame(width: 5, height: 5).offset(x: 7, y: -1)
+                                    Circle().fill(DS.Palette.danger).frame(width: 6, height: 6).offset(x: 8, y: -1)
                                 }
                             }
                         ZStack {
@@ -133,15 +136,16 @@ private struct FilterChip: View {
     let on: Bool
     var count: Int?
     var body: some View {
+        // 피그마 Chip: 안쪽 7 / 14, 글자 14(고른 칩 SemiBold, 나머지 Medium, 행간 17, 자간 0), 숫자 13 Bold, 높이 31
         HStack(spacing: 4) {
-            Text(title).suit(14, .medium, tracking: -0.56)
+            Text(title).suit(14, on ? .semibold : .medium, lineHeight: 17)
             if let count {
-                Text("\(count)").suit(13, .bold, tracking: -0.52).foregroundStyle(DS.Palette.brandPrimary)
+                Text("\(count)").suit(13, .bold, lineHeight: 16).foregroundStyle(DS.Palette.brandPrimary)
             }
         }
         .foregroundStyle(on ? DS.Palette.bgSurface : DS.Palette.textPrimary)
         .padding(.horizontal, 14)
-        .frame(height: 32)
+        .frame(height: 31)
         .background(on ? DS.Palette.textPrimary : DS.Palette.bgElevated, in: Capsule())
     }
 }
@@ -156,7 +160,7 @@ struct NotiActivityView: View {
     var body: some View {
         VStack(spacing: 0) {
             NotiHeader(title: nil)
-            NotiTabs(tab: $tab).padding(.top, 2)
+            NotiTabs(tab: $tab).padding(.top, 6)
             ZStack {
                 if tab == 0 {
                     activity.transition(.opacity)
@@ -228,15 +232,15 @@ struct NotiActivityView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .firstTextBaseline) {
                     (Text("알림 받는 키워드 ").foregroundStyle(DS.Palette.textPrimary) + Text("\(store.keywords.count)개").foregroundStyle(DS.Palette.brandPrimary))
-                        .suit(18, .bold, tracking: -0.72)
+                        .suit(18, .bold, lineHeight: 22)
                     Spacer()
                     Button { router.push(.notiKeywordSettings) } label: {
                         HStack(spacing: 2) {
-                            Text("키워드 관리").suit(15, .medium, tracking: -0.6)
+                            Text("키워드 관리").suit(15, .medium, lineHeight: 19)
                             Image("C-chevron-right").renderingMode(.template).resizable().frame(width: 16, height: 16)
                         }
                         .foregroundStyle(DS.Palette.textSecondary)
-                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
@@ -260,8 +264,9 @@ struct NotiActivityView: View {
                 ForEach(NotiData.sections, id: \.0) { section in
                     let hits = section.1.filter { keywordFilter == "전체" || $0.keyword == keywordFilter }
                     if !hits.isEmpty {
-                        Text(section.0).suit(14, .bold).foregroundStyle(DS.Palette.textSecondary)
-                            .padding(.horizontal, 24).padding(.top, 24).padding(.bottom, 4)
+                        // 피그마 Group 머리: 앞 묶음과 사이 12, 안쪽 위 20, 아래 4, 글자 14 Bold 행간 17
+                        Text(section.0).suit(14, .bold, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
+                            .padding(.horizontal, 24).padding(.top, 32).padding(.bottom, 4)
                         ForEach(hits) { h in
                             Button { router.push(.liveWatch) } label: { hitRow(h) }.buttonStyle(.plain).padding(.top, 12)
                         }
@@ -287,10 +292,13 @@ struct NotiActivityView: View {
             ZStack {
                 Image(h.thumb).resizable().scaledToFill().frame(width: 72, height: 72).clipShape(RoundedRectangle(cornerRadius: 12))
                 if let t = h.time {
-                    TimerBadge(time: t).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading).padding(4)
+                    // 피그마 Timer Badge(2009:12602): 썸네일 왼쪽 8, 아래 6
+                    KeywordTimerBadge(time: t).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                        .padding(.leading, 8).padding(.bottom, 6)
                 } else {
-                    RoundedRectangle(cornerRadius: 12).fill(.black.opacity(0.5))
-                    Text("종료").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
+                    // 피그마 Ended Overlay(2009:12666): 검정 55%
+                    RoundedRectangle(cornerRadius: 12).fill(.black.opacity(0.55))
+                    Text("종료").suit(12, .bold, lineHeight: 15).foregroundStyle(DS.Palette.textPrimary)
                 }
             }
             .frame(width: 72, height: 72)
@@ -310,6 +318,22 @@ struct NotiActivityView: View {
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
         .contentShape(Rectangle())
+    }
+}
+
+/// 키워드 알림 썸네일 위 남은 시간(피그마 Timer Badge 2009:12602): 안쪽 위아래 3, 왼쪽 6, 오른쪽 7, 사이 3,
+/// 시계 13, 글자 11 Bold(행간 130%, 자간 0), 바탕 검정 75%
+private struct KeywordTimerBadge: View {
+    let time: String
+    var body: some View {
+        HStack(spacing: 3) {
+            Image("C-clock").renderingMode(.template).resizable().frame(width: 13, height: 13)
+            Text(time).suit(11, .bold, lineHeight: 14.3).monospacedDigit()
+        }
+        .foregroundStyle(DS.Palette.brandPrimary)
+        .padding(.leading, 6).padding(.trailing, 7)
+        .frame(height: 20)
+        .background(Color.black.opacity(0.75), in: Capsule())
     }
 }
 

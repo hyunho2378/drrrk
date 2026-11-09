@@ -966,11 +966,15 @@ private struct SectionHead: View {
 /// 02 오늘 나눈 대화: 칩과 단계 세 줄(번호 원 24, 잇는 선 4 x 40)
 private struct TalkTimeline: View {
     var gap: CGFloat
-    private let steps = [
-        ("고민을 꺼냈어요", "\"이거 일부러야?\"로 이야기가 시작됐어요"),
-        ("서로의 생각을 나눴어요", "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요."),
-        ("다음 행동을 정했어요", "다음엔 한번 직접 말해보기로 했어요"),
-    ]
+    /// 아침(1647:26923)만 3단계 설명이 "디엠으로"가 들어간 글이다. 종료(1647:26790)와 오늘 나눈 대화(1647:27059)는 같다.
+    var morning = false
+    private var steps: [(String, String)] {
+        [
+            ("고민을 꺼냈어요", "\"이거 일부러야?\"로 이야기가 시작됐어요"),
+            ("서로의 생각을 나눴어요", "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요."),
+            ("다음 행동을 정했어요", morning ? "다음엔 한번 디엠으로 직접 말해보기로 했어요" : "다음엔 한번 직접 말해보기로 했어요"),
+        ]
+    }
     var body: some View {
         VStack(alignment: .leading, spacing: gap) {
             VStack(alignment: .leading, spacing: 8) {
@@ -1015,7 +1019,9 @@ private struct BestCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Image(asset).resizable().scaledToFill().frame(width: 24, height: 24)
+                // 피그마 Thumb 24 원 안에서 의자 그림(Chair 24 x 24)이 4 아래로 내려가 있다(1647:26800, 26815, 26828).
+                Image(asset).resizable().scaledToFill().frame(width: 24, height: 24).offset(y: 4)
+                    .frame(width: 24, height: 24)
                     .background(dark ? DS.Palette.bgSurface : .clear).clipShape(Circle())
                 Text(name).fig(12, .bold, DS.Palette.textSecondary)
             }
@@ -1038,22 +1044,29 @@ private struct BestCard: View {
 }
 
 /// 04 대화 상대 추천: 양쪽 화살표와 의자 세 칸. 최대 두 명까지 고른다.
+/// 아침(1647:26978)과 오늘 나눈 대화(1647:27114): 화살표 28 x 84, 칸 80, 이름 16, 줄은 왼쪽 붙임(24에서 360까지).
+/// 피그마 그대로 택배상자와 스툴의 얼굴은 80 x 84, 소파 얼굴은 80 x 80이고 의자 그림 84 x 84를 얼굴 왼쪽 위에 맞춰 자른다.
+/// 종료(1647:26845): 화살표 24 x 72, 칸 72, 이름 12, 줄은 가운데(43에서 347까지), 고른 칸에 하늘색 테두리 2, 첫 칸은 노란 의자 "새벽2시 드르륵 칵".
 private struct RecommendPicker: View {
     var cell: CGFloat = 80
     var showCount = true
-    /// 종료 화면: 72 칸, 이름 12, 고른 칸에 하늘색 테두리 2, 첫 칸은 노란 의자 "드르륵 칵"
     var compact = false
     @State private var picked: Set<String> = ["sofa"]
     private var people: [(String, String, String)] {
         [compact ? ("box", "새벽2시\n드르륵 칵", "B-chair-yellow") : ("box", "새벽2시\n택배상자", "B-chair-box"),
          ("sofa", "따뜻한\n가죽소파29", "B-chair-sofa"), ("stool", "딱딱한\n나무 스툴12", "B-chair-stool")]
     }
+
+    private func faceHeight(_ key: String) -> CGFloat {
+        compact || key == "sofa" ? cell : cell + 4
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if showCount {
                 HStack(spacing: 4) {
                     Text("\(picked.count)명 선택").fig(12, .bold, DS.Palette.brandPrimary)
-                    Text("최대 2명").fig(12, .medium, DS.Palette.textTertiary)
+                    Text("· 최대 2명").fig(12, .medium, DS.Palette.textTertiary)
                 }
             }
             HStack(alignment: .top, spacing: 8) {
@@ -1068,9 +1081,11 @@ private struct RecommendPicker: View {
                             UISelectionFeedbackGenerator().selectionChanged()
                         } label: {
                             VStack(spacing: 8) {
-                                Image(p.2).resizable().scaledToFill().frame(width: compact ? cell : cell + 4, height: compact ? cell : cell + 4)
-                                    .frame(width: cell, height: cell).background(DS.Palette.bgSurface).clipShape(Circle())
-                                    .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(compact && on ? 1 : 0))
+                                Image(p.2).resizable().scaledToFill()
+                                    .frame(width: compact ? cell : cell + 4, height: compact ? cell : cell + 4)
+                                    .frame(width: cell, height: faceHeight(p.0), alignment: .topLeading)
+                                    .background(DS.Palette.bgSurface).clipShape(Capsule())
+                                    .overlay(Capsule().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(compact && on ? 1 : 0))
                                 Text(p.1).fig(compact ? 12 : 16, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
                                     .multilineTextAlignment(.center).fixedSize()
                             }
@@ -1079,9 +1094,9 @@ private struct RecommendPicker: View {
                         .buttonStyle(RoomPressStyle())
                     }
                 }
-                .frame(maxWidth: .infinity)
                 arrow(left: false)
             }
+            .frame(maxWidth: .infinity, alignment: compact ? .center : .leading)
         }
     }
 
@@ -1101,20 +1116,26 @@ private struct ReportBody: View {
     var body: some View {
         VStack(alignment: .leading, spacing: kind == .end ? 36 : 40) {
             if kind != .summary { WarmthCard() }
-            TalkTimeline(gap: kind == .end ? 12 : 20)
-            VStack(alignment: .leading, spacing: 12) {
-                if kind == .end {
+            TalkTimeline(gap: kind == .end ? 12 : 20, morning: kind == .morning)
+            // 오늘 나눈 대화(1647:27028)에는 댓글 묶음이 없다. 종료(1647:26791)와 아침(1647:26924)만 있다.
+            if kind == .end {
+                VStack(alignment: .leading, spacing: 12) {
                     SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요")
-                } else {
-                    SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
+                    // 종료 1647:26796, 26810, 26825: 이름과 그림 짝은 피그마 그대로(첫 카드 이름 "진실의 의자10"에 소파 그림, 둘째 "따딱한 나무 스툴12"에 택배상자 그림, 셋째 "새벽2시 피시방"에 스툴 그림)
+                    VStack(spacing: 8) {
+                        BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "B-chair-sofa", dark: false)
+                        BestCard(name: "따딱한 나무 스툴12", text: "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ", likes: nil, asset: "B-chair-box")
+                        BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "B-chair-stool")
+                    }
                 }
-                VStack(spacing: 8) {
-                    BestCard(name: "따뜻한 가죽소파29", text: kind == .morning ? "그 친구 외모정병 레전드인듯..ㅠ" : "그 친구 인성 레전드인듯..ㅠ",
-                             likes: kind == .morning ? "24" : nil, asset: "B-chair-sofa", dark: false)
-                    BestCard(name: "새벽2시 택배상자", text: kind == .morning ? "다음 사진은 네가 먼저 보정해서 올려버려 ㅋㅋ" : "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ",
-                             likes: kind == .morning ? "17" : nil, asset: "B-chair-box")
-                    BestCard(name: "딱딱한 나무 스툴12", text: kind == .end ? "요즘 쌍수가 성형이냐" : "걍 물어보면 안됨? 나 저런 애들 이해가 안돼",
-                             likes: kind == .end ? nil : "11", asset: "B-chair-stool")
+            } else if kind == .morning {
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
+                    VStack(spacing: 8) {
+                        BestCard(name: "따뜻한 가죽소파29", text: "그 친구 외모정병 레전드인듯..ㅠ", likes: "24", asset: "B-chair-sofa", dark: false)
+                        BestCard(name: "새벽2시 택배상자", text: "다음 사진은 네가 먼저 보정해서 올려버려 ㅋㅋ", likes: "17", asset: "B-chair-box")
+                        BestCard(name: "딱딱한 나무 스툴12", text: "걍 물어보면 안됨? 나 저런 애들 이해가 안돼", likes: "11", asset: "B-chair-stool")
+                    }
                 }
             }
             VStack(alignment: .leading, spacing: kind == .end ? 16 : 12) {
@@ -1197,15 +1218,10 @@ private struct ReportScreen: View {
         .accessibilityLabel("뒤로")
     }
 
-    @ViewBuilder private var hero: some View {
-        if kind == .morning {
-            // 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작
-            Image("B-morning-sun").resizable().scaledToFit().frame(width: 146, height: 146)
-                .frame(maxWidth: .infinity).padding(.top, 273 - 240).padding(.bottom, 452 - 419)
-        } else {
-            Image("B-end-hero").resizable().scaledToFit().frame(width: 224, height: 160)
-                .frame(maxWidth: .infinity).padding(.top, 268 - 240).padding(.bottom, 452 - 428)
-        }
+    /// 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작. 아침(1951:20746)과 종료(2023:11803)가 같은 그림(해시 23749c04da)이다.
+    private var hero: some View {
+        Image("B-morning-sun").resizable().scaledToFit().frame(width: 146, height: 146)
+            .frame(maxWidth: .infinity).padding(.top, 273 - 240).padding(.bottom, 452 - 419)
     }
 
     @ViewBuilder private var buttons: some View {
