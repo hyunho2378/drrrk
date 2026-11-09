@@ -3,12 +3,27 @@ import { motion, live as LIVE } from '../tokens.js';
 import { q, setText } from './dom.js';
 import { cloneOf } from './donor.js';
 
-const state = { love: false, item: null, from: 36 };
+const state = { love: false, item: null, from: 36, slot: 0 };
 
 // 아이템을 누르면 어느 화면에서 눌렀는지 적어 둔다(상세를 닫으면 그 화면으로 돌아간다).
-export function pickItem(name, from) {
+// slot은 업적 편의점 8칸 중 몇 번째 칸인지(0~7)다. 마이(36)는 직접 넘기고, 나의 편의점(53)은 누른 칸 자리로 정한다.
+export function pickItem(name, from, slot) {
   state.item = name;
   state.from = from;
+  if (slot != null) state.slot = slot;
+}
+// 54 아이템 상세가 열 칸 번호. 36에서 연 경우와 53에서 연 경우 모두 여기서 읽는다.
+export const pickedSlot = () => state.slot || 0;
+// 53의 아이템 칸(flow 링크, 이름이 같은 마지막처럼 두 칸 포함)은 누른 칸의 자리(x 31, 113, 195, 277 / y 216, 347)로 칸 번호를 정한다.
+if (typeof document !== 'undefined' && !window.__drrrkItemSlot) {
+  window.__drrrkItemSlot = true;
+  document.addEventListener('click', (e) => {
+    const h = e.target && e.target.closest && e.target.closest('[data-hotspot][aria-label^="아이템 "]');
+    if (!h || h.getAttribute('aria-label') === '아이템 닫기') return;
+    const col = Math.round((parseFloat(h.style.left) - 31) / 82);
+    const row = parseFloat(h.style.top) > 300 ? 1 : 0;
+    if (col >= 0 && col < 4) state.slot = row * 4 + col;
+  }, true);
 }
 export const itemFrom = () => state.from;
 

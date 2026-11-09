@@ -43,6 +43,14 @@
   55% { opacity: 1; transform: translate(36px, -120px) scale(2); }
   100% { opacity: 0; transform: translate(52px, -190px) scale(2.4); }
 }
+/* 이모지 얼굴 궤적: 누른 이모지 자리(--dx, --dy)에서 작게(--s0) 출발해 제자리로 커지며 날아온 뒤 사라진다 */
+@keyframes obFace {
+  0% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(var(--s0)); }
+  10% { opacity: 1; }
+  50% { opacity: 1; transform: none; }
+  78% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
 /* 주전부리 포물선: 출발점(--sx, --sy)에서 위로 솟았다가 제자리로 떨어진다 */
 @keyframes obArc {
   0% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(.8); }

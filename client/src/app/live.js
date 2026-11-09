@@ -12,7 +12,8 @@ import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
 import { attachQuickSlot } from './quickSlot.js';
 import { attachTaps } from './taps.js';
-import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
+import { prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
+import { prepLoveDot, attachLoveDot } from './loveDots.js';
 import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
 import { patchCommunity } from './community.js';
@@ -725,7 +726,7 @@ export async function prepare(layer, n, prevN) {
   attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachSort(root, n, true);
   attachDrag(layer, root, n);
-  prepTabs(root, n);
+  prepLoveDot(root, n);
   fixIcons(root);
   patchLounge(root, n);
   patchLiveV2(root, n);
@@ -769,7 +770,7 @@ export function attach(layer, n, go, prevN) {
   attachTaps(root, n, go, prevN);
   attachSort(root, n, false);
   attachDrag(layer, root, n);
-  attachTabs(root, n);
+  attachLoveDot(root, n);
   attachPost(root);
   fixIcons(root);
   patchLounge(root, n);

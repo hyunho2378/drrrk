@@ -56,7 +56,7 @@ struct LiveView: View {
     @State private var sort: LiveSort = .popular
     @State private var showSort = false
     @State private var page = 0
-    @State private var loveLeft = false
+    @State private var loveDots = LoveDotStore.shared
 
     private var cards: [LiveCard] {
         let list = LiveData.cards[category] ?? []
@@ -103,10 +103,10 @@ struct LiveView: View {
                 LiveCarousel(items: LiveData.featured, page: $page) { router.watch = nil; router.push(.liveWatch) }
                     .offset(y: 128)
                 LiveDots(index: page).offset(x: 163, y: 372)
-                LiveTabs(selected: $category, showDot: !loveLeft)
+                LiveTabs(selected: $category, showDot: !loveDots.liveLoveSeen)
                     .offset(y: 396)
-                    .onChange(of: category) { old, _ in
-                        if old == "연애" { loveLeft = true }
+                    .onChange(of: category, initial: true) { _, new in
+                        if new == "연애" { loveDots.markLive() }
                     }
                 Text("지금 들어갈 수 있는 방").suit(18, .bold, lineHeight: 25).foregroundStyle(DS.Palette.textPrimary)
                     .offset(x: 24, y: 448)
@@ -286,7 +286,7 @@ private struct LiveDots: View {
 }
 
 /// 카테고리 탭: 글자 15(고른 탭 굵게 #F8F8F8, 나머지 #9AA1A6), x 24부터 63 간격, 밑줄 27 x 2(y 27), 아래 1px #222628 선(y 27).
-/// 연애 옆 빨간 점(6)은 연애를 보고 다른 탭으로 옮길 때까지 보인다(피그마 전체, 친구, 연애 프레임에만 있다).
+/// 연애 옆 빨간 점(6)은 라이브에서 연애를 처음 열면 사라진다(LoveDotStore.liveLoveSeen, 커뮤니티 점과 따로).
 private struct LiveTabs: View {
     @Binding var selected: String
     var showDot: Bool
@@ -309,6 +309,7 @@ private struct LiveTabs: View {
                 .offset(x: 24 + CGFloat(i) * 63)
                 if c == "연애", showDot {
                     Circle().fill(DS.Palette.danger).frame(width: 6, height: 6).offset(x: 179, y: 0)
+                        .transition(LoveDotStore.transition)
                 }
             }
             Rectangle().fill(DS.Palette.textPrimary).frame(width: 27, height: 2)
@@ -460,6 +461,7 @@ struct CategoryTabs: View {
                                 .overlay(alignment: .topTrailing) {
                                     if c == "연애", showDot {
                                         Circle().fill(DS.Palette.danger).frame(width: 6, height: 6).offset(x: 7, y: 0)
+                                            .transition(LoveDotStore.transition)
                                     }
                                 }
                             ZStack {

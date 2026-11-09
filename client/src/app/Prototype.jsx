@@ -20,12 +20,6 @@ const visH = (l, vp) => (!vp.mobile ? l.h : l.h <= 845 ? vp.view : l.h - MOB.cro
 
 function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) {
   const ref = useRef(null);
-  const [hint, setHint] = useState(false);
-  const flash = (e) => {
-    if (e.target.closest('[data-hotspot]')) return;
-    setHint(true);
-    window.setTimeout(() => setHint(false), motion.hint);
-  };
   const Comp = layer.Comp;
   // 상태바는 맨 위 시스템 상태바 하나만 쓴다. 화면 안의 상태바는 숨긴다.
   useLayoutEffect(() => {
@@ -82,9 +76,9 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) 
       // 미리 그리는 동안은 opacity 0으로 숨긴다. visibility를 쓰면 마무리 단계가 만든 캔버스가 숨김 값을 물려받는다(실측: 그림이 검게 빠졌다).
       style={{ height: visH(layer, vp), overflow: vp.mobile ? 'hidden' : undefined, opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto' }}
     >
-      <div className="relative w-screen overflow-hidden" style={{ height: vp.mobile && layer.h <= 845 ? Math.max(layer.h, vp.view + MOB.crop) : layer.h, marginTop: vp.mobile ? -MOB.crop : 0 }} onClick={flash}>
+      <div className="relative w-screen overflow-hidden" style={{ height: vp.mobile && layer.h <= 845 ? Math.max(layer.h, vp.view + MOB.crop) : layer.h, marginTop: vp.mobile ? -MOB.crop : 0 }}>
         <Comp />
-        <Hotspots links={LINKS.filter((l) => l.from === layer.n)} active={active} hint={hint} onPress={onPress} />
+        <Hotspots links={LINKS.filter((l) => l.from === layer.n)} active={active} onPress={onPress} />
         <RoomGuide n={layer.n} />
       </div>
     </div>

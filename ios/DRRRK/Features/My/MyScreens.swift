@@ -130,8 +130,12 @@ private struct MyHome: View {
         .onAppear {
             overlay = startOverlay
             item = startItem
-            gauge = 0
-            withAnimation(DS.Motion.decel(1.0).delay(0.2)) { gauge = 1 }
+            // 엉따 막대는 다른 탭이나 화면에서 마이로 들어올 때만 0에서 차오른다.
+            // 그때는 이 화면이 새로 만들어져 gauge가 0이다. 의자 꾸미기에서 뒤로 오거나 시트와 팝업을 닫을 때는
+            // 같은 화면이 남아 있어 gauge가 이미 1이므로 다시 비우거나 채우지 않는다.
+            if gauge < 1 {
+                withAnimation(DS.Motion.decel(1.0).delay(0.2)) { gauge = 1 }
+            }
         }
     }
 
@@ -446,6 +450,7 @@ private struct MySheet<Content: View>: View {
                     Color.black.opacity(dim)
                         .onTapGesture(perform: onClose)
                         .transition(.opacity)
+                        .zIndex(0)
                     VStack(spacing: 0) {
                         RoundedRectangle(cornerRadius: 2).fill(Color(hex: 0x6E767C))
                             .frame(width: 40, height: 4)
@@ -455,7 +460,9 @@ private struct MySheet<Content: View>: View {
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: h, alignment: .top)
-                    .background(background, in: UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24))
+                    // 시트 판은 올라올 때와 내려갈 때 모두 불투명 단색 그대로다(옅어지는 움직임 없음, 위치로만 움직인다).
+                    .background(UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24).fill(background))
+                    .compositingGroup()
                     .offset(y: max(0, drag))
                     .gesture(
                         DragGesture()
@@ -467,7 +474,8 @@ private struct MySheet<Content: View>: View {
                                 withAnimation(DS.Motion.emphasizedDecel) { drag = 0 }
                             }
                     )
-                    .transition(.move(edge: .bottom))
+                    .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .bottom)))
+                    .zIndex(1)
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .bottom)
