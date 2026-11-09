@@ -13,7 +13,7 @@ export function ChatNameTap({ style, className }) {
   useFigmaSubpixel(__root);
   if (true) return (
     <div ref={__root} data-figma="DRRRK · 드르륵 · 해뜨기" data-node="1952:15499" className={cx("[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden]", className)} style={style}>
-      <div data-figma="image 1208091463" data-node="1952:15500" data-img={"{\"src\":\"assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.png\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [background:url(assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.png)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
+      <div data-figma="image 1208091463" data-node="1952:15500" data-img={"{\"src\":\"assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.webp\",\"mode\":\"FILL\",\"tf\":[[1,0,0],[0,1,0]],\"op\":1,\"flip\":\"\"}"} className="[width:390px] [height:844px] [background:url(assets/images/320c986cd0c78068b7b4f0ec16d590deb18de99b.webp)_50%_/_cover_no-repeat] [position:absolute] [left:0px] [top:0px]" />
       <div data-figma="Status Bar" data-node="1952:15501" data-instance-of="Status Bar" className="[display:flex] [width:390px] [height:64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] [position:absolute] [left:0px] [top:0px] [overflow:hidden]">
         <div data-figma="Group 3" data-node="I1952:15501;3035:448" className="[width:316.391px] [height:22.767px] [flex-shrink:0] [position:absolute] [left:40.52px] [top:20.26px]">
           <div data-figma="Right Side" data-node="I1952:15501;3035:449" className="[width:77.07px] [height:12.9px] [position:absolute] [left:239.32px] [top:5.06px]">

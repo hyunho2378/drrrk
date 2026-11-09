@@ -10,6 +10,7 @@ import { patchLiveV2, patchWatchSeats } from './liveV2.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
+import { attachQuickSlot } from './quickSlot.js';
 import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
 import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
@@ -552,7 +553,7 @@ export function swapMap(n) {
   if (MINE_YELLOW.includes(n)) map[IMG.yellow] = mineRel(false);
   map[IMG.myOld] = mineRel(true);
   // 고민 분석 의자: 생성 코드가 678KB PNG를 가리켜 휴대폰에서 늦게 떴다. 같은 그림의 78KB WebP(미리 받아 둔 그림)로 바꾼다.
-  map['df0a1d154446b484e3518dd2e5f901753261b27f.png'] = 'df0a1d154446b484e3518dd2e5f901753261b27f.webp';
+  map['df0a1d154446b484e3518dd2e5f901753261b27f.webp'] = 'df0a1d154446b484e3518dd2e5f901753261b27f.webp';
   return map;
 }
 export function swapAssets(el, n) {
@@ -719,6 +720,7 @@ export async function prepare(layer, n, prevN) {
   await patchRoom2(root, n);
   attachRoom(root, n);
   attachThrow(root);
+  attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachSort(root, n, true);
   attachDrag(layer, root, n);
   prepTabs(root, n);
@@ -760,6 +762,7 @@ export function attach(layer, n, go, prevN) {
   patchScene(root, n);
   attachRoom(root, n);
   attachThrow(root);
+  attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachInputs(root, n, go);
   attachSort(root, n, false);
   attachDrag(layer, root, n);

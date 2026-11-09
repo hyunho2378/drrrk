@@ -121,7 +121,7 @@ struct ClipCommentSheet: View {
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 6).fill(Color(hex: 0x36D2FF)).frame(width: 359, height: 67)
             // 1910:11690 글자 바깥 흰 테두리 2
-            Text("드르륙 칵, 잼컨 썰 여기 다 있네").suit(15.5, .extrabold, tracking: -0.31, lineHeight: 22)
+            Text("드르륵 칵, 잼컨 썰 여기 다 있네").suit(15.5, .extrabold, tracking: -0.31, lineHeight: 22)
                 .foregroundStyle(.black)
                 .shadow(color: .white, radius: 0, x: 2, y: 0).shadow(color: .white, radius: 0, x: -2, y: 0)
                 .shadow(color: .white, radius: 0, x: 0, y: 2).shadow(color: .white, radius: 0, x: 0, y: -2)
@@ -157,7 +157,7 @@ struct ClipCommentSheet: View {
             Spacer()
             HStack(spacing: 4) {
                 Image(systemName: "gearshape.fill").font(.system(size: 12))
-                Text("설정").suit(14, .medium)
+                Text("설정").suit(14, .medium, tracking: -0.28)
             }
             .foregroundStyle(Color(hex: 0xA2A2A2))
         }
@@ -216,7 +216,7 @@ struct ClipCommentSheet: View {
                 Text(c.name).suit(15, .bold, tracking: -0.3).foregroundStyle(Color(hex: 0xF6F6F6))
                 Text(c.text).suit(15, .regular, tracking: -0.3, lineHeight: 20).foregroundStyle(BODY).padding(.top, 3)
                     .fixedSize(horizontal: false, vertical: true)
-                Text(c.when).suit(13).foregroundStyle(SUB).padding(.top, 1)
+                Text(c.when).suit(13, .regular, tracking: -0.26).foregroundStyle(SUB).padding(.top, 1)
                 Button { say("답글 쓰기는 준비 중이에요") } label: {
                     Text("답글 쓰기").suit(14, .regular, tracking: -0.28).foregroundStyle(Color(hex: 0xEBEBEB)).frame(height: 34)
                 }
@@ -241,7 +241,7 @@ struct ClipCommentSheet: View {
                         Image(systemName: on ? "heart.fill" : "heart").font(.system(size: 16))
                             .foregroundStyle(on ? Color(hex: 0xFF3B5C) : Color(hex: 0xC4C4C4))
                             .scaleEffect(on ? 1.1 : 1)
-                        Text("\(c.likes)").suit(14).foregroundStyle(on ? Color(hex: 0xFF3B5C) : Color(hex: 0xCACACA))
+                        Text("\(c.likes)").suit(14, .regular, tracking: -0.28).foregroundStyle(on ? Color(hex: 0xFF3B5C) : Color(hex: 0xCACACA))
                     }
                 }
                 .buttonStyle(.plain)
@@ -256,7 +256,8 @@ struct ClipCommentSheet: View {
     private var inputArea: some View {
         ZStack(alignment: .topLeading) {
             SHEET.frame(width: 390, height: 142)
-            Rectangle().fill(Color(hex: 0x292929)).frame(width: 390, height: 1)
+            // 피그마 1910:11735 윗선은 입력 영역(702)보다 1 위(701)에 있다.
+            Rectangle().fill(Color(hex: 0x292929)).frame(width: 390, height: 1).offset(y: -1)
             Circle().fill(.white).frame(width: 44, height: 44)
                 .overlay(Image(systemName: "person.fill").font(.system(size: 26)).foregroundStyle(Color(hex: 0xC9C9CE)).offset(y: 4))
                 .clipShape(Circle())

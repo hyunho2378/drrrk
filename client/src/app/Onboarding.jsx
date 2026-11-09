@@ -111,7 +111,7 @@ export default function Onboarding() {
   const home = () => window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 24, t: 'fade' } }));
   return (
     <div data-figma="함께 드르륵 온보딩" style={{ position: 'relative', width: 390, height: 844, overflow: 'hidden', background: '#121415', fontFamily: FONT }}>
-      <img alt="" src={BASE + 'ob-bg.png'} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 844 }} />
+      <img alt="" src={BASE + 'ob-bg.webp'} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 844 }} />
       <Deck pages={TOGETHER} onFinish={home} />
     </div>
   );

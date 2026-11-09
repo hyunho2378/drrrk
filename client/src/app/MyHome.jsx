@@ -106,7 +106,7 @@ export default function MyHome({ item }) {
   return (
     <div data-figma="MY · 리디자인" data-node="1980:28455" style={{ position: 'relative', width: 390, height: 844, overflow: 'hidden', background: '#121415', fontFamily: FONT }}>
       <style>{CSS}</style>
-      <img alt="" src={A + 'hero.png'} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 336 }} />
+      <img alt="" src={A + 'hero.webp'} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 336 }} />
       <img alt="Drrrk" src={A + 'logo.png'} style={{ position: 'absolute', left: 24, top: 64, width: 90, height: 34 }} />
       <img alt="" aria-hidden src={A + 'settings.png'} style={{ position: 'absolute', left: 326, top: 68, width: 40, height: 40 }} />
 

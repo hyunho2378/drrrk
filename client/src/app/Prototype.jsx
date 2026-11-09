@@ -179,8 +179,19 @@ export default function Prototype() {
       window.scrollTo(0, 0);
       // 이 화면에서 갈 수 있는 화면의 코드를 미리 받아 둔다(다음 누름의 대기를 줄인다).
       const idle = window.requestIdleCallback || ((f) => window.setTimeout(f, 200));
+      // 자동으로 넘어가는 화면(고민 분석 26 → 추천 27)과 그 화면에서 갈 수 있는 방도 함께 미리 받는다. 넘어가기 전에 그림이 준비돼 있어야 멈칫하지 않는다.
+      const aheadOf = (from) => {
+        const set = new Set(LINKS.filter((l) => l.from === from).map((l) => l.to));
+        const au1 = AUTO[from];
+        if (au1) {
+          set.add(au1.to);
+          LINKS.filter((l) => l.from === au1.to).forEach((l) => set.add(l.to));
+        }
+        [...set].forEach((t) => { if (AUTO[t]) set.add(AUTO[t].to); });
+        return [...set];
+      };
       idle(() =>
-        [...new Set(LINKS.filter((l) => l.from === (shownN || n)).map((l) => l.to))].forEach((to) => {
+        aheadOf(shownN || n).forEach((to) => {
           loadScreen(to);
           (SCREEN_ASSETS[to] || []).forEach((u) => {
             const i = new Image();

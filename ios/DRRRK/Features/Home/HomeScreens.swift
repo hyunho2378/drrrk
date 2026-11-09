@@ -52,7 +52,7 @@ private struct CloseX: View {
     }
 }
 
-// MARK: - 홈 배경(하늘, 별, 의자, 로고, 지금 드르륵 중, 알림)
+// MARK: - 홈 배경(간판 그림, 로고, 지금 드르륵 중, 의자 얼굴 프로필)
 
 private struct HomeBackdrop: View {
     @Environment(Router.self) private var router
@@ -60,9 +60,8 @@ private struct HomeBackdrop: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Image("A-home-sky").resizable().scaledToFill().frame(width: 390, height: 761).clipped()
-            Image("A-home-top").resizable().scaledToFill().frame(width: 390, height: 271).clipped()
-            Image("A-home-chair").resizable().frame(width: 168, height: 192).at(193, 305)
+            // 피그마 1647:23476, 1647:23437 배경 한 장(Drrrk 간판 편의점, 파란 의자와 흰 테이블이 그림에 들어 있음)
+            Image("I-home-bg").resizable().scaledToFill().frame(width: 390, height: 761).clipped()
             Image("logo-wordmark").resizable().frame(width: 90, height: 34).at(24, 64)
             HStack(spacing: 8) {
                 Circle().fill(DS.Palette.brandPrimary).frame(width: 8, height: 8)
@@ -73,6 +72,7 @@ private struct HomeBackdrop: View {
             .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 20))
             .fixedSize()
             .at(24, 118)
+            // 피그마 1647:23513, 1647:23442 의자 얼굴 프로필(339, 69, 26 x 26). 누르면 지금처럼 알림으로 간다.
             Button { router.push(.notiActivity) } label: {
                 Image("A-home-bell").resizable().frame(width: 26, height: 26)
                     .frame(width: 40, height: 40).contentShape(Rectangle())
@@ -118,14 +118,17 @@ struct HomeView: View {
     private var sheet: some View {
         ZStack(alignment: .topLeading) {
             UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20).fill(.black).frame(width: 390, height: 327)
-            Capsule().fill(DS.Palette.textTertiary).frame(width: 40, height: 4).at(175, 12)
+            // 손잡이는 접힌 홈(1647:23488)에만 있고 펼친 홈(1647:23436)에는 없다.
+            RoundedRectangle(cornerRadius: 3).fill(DS.Palette.textTertiary).frame(width: 40, height: 4).at(175, 12)
+                .opacity(up ? 0 : 1)
             Text("유난히 잠 못드는 밤\n혹시 무슨 일 있어?")
                 .suit(28, .bold, tracking: -1.12, lineHeight: 39.2)
                 .foregroundStyle(DS.Palette.textPrimary)
                 .frame(width: 342, alignment: .leading)
                 .at(24, up ? 40 : 38)
             input.at(24, up ? 138 : 136)
-            Text("자기 전 뒤척이게 만드는 친구의 한 마디").suit(12, .medium, tracking: -0.48)
+            // 접힌 홈 1647:23487 Medium 13, 펼친 홈 1647:23452 Medium 12
+            Text("자기 전 뒤척이게 만드는 친구의 한 마디").suit(up ? 12 : 13, .medium, tracking: up ? -0.48 : -0.52)
                 .foregroundStyle(DS.Palette.brandPrimary)
                 .frame(width: 390).at(0, up ? 212 : 204)
         }
@@ -154,7 +157,7 @@ struct HomeView: View {
     private var input: some View {
         HStack(spacing: 8) {
             TextField("", text: $text, prompt: Text("편하게 고민을 꺼내보아요").foregroundStyle(DS.Palette.textSecondary), axis: .horizontal)
-                .suit(16, .regular, tracking: -0.64)
+                .suit(up ? 16 : 15, .regular, tracking: up ? -0.64 : -0.6)
                 .foregroundStyle(DS.Palette.textPrimary)
                 .focused($focused)
                 .submitLabel(.send)
@@ -170,9 +173,11 @@ struct HomeView: View {
             .buttonStyle(ClipPressStyle(radius: 24))
             .accessibilityLabel("고민 보내기")
         }
-        .padding(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 8))
-        .frame(width: 342, height: 66)
-        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 32))
+        // 펼친 홈 1671:45255: 342 x 66, 반경 32, 글 왼쪽 21, 버튼 둘레 9.
+        // 접힌 홈 1647:23481: 342 x 60, 반경 30, 글 왼쪽 20, 버튼 둘레 6.
+        .padding(up ? EdgeInsets(top: 9, leading: 21, bottom: 9, trailing: 9) : EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 6))
+        .frame(width: 342, height: up ? 66 : 60)
+        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: up ? 32 : 30))
         .onTapGesture {
             if !up {
                 withAnimation(DS.Motion.emphasizedDecel) { up = true }

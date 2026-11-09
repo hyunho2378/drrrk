@@ -38,7 +38,7 @@ export default function SkinPopup() {
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}><MyHome /></div>
       <div onClick={later} style={{ position: 'absolute', inset: 0, background: 'rgba(5,8,10,.88)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', opacity: shown ? 1 : 0, ...fade(350) }} />
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: shown ? 1 : 0, ...fade(350) }}>
-        <img alt="" src={BASE + 'D2-skin-glow.png'} style={{ position: 'absolute', left: 5, top: 101, width: 380, height: 380 }} />
+        <img alt="" src={BASE + 'D2-skin-glow.webp'} style={{ position: 'absolute', left: 5, top: 101, width: 380, height: 380 }} />
         <img alt="" src={BASE + 'D2-skin-rays.png'} style={{ position: 'absolute', left: 0, top: 100, width: 390, height: 390 }} />
         <img alt="" src={big(2, 0)} style={{ position: 'absolute', left: 80, top: 180, width: 230, height: 230, objectFit: 'contain', filter: 'drop-shadow(0 16px 10px rgba(0,0,0,.5))', transform: shown ? 'scale(1)' : 'scale(.85)', ...fade(350) }} />
         {SPARKLES.map(([x, y, s], i) => (

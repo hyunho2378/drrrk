@@ -14,7 +14,7 @@ export function SoloField2({ style, className }) {
   if (true) return (
     <div ref={__root} data-figma="DRRRK · 드르륵 · 현장 모드" data-node="1804:12770" className={cx("[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden]", className)} style={style}>
       <div data-figma="scene dim" data-node="1804:12771" className="[width:390px] [height:844px] [opacity:0.35] [background:#000] [position:absolute] [left:0px] [top:0px]" />
-      <img data-figma="image 1208091463" data-node="1804:12772" data-px="" data-hires="" alt="" src="assets/raster/1804-12772.png" className="[width:390px] [height:844px] [position:absolute] [left:0px] [top:0px] [display:block]" />
+      <img data-figma="image 1208091463" data-node="1804:12772" data-px="" data-hires="" alt="" src="assets/raster/1804-12772.webp" className="[width:390px] [height:844px] [position:absolute] [left:0px] [top:0px] [display:block]" />
       <div data-figma="Status Bar" data-node="1804:12773" data-instance-of="Status Bar" className="[display:flex] [width:390px] [height:64px] [padding:20.258px_33.09px_20.975px_40.52px] [justify-content:flex-end] [align-items:center] [position:absolute] [left:0px] [top:0px] [overflow:hidden]">
         <div data-figma="Group 3" data-node="I1804:12773;3035:448" className="[width:316.391px] [height:22.767px] [flex-shrink:0] [position:absolute] [left:40.52px] [top:20.26px]">
           <div data-figma="Right Side" data-node="I1804:12773;3035:449" className="[width:77.07px] [height:12.9px] [position:absolute] [left:239.32px] [top:5.06px]">
