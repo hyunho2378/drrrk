@@ -1,4 +1,4 @@
-// 마이 메인. 팀 피그마 "MY · 리디자인 (히어로 + 엉따 밴드 + 업적 편의점)"(1972:22735)의 자리와 값을 그대로 옮겼다(390 x 844).
+// 마이 메인. 팀 피그마 "MY · 리디자인 (히어로 + 엉따 밴드 + 업적 편의점)"(1972:22735, 11. 9. 최신 후보 1980:28455의 "+ 0.5°" 칩 포함)의 자리와 값을 그대로 옮겼다(390 x 844).
 // iOS MyScreens.swift와 같은 값이다: 히어로 336 높이, 의자 100,126 190, 디자인 버튼 278,280 84 x 36,
 // 엉따 39.2° Bold 26 #FF9A4D, 막대 342 x 6 중 244.8, 업적 편의점 76 x 93 4칸 두 줄(끝 두 칸은 잠긴 칸).
 // 의자는 지금 저장된 의자(chairs.js), 나머지 그림은 피그마에서 내보낸 그림(public/assets/my2)이다.
@@ -104,7 +104,7 @@ export default function MyHome({ item }) {
     });
   });
   return (
-    <div data-figma="MY · 리디자인" style={{ position: 'relative', width: 390, height: 844, overflow: 'hidden', background: '#121415', fontFamily: FONT }}>
+    <div data-figma="MY · 리디자인" data-node="1980:28455" style={{ position: 'relative', width: 390, height: 844, overflow: 'hidden', background: '#121415', fontFamily: FONT }}>
       <style>{CSS}</style>
       <img alt="" src={A + 'hero.png'} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 336 }} />
       <img alt="Drrrk" src={A + 'logo.png'} style={{ position: 'absolute', left: 24, top: 64, width: 90, height: 34 }} />
@@ -129,6 +129,14 @@ export default function MyHome({ item }) {
           <Title text="엉따 온도" />
           <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.52px', lineHeight: '36px', color: '#FF9A4D' }}>39.2°</span>
         </div>
+        {/* 오늘 오른 온도 칩(팀 피그마 1980:28595): 화면 기준 237, 361. 칩 49 x 25, 모서리 11, #36D2FF, 안쪽 여백 9와 4,
+            글자 SUIT Bold 11, 행간 150%, 자간 -4%, 검정. 오른쪽 꼬리(1980:28598)는 285, 369의 9.5 x 9 삼각형이다. */}
+        <span aria-label="오늘 0.5도 올랐어요" data-figma="+ 0.5°" style={{ position: 'absolute', left: 213, top: 5, width: 58, height: 25, pointerEvents: 'none' }}>
+          <span style={{ position: 'absolute', left: 0, top: 0, width: 49, height: 25, borderRadius: 11, background: '#36D2FF', boxSizing: 'border-box', padding: '4px 9px', fontSize: 11, fontWeight: 700, lineHeight: '16.5px', letterSpacing: '-0.44px', color: '#000', whiteSpace: 'nowrap' }}>+ 0.5°</span>
+          <svg aria-hidden width="58" height="25" viewBox="0 0 58 25" style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
+            <path d="M55.5921 11.5962L48 8V17L55.5921 13.4037C56.3547 13.0425 56.3547 11.9574 55.5921 11.5962Z" fill="#36D2FF" />
+          </svg>
+        </span>
         <div style={{ position: 'relative', marginTop: 12, width: 342, height: 6, borderRadius: 3, background: 'rgba(110,118,124,.4)', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', left: 0, top: 0, width: 244.8, height: 6, borderRadius: 3, background: 'linear-gradient(90deg,#36D2FF,#FF9A4D)', transformOrigin: '0 50%', animation: `mhGauge 1000ms ${EASE} 200ms both` }} />
         </div>

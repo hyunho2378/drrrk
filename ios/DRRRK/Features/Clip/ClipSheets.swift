@@ -49,6 +49,7 @@ struct ClipCommentSheet: View {
     @State private var draft = ""
 
     private let emojis = ["👍", "❤️", "🤣", "🎉", "🥰", "👏", "😄", "🔥"]
+    /// 피그마 1910:11768~11775 이모지 그림(28 x 28) 가운데 x
     private let emojiX: [CGFloat] = [42, 85, 129, 172, 216, 260, 303, 347]
 
     var body: some View {
@@ -57,7 +58,7 @@ struct ClipCommentSheet: View {
             Color.black.opacity(open ? 1 : 0).frame(width: 390, height: 844)
                 .contentShape(Rectangle())
                 .onTapGesture { onClose() }
-            Image("A-clip-vid").resizable().scaledToFill()
+            Image("G-clip-vid").resizable().scaledToFill()
                 .frame(width: open ? 169 : 390, height: open ? 299 : 750)
                 .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: open ? 14 : 0, bottomTrailingRadius: open ? 14 : 0))
                 .offset(x: open ? 110.5 : 0)
@@ -65,22 +66,24 @@ struct ClipCommentSheet: View {
                 .allowsHitTesting(false)
             SheetFrame(open: open, top: 310, onClose: onClose) {
                 ZStack(alignment: .topLeading) {
-                    if !info {
-                        header
-                    }
+                    // 배너 위 의자 그림이 배너 위로 35 튀어나와(피그마 2006:11799, 화면 y 362) 목록 영역을 y 52부터 연다.
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 0) {
                             if info {
                                 infoBlock
                             } else {
+                                Color.clear.frame(height: 23)
                                 banner; cleanbot
                             }
                             ForEach(list) { row($0) }
                             Color.clear.frame(height: 30)
                         }
                     }
-                    .frame(width: 390, height: info ? 362 : 317)
-                    .offset(y: info ? 30 : 75)
+                    .frame(width: 390, height: info ? 362 : 340)
+                    .offset(y: info ? 30 : 52)
+                    if !info {
+                        header
+                    }
                     inputArea.offset(y: 392)
                 }
             }
@@ -114,33 +117,34 @@ struct ClipCommentSheet: View {
     }
 
     private var banner: some View {
+        // 피그마 1910:11689 배너(359 x 67, #36D2FF, 반경 6). 아래 좌표는 배너 왼쪽 위(화면 15, 397) 기준이다.
         ZStack(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 6).fill(Color(hex: 0xADA8FF)).frame(width: 359, height: 67)
-            Text("댓글 좀 치세요? 장려금 드리려는데!").suit(15.5, .heavy, tracking: -0.5)
-                .foregroundStyle(Color(hex: 0x2D31B3))
-                .shadow(color: .white, radius: 0, x: 1.5, y: 0).shadow(color: .white, radius: 0, x: -1.5, y: 0)
-                .shadow(color: .white, radius: 0, x: 0, y: 1.5).shadow(color: .white, radius: 0, x: 0, y: -1.5)
-                .offset(x: 15, y: 10)
+            RoundedRectangle(cornerRadius: 6).fill(Color(hex: 0x36D2FF)).frame(width: 359, height: 67)
+            // 1910:11690 글자 바깥 흰 테두리 2
+            Text("드르륙 칵, 잼컨 썰 여기 다 있네").suit(15.5, .extrabold, tracking: -0.31, lineHeight: 22)
+                .foregroundStyle(.black)
+                .shadow(color: .white, radius: 0, x: 2, y: 0).shadow(color: .white, radius: 0, x: -2, y: 0)
+                .shadow(color: .white, radius: 0, x: 0, y: 2).shadow(color: .white, radius: 0, x: 0, y: -2)
+                .shadow(color: .white, radius: 0, x: 1.4, y: 1.4).shadow(color: .white, radius: 0, x: -1.4, y: -1.4)
+                .shadow(color: .white, radius: 0, x: 1.4, y: -1.4).shadow(color: .white, radius: 0, x: -1.4, y: 1.4)
+                .offset(x: 16, y: 10)
+            // 1910:11691 배너 버튼(로고, 지금 다운받기, 오른쪽 화살표)
             HStack(spacing: 4) {
-                Text("참여 신청하는 곳").suit(11.5, .semibold, tracking: -0.3)
-                Image(systemName: "chevron.right").font(.system(size: 8, weight: .bold))
+                Image("G-clip-drrrk-logo").resizable().frame(width: 29.2, height: 11)
+                Text("지금 다운받기").suit(11.5, .semibold, tracking: -0.23, lineHeight: 16)
+                    .foregroundStyle(Color(hex: 0xE7E0FA))
+                Image("G-clip-chevron").resizable().frame(width: 7, height: 11)
             }
-            .foregroundStyle(Color(hex: 0xE7E0FA))
             .padding(.horizontal, 9).frame(height: 19)
-            .background(Color(hex: 0x4F20DA))
-            .shadow(color: .white, radius: 0, x: 1, y: 1)
-            .offset(x: 17, y: 36)
-            VStack(spacing: 0) {
-                Text("웃플 장려금").suit(13, .heavy, tracking: -0.3)
-                Text("드립니다").suit(13, .heavy, tracking: -0.3)
-            }
-            .foregroundStyle(Color(hex: 0x1A1A24))
-            .frame(width: 92, height: 50)
-            .background(Color(hex: 0xF3EEDF), in: RoundedRectangle(cornerRadius: 5))
-            .shadow(color: .black.opacity(0.3), radius: 1.5, y: 1)
-            .rotationEffect(.degrees(-7))
-            .offset(x: 254, y: 9)
+            .background(Color(hex: 0x222628), in: RoundedRectangle(cornerRadius: 5))
+            .offset(x: 16, y: 36)
+            // 2006:11816, 2006:11817, 2006:11844, 2006:11799 장식 그림(회전과 흐림은 그림에 들어 있음)
+            Image("G-clip-cb-drrra").resizable().frame(width: 55.3, height: 55.3).offset(x: 216, y: -18)
+            Image("G-clip-cb-squid").resizable().frame(width: 56, height: 56.4).offset(x: 319, y: 8)
+            Image("G-clip-cb-shadow").resizable().frame(width: 86, height: 32).offset(x: 249, y: 40)
+            Image("G-clip-cb-chair").resizable().frame(width: 110.2, height: 110.2).offset(x: 242, y: -35)
         }
+        .allowsHitTesting(false)
         .frame(width: 359, height: 67, alignment: .topLeading)
         .padding(.leading, 15).padding(.top, 12)
     }
@@ -167,15 +171,15 @@ struct ClipCommentSheet: View {
     private var infoBlock: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 6) {
-                Image("A-clip-av0").resizable().scaledToFill().frame(width: 32, height: 32).clipShape(Circle())
-                Text("쌍수일기").suit(15, .bold, tracking: -0.3).foregroundStyle(Color(hex: 0xF6F6F6)).padding(.leading, 4)
+                Image("G-clip-av-webd").resizable().scaledToFill().frame(width: 32, height: 32).clipShape(Circle())
+                Text("흔한 웹드").suit(15, .bold, tracking: -0.3).foregroundStyle(Color(hex: 0xF6F6F6)).padding(.leading, 4)
                 Image(systemName: "checkmark.seal.fill").font(.system(size: 13)).foregroundStyle(Color(hex: 0xF9A825))
                 Text("팔로우").suit(13.5, .medium, tracking: -0.27).foregroundStyle(Color(hex: 0xEFEFEF))
                     .padding(.horizontal, 9).frame(height: 26)
                     .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: 0x343436)))
                     .padding(.leading, 6)
             }
-            Text("친구가 썸남 앞에서 내 쌍밍아웃함").suit(16.5, .regular, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5)).padding(.top, 11)
+            Text("베프가 내 비밀을 까발린다 ep.01").suit(16.5, .regular, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5)).padding(.top, 11)
             Text("#친구관계 #연애").suit(16.5, .bold, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5))
             HStack(spacing: 6) {
                 Text("재생수 2.4만")
@@ -276,7 +280,9 @@ struct ClipCommentSheet: View {
             .buttonStyle(.plain)
             .offset(x: 340, y: 19)
             ForEach(emojis.indices, id: \.self) { i in
-                Button { draft += emojis[i] } label: { Text(emojis[i]).font(.system(size: 24)).frame(width: 40, height: 40) }
+                Button { draft += emojis[i] } label: {
+                    Image("G-clip-emoji-\(i + 1)").resizable().frame(width: 28, height: 28).frame(width: 40, height: 40)
+                }
                     .buttonStyle(ClipPressStyle(radius: 20))
                     .offset(x: emojiX[i] - 20, y: 66)
             }
@@ -346,7 +352,7 @@ struct ClipMoreSheet: View {
                     if let label {
                         Text(label).suit(15.5, .semibold, tracking: -0.31)
                     } else {
-                        (Text("쌍수일기").foregroundColor(Color(hex: 0x4F96FF)) + Text(" 콘텐츠 숨기기")).suit(15.5, .semibold, tracking: -0.31)
+                        (Text("웹드플리").foregroundColor(Color(hex: 0x4F96FF)) + Text(" 콘텐츠 숨기기")).suit(15.5, .semibold, tracking: -0.31)
                     }
                     if let tail {
                         Circle().fill(SUB).frame(width: 3.5, height: 3.5)

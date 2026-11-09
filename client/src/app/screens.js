@@ -131,7 +131,7 @@ export const SCREENS = [
   "n": 23,
   "id": "1952:16490",
   "name": "DRRRK · 드르륵 · 일반 모드",
-  "file": "NormalNameTap2",
+  "file": "MiniProfileNormal",
   "h": 844
  },
  {
@@ -392,6 +392,7 @@ export const SCREEN_BY_N = Object.fromEntries(SCREENS.map((s) => [s.n, s]));
 
 const modules = {
   'NormalEmoji': () => import('../figma/screens/NormalEmoji.jsx'),
+  'MiniProfileNormal': () => import('./MiniProfileNormal.jsx'),
   'NormalNameTap2': () => import('../figma/screens/NormalNameTap2.jsx'),
   'NormalNameTap': () => import('../figma/screens/NormalNameTap.jsx'),
   'ChatNameTap': () => import('../figma/screens/ChatNameTap.jsx'),

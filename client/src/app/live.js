@@ -19,7 +19,7 @@ import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
 import { patchSolo } from './solo.js';
-import { swapScene } from './scene.js';
+import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
 
 export { setText };
@@ -622,8 +622,8 @@ function patchLounge(root, n) {
   });
 }
 
-// 새 장면(28, 30, 31)에서 팀 피그마가 옮긴 이름표 묶음 위치를 맞춘다(피그마 값: 묶음 y 288, 높이 115, 안쪽 +25).
-const SCENE_FIX = [28, 30, 31];
+// 옛 장면(28, 30, 31)에서 팀 피그마가 옮긴 이름표 묶음 위치를 맞추던 자리. 11. 9. 새 방 장면으로 바뀌어 scene.js patchRoom2가 새 값(묶음 17, 306, 358 x 84)으로 맞춘다.
+const SCENE_FIX = [];
 function patchScene(root, n) {
   if (!SCENE_FIX.includes(n) || root.dataset.sceneFix) return;
   root.dataset.sceneFix = '1';
@@ -716,6 +716,7 @@ export async function prepare(layer, n, prevN) {
   applyAvatars(root, n);
   showEmptyOutlines(root);
   patchScene(root, n);
+  await patchRoom2(root, n);
   attachRoom(root, n);
   attachThrow(root);
   attachSort(root, n, true);
@@ -812,6 +813,8 @@ function tick() {
   const rule = room.kind === 'sun' ? LIVE.rooms[room.scene] : null;
   if (!rule || !current.go) return;
   for (const step of rule) {
+    // 그 단계의 화면(1분 전 40)에 이미 와 있으면 지나간 것으로 센다. 안 그러면 40에서 일반 모드로 갈 때 0.5초 뒤 40으로 되돌아왔다(11/09 QA).
+    if (step.to === current.n) room.fired[step.at] = true;
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
       room.fired[step.at] = true;
       current.go({ to: step.to, t: 'fade' });

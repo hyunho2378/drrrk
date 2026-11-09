@@ -82,7 +82,7 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) 
       // 미리 그리는 동안은 opacity 0으로 숨긴다. visibility를 쓰면 마무리 단계가 만든 캔버스가 숨김 값을 물려받는다(실측: 그림이 검게 빠졌다).
       style={{ height: visH(layer, vp), overflow: vp.mobile ? 'hidden' : undefined, opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto' }}
     >
-      <div className="relative w-screen overflow-hidden" style={{ height: layer.h, marginTop: vp.mobile ? -MOB.crop : 0 }} onClick={flash}>
+      <div className="relative w-screen overflow-hidden" style={{ height: vp.mobile && layer.h <= 845 ? Math.max(layer.h, vp.view + MOB.crop) : layer.h, marginTop: vp.mobile ? -MOB.crop : 0 }} onClick={flash}>
         <Comp />
         <Hotspots links={LINKS.filter((l) => l.from === layer.n)} active={active} hint={hint} onPress={onPress} />
         <RoomGuide n={layer.n} />

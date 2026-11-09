@@ -42,6 +42,9 @@ function Item({ it, flow, pw }) {
     case 'text': {
       const lh = lineH(it);
       const st = textBase(it.size, it.wt, it.c, it.a, lh);
+      // 피그마에서 SUIT가 아닌 글꼴(ff)이나 다른 자간(ls)을 쓴 글자는 그 값을 따른다.
+      if (it.ff) st.fontFamily = it.ff;
+      if (it.ls) st.letterSpacing = it.ls;
       let box;
       if (flow) box = { position: 'relative', flexShrink: 0, marginLeft: it.ml || 0 };
       else if (it.cx != null) box = { position: 'absolute', left: it.cx - 150, width: 300, textAlign: 'center', top: it.cy - lh / 2, height: lh };
@@ -64,7 +67,7 @@ function Item({ it, flow, pw }) {
       const tx = it.text;
       const where = flow ? { position: 'relative', flexShrink: 0, marginLeft: it.ml || 0 } : it.right != null ? { position: 'absolute', right: pw - it.right, top: it.y } : { position: 'absolute', left: it.x, top: it.y };
       return (
-        <div data-figma={it.n} style={{ ...where, height: it.h, boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 ' + it.px + 'px', borderRadius: it.rad, background: fillCss(it.f), border: it.s ? it.s.w + 'px solid ' + rgba(it.s.c, it.s.a) : undefined, ...textBase(tx.size, tx.wt, tx.c, 1, Math.round(tx.size * 1.4)) }}>{tx.s}</div>
+        <div data-figma={it.n} style={{ ...where, height: it.h, boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 ' + it.px + 'px', borderRadius: it.rad, background: fillCss(it.f), border: it.s ? it.s.w + 'px solid ' + rgba(it.s.c, it.s.a) : undefined, ...textBase(tx.size, tx.wt, tx.c, 1, Math.round(tx.size * 1.4)), margin: flow ? '0 0 0 ' + (it.ml || 0) + 'px' : 0 }}>{tx.s}</div>
       );
     }
     case 'group': {

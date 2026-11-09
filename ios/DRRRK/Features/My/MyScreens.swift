@@ -1,7 +1,7 @@
 import Observation
 import SwiftUI
 
-// 마이 묶음. 마이 리디자인(팀 피그마 1972:22735, 히어로와 엉따 밴드, 업적 편의점 격자), 스킨 획득 팝업(1972:22149),
+// 마이 묶음. 마이 리디자인(팀 피그마 1980:28455, 1972:22735에 "+ 0.5°" 칩이 더해진 판, 히어로와 엉따 밴드, 업적 편의점 격자), 스킨 획득 팝업(1972:22149),
 // 나의 편의점 시트(1790:10756), 아이템 상세(1790:10988).
 // 좌표와 값은 피그마 390 x 844 기준이다. 시트와 팝업은 마이 화면 위에 같은 화면 안에서 올라온다(화면 이동 없음).
 
@@ -232,6 +232,8 @@ private struct MyHome: View {
             .frame(height: 40)
         }
         .frame(width: 342, alignment: .topLeading)
+        // 피그마 1980:28595: 39.2° 왼쪽 "+ 0.5°" 칩(밴드 기준 213, 5). 49 x 25, 모서리 11, #36D2FF, 오른쪽 꼬리(1980:28598)
+        .overlay(alignment: .topLeading) { WarmGainChip().offset(x: 213, y: 5) }
     }
 
     /// 업적 편의점 머리줄(24, 498): 제목과 "전체 8"
@@ -667,5 +669,42 @@ private struct MySkinModal: View {
                 .frame(width: 240, alignment: .trailing).offset(y: 34)
         }
         .frame(width: 240, height: 50, alignment: .topLeading)
+    }
+}
+
+/// 엉따 온도 옆 "+ 0.5°" 말풍선 칩(피그마 1980:28595, 57.5 x 25)
+/// 칩 1980:28596: 49 x 25, 모서리 11, 안쪽 여백 9, 4, #36D2FF. 글자 1980:28597: SUIT Bold 11, 자간 -4%, 행간 150%, 검정.
+/// 꼬리 1980:28598: 칩 오른쪽(48, 8)에서 9 x 9, 끝이 둥근 삼각형.
+private struct WarmGainChip: View {
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            WarmGainTail().fill(DS.Palette.brandPrimary)
+                .frame(width: 58, height: 25)
+            Text("+ 0.5°").suit(11, .bold, tracking: -0.44, lineHeight: 16.5)
+                .foregroundStyle(.black)
+                .lineLimit(1)
+                .fixedSize()
+                .frame(width: 49, height: 25)
+                .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 11))
+        }
+        .frame(width: 58, height: 25, alignment: .topLeading)
+        .accessibilityLabel("0.5도 올랐어요")
+    }
+}
+
+/// 피그마 내보내기 SVG 경로 그대로(58 x 25 칸 기준)
+private struct WarmGainTail: Shape {
+    func path(in rect: CGRect) -> Path {
+        let sx = rect.width / 58, sy = rect.height / 25
+        var p = Path()
+        p.move(to: CGPoint(x: 55.5921 * sx, y: 11.5962 * sy))
+        p.addLine(to: CGPoint(x: 48 * sx, y: 8 * sy))
+        p.addLine(to: CGPoint(x: 48 * sx, y: 17 * sy))
+        p.addLine(to: CGPoint(x: 55.5921 * sx, y: 13.4037 * sy))
+        p.addCurve(to: CGPoint(x: 55.5921 * sx, y: 11.5962 * sy),
+                   control1: CGPoint(x: 56.3547 * sx, y: 13.0425 * sy),
+                   control2: CGPoint(x: 56.3547 * sx, y: 11.9574 * sy))
+        p.closeSubpath()
+        return p
     }
 }
