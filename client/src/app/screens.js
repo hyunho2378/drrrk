@@ -3,7 +3,7 @@
 export const SCREENS = [
  {
   "n": 1,
-  "id": "1647:26726",
+  "id": "2023:30658",
   "name": "종료",
   "file": "Screen1647_26726",
   "h": 1708
