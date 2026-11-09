@@ -405,7 +405,7 @@ struct RecommendView: View {
             }
             .buttonStyle(PressStyle())
             .at(24, 726)
-            Button { router.push(.roomSolo) } label: {
+            Button { router.push(.noRoom) } label: {
                 Text("혼자 드르륵 앉기").suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textSecondary)
                     .frame(width: 342, height: 44).contentShape(Rectangle())
             }
