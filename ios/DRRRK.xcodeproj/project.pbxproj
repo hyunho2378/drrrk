@@ -17,6 +17,7 @@
 		3BC2C129F9EA63AE7592263A /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A4A2BA30C7DB329308DD9B /* RoomView.swift */; };
 		3F4E0A7FEF2177ECCA5A335E /* SUIT-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6467F779520715C87E712F41 /* SUIT-Medium.otf */; };
 		41A44E31079DD018324A741C /* ClipSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A58B17C0F22880FD7E18C587 /* ClipSheets.swift */; };
+		48F0D0EA9E7B55B9CDE3592F /* OnboardingVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750CE6725CCE720A9C573997 /* OnboardingVisuals.swift */; };
 		5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5D62597EB5736F98D562A0 /* NotiScreens.swift */; };
 		5AE4CBC169CDA200AA9E51DB /* DRRRKApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071502F7C6300EB6A419D22B /* DRRRKApp.swift */; };
 		5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */; };
@@ -31,6 +32,7 @@
 		AAE8AE5F7B7F908B3E51409E /* ScreenRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */; };
 		C337B1A6C586DC8ADD91ADF0 /* SUIT-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 14456F248BBE7E155D47906C /* SUIT-Heavy.otf */; };
 		C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */; };
+		C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */; };
 		D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B487C08A1B7EC0175936B1F /* RoomModel.swift */; };
 		DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 501E8B9CBA004BB542AF4AF8 /* SUIT-SemiBold.otf */; };
 		E901701EBADC7258D253319F /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AE12650DE60F318392041F22 /* SUIT-Regular.otf */; };
@@ -54,6 +56,7 @@
 		705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityScreens.swift; sourceTree = "<group>"; };
 		71995CDE44FF241C9D51C4E3 /* SUIT-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Bold.otf"; sourceTree = "<group>"; };
 		7354575B5B2406A0040950A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		750CE6725CCE720A9C573997 /* OnboardingVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingVisuals.swift; sourceTree = "<group>"; };
 		79E359FEC2985AFFE94377DB /* logo-motion.mp4 */ = {isa = PBXFileReference; path = "logo-motion.mp4"; sourceTree = "<group>"; };
 		7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScreens.swift; sourceTree = "<group>"; };
 		8873B83148F8763D3B5E0993 /* HomeScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreens.swift; sourceTree = "<group>"; };
@@ -65,6 +68,7 @@
 		BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScreens.swift; sourceTree = "<group>"; };
 		D2DD6D0BE274C4209DEA4486 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		D88CDC61C1AC45D9164E2648 /* ClipScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScene.swift; sourceTree = "<group>"; };
+		E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingKit.swift; sourceTree = "<group>"; };
 		E5C3CA32A15F62294981BB03 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStudioView.swift; sourceTree = "<group>"; };
 		FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScreens.swift; sourceTree = "<group>"; };
@@ -89,6 +93,7 @@
 				18CA81BC6AEFD2BDE67D5203 /* Live */,
 				CD30D884D2ED469B2462D832 /* My */,
 				2FFB7D2479EBD7EC5B87A249 /* Notifications */,
+				F99A266EF8EB5A7DCFEFC9C4 /* Onboarding */,
 				EE3738FC29836FDBA9155398 /* Room */,
 			);
 			path = Features;
@@ -245,6 +250,15 @@
 			path = Room;
 			sourceTree = "<group>";
 		};
+		F99A266EF8EB5A7DCFEFC9C4 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */,
+				750CE6725CCE720A9C573997 /* OnboardingVisuals.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -336,6 +350,8 @@
 				2086FB2D2C7FC1046CDB9399 /* LiveScreens.swift in Sources */,
 				856CF2631A345DE00B0E82B2 /* MyScreens.swift in Sources */,
 				5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */,
+				C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */,
+				48F0D0EA9E7B55B9CDE3592F /* OnboardingVisuals.swift in Sources */,
 				D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */,
 				5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */,
 				3BC2C129F9EA63AE7592263A /* RoomView.swift in Sources */,
