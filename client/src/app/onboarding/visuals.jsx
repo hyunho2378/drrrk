@@ -179,7 +179,7 @@ export function V3() {
   );
 }
 
-// 함께 드르륵 4: 해 뜨기 타이머. 20:00에서 00:00까지 2.4초에 줄고, 끝나면 "해가 떴어요" 칩이 떠오른 뒤 타이머가 20:00으로 돌아간다. 누르면 처음부터.
+// 함께 드르륵 4: 해 뜨기 타이머. 20:00에서 00:00까지 1.3초에 줄고(11/10 사용자: 온보딩 안 시계가 느림), 끝나면 "해가 떴어요" 칩이 떠오른 뒤 타이머가 20:00으로 돌아간다. 누르면 처음부터.
 const fmt = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 function V4Run({ onReplay }) {
   const reduced = useRM();
@@ -189,9 +189,9 @@ function V4Run({ onReplay }) {
     if (reduced) return undefined;
     let raf = 0;
     const timers = [];
-    const start = performance.now() + 600;
+    const start = performance.now() + 450;
     const tick = (now) => {
-      const p = Math.min(1, Math.max(0, (now - start) / 2400));
+      const p = Math.min(1, Math.max(0, (now - start) / 1300));
       setSec(Math.round(1200 * (1 - p)));
       if (p > 0) setPhase((ph) => (ph === 'wait' ? 'run' : ph));
       if (p < 1) raf = requestAnimationFrame(tick);

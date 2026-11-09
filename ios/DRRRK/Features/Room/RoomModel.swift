@@ -4,9 +4,9 @@ import SwiftUI
 /// 현장 모드 방의 상태. 팀 피그마 "주전부리 · 퀵슬롯 (기본)"(1979:27515)과 웹 프로토타입 동작을 따른다.
 @Observable
 final class RoomModel {
-    // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어들고, 실제로는 1분(60초)에 끝난다(웹 tokens.js realRoomSeconds와 같은 값).
+    // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어들고, 실제로는 3분(180초)에 끝난다(웹 tokens.js realRoomSeconds와 같은 값).
     static let shownSeconds: Double = 20 * 60
-    static let realSeconds: Double = 60
+    static let realSeconds: Double = 180
     /// 화면 시계가 01:12에 닿으면 해 뜨기 1분 전 장면(피그마 1979:27780)으로 바뀐다.
     static let lastMinuteShown: Double = 72
 

@@ -475,7 +475,7 @@ struct ObTogetherSunrise: View {
         .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 20))
     }
 
-    /// 20:00에서 00:00까지 2.4초 동안 빠르게 줄고, 그동안 타이머 아이콘이 천천히 한 바퀴 돈다. 00:00에서 해 칩이 떠오른다.
+    /// 20:00에서 00:00까지 1.3초 동안 빠르게 줄고(웹과 같은 값), 그동안 타이머 아이콘이 천천히 한 바퀴 돈다. 00:00에서 해 칩이 떠오른다.
     private func play() async {
         var reset = Transaction()
         reset.disablesAnimations = true
@@ -490,12 +490,12 @@ struct ObTogetherSunrise: View {
             sunUp = true
             return
         }
-        guard await obWait(round == 0 ? 0.8 : 0.25) else { return }
-        withAnimation(ObMotion.standard(2.4)) {
+        guard await obWait(round == 0 ? 0.55 : 0.2) else { return }
+        withAnimation(ObMotion.standard(1.3)) {
             seconds = 0
             spin = true
         }
-        guard await obWait(2.4) else { return }
+        guard await obWait(1.3) else { return }
         sunUp = true
     }
 }
