@@ -9,9 +9,9 @@ import { attachSpeakers } from './room.js';
 const FILES = {
   base: 'room2/scene.webp',
   fold: 'room2/scene.webp',
-  field: 'images/bd5037f7eb80881c82b3de6cd35faf6073b5c925.png',
+  field: 'images/bd5037f7eb80881c82b3de6cd35faf6073b5c925.webp',
   // 혼자 드르륵 방에 처음 들어온 장면(1647:25199 영상의 첫 화면, 멀리서 본 흰 의자와 테이블).
-  far: 'images/solo-video-still.png',
+  far: 'images/solo-video-still.webp',
 };
 export const SCENE_OF = { 28: 'base', 29: 'base', 30: 'base', 31: 'fold', 40: 'base', 41: 'field', 42: 'field', 43: 'field', 46: 'far' };
 export const sceneUrl = (key) => new URL('assets/' + FILES[key], document.baseURI).href;

@@ -174,7 +174,7 @@ export function patchLiveV2(root, n) {
   [1, 2].forEach((i) => {
     const car = root.querySelector('[data-figma="Carousel / ' + i + '"]');
     if (!car) return;
-    const url = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.png)';
+    const url = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.webp)';
     const sc = car.querySelector(':scope > [data-figma="Scene"]');
     // 연애(49) 생성 화면은 장면 칸 없이 카드 자체 배경에 옛 장면을 깔고 있어서, 그때는 카드 배경을 바꾼다.
     if (sc) sc.style.backgroundImage = url;

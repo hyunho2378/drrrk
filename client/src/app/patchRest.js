@@ -33,7 +33,7 @@ function soloOnboarding(root, n) {
   const bg = document.createElement('img');
   bg.alt = '';
   bg.draggable = false;
-  bg.src = A + 'n1974-19388.png';
+  bg.src = A + 'n1974-19388.webp';
   bg.dataset.figma = '방 장면';
   Object.assign(bg.style, { position: 'absolute', left: '0px', top: '0px', width: '390px', height: '844px', objectFit: 'cover', pointerEvents: 'none' });
   frame.insertBefore(bg, frame.firstChild);

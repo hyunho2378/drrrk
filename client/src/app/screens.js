@@ -138,14 +138,14 @@ export const SCREENS = [
   "n": 24,
   "id": "1647:23436",
   "name": "DRRRK · 홈 (Dark)",
-  "file": "DRRRKDark",
+  "file": "HomeDark",
   "h": 844
  },
  {
   "n": 25,
   "id": "1647:23475",
   "name": "DRRRK · 홈 (Dark)",
-  "file": "DRRRKDark2",
+  "file": "HomeDark2",
   "h": 844
  },
  {
@@ -441,6 +441,8 @@ const modules = {
   'MyHome': () => import('./MyHome.jsx'),
   'MyItem': () => import('./MyItem.jsx'),
   'Onboarding': () => import('./Onboarding.jsx'),
+  'HomeDark': () => import('./HomeDark.jsx'),
+  'HomeDark2': () => import('./HomeDark2.jsx'),
   'DRRRK': () => import('../figma/screens/DRRRK.jsx'),
   'DRRRK2': () => import('../figma/screens/DRRRK2.jsx'),
   'DRRRKDark': () => import('../figma/screens/DRRRKDark.jsx'),
