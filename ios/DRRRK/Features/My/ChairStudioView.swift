@@ -31,7 +31,7 @@ struct ChairStudioView: View {
                     .padding(10)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel("뒤로")
             .offset(x: 14, y: 69)
 
@@ -210,11 +210,9 @@ struct ChairStudioView: View {
     }
 }
 
-/// 눌렀을 때 살짝 작아지는 버튼(웹 cs-btn과 같은 0.96).
+/// 앱 전체 눌림 반응(PressStyle)과 같다. 예전 이름을 쓰는 자리를 위해 남겨 둔다.
 struct ChairPressStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.96 : 1)
-            .animation(DS.Motion.press, value: configuration.isPressed)
+        PressStyle().makeBody(configuration: configuration)
     }
 }

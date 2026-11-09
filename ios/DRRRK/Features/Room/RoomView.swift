@@ -81,6 +81,7 @@ struct RoomView: View {
         }
         .ignoresSafeArea()
         .background(DS.Palette.bgBase)
+        .overlay { RoomToastLayer().ignoresSafeArea() }
         // 함께 드르륵 온보딩: 추천에서 방에 처음 들어오면 이 방 위에 어둡게 깔고 다섯 장을 띄운다. 닫으면 방이 그대로 이어진다.
         .overlay {
             if showOnboarding {
@@ -136,7 +137,7 @@ struct RoomView: View {
                     .padding(8)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .position(p)
             .animation(DS.Motion.emphasizedDecel, value: model.speaker)
             .accessibilityLabel(seat.name + " 프로필")
@@ -173,7 +174,9 @@ struct RoomView: View {
                 .overlay {
                     ForEach(flying) { e in FlyingEmojiView(item: e) }
                 }
-            RoomInputBar(emojiOpen: $emojiOpen)
+            RoomInputBar(emojiOpen: $emojiOpen) { t in
+                withAnimation(DS.Motion.emphasizedDecel) { model.send(t) }
+            }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
                 .padding(.bottom, 24)
@@ -441,7 +444,7 @@ struct RoomHeader: View {
                     .frame(width: 44, height: 44, alignment: .leading)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel("나가기")
             Spacer()
             TimelineView(.periodic(from: .now, by: 0.25)) { ctx in
@@ -467,7 +470,7 @@ struct RoomHeader: View {
                     .frame(width: 46, height: 32)
                     .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel("일반 모드로 보기")
         }
         // 피그마 Header: 뒤로 아이콘 x 24, 모드 토글 오른쪽 끝 24
@@ -574,7 +577,7 @@ private struct ChatColumn: View {
                     }
                     .opacity(line.opacity)
                     .transition(.opacity)
-                case let .mine(text):
+                case let .mine(text), let .sent(_, text):
                     Text(text).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
                         .padding(.horizontal, 12).padding(.vertical, 8)
                         .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
@@ -591,7 +594,10 @@ private struct ChatColumn: View {
 
 struct RoomInputBar: View {
     @Binding var emojiOpen: Bool
+    /// 보내기(키보드 보내기 키). 빈 글은 보내지 않는다.
+    var onSend: (String) -> Void = { _ in }
     @State private var text = ""
+    @FocusState private var typing: Bool
     @State private var micOn = true
     var body: some View {
         HStack(spacing: 8) {
@@ -603,11 +609,14 @@ struct RoomInputBar: View {
                     .frame(width: 48, height: 48)
                     .background(.black, in: Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel(emojiOpen ? "이모지 닫기" : "이모지 열기")
             TextField("", text: $text, prompt: Text("채팅으로 한마디...").foregroundStyle(DS.Palette.textSecondary))
                 .suit(16, .regular, tracking: -0.64)
                 .foregroundStyle(DS.Palette.textPrimary)
+                .focused($typing)
+                .submitLabel(.send)
+                .onSubmit(send)
                 .frame(height: 48)
             Button {
                 withAnimation(DS.Motion.stateIn) { micOn.toggle() }
@@ -619,11 +628,67 @@ struct RoomInputBar: View {
                     .frame(width: 48, height: 48)
                     .background(micOn ? DS.Palette.success : DS.Palette.danger, in: Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel(micOn ? "마이크 끄기" : "마이크 켜기")
         }
         .padding(8)
         .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.input))
+    }
+
+    private func send() {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        onSend(t)
+        text = ""
+        typing = true
+    }
+}
+
+// MARK: - 방 안내 글(토스트)
+// 웹 room.js toast와 같은 모양: 342 폭, 안쪽 12 / 16, 모서리 12, #222628, 글자 14 SemiBold 행간 20,
+// 입력줄 위 18에 아래에서 8 올라오며 나타나고 2.4초 뒤 옅어진다. 신고 시트처럼 방 위 창이 닫힌 뒤에도 방에 남는다.
+
+@Observable
+final class RoomToastCenter {
+    static let shared = RoomToastCenter()
+    var text: String?
+    private var serial = 0
+
+    func show(_ message: String) {
+        serial += 1
+        let mine = serial
+        withAnimation(DS.Motion.decel(0.25)) { text = message }
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2.4))
+            guard mine == self.serial else { return }
+            withAnimation(DS.Motion.stateIn) { self.text = nil }
+        }
+    }
+}
+
+struct RoomToastLayer: View {
+    @State private var center = RoomToastCenter.shared
+    /// 화면 바닥에서 토스트 아래 끝까지(입력줄 아래 여백 24 + 입력줄 64 + 사이 18)
+    var bottom: CGFloat = 106
+    var body: some View {
+        VStack {
+            Spacer()
+            if let t = center.text {
+                Text(t).suit(14, .semibold, tracking: -0.28, lineHeight: 20)
+                    .foregroundStyle(DS.Palette.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.vertical, 12).padding(.horizontal, 16)
+                    .frame(width: 342)
+                    .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: .black.opacity(0.32), radius: 8, y: 6)
+                    .padding(.bottom, bottom)
+                    .transition(.opacity.combined(with: .offset(y: 8)))
+                    .accessibilityAddTraits(.isStaticText)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
     }
 }
 
@@ -651,7 +716,7 @@ struct EmojiMenu: View {
                         .frame(width: 48, height: 48)
                         .background(DS.Palette.bgElevated, in: Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .opacity(shown ? 1 : 0)
                 .offset(y: shown ? 0 : 14)
                 .scaleEffect(shown ? 1 : 0.9)

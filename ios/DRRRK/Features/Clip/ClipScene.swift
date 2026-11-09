@@ -364,3 +364,307 @@ struct ClipCanvas<Overlay: View>: View {
         .ignoresSafeArea()
     }
 }
+
+// MARK: - 클립 표와 공유 상태
+
+
+// 네이버 클립 리스트와 영상 보기가 함께 쓰는 클립 표와 상태. 웹 clipState.js(CLIPS, SUBS, DURATION)와 같은 값이다.
+// 클립 순서는 리스트 카드 순서(위에서 아래, 같은 높이면 왼쪽 먼저)이고, 첫 클립(쌍밍아웃)은 피그마 영상 보기 값 그대로다.
+
+struct ClipInfo: Identifiable, Hashable {
+    let id: String
+    /// 장면 그림(G-clip-*). 리스트 썸네일과 같은 그림이다.
+    let image: String
+    /// 가로 영상(혼술바)은 화면 폭에 맞춰 가운데에 놓는다.
+    let wide: Bool
+    let title: String
+    let tags: String
+    let creator: String
+    /// 더보기 메뉴의 "~ 콘텐츠 숨기기"에 쓰는 채널 이름
+    let channel: String
+    let avatar: String
+    let badge: Bool
+    let likes: Int
+    let comments: Int
+    let plays: String
+    let when: String
+    let bubble: String
+    let bubbleAvatar: String
+    let bubbleName: String
+    /// 리스트 카드 자리(390 x 844 좌표)와 카드를 이루는 장면 요소 이름
+    let card: CGRect
+    let parts: [String]
+
+    static let all: [ClipInfo] = [
+        .init(id: "s0", image: "G-clip-vid", wide: false, title: "베프가 내 비밀을 까발린다 ep.01", tags: "#친구관계 #연애",
+              creator: "흔한 웹드", channel: "웹드플리", avatar: "G-clip-av-webd", badge: true, likes: 2413, comments: 187, plays: "2.4만", when: "3일 전",
+              bubble: "와 이번꺼 공감 100000%", bubbleAvatar: "G-clip-av-mjg", bubbleName: "먼작귀더쿠",
+              card: CGRect(x: 7.6, y: 109, width: 183.4, height: 354.4),
+              parts: ["썸네일 / 쌍밍아웃 영상", "아바타 / 쌍수일기", "크리에이터 이름 줄 / 쌍수일기"]),
+        .init(id: "s1", image: "G-clip-desk", wide: true, title: "드디어 가봤습니다 혼술바!", tags: "#혼술 #바투어",
+              creator: "트민언니", channel: "트민언니", avatar: "G-clip-av-trm", badge: false, likes: 864, comments: 52, plays: "9,120", when: "5일 전",
+              bubble: "분위기 미쳤다 위치 어디예요", bubbleAvatar: "G-clip-av-lucky", bubbleName: "럭키비키",
+              card: CGRect(x: 199.2, y: 305.4, width: 183, height: 151.4),
+              parts: ["썸네일 / 편집 영상", "NEW 알약 / 편집 영상", "시간 알약 / 02:00", "제목 / 편집 영상", "아바타 / 편집하는 하루", "크리에이터 / 편집하는 하루"]),
+        .init(id: "s2", image: "G-clip-dance", wide: false, title: "연습실에서 11초 챌린지 찍어 봤어요", tags: "#댄스챌린지 #연습실",
+              creator: "연습실일지", channel: "연습실일지", avatar: "G-clip-av-lucky", badge: false, likes: 1532, comments: 96, plays: "1.8만", when: "1일 전",
+              bubble: "동작 너무 깔끔해요", bubbleAvatar: "G-clip-av-mjg", bubbleName: "먼작귀더쿠",
+              card: CGRect(x: 199.2, y: 473, width: 183, height: 284),
+              parts: ["썸네일 / 댄스 연습실", "시간 알약 / 00:11"]),
+        .init(id: "s3", image: "G-clip-cafe", wide: false, title: "군자 주민들만 몰래 가는 느좋 카페 추천 top 3", tags: "#군자카페 #카페추천",
+              creator: "군자동산책", channel: "군자동산책", avatar: "G-clip-av-mjg", badge: false, likes: 677, comments: 38, plays: "7,450", when: "2일 전",
+              bubble: "저장해 두고 이번 주말에 가요", bubbleAvatar: "G-clip-av-lucky", bubbleName: "럭키비키",
+              card: CGRect(x: 7.6, y: 479.2, width: 183.4, height: 290),
+              parts: ["썸네일 / 카페 모아보기", "NEW 알약 / 카페 모아보기", "제목 / 카페 모아보기"]),
+    ]
+
+    /// 드르륵 배너 카드(누르면 스플래시를 거쳐 드르륵 홈)
+    static let bannerCard = CGRect(x: 199.2, y: 109.4, width: 183, height: 183)
+    static let bannerPart = "배너 / 오늘의 행운 뽑기"
+
+    /// 구독 탭에 늘 보이는 크리에이터(팀 지시: 흔한 웹드, 트민언니). 영상 보기에서 팔로우한 크리에이터도 더해진다.
+    static let subscribed: Set<String> = ["흔한 웹드", "트민언니"]
+    /// 영상 한 편 길이(초). 끝나면 처음부터 다시 돈다.
+    static let duration: Double = 38
+}
+
+enum ClipFeedTab: String, CaseIterable { case subs, rec, mine }
+
+/// 화면을 나갔다 들어와도 켜 둔 상태가 남는다. 리스트와 영상 보기가 같은 저장소를 쓴다.
+@Observable
+final class ClipState {
+    static let shared = ClipState()
+
+    /// 영상 보기에서 보고 있는 클립 번호(ClipInfo.all 순서)
+    var pick = 0
+    var tab: ClipFeedTab = .rec
+    var favorite = false
+    var follow: Set<String> = []
+    var likedClips: Set<String> = []
+    var savedClips: Set<String> = []
+    var mute = false
+    /// 반복 재생(true)과 한 번만 재생(false)
+    var loop = true
+    /// 클립마다 멈춘 자리(초). 첫 클립은 피그마 진행 막대(107 / 390) 자리다.
+    var progress: [String: Double] = ["s0": 10.4]
+    /// 클립마다 댓글 목록
+    var threads: [String: [ClipComment]] = ClipState.seedThreads()
+    /// 공감을 누른 댓글
+    var liked: Set<Int> = []
+    private var nextID = 1000
+
+    var current: ClipInfo {
+        ClipInfo.all[min(max(pick, 0), ClipInfo.all.count - 1)]
+    }
+
+    var like: Bool {
+        get { likedClips.contains(current.id) }
+        set { if newValue { likedClips.insert(current.id) } else { likedClips.remove(current.id) } }
+    }
+
+    var save: Bool {
+        get { savedClips.contains(current.id) }
+        set { if newValue { savedClips.insert(current.id) } else { savedClips.remove(current.id) } }
+    }
+
+    var comments: [ClipComment] {
+        get { threads[current.id] ?? [] }
+        set { threads[current.id] = newValue }
+    }
+
+    /// 지금 클립의 댓글 수(바탕 수에 새로 남긴 댓글을 더한다)
+    var total: Int {
+        total(for: current)
+    }
+
+    func total(for c: ClipInfo) -> Int {
+        let seeded = ClipState.seedThreads()[c.id]?.count ?? 0
+        return c.comments + (threads[c.id]?.count ?? 0) - seeded
+    }
+
+    func likeCount(_ c: ClipInfo) -> Int {
+        c.likes + (likedClips.contains(c.id) ? 1 : 0)
+    }
+
+    func isFollowing(_ name: String) -> Bool {
+        follow.contains(name)
+    }
+
+    func toggleFollow(_ name: String) {
+        if follow.contains(name) { follow.remove(name) } else { follow.insert(name) }
+    }
+
+    func makeID() -> Int {
+        nextID += 1
+        return nextID
+    }
+
+    /// 탭마다 보이는 클립. 추천은 피그마 피드 전체, 구독은 팔로우한 크리에이터, 내클립은 저장한 클립이다.
+    func clips(in tab: ClipFeedTab) -> [ClipInfo] {
+        switch tab {
+        case .rec: ClipInfo.all
+        case .subs: ClipInfo.all.filter { ClipInfo.subscribed.contains($0.creator) || follow.contains($0.creator) }
+        case .mine: ClipInfo.all.filter { savedClips.contains($0.id) }
+        }
+    }
+
+    static func seedThreads() -> [String: [ClipComment]] {
+        var out: [String: [ClipComment]] = ["s0": ClipComment.seed]
+        for (i, c) in ClipInfo.all.enumerated() where c.id != "s0" {
+            out[c.id] = [.init(id: 10 + i, name: c.bubbleName, avatar: c.bubbleAvatar, text: c.bubble, when: c.when, order: 1, likes: 12 + i * 7)]
+        }
+        return out
+    }
+}
+
+struct ClipComment: Identifiable, Hashable {
+    let id: Int
+    let name: String
+    let avatar: String?
+    let text: String
+    let when: String
+    let order: Int
+    var likes: Int
+    /// 답글이면 원 댓글 번호
+    var parent: Int? = nil
+
+    static let seed: [ClipComment] = [
+        .init(id: 1, name: "먼작귀더쿠", avatar: "G-clip-av-mjg", text: "와 이번꺼 공감 100000% 나도 꼭 저렇게\n여우짓하는 애 있었는데 손절한지 4년됨", when: "3일 전", order: 3, likes: 355),
+        .init(id: 2, name: "럭키비키", avatar: "G-clip-av-lucky", text: "얼굴 화끈거리는 마음 너무 알아서 두 번 봤어", when: "2일 전", order: 2, likes: 128),
+        .init(id: 3, name: "모카빵굽는밤", avatar: nil, text: "일단 그 친구한테 바로 따지지 말고 마음 정리부터 해 보자", when: "1일 전", order: 1, likes: 76),
+        .init(id: 4, name: "새벽세시", avatar: nil, text: "이럴 땐 드르륵에서 비슷한 고민 방을 열어 보는 것도 방법이야", when: "20시간 전", order: 0, likes: 41),
+    ]
+}
+
+/// 2413 같은 수를 2,413으로 적는다.
+func clipCount(_ n: Int) -> String {
+    let s = String(n)
+    var out = ""
+    for (i, ch) in s.enumerated() {
+        if i > 0, (s.count - i) % 3 == 0 {
+            out.append(",")
+        }
+        out.append(ch)
+    }
+    return out
+}
+
+// MARK: - 눌림 반응
+
+/// 누르는 즉시 scale 0.97, opacity 0.85(90ms), 떼면 120ms로 돌아온다(웹 ClipKit.jsx PRESS_CSS와 같은 값).
+struct ClipPressStyle: ButtonStyle {
+    var radius: CGFloat = 12
+    /// 장면 그림을 담은 누름 칸은 그림이 칸 밖으로 조금 나가도 잘리지 않게 false로 둔다.
+    var clips = true
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .contentShape(RoundedRectangle(cornerRadius: radius))
+            .modifier(ClipOptionalClip(radius: radius, on: clips))
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .animation(.timingCurve(0.2, 0, 0, 1, duration: configuration.isPressed ? 0.09 : 0.12), value: configuration.isPressed)
+    }
+}
+
+private struct ClipOptionalClip: ViewModifier {
+    let radius: CGFloat
+    let on: Bool
+    func body(content: Content) -> some View {
+        if on {
+            content.clipShape(RoundedRectangle(cornerRadius: radius))
+        } else {
+            content
+        }
+    }
+}
+
+/// 끌어서 움직이는 판 위(리스트 피드)의 카드용 눌림. 10 넘게 움직이면 끌기로 보고 눌림을 풀고, 누름도 하지 않는다.
+struct ClipPressable: ViewModifier {
+    let action: () -> Void
+    @State private var down = false
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(down ? 0.97 : 1)
+            .opacity(down ? 0.85 : 1)
+            .animation(.timingCurve(0.2, 0, 0, 1, duration: down ? 0.09 : 0.12), value: down)
+            .contentShape(Rectangle())
+            // 눌림 판정을 드래그 제스처 끝에서 한다. onTapGesture를 같이 쓰면 드래그와 겹쳐 누름이 안 들어오는 경우가 있다(11/10 시뮬레이터 확인).
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { v in down = hypot(v.translation.width, v.translation.height) < 10 }
+                    .onEnded { v in
+                        down = false
+                        if hypot(v.translation.width, v.translation.height) < 10 { action() }
+                    }
+            )
+            .accessibilityAction(.default) { action() }
+    }
+}
+
+extension View {
+    func clipPressable(_ action: @escaping () -> Void) -> some View {
+        modifier(ClipPressable(action: action))
+    }
+}
+
+/// 장면 요소를 담은 누름 칸. box(390 x 844 좌표) 안에서만 눌리고, 칸 안에 장면 요소를 같은 자리에 그려 눌림 반응이 그림에 보인다.
+struct ClipHit: View {
+    let label: String
+    let box: CGRect
+    var radius: CGFloat = 12
+    var items: [ClipItem] = []
+    var pop: CGFloat = 1
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            ZStack(alignment: .topLeading) {
+                ClipItemsLayer(items: items)
+                    .offset(x: -box.minX, y: -box.minY)
+                    .allowsHitTesting(false)
+            }
+            .frame(width: box.width, height: box.height, alignment: .topLeading)
+            .scaleEffect(pop)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(ClipPressStyle(radius: radius, clips: false))
+        .offset(x: box.minX, y: box.minY)
+        .accessibilityLabel(label)
+    }
+}
+
+/// 장면 요소 묶음을 390 x 844 좌표 그대로 그린다.
+struct ClipItemsLayer: View {
+    let items: [ClipItem]
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(items) { ClipItemView(it: $0) }
+        }
+        .frame(width: 390, height: 844, alignment: .topLeading)
+    }
+}
+
+/// 화면 키보드 높이(390 좌표 기준). 댓글 입력칸을 키보드 위로 올릴 때 쓴다.
+@Observable
+final class ClipKeyboard {
+    var height: CGFloat = 0
+    private var token: NSObjectProtocol?
+
+    init() {
+        token = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: .main) { [weak self] n in
+            guard let end = n.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            let screen = UIScreen.main.bounds
+            let s = screen.width / 390
+            let h = max(0, screen.maxY - end.minY) / s
+            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.25)) { self?.height = h }
+        }
+    }
+
+    deinit {
+        if let token {
+            NotificationCenter.default.removeObserver(token)
+        }
+    }
+}

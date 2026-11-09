@@ -11,6 +11,7 @@ import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
 import { attachQuickSlot } from './quickSlot.js';
+import { attachTaps } from './taps.js';
 import { attachTabs, prepTabs, prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
 import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
@@ -764,6 +765,7 @@ export function attach(layer, n, go, prevN) {
   attachThrow(root);
   attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachInputs(root, n, go);
+  attachTaps(root, n, go, prevN);
   attachSort(root, n, false);
   attachDrag(layer, root, n);
   attachTabs(root, n);

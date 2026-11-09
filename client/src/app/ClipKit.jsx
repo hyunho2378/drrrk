@@ -5,6 +5,40 @@ export const BASE = import.meta.env.BASE_URL;
 export const pic = (n) => BASE + 'assets/images/clip-' + n + '.webp';
 const FONT = "'SUIT', system-ui, sans-serif";
 
+// 눌림 반응: .ck-press, .cp-btn, .cp-row 요소는 누르는 즉시 scale 0.97, opacity 0.85(90ms), 떼면 120ms로 돌아온다.
+// 문서 하나에 한 번만 붙이는 공용 처리다(터치와 마우스 모두 pointer 이벤트). 10px 넘게 움직이면 끌기로 보고 눌림을 푼다.
+export const PRESS_SEL = '.ck-press, .cp-btn, .cp-row';
+const PRESS_CSS = `
+.ck-press,.cp-btn,.cp-row{transition:transform 120ms cubic-bezier(.2,0,0,1),opacity 120ms cubic-bezier(.2,0,0,1),background-color 120ms;-webkit-tap-highlight-color:transparent}
+.ck-press.is-down,.cp-btn.is-down,.cp-row.is-down{transform:scale(.97);opacity:.85;transition-duration:90ms}
+.ck-root,.ck-root *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ck-root input,.ck-root textarea{-webkit-user-select:text;user-select:text}
+.ck-root{touch-action:manipulation}
+@media (prefers-reduced-motion:reduce){.ck-press,.cp-btn,.cp-row{transition:none}}
+`;
+export function installPress(doc) {
+  if (!doc || doc.__ckPress) return;
+  doc.__ckPress = true;
+  const st = doc.createElement('style');
+  st.textContent = PRESS_CSS;
+  doc.head.appendChild(st);
+  let el = null;
+  let x = 0;
+  let y = 0;
+  const off = () => { if (el) el.classList.remove('is-down'); el = null; };
+  doc.addEventListener('pointerdown', (e) => {
+    off();
+    const t = e.target && e.target.closest ? e.target.closest(PRESS_SEL) : null;
+    if (!t || t.disabled) return;
+    el = t; x = e.clientX; y = e.clientY;
+    t.classList.add('is-down');
+  }, true);
+  doc.addEventListener('pointermove', (e) => { if (el && Math.hypot(e.clientX - x, e.clientY - y) > 10) off(); }, true);
+  doc.addEventListener('pointerup', off, true);
+  doc.addEventListener('pointercancel', off, true);
+  doc.addEventListener('dragstart', off, true);
+}
+if (typeof document !== 'undefined') installPress(document);
 const rgba = (hex, a = 1) => {
   const n = parseInt(hex.slice(1), 16);
   return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
@@ -22,7 +56,18 @@ function Fill({ img }) {
   return <img src={pic(img)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />;
 }
 
-function Item({ it, flow, pw }) {
+export function Item({ it, flow, pw }) {
+  // 줄 안(flow)에 놓인 요소(예: 팔로우 알약)를 누를 수 있게 감싼다. 절대 위치 요소는 Hit을 쓴다.
+  if (it.on && flow) {
+    const { on, ...rest } = it;
+    return (
+      <div className="ck-press" role="button" tabIndex={0} aria-label={it.label || it.n} aria-pressed={it.pressed}
+        onClick={(e) => { e.stopPropagation(); on(); }} onKeyDown={(e) => { if (e.key === 'Enter') on(); }}
+        style={{ position: 'relative', flexShrink: 0, marginLeft: it.ml || 0, cursor: 'pointer', padding: '6px 0', margin: '-6px 0 -6px ' + (it.ml || 0) + 'px' }}>
+        <Item it={{ ...rest, ml: 0 }} flow pw={pw} />
+      </div>
+    );
+  }
   const pos = (x, y, w, h) => (flow ? { position: 'relative', flexShrink: 0, marginLeft: it.ml || 0 } : { position: 'absolute', left: x, top: y, width: w, height: h });
   switch (it.k) {
     case 'rect':
@@ -91,9 +136,26 @@ function Item({ it, flow, pw }) {
   }
 }
 
+// 누르는 칸. box(부모 기준 x, y, w, h) 안에서만 눌리고, items는 부모 좌표 그대로 그린다. 눌림 반응은 칸 가운데를 기준으로 줄어든다.
+// at을 주면 칸을 그 자리(x, y)로 옮겨 그린다(구독, 내클립 탭에서 카드 다시 배치).
+export function Hit({ box, label, onTap, items = [], pressed, at, style, children, name }) {
+  const [x, y, w, h] = box;
+  const [ox, oy] = at || [x, y];
+  return (
+    <div data-figma={name} className="ck-press" role="button" tabIndex={0} aria-label={label} aria-pressed={pressed}
+      onClick={(e) => { e.stopPropagation(); onTap(e); }} onKeyDown={(e) => { if (e.key === 'Enter') onTap(e); }}
+      style={{ position: 'absolute', left: ox, top: oy, width: w, height: h, cursor: 'pointer', outline: 'none', ...style }}>
+      <div style={{ position: 'absolute', left: -x, top: -y, width: 390, height: 0, pointerEvents: 'none' }}>
+        {items.map((it, i) => <Item key={it.key || i} it={it} pw={390} />)}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function Scene({ items, name, node, bg, style, className, children }) {
   return (
-    <div data-figma={name} data-node={node} className={className} style={{ position: 'relative', width: '390px', height: '844px', overflow: 'hidden', background: bg, ...style }}>
+    <div data-figma={name} data-node={node} className={'ck-root' + (className ? ' ' + className : '')} style={{ position: 'relative', width: '390px', height: '844px', overflow: 'hidden', background: bg, ...style }}>
       {items.map((it, i) => <Item key={it.key || i} it={it} pw={390} />)}
       {children}
     </div>

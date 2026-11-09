@@ -255,7 +255,7 @@ private struct MyHome: View {
                 .padding(.leading, 12)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .padding(.vertical, -12)
             .accessibilityLabel("나의 편의점 전체 8종 보기")
         }
@@ -620,7 +620,7 @@ private struct MySkinModal: View {
                         Text("나중에 할게요").suit(13, .medium, tracking: -0.52, lineHeight: 18.2).foregroundStyle(DS.Palette.textTertiary)
                             .frame(height: 18).padding(.horizontal, 20).padding(.vertical, 8).contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     .padding(.vertical, -8)
                 }
                 .frame(width: 390)

@@ -47,6 +47,13 @@ struct ClipCommentSheet: View {
     let say: (String) -> Void
     @State private var sortByLike = true
     @State private var draft = ""
+    /// 답글을 쓰는 원 댓글 번호와 입력 글(누른 댓글 아래에 입력칸이 열린다)
+    @State private var replyTo: Int?
+    @State private var replyDraft = ""
+    @State private var replyPrefix = ""
+    @State private var keyboard = ClipKeyboard()
+    @FocusState private var mainFocus: Bool
+    @FocusState private var replyFocus: Bool
 
     private let emojis = ["👍", "❤️", "🤣", "🎉", "🥰", "👏", "😄", "🔥"]
     /// 피그마 1910:11768~11775 이모지 그림(28 x 28) 가운데 x
@@ -58,7 +65,7 @@ struct ClipCommentSheet: View {
             Color.black.opacity(open ? 1 : 0).frame(width: 390, height: 844)
                 .contentShape(Rectangle())
                 .onTapGesture { onClose() }
-            Image("G-clip-vid").resizable().scaledToFill()
+            Image(state.current.image).resizable().scaledToFill()
                 .frame(width: open ? 169 : 390, height: open ? 299 : 750)
                 .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: open ? 14 : 0, bottomTrailingRadius: open ? 14 : 0))
                 .offset(x: open ? 110.5 : 0)
@@ -67,31 +74,77 @@ struct ClipCommentSheet: View {
             SheetFrame(open: open, top: 310, onClose: onClose) {
                 ZStack(alignment: .topLeading) {
                     // 배너 위 의자 그림이 배너 위로 35 튀어나와(피그마 2006:11799, 화면 y 362) 목록 영역을 y 52부터 연다.
-                    ScrollView(showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            if info {
-                                infoBlock
-                            } else {
-                                Color.clear.frame(height: 23)
-                                banner; cleanbot
+                    ScrollViewReader { proxy in
+                        ScrollView(showsIndicators: false) {
+                            VStack(alignment: .leading, spacing: 0) {
+                                if info {
+                                    infoBlock
+                                } else {
+                                    Color.clear.frame(height: 23)
+                                    banner; cleanbot
+                                }
+                                ForEach(list) { c in
+                                    row(c)
+                                    if replyTo != nil, replyTo == (c.parent ?? c.id), isLastInThread(c) {
+                                        replyField
+                                    }
+                                }
+                                Color.clear.frame(height: 30)
                             }
-                            ForEach(list) { row($0) }
-                            Color.clear.frame(height: 30)
+                        }
+                        .scrollDismissesKeyboard(.interactively)
+                        .onChange(of: keyboard.height) {
+                            if replyTo != nil, keyboard.height > 0 {
+                                withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.25)) { proxy.scrollTo("reply-field", anchor: .bottom) }
+                            }
                         }
                     }
-                    .frame(width: 390, height: info ? 362 : 340)
-                    .offset(y: info ? 30 : 52)
+                    .frame(width: 390, height: listHeight)
+                    .offset(y: listTop)
                     if !info {
                         header
                     }
-                    inputArea.offset(y: 392)
+                    inputArea.offset(y: inputTop)
                 }
+            }
+        }
+        .onChange(of: open) {
+            if !open {
+                mainFocus = false
+                replyFocus = false
+                replyTo = nil
             }
         }
     }
 
+    /// 원 댓글은 고른 순서로, 답글은 원 댓글 바로 아래에 남긴 순서대로 둔다.
     private var list: [ClipComment] {
-        state.comments.sorted { sortByLike ? $0.likes > $1.likes : $0.order > $1.order }
+        let all = state.comments
+        let tops = all.filter { $0.parent == nil }.sorted { sortByLike ? $0.likes > $1.likes : $0.order > $1.order }
+        return tops.flatMap { t in [t] + all.filter { $0.parent == t.id }.sorted { $0.id < $1.id } }
+    }
+
+    private func isLastInThread(_ c: ClipComment) -> Bool {
+        let top = c.parent ?? c.id
+        return list.last { ($0.parent ?? $0.id) == top }?.id == c.id
+    }
+
+    // 키보드가 올라오면 목록과 입력칸을 키보드 위로 올린다(시트 안 좌표, 시트 위끝은 화면 310).
+    private var keyboardTop: CGFloat {
+        844 - keyboard.height - 310
+    }
+
+    private var listTop: CGFloat {
+        info ? 30 : 52
+    }
+
+    private var inputTop: CGFloat {
+        keyboard.height > 0 && mainFocus ? min(392, keyboardTop - 66) : 392
+    }
+
+    private var listHeight: CGFloat {
+        let bottom: CGFloat = keyboard.height > 0 ? (mainFocus ? inputTop : min(392, keyboardTop)) : 392
+        return max(60, bottom - listTop)
     }
 
     private var header: some View {
@@ -113,7 +166,7 @@ struct ClipCommentSheet: View {
                 Text(t).suit(15, .medium, tracking: -0.3).foregroundStyle(on ? DS.Palette.textPrimary : SUB2)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ClipPressStyle(radius: 6, clips: false))
     }
 
     private var banner: some View {
@@ -169,22 +222,35 @@ struct ClipCommentSheet: View {
 
     /// 캡션의 더보기를 누르면 나오는 설명 부분(원본 15번): 만든 사람, 글, 재생수, AI 활용 칩, 구분선 순서다.
     private var infoBlock: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        let c = state.current
+        let following = state.isFollowing(c.creator)
+        return VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 6) {
-                Image("G-clip-av-webd").resizable().scaledToFill().frame(width: 32, height: 32).clipShape(Circle())
-                Text("흔한 웹드").suit(15, .bold, tracking: -0.3).foregroundStyle(Color(hex: 0xF6F6F6)).padding(.leading, 4)
-                Image(systemName: "checkmark.seal.fill").font(.system(size: 13)).foregroundStyle(Color(hex: 0xF9A825))
-                Text("팔로우").suit(13.5, .medium, tracking: -0.27).foregroundStyle(Color(hex: 0xEFEFEF))
-                    .padding(.horizontal, 9).frame(height: 26)
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: 0x343436)))
-                    .padding(.leading, 6)
+                Image(c.avatar).resizable().scaledToFill().frame(width: 32, height: 32).clipShape(Circle())
+                Text(c.creator).suit(15, .bold, tracking: -0.3).foregroundStyle(Color(hex: 0xF6F6F6)).padding(.leading, 4)
+                if c.badge {
+                    Image(systemName: "checkmark.seal.fill").font(.system(size: 13)).foregroundStyle(Color(hex: 0xF9A825))
+                }
+                // 영상 보기 크리에이터 줄과 같은 팔로우 상태를 켜고 끈다.
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.18)) { state.toggleFollow(c.creator) }
+                } label: {
+                    Text(following ? "팔로잉" : "팔로우").suit(13.5, .medium, tracking: -0.27).foregroundStyle(Color(hex: 0xEFEFEF))
+                        .padding(.horizontal, 9).frame(height: 26)
+                        .background(following ? Color.black.opacity(0.22) : Color.clear, in: RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: 0x343436)))
+                }
+                .buttonStyle(ClipPressStyle(radius: 8))
+                .padding(.leading, 6)
             }
-            Text("베프가 내 비밀을 까발린다 ep.01").suit(16.5, .regular, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5)).padding(.top, 11)
-            Text("#친구관계 #연애").suit(16.5, .bold, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5))
+            Text(c.title).suit(16.5, .regular, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5)).padding(.top, 11)
+                .lineLimit(1)
+            Text(c.tags).suit(16.5, .bold, tracking: -0.33).foregroundStyle(Color(hex: 0xF5F5F5))
             HStack(spacing: 6) {
-                Text("재생수 2.4만")
+                Text("재생수 \(c.plays)")
                 Circle().frame(width: 3.5, height: 3.5)
-                Text("3일 전")
+                Text(c.when)
             }
             .suit(15, .regular, tracking: -0.3).foregroundStyle(SUB).padding(.top, 8)
             Text("AI 활용").suit(14, .regular, tracking: -0.28).foregroundStyle(Color(hex: 0xEDEDED))
@@ -217,10 +283,10 @@ struct ClipCommentSheet: View {
                 Text(c.text).suit(15, .regular, tracking: -0.3, lineHeight: 20).foregroundStyle(BODY).padding(.top, 3)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(c.when).suit(13, .regular, tracking: -0.26).foregroundStyle(SUB).padding(.top, 1)
-                Button { say("답글 쓰기는 준비 중이에요") } label: {
+                Button { startReply(c) } label: {
                     Text("답글 쓰기").suit(14, .regular, tracking: -0.28).foregroundStyle(Color(hex: 0xEBEBEB)).frame(height: 34)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ClipPressStyle(radius: 6, clips: false))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             VStack(spacing: 1.3) {
@@ -244,13 +310,68 @@ struct ClipCommentSheet: View {
                         Text("\(c.likes)").suit(14, .regular, tracking: -0.28).foregroundStyle(on ? Color(hex: 0xFF3B5C) : Color(hex: 0xCACACA))
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ClipPressStyle(radius: 10, clips: false))
                 .accessibilityLabel("공감")
             }
             .frame(width: 44)
         }
-        .padding(.leading, 19).padding(.trailing, 14)
-        .padding(.top, 20)
+        .padding(.leading, c.parent == nil ? 19 : 62).padding(.trailing, 14)
+        .padding(.top, c.parent == nil ? 20 : 14)
+    }
+
+    /// 누른 댓글 아래에 열리는 답글 입력칸. "@이름 "이 들어간 채 바로 쓸 수 있다.
+    private var replyField: some View {
+        HStack(spacing: 8) {
+            TextField("", text: $replyDraft, prompt: Text("답글을 남겨보세요.").foregroundStyle(Color(hex: 0x797979)))
+                .suit(15, .regular, tracking: -0.3).foregroundStyle(DS.Palette.textPrimary)
+                .focused($replyFocus)
+                .submitLabel(.send)
+                .onSubmit(sendReply)
+            Button(action: sendReply) {
+                Image(systemName: "arrow.up").font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(replyEmpty ? Color(hex: 0x6E6E6E) : .black)
+                    .frame(width: 32, height: 32)
+                    .background(replyEmpty ? ROW : DS.Palette.brandPrimary, in: Circle())
+            }
+            .buttonStyle(ClipPressStyle(radius: 16))
+            .accessibilityLabel("답글 보내기")
+        }
+        .padding(.leading, 14).padding(.trailing, 5)
+        .frame(height: 42)
+        .overlay(Capsule().strokeBorder(Color(hex: 0x343436)))
+        .padding(.leading, 62).padding(.trailing, 14).padding(.top, 6)
+        .id("reply-field")
+        .transition(.opacity.combined(with: .offset(y: -6)))
+    }
+
+    private var replyEmpty: Bool {
+        let v = replyDraft.trimmingCharacters(in: .whitespaces)
+        return v.isEmpty || v == replyPrefix.trimmingCharacters(in: .whitespaces)
+    }
+
+    private func startReply(_ c: ClipComment) {
+        mainFocus = false
+        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.2)) {
+            replyTo = c.parent ?? c.id
+            replyPrefix = "@\(c.name) "
+            replyDraft = replyPrefix
+        }
+        Task {
+            try? await Task.sleep(for: .milliseconds(60))
+            replyFocus = true
+        }
+    }
+
+    private func sendReply() {
+        let v = replyDraft.trimmingCharacters(in: .whitespaces)
+        guard let parent = replyTo, !replyEmpty else { return }
+        replyFocus = false
+        withAnimation(DS.Motion.emphasizedDecel) {
+            state.comments.append(.init(id: state.makeID(), name: "새벽2시", avatar: nil, text: v, when: "방금 전", order: 0, likes: 0, parent: parent))
+            replyTo = nil
+            replyDraft = ""
+        }
+        say("답글을 남겼어요")
     }
 
     private var inputArea: some View {
@@ -265,6 +386,7 @@ struct ClipCommentSheet: View {
             HStack {
                 TextField("", text: $draft, prompt: Text("힘이 되는 말 한마디 남겨보세요.").foregroundStyle(Color(hex: 0x797979)))
                     .suit(15, .regular, tracking: -0.3).foregroundStyle(DS.Palette.textPrimary)
+                    .focused($mainFocus)
                     .onSubmit(send)
                 Image(systemName: "face.smiling").font(.system(size: 19)).foregroundStyle(Color(hex: 0x8E8E8E))
             }
@@ -278,7 +400,7 @@ struct ClipCommentSheet: View {
                     .frame(width: 38, height: 38)
                     .background(draft.isEmpty ? ROW : DS.Palette.brandPrimary, in: Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ClipPressStyle(radius: 19))
             .offset(x: 340, y: 19)
             ForEach(emojis.indices, id: \.self) { i in
                 Button { draft += emojis[i] } label: {
@@ -295,7 +417,7 @@ struct ClipCommentSheet: View {
         guard !v.isEmpty else { return }
         draft = ""
         withAnimation(DS.Motion.emphasizedDecel) {
-            state.comments.insert(.init(id: 100 + state.comments.count, name: "새벽2시", avatar: nil, text: v, when: "방금 전", order: 99 + state.comments.count, likes: 0), at: 0)
+            state.comments.insert(.init(id: state.makeID(), name: "새벽2시", avatar: nil, text: v, when: "방금 전", order: 99 + state.comments.count, likes: 0), at: 0)
             sortByLike = false
         }
         say("댓글을 남겼어요")
@@ -317,11 +439,11 @@ struct ClipMoreSheet: View {
                 .onTapGesture { onClose() }
             SheetFrame(open: open, top: 413, onClose: onClose) {
                 ZStack(alignment: .topLeading) {
-                    tile(19.5, state.like ? "heart.fill" : "heart", "좋아요 " + (state.like ? "2,414" : "2,413"), state.like ? Color(hex: 0xFF3B5C) : DS.Palette.textPrimary, "like")
+                    tile(19.5, state.like ? "heart.fill" : "heart", "좋아요 " + clipCount(state.likeCount(state.current)), state.like ? Color(hex: 0xFF3B5C) : DS.Palette.textPrimary, "like")
                     tile(138, "ellipsis.bubble", "댓글 \(state.total)", DS.Palette.textPrimary, "comments")
                     tile(256.5, state.save ? "bookmark.fill" : "bookmark", "Keep", DS.Palette.textPrimary, "save")
                     rowView("arrow.up.left.and.arrow.down.right", "몰입 모드로 보기", nil, 109, "immersive")
-                    rowView("play.rectangle", "재생 방식 설정", "반복 재생", 151, "play")
+                    rowView("play.rectangle", "재생 방식 설정", state.loop ? "반복 재생" : "한 번만 재생", 151, "play")
                     Rectangle().fill(.white.opacity(0.07)).frame(width: 350, height: 1).offset(x: 20, y: 204)
                     rowView("eye.slash", "이 콘텐츠 숨기기", nil, 214, "hide")
                     rowView("person.slash", nil, nil, 256, "hideCreator")
@@ -353,7 +475,7 @@ struct ClipMoreSheet: View {
                     if let label {
                         Text(label).suit(15.5, .semibold, tracking: -0.31)
                     } else {
-                        (Text("웹드플리").foregroundColor(Color(hex: 0x4F96FF)) + Text(" 콘텐츠 숨기기")).suit(15.5, .semibold, tracking: -0.31)
+                        (Text(state.current.channel).foregroundColor(Color(hex: 0x4F96FF)) + Text(" 콘텐츠 숨기기")).suit(15.5, .semibold, tracking: -0.31)
                     }
                     if let tail {
                         Circle().fill(SUB).frame(width: 3.5, height: 3.5)
@@ -367,7 +489,7 @@ struct ClipMoreSheet: View {
             .frame(width: 390, height: 42)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ClipPressStyle(radius: 0))
         .offset(y: top)
     }
 }

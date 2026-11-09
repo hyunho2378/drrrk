@@ -118,7 +118,7 @@ struct LiveView: View {
                     .foregroundStyle(DS.Palette.textSecondary)
                     .frame(height: 44).contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .frame(width: 366, alignment: .trailing)
                 .offset(y: 438)
                 .accessibilityLabel("정렬 " + sort.rawValue)
@@ -192,7 +192,7 @@ private struct LiveHeader: View {
                 .frame(width: 44, height: 44, alignment: .topLeading)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .offset(x: 330, y: 58)
             .accessibilityLabel("알림")
         }
@@ -305,7 +305,7 @@ private struct LiveTabs: View {
                         .frame(width: 63, height: 44, alignment: .topLeading)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .offset(x: 24 + CGFloat(i) * 63)
                 if c == "연애", showDot {
                     Circle().fill(DS.Palette.danger).frame(width: 6, height: 6).offset(x: 179, y: 0)
@@ -345,7 +345,7 @@ private struct LiveSortSheet: View {
                     .frame(height: 69)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
             }
             Spacer(minLength: 0)
         }
@@ -371,7 +371,7 @@ struct AppTitleBar: View {
                 }
                 .frame(width: 44, height: 44)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressStyle())
             .accessibilityLabel("알림")
         }
         .padding(.leading, 24)
@@ -473,7 +473,7 @@ struct CategoryTabs: View {
                         .frame(maxWidth: .infinity)
                         .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                 }
             }
             .padding(.horizontal, 10)
@@ -494,7 +494,7 @@ struct SortButton: View {
             .foregroundStyle(DS.Palette.textSecondary)
             .frame(minHeight: 44)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressStyle())
     }
 }
 
@@ -525,7 +525,7 @@ struct SortSheet: View {
                     .frame(height: 72)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
             }
             Spacer(minLength: 0)
         }
@@ -645,12 +645,17 @@ struct LiveCardView: View {
     }
 }
 
+/// 앱 전체 눌림 반응 하나. 누르면 0.97배, 85%로 90ms 동안 줄고, 떼면 120ms 동안 돌아온다.
+/// 누르는 자리는 버튼 틀 전체(contentShape)라서 글자만 있는 버튼도 빈 곳까지 눌린다. 크기와 자리는 바뀌지 않는다.
 struct PressStyle: ButtonStyle {
+    static let pressIn = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.09)
+    static let release = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.12)
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .contentShape(Rectangle())
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .opacity(configuration.isPressed ? 0.9 : 1)
-            .animation(DS.Motion.press, value: configuration.isPressed)
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .animation(configuration.isPressed ? Self.pressIn : Self.release, value: configuration.isPressed)
     }
 }
 
@@ -772,7 +777,7 @@ struct LiveWatchView: View {
                     Image("C-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44).contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .accessibilityLabel("뒤로")
                 .offset(x: 14, y: 69)
                 LiveViewersPill(count: router.watch?.viewers ?? "22").offset(x: 313, y: 78)

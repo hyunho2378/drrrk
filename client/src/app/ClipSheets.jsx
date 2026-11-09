@@ -1,6 +1,6 @@
 // 네이버 클립 영상 보기에서 열리는 두 시트. 원본 캡처 12번(댓글 시트)과 16번(더보기 메뉴)을 390 x 844 기준으로 재서 같은 자리와 크기로 만든다.
 // 값은 artifacts/21_네이버클립_미러링/기준_390x844 의 기준 이미지에서 쟀다(자리는 css px, 색은 픽셀 샘플).
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { pic } from './ClipKit.jsx';
 
 const FONT = "'SUIT', system-ui, sans-serif";
@@ -22,11 +22,13 @@ export const CSS = `
 @keyframes cpToast{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 .cp-pop{animation:cpPop 360ms cubic-bezier(.2,0,0,1) both;transform-origin:50% 55%}
 .cp-agent{animation:cpAgent 640ms cubic-bezier(.2,.9,.3,1) both}
-.cp-btn{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transition:transform 110ms cubic-bezier(.2,0,0,1),opacity 110ms}
-.cp-btn:active{transform:scale(.92);opacity:.8}
+.cp-btn{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
 .cp-btn:focus-visible{box-shadow:0 0 0 2px #36D2FF}
-.cp-row{border:0;background:transparent;padding:0;margin:0;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;font-family:${FONT};transition:background-color 120ms}
-.cp-row:active{background:rgba(255,255,255,.06)}
+.cp-row{border:0;background:transparent;padding:0;margin:0;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;font-family:${FONT}}
+.cp-row.is-down{background:rgba(255,255,255,.06)}
+.cp-reply{transition:clip-path 260ms cubic-bezier(.2,0,0,1),opacity 200ms cubic-bezier(.2,0,0,1)}
+@keyframes cpIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.cp-new{animation:cpIn 240ms cubic-bezier(.2,0,0,1) both}
 .cp-hide{scrollbar-width:none}
 .cp-hide::-webkit-scrollbar{display:none}
 .cp-imm > [data-figma]:not([data-figma^="영상"]):not([data-figma^="Scrim"]):not([data-figma^="아래 검정"]){opacity:0 !important;pointer-events:none;transition:opacity 260ms cubic-bezier(.2,0,0,1)}
@@ -52,11 +54,16 @@ const SEED = [
   { id: 3, name: '모카빵굽는밤', av: null, text: '일단 그 친구한테 바로 따지지 말고 마음 정리부터 해 보자', when: '1일 전', order: 1, likes: 76 },
   { id: 4, name: '새벽세시', av: null, text: '이럴 땐 드르륵에서 비슷한 고민 방을 열어 보는 것도 방법이야', when: '20시간 전', order: 0, likes: 41 },
 ];
-let comments = SEED.map((c) => ({ ...c }));
+// 클립마다 따로 둔다(첫 클립은 피그마 댓글 그대로, 다른 클립도 같은 댓글로 시작해 공감과 답글은 따로 기억한다).
+const store = {};
+const listOf = (id) => { if (!store[id]) store[id] = SEED.map((c) => ({ ...c, replies: [] })); return store[id]; };
 let liked = new Set();
 let nextId = 100;
-// 오른쪽 댓글 수(187)에 새로 쓴 댓글을 더한 값.
-export const commentTotal = () => 187 + comments.length - SEED.length;
+const extra = (id) => { const l = listOf(id); return l.length - SEED.length + l.reduce((a, c) => a + c.replies.length, 0); };
+// 오른쪽 댓글 수(187)에 새로 쓴 댓글과 답글을 더한 값.
+export const commentTotal = (id = 's0') => 187 + extra(id);
+// 클립의 댓글 수(첫 클립은 피그마 187, 다른 클립은 clipState.js 값)에 새로 쓴 댓글과 답글을 더한 값.
+export const commentCount = (c) => (c ? c.comments : 187) + extra(c ? c.id : 's0');
 
 const Avatar = ({ c, size = 32 }) => (
   <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: '#3A3A3C', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D1D1D6', fontSize: 13, fontWeight: 700 }}>
@@ -65,11 +72,11 @@ const Avatar = ({ c, size = 32 }) => (
 );
 
 // 댓글 시트가 올라올 때: 영상이 위쪽 카드(110.5, 0, 169 x 299)로 줄어들고 바탕은 검정이 된다.
-function CardBackdrop({ open, onClose }) {
+function CardBackdrop({ open, onClose, img = 'card' }) {
   return (
     <div onClick={(e) => { e.stopPropagation(); onClose(); }} style={{ position: 'absolute', inset: 0, zIndex: 60, background: open ? '#000' : 'rgba(0,0,0,0)', transition: 'background-color 320ms cubic-bezier(.2,0,0,1)' }}>
       <div style={{ position: 'absolute', left: open ? 110.5 : 0, top: 0, width: open ? 169 : 390, height: open ? 299 : 750, borderRadius: open ? '0 0 14px 14px' : 0, overflow: 'hidden', transition: 'all 380ms ' + EASE, opacity: open ? 1 : 0 }}>
-        <img src={pic('card')} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={pic(img)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
     </div>
   );
@@ -89,7 +96,7 @@ function Sheet({ open, top, onClose, children }) {
   const move = (e) => { if (drag.current) setDy(Math.max(0, e.clientY - drag.current.y)); };
   const up = () => { if (!drag.current) return; const d = dy; drag.current = null; setDy(0); if (d > 70) onClose(); };
   return (
-    <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', left: 0, top, width: 390, height: 844 - top, zIndex: 61, background: SHEET, borderRadius: '24px 24px 0 0', transform: open ? 'translateY(' + dy + 'px)' : 'translateY(100%)', transition: drag.current ? 'none' : 'transform 360ms ' + EASE, fontFamily: FONT, color: TXT, overflow: 'hidden' }}>
+    <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', left: 0, top, bottom: 0, width: 390, zIndex: 61, background: SHEET, borderRadius: '24px 24px 0 0', transform: open ? 'translateY(' + dy + 'px)' : 'translateY(100%)', transition: drag.current ? 'none' : 'transform 360ms ' + EASE, fontFamily: FONT, color: TXT, overflow: 'hidden' }}>
       <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 32, touchAction: 'none', cursor: 'grab' }}>
         <div style={{ position: 'absolute', left: 175, top: 12, width: 40, height: 4, borderRadius: 2, background: HANDLE }} />
       </div>
@@ -103,38 +110,92 @@ const LOGO = "<svg style=\"display:block\" width=\"30\" height=\"11\" viewBox=\"
 const CHEV = "<svg style=\"display:block\" width=\"7\" height=\"11\" viewBox=\"0 0 7 11\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><g clip-path=\"url(#clip0_1910_11693)\"><path d=\"M1 1L5.5 5.5L1 10\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"#E7E0FA\"/></g><defs><clipPath id=\"clip0_1910_11693\"><rect width=\"7\" height=\"11\" fill=\"white\"/></clipPath></defs></svg>";
 const EMOJI_X = [42, 85, 129, 172, 216, 260, 303, 347];
 
-// 캡션의 더보기를 누르면 나오는 설명 부분(원본 15번): 만든 사람, 글, 재생수, AI 활용 칩, 구분선 순서다.
-function InfoBlock() {
+// 캡션의 더보기를 누르면 나오는 설명 부분(원본 15번): 만든 사람, 글, 재생수, AI 활용 칩, 구분선 순서다. 지금 보고 있는 클립의 값을 넣는다.
+function InfoBlock({ clip, following, onFollow }) {
+  const c = clip || { av: 'av0', creator: '흔한 웹드', badge: true, title: '베프가 내 비밀을 까발린다 ep.01', tags: '#친구관계 #연애', plays: '2.4만', when: '3일 전', id: 's0' };
   return (
     <div style={{ position: 'relative', height: 182, margin: '10px 0 0' }}>
       <div style={{ position: 'absolute', left: 20, top: 0, width: 32, height: 32, borderRadius: '50%', overflow: 'hidden' }}>
-        <img src={pic('av0')} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={pic(c.av)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
       <div style={{ position: 'absolute', left: 62, top: 0, height: 32, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.3px', color: '#F6F6F6' }}>흔한 웹드</span>
-        <svg width="13" height="13" viewBox="0 0 14 14" style={{ display: 'block' }}><circle cx="7" cy="7" r="6.5" fill="#F9A825" /><path d="M4 7.2l2 2L10 5" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        <span style={{ marginLeft: 6, height: 26, padding: '0 9px', display: 'flex', alignItems: 'center', border: '1px solid #343436', borderRadius: 8, fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.27px', color: '#EFEFEF' }}>팔로우</span>
+        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.3px', color: '#F6F6F6' }}>{c.creator}</span>
+        {c.badge ? <svg width="13" height="13" viewBox="0 0 14 14" style={{ display: 'block' }}><circle cx="7" cy="7" r="6.5" fill="#F9A825" /><path d="M4 7.2l2 2L10 5" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}
+        <span className="ck-press" role="button" tabIndex={0} aria-pressed={!!following} onClick={(e) => { e.stopPropagation(); if (onFollow) onFollow(); }}
+          style={{ marginLeft: 6, height: 26, padding: '0 9px', display: 'flex', alignItems: 'center', border: '1px solid #343436', borderRadius: 8, fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.27px', color: '#EFEFEF', background: following ? '#141414' : 'transparent', cursor: 'pointer' }}>{following ? '팔로잉' : '팔로우'}</span>
       </div>
-      <p style={{ position: 'absolute', left: 20, top: 43, margin: 0, fontSize: 16.5, lineHeight: '22px', letterSpacing: '-0.33px', color: '#F5F5F5', whiteSpace: 'pre' }}>베프가 내 비밀을 까발린다 ep.01</p>
-      <p style={{ position: 'absolute', left: 20, top: 62, margin: 0, fontSize: 16.5, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.33px', color: '#F5F5F5', whiteSpace: 'pre' }}>#친구관계 #연애</p>
-      <p style={{ position: 'absolute', left: 20, top: 90, margin: 0, fontSize: 15, lineHeight: '20px', letterSpacing: '-0.3px', color: SUB, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'pre' }}>재생수 2.4만<i style={{ width: 3.5, height: 3.5, borderRadius: '50%', background: SUB, display: 'block' }} />3일 전</p>
-      <div style={{ position: 'absolute', left: 20, top: 127, width: 52, height: 29, borderRadius: 8, border: '1px solid #343436', background: ROW, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, letterSpacing: '-0.28px', color: '#EDEDED' }}>AI 활용</div>
+      <p style={{ position: 'absolute', left: 20, top: 43, margin: 0, fontSize: 16.5, lineHeight: '22px', letterSpacing: '-0.33px', color: '#F5F5F5', whiteSpace: 'pre' }}>{c.title}</p>
+      <p style={{ position: 'absolute', left: 20, top: 62, margin: 0, fontSize: 16.5, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.33px', color: '#F5F5F5', whiteSpace: 'pre' }}>{c.tags}</p>
+      <p style={{ position: 'absolute', left: 20, top: 90, margin: 0, fontSize: 15, lineHeight: '20px', letterSpacing: '-0.3px', color: SUB, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'pre' }}>{'재생수 ' + c.plays}<i style={{ width: 3.5, height: 3.5, borderRadius: '50%', background: SUB, display: 'block' }} />{c.when}</p>
+      {c.id === 's0' ? <div style={{ position: 'absolute', left: 20, top: 127, width: 52, height: 29, borderRadius: 8, border: '1px solid #343436', background: ROW, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, letterSpacing: '-0.28px', color: '#EDEDED' }}>AI 활용</div> : null}
       <div style={{ position: 'absolute', left: 0, top: 181, width: 390, height: 1, background: '#292929' }} />
     </div>
   );
 }
 
+const ME = '새벽2시';
+const SendIcon = ({ on, size = 19 }) => <Svg size={size} stroke={on ? '#000' : '#6E6E6E'} sw={2.2}><path d="M12 19V5M5 12l7-7 7 7" /></Svg>;
+
+// 답글 입력칸. 열릴 때 clip-path와 opacity로 위에서 아래로 펼쳐지고, "@이름 "이 들어간 채 포커스된다.
+function ReplyBox({ open, name, onSend, onCancel, scroller }) {
+  const [v, setV] = useState('@' + name + ' ');
+  const [on, setOn] = useState(false);
+  const box = useRef(null);
+  useEffect(() => { if (!open) { setOn(false); return undefined; } const r = requestAnimationFrame(() => setOn(true)); return () => cancelAnimationFrame(r); }, [open]);
+  const input = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    setV('@' + name + ' ');
+    const t = window.setTimeout(() => {
+      const el = input.current;
+      if (!el) return;
+      try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+      const n = el.value.length;
+      try { el.setSelectionRange(n, n); } catch (e) { /* 무시 */ }
+      // 입력칸이 아래 입력 줄에 가리지 않게 목록을 그만큼 올린다.
+      const sc = scroller && scroller.current;
+      if (sc && box.current) {
+        const r = box.current.getBoundingClientRect();
+        const sr = sc.getBoundingClientRect();
+        const s = sr.height / sc.offsetHeight || 1;
+        const over = (r.bottom - sr.bottom) / s + 12;
+        if (over > 0) sc.scrollTo({ top: sc.scrollTop + over, behavior: 'smooth' });
+      }
+    }, 30);
+    return () => window.clearTimeout(t);
+  }, [open, name]);
+  const body = v.replace(new RegExp('^@' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*'), '').trim();
+  const send = () => { if (!body) return; onSend(v.trim()); };
+  if (!open) return null;
+  return (
+    <div ref={box} className="cp-reply" style={{ margin: '2px 52px 8px 0', height: 40, position: 'relative', clipPath: on ? 'inset(0 0 0 0 round 20px)' : 'inset(0 0 100% 0 round 20px)', opacity: on ? 1 : 0 }}>
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: ROW }} />
+      <input ref={input} value={v} onChange={(e) => setV(e.target.value)} enterKeyHint="send" aria-label={name + '님에게 답글'}
+        onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } if (e.key === 'Escape') onCancel(); }}
+        style={{ position: 'absolute', left: 14, top: 0, width: 'calc(100% - 58px)', height: 40, border: 0, outline: 'none', background: 'transparent', color: TXT, fontFamily: FONT, fontSize: 14.5, letterSpacing: '-0.29px', padding: 0 }} />
+      <button type="button" aria-label="답글 보내기" onClick={(e) => { e.stopPropagation(); send(); }} className="cp-btn" style={{ right: 5, top: 5, width: 30, height: 30, borderRadius: '50%', background: body ? '#36D2FF' : '#3A3A3A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <SendIcon on={!!body} size={16} />
+      </button>
+    </div>
+  );
+}
+
 // ---------- 댓글 시트(원본 12번) ----------
-export function CommentSheet({ open, onClose, onCount, say, info }) {
+export function CommentSheet({ open, onClose, onCount, say, info, clip, following, onFollow }) {
+  const id = clip ? clip.id : 's0';
   const [sort, setSort] = useState('like');
   const [, force] = useState(0);
   const [draft, setDraft] = useState('');
+  const [replyTo, setReplyTo] = useState(null);
+  const [fresh, setFresh] = useState(null);
+  const scroller = useRef(null);
   const bump = () => force((k) => k + 1);
+  const comments = listOf(id);
   const list = comments.slice().sort((a, b) => (sort === 'like' ? b.likes - a.likes : b.order - a.order));
   const add = (text) => {
-    comments = [{ id: nextId++, name: '새벽2시', av: null, text, when: '방금 전', order: 99 + nextId, likes: 0 }, ...comments];
+    store[id] = [{ id: nextId++, name: ME, av: null, text, when: '방금 전', order: 99 + nextId, likes: 0, replies: [] }, ...comments];
     bump();
-    onCount(commentTotal());
+    onCount(commentCount(clip));
     say('댓글을 남겼어요');
   };
   const send = () => {
@@ -143,25 +204,40 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
     setDraft('');
     add(v);
   };
+  const reply = (c, text) => {
+    const r = { id: nextId++, name: ME, av: null, text, when: '방금 전', likes: 0 };
+    c.replies.push(r);
+    setReplyTo(null);
+    setFresh(r.id);
+    bump();
+    onCount(commentCount(clip));
+    say('답글을 남겼어요');
+  };
   const toggle = (c) => {
     if (liked.has(c.id)) { liked.delete(c.id); c.likes -= 1; } else { liked.add(c.id); c.likes += 1; }
     bump();
   };
   const opt = (on) => ({ border: 0, background: 'transparent', padding: 0, margin: 0, cursor: 'pointer', fontFamily: FONT, fontSize: 15, lineHeight: '22px', letterSpacing: '-0.3px', fontWeight: 500, color: on ? '#F8F8F8' : SUB2, outline: 'none', WebkitTapHighlightColor: 'transparent', display: 'flex', alignItems: 'center', gap: 7.5, transition: 'color 160ms' });
   const dot = (on) => ({ width: 5, height: 5, borderRadius: '50%', background: on ? '#F8F8F8' : SUB2, display: 'block' });
+  const LikeBtn = ({ c, top, small }) => (
+    <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 14, top, width: 44, height: small ? 46 : 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.3 }}>
+      <span key={liked.has(c.id) ? 'on' : 'off'} className={liked.has(c.id) ? 'cp-pop' : undefined} style={{ display: 'block', lineHeight: 0 }}><Heart on={liked.has(c.id)} size={small ? 15 : 17} off="#C4C4C4" /></span>
+      <span style={{ fontSize: small ? 13 : 14, lineHeight: '19px', color: liked.has(c.id) ? '#FF3B5C' : '#CACACA', fontWeight: 400 }}>{c.likes}</span>
+    </button>
+  );
   return (
     <>
-      <CardBackdrop open={open} onClose={onClose} />
+      <CardBackdrop open={open} onClose={onClose} img={clip ? clip.back : 'card'} />
       <Sheet open={open} top={310} onClose={onClose}>
         {!info ? (<>
-        <p style={{ position: 'absolute', left: 20, top: 38, margin: 0, fontSize: 17, fontWeight: 500, lineHeight: '24px', letterSpacing: '-0.34px', color: '#F9F9F9' }}>{'댓글 ' + commentTotal()}</p>
+        <p style={{ position: 'absolute', left: 20, top: 38, margin: 0, fontSize: 17, fontWeight: 500, lineHeight: '24px', letterSpacing: '-0.34px', color: '#F9F9F9' }}>{'댓글 ' + commentCount(clip).toLocaleString('en-US')}</p>
         <div style={{ position: 'absolute', right: 21, top: 38, display: 'flex', gap: 12.5 }}>
           <button type="button" onClick={() => setSort('like')} style={opt(sort === 'like')} aria-pressed={sort === 'like'}><i style={dot(sort === 'like')} />순공감순</button>
           <button type="button" onClick={() => setSort('new')} style={opt(sort === 'new')} aria-pressed={sort === 'new'}><i style={dot(sort === 'new')} />최신순</button>
         </div>
         </>) : null}
-        <div className="cp-hide" style={{ position: 'absolute', left: 0, top: info ? 30 : 62, width: 390, height: info ? 362 : 330, overflowY: 'auto', overscrollBehavior: 'contain' }} onWheel={(e) => e.stopPropagation()}>
-          {info ? <InfoBlock /> : (<>
+        <div ref={scroller} className="cp-hide" style={{ position: 'absolute', left: 0, top: info ? 30 : 62, width: 390, bottom: 142, overflowY: 'auto', overscrollBehavior: 'contain', touchAction: 'pan-y' }} onWheel={(e) => e.stopPropagation()}>
+          {info ? <InfoBlock clip={clip} following={following} onFollow={onFollow} /> : (<>
           <div style={{ margin: '25px 0 0 15px', width: 359, height: 67, position: 'relative' }}>
             <div style={{ position: 'absolute', inset: 0, borderRadius: 6, background: '#36D2FF' }} />
             <p style={{ position: 'absolute', left: 16, top: 10, margin: 0, fontSize: 15.5, fontWeight: 800, lineHeight: '22px', letterSpacing: '-0.31px', color: '#000000', whiteSpace: 'pre', textShadow: '-2px 0 #fff, 2px 0 #fff, 0 -2px #fff, 0 2px #fff, -1.4px -1.4px #fff, 1.4px 1.4px #fff, -1.4px 1.4px #fff, 1.4px -1.4px #fff' }}>드르륵 칵, 잼컨 썰 여기 다 있네</p>
@@ -191,13 +267,24 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
                   <p style={{ margin: 0, fontSize: 15, fontWeight: 700, lineHeight: '20px', letterSpacing: '-0.3px', color: '#F6F6F6' }}>{c.name}</p>
                   <p style={{ margin: '3px 0 0', fontSize: 15, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.3px', color: BODY, wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>{c.text}</p>
                   <p style={{ margin: '1px 0 0', fontSize: 13, lineHeight: '17px', color: SUB }}>{c.when}</p>
-                  <button type="button" className="cp-row" onClick={() => say('답글 쓰기는 준비 중이에요')} style={{ display: 'block', height: 34, padding: 0, fontSize: 14, color: '#EBEBEB', fontWeight: 400, letterSpacing: '-0.28px' }}>답글 쓰기</button>
+                  <button type="button" className="cp-row" aria-expanded={replyTo === c.id} onClick={(e) => { e.stopPropagation(); setReplyTo((r) => (r === c.id ? null : c.id)); }} style={{ display: 'block', height: 34, padding: 0, fontSize: 14, color: '#EBEBEB', fontWeight: 400, letterSpacing: '-0.28px' }}>답글 쓰기</button>
                 </div>
               </div>
-              <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 14, top: 20.65, width: 44, height: 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.3 }}>
-                <span key={liked.has(c.id) ? 'on' : 'off'} className={liked.has(c.id) ? 'cp-pop' : undefined} style={{ display: 'block', lineHeight: 0 }}><Heart on={liked.has(c.id)} size={17} off="#C4C4C4" /></span>
-                <span style={{ fontSize: 14, lineHeight: '19px', color: liked.has(c.id) ? '#FF3B5C' : '#CACACA', fontWeight: 400 }}>{c.likes}</span>
-              </button>
+              <div style={{ paddingLeft: 43 }}>
+                <ReplyBox open={replyTo === c.id} name={c.name} scroller={scroller} onSend={(t) => reply(c, t)} onCancel={() => setReplyTo(null)} />
+                {c.replies.map((r) => (
+                  <div key={r.id} className={fresh === r.id ? 'cp-new' : undefined} style={{ position: 'relative', display: 'flex', gap: 9, margin: '4px 0 6px' }}>
+                    <Avatar c={r} size={24} />
+                    <div style={{ flex: 1, minWidth: 0, paddingRight: 52 }}>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, lineHeight: '19px', letterSpacing: '-0.28px', color: '#F6F6F6' }}>{r.name}</p>
+                      <p style={{ margin: '2px 0 0', fontSize: 14.5, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.29px', color: BODY, wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>{r.text}</p>
+                      <p style={{ margin: '1px 0 0', fontSize: 12.5, lineHeight: '17px', color: SUB }}>{r.when}</p>
+                    </div>
+                    <LikeBtn c={r} top={-4} small />
+                  </div>
+                ))}
+              </div>
+              <LikeBtn c={c} top={20.65} />
               <div style={{ position: 'absolute', right: 28.5, top: 6.2, width: 16, height: 5, lineHeight: 0 }}>
                 <svg width="16" height="5" viewBox="0 0 16 5" fill="#B5B5B5"><circle cx="2" cy="2.5" r="1.5" /><circle cx="8" cy="2.5" r="1.5" /><circle cx="14" cy="2.5" r="1.5" /></svg>
               </div>
@@ -205,7 +292,7 @@ export function CommentSheet({ open, onClose, onCount, say, info }) {
           ))}
           <div style={{ height: 30 }} />
         </div>
-        <div style={{ position: 'absolute', left: 0, top: 392, width: 390, height: 142, background: SHEET, boxShadow: '0 -1px 0 #292929' }}>
+        <div style={{ position: 'absolute', left: 0, bottom: 0, width: 390, height: 142, background: SHEET, boxShadow: '0 -1px 0 #292929' }}>
           <div style={{ position: 'absolute', left: 19, top: 13, width: 44, height: 44, borderRadius: '50%', background: '#FFFFFF', overflow: 'hidden' }}>
             <svg width="44" height="44" viewBox="0 0 44 44" fill="#C9C9CE"><circle cx="22" cy="17" r="8" /><path d="M6 44C6 33 13 27 22 27C31 27 38 33 38 44Z" /></svg>
           </div>
@@ -253,7 +340,7 @@ function Row({ icon, label, tail, color, top, onClick }) {
     </button>
   );
 }
-export function MoreSheet({ open, onClose, stats, liked: isLiked, saved, onAction }) {
+export function MoreSheet({ open, onClose, stats, liked: isLiked, saved, onAction, loop = true }) {
   const Tile = ({ x, w, icon, text, on, onClick }) => (
     <button type="button" className="cp-btn" onClick={onClick} style={{ left: x, top: 28, width: w, height: 70, borderRadius: 8, background: TILE, display: 'block', fontFamily: FONT }}>
       <span style={{ position: 'absolute', left: 0, top: 11, width: w, display: 'flex', justifyContent: 'center', lineHeight: 0 }}>
@@ -270,7 +357,7 @@ export function MoreSheet({ open, onClose, stats, liked: isLiked, saved, onActio
         <Tile x={138} w={113.5} icon="chat" text={'댓글 ' + stats.comment} onClick={() => onAction('comments')} />
         <Tile x={256.5} w={113.5} icon="keep" text="Keep" on={saved} onClick={() => onAction('save')} />
         <Row icon="full" label="몰입 모드로 보기" top={109} onClick={() => onAction('immersive')} />
-        <Row icon="play" label="재생 방식 설정" tail="반복 재생" top={151} onClick={() => onAction('play')} />
+        <Row icon="play" label="재생 방식 설정" tail={loop ? '반복 재생' : '한 번만 재생'} top={151} onClick={() => onAction('play')} />
         <div style={{ position: 'absolute', left: 20, top: 204, width: 350, height: 1, background: 'rgba(255,255,255,0.07)' }} />
         <Row icon="eyeoff" label="이 콘텐츠 숨기기" top={214} onClick={() => onAction('hide')} />
         <Row icon="person" label={<><span style={{ color: BLUE }}>웹드플리</span> 콘텐츠 숨기기</>} color={TXT} top={256} onClick={() => onAction('hideCreator')} />
