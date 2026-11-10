@@ -854,11 +854,11 @@ struct RoomSoloView: View {
         }
     }
 
-    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 180초). 0이 되면 아침 화면으로 넘어간다.
+    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 180초). 0이 되면 종료 리포트(함께 방과 같은 화면)로 넘어간다.
     private func watchClock() async {
         while !Task.isCancelled {
             if model.remaining(at: .now) <= 0 {
-                router.push(.roomMorning)
+                router.push(.roomEnd)
                 return
             }
             try? await Task.sleep(for: .seconds(0.5))
@@ -921,6 +921,30 @@ private extension View {
 
 private enum ReportKind { case end, morning, summary }
 
+/// 두 이야기의 리포트 글. 사진보정은 2100:24606(옛 2023:30658과 같은 글), 쌍밍아웃은 2096:22857이다.
+/// 웹 client/src/app/reportPatch.js의 SSANG_TEXT와 같은 글이다. 아침(1647:26876)은 옛 글 그대로 둔다.
+private struct ReportText {
+    let worry: String
+    let firstStep: String
+    let secondName: String
+    let secondLine: String
+    let recommendDesc: String
+
+    static var current: ReportText {
+        Story.current == .ssang
+            ? ReportText(worry: "썸남 앞에서 내 쌍수를 말해버린 친구",
+                         firstStep: "\"걔 완전 미친 거 아니야?\"로 이야기가 시작됐어요",
+                         secondName: "딱딱한 나무 스툴12",
+                         secondLine: "다음엔 ‘그 얘길 왜 해?’ 하고 물어봐봐 ㅋ",
+                         recommendDesc: "좋은 이야기를 나눠준 유저를 누르면 추천, 다시 누르면 취소돼요")
+            : ReportText(worry: "둘이 찍은 사진, 자기만 보정한 친구",
+                         firstStep: "\"이거 일부러야?\"로 이야기가 시작됐어요",
+                         secondName: "따딱한 나무 스툴12",
+                         secondLine: "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ",
+                         recommendDesc: "좋은 이야기를 나눠준 유저를 추천해주세요")
+    }
+}
+
 /// 00 엉따온도 카드(342 x 188, #222628, 모서리 20, 안쪽 24 / 20)
 private struct WarmthCard: View {
     var body: some View {
@@ -974,9 +998,15 @@ private struct TalkTimeline: View {
     var gap: CGFloat
     /// 아침(1647:26923)만 3단계 설명이 "디엠으로"가 들어간 글이다. 종료(1647:26790)와 오늘 나눈 대화(1647:27059)는 같다.
     var morning = false
+    /// 종료와 오늘 나눈 대화는 이야기별 글(ReportText), 아침은 옛 사진보정 글이다.
+    private var text: ReportText {
+        morning ? ReportText(worry: "둘이 찍은 사진, 자기만 보정한 친구", firstStep: "\"이거 일부러야?\"로 이야기가 시작됐어요",
+                             secondName: "", secondLine: "", recommendDesc: "") : ReportText.current
+    }
+
     private var steps: [(String, String)] {
         [
-            ("고민을 꺼냈어요", "\"이거 일부러야?\"로 이야기가 시작됐어요"),
+            ("고민을 꺼냈어요", text.firstStep),
             ("서로의 생각을 나눴어요", "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요."),
             ("다음 행동을 정했어요", morning ? "다음엔 한번 디엠으로 직접 말해보기로 했어요" : "다음엔 한번 직접 말해보기로 했어요"),
         ]
@@ -989,7 +1019,7 @@ private struct TalkTimeline: View {
                     Text("오늘의 고민").fig(12, .bold, DS.Palette.brandPrimary)
                         .padding(.vertical, 4).padding(.horizontal, 8)
                         .background(DS.Palette.brandSubtle, in: Capsule())
-                    Text("둘이 찍은 사진, 자기만 보정한 친구").fig(12, .medium, DS.Palette.textTertiary)
+                    Text(text.worry).fig(12, .medium, DS.Palette.textTertiary)
                 }
             }
             VStack(alignment: .leading, spacing: 0) {
@@ -1228,89 +1258,99 @@ private struct RecommendPicker: View {
     }
 }
 
-/// 종료 04 대화 상대 추천(2023:30737): 가운데 의자 한 개를 크게 보여 주고 좌우 화살표로 한 칸씩 넘긴다.
-/// 피그마 값: 줄 304(43에서 347까지) = 화살표 24 x 72, 사이 8, 칸 자리 240, 사이 8, 화살표 24 x 72. 칸 72 x 116은 240 가운데(159).
-/// 그림은 72 원(#222628)과 의자 56(8, 8)을 한 장으로 내보낸 M-end-pick 그림, 이름 12 Medium 가운데.
-/// 피그마 첫 모습은 "차가운 새벽의자92"이고 왼쪽 화살표가 또렷하고 오른쪽 화살표가 30%다. 그래서 이 의자를 줄의 마지막 칸으로 두고
-/// 끝에 닿은 쪽 화살표를 30%로 흐리게 한다. 나머지 칸은 같은 방 의자(오늘 나눈 대화 2023:30510, 30515, 30520 칸)다.
-/// 가운데 의자를 누르면 이름이 하늘색으로 켜지고 꺼진다(피그마에 고른 상태 그림이 없어 이름 색만 바꾼다). 최대 두 명이고,
-/// 세 번째를 고르면 처음 고른 의자가 빠진다(웹 taps.js chairPicker와 같은 규칙).
-private struct SingleChairPicker: View {
+/// 종료와 오늘 나눈 대화 04 도움이 된 유저(2096:22857 첫 쪽, 2096:22969 둘째 쪽, 2100:24606, 2100:24718도 같은 의자).
+/// 줄 304(43에서 347까지) = 화살표 24 x 72, 사이 8, 칸 자리 240, 사이 8, 화살표 24 x 72.
+/// 첫 쪽은 의자 셋(72씩 사이 12), 둘째 쪽은 차가운 새벽의자92 하나를 가운데(칸 75에서 84 안쪽)에 둔다.
+/// 첫 쪽은 왼쪽 화살표가 30%, 둘째 쪽은 오른쪽 화살표가 30%이고 흐린 화살표는 눌리지 않는다.
+/// 의자를 누르면 추천(72 원 안쪽 2 하늘색 링과 하늘색 이름, 2096:22952), 다시 누르면 취소. 개수 제한이 없고 쪽을 넘겨도 남는다.
+/// 피그마 첫 쪽처럼 새벽2시 피시방이 추천된 상태로 시작한다.
+/// 쪽 넘김은 웹 reportPatch.js와 같다: 지금 쪽이 24 밀리며 옅어지고(150ms), 새 쪽이 반대쪽 24에서 들어온다(150ms).
+private struct PagedChairPicker: View {
     private let chairs: [(key: String, name: String, asset: String)] = [
         ("lime", "진실의\n의자10", "M-end-pick-lime"),
         ("swivel", "새벽2시\n피시방", "M-end-pick-swivel"),
         ("stool", "딱딱한\n나무 스툴12", "M-end-pick-stool"),
         ("white", "차가운\n새벽의자92", "M-end-pick-white"),
     ]
-    @State private var index = 3
-    @State private var picked: [String] = []
-    @State private var forward = true
-    @State private var bump = false
+    private let pages: [[Int]] = [[0, 1, 2], [3]]
+    @State private var page = 0
+    @State private var picked: Set<String> = ["swivel"]
+    @State private var shift: CGFloat = 0
+    @State private var fade = 1.0
+    @State private var busy = false
+    @State private var bump: String?
 
     private func go(_ dir: Int) {
-        let next = index + dir
-        guard chairs.indices.contains(next) else { return }
+        let next = page + dir
+        guard !busy, pages.indices.contains(next) else { return }
+        busy = true
         UISelectionFeedbackGenerator().selectionChanged()
-        forward = dir > 0
-        withAnimation(DS.Motion.standard) { index = next }
+        let half = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
+        withAnimation(half) { shift = CGFloat(-24 * dir); fade = 0 }
+        Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            var quiet = Transaction()
+            quiet.disablesAnimations = true
+            withTransaction(quiet) { page = next; shift = CGFloat(24 * dir) }
+            withAnimation(half) { shift = 0; fade = 1 }
+            try? await Task.sleep(for: .milliseconds(150))
+            busy = false
+        }
     }
 
     private func toggle(_ key: String) {
         withAnimation(DS.Motion.stateIn) {
-            if let i = picked.firstIndex(of: key) {
-                picked.remove(at: i)
-            } else {
-                picked.append(key)
-                if picked.count > 2 { picked.removeFirst() }
-            }
+            if picked.contains(key) { picked.remove(key) } else { picked.insert(key) }
         }
         UISelectionFeedbackGenerator().selectionChanged()
         guard picked.contains(key) else { return }
-        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = true }
+        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = key }
         Task {
             try? await Task.sleep(for: .milliseconds(150))
-            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = false }
+            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { if bump == key { bump = nil } }
         }
     }
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             arrow(left: true)
-            ZStack(alignment: .top) {
-                let chair = chairs[index]
-                let on = picked.contains(chair.key)
-                Button { toggle(chair.key) } label: {
-                    VStack(spacing: 8) {
-                        Image(chair.asset).resizable().frame(width: 72, height: 72)
-                            .scaleEffect(bump ? 1.06 : 1)
-                        Text(chair.name).fig(12, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
-                            .multilineTextAlignment(.center).fixedSize()
+            HStack(alignment: .top, spacing: 12) {
+                ForEach(pages[page], id: \.self) { i in
+                    let chair = chairs[i]
+                    let on = picked.contains(chair.key)
+                    Button { toggle(chair.key) } label: {
+                        VStack(spacing: 8) {
+                            Image(chair.asset).resizable().frame(width: 72, height: 72)
+                                .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(on ? 1 : 0))
+                                .scaleEffect(bump == chair.key ? 1.06 : 1)
+                            Text(chair.name).fig(12, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
+                                .multilineTextAlignment(.center).fixedSize()
+                        }
+                        .frame(width: 72, height: 116, alignment: .top)
                     }
-                    .frame(width: 72, height: 116, alignment: .top)
+                    .buttonStyle(PressStyle())
+                    .allowsHitTesting(!busy)
+                    .accessibilityLabel(chair.name.replacingOccurrences(of: "\n", with: " "))
+                    .accessibilityAddTraits(on ? .isSelected : [])
                 }
-                .buttonStyle(PressStyle())
-                .accessibilityAddTraits(on ? .isSelected : [])
-                .id(chair.key)
-                .transition(.asymmetric(
-                    insertion: .offset(x: forward ? 84 : -84).combined(with: .opacity),
-                    removal: .offset(x: forward ? -84 : 84).combined(with: .opacity)
-                ))
             }
+            .offset(x: shift)
+            .opacity(fade)
             .frame(width: 240, height: 116)
-            .clipped()
             arrow(left: false)
         }
         .frame(maxWidth: .infinity)
     }
 
-    /// 화살표 24 x 72(아이콘 24가 세로 가운데). 끝에 닿은 쪽은 피그마처럼 30%로 흐리고 누르지 않는다.
+    /// 화살표 24 x 72(아이콘 24가 세로 가운데). 끝 쪽은 30%로 흐리고 누르지 않는다.
     private func arrow(left: Bool) -> some View {
-        let atEnd = left ? index == 0 : index == chairs.count - 1
+        let atEnd = left ? page == 0 : page == pages.count - 1
         return Button { go(left ? -1 : 1) } label: {
             Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
                 .foregroundStyle(DS.Palette.textPrimary)
                 .rotationEffect(.degrees(left ? 0 : 180))
                 .opacity(atEnd ? 0.3 : 1)
+                .animation(DS.Motion.stateIn, value: atEnd)
                 .frame(width: 24, height: 72)
                 .contentShape(Rectangle())
         }
@@ -1321,8 +1361,8 @@ private struct SingleChairPicker: View {
 }
 
 /// 리포트 본문. 피그마 Report 묶음의 순서와 간격.
-/// 종료(2023:30661): 엉따 카드, 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(머리와 줄 사이 24, 의자 한 개), 묶음 사이 36.
-/// 오늘 나눈 대화(2023:30425): 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(24, 의자 세 칸), 묶음 사이 36.
+/// 종료(2096:22857, 2100:24606): 엉따 카드, 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(머리와 줄 사이 24, 의자 3개씩 한 쪽), 묶음 사이 36.
+/// 오늘 나눈 대화(2023:30425): 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(24, 종료와 같은 줄), 묶음 사이 36.
 /// 아침(1647:26878): 엉따 카드, 오늘 나눈 대화(20), 오늘의 베스트 댓글, 도움이 된 의자(12, 선택 수, 의자 세 칸), 묶음 사이 40.
 private struct ReportBody: View {
     let kind: ReportKind
@@ -1345,21 +1385,19 @@ private struct ReportBody: View {
                 }
             } else {
                 // 종료 2023:30711과 오늘 나눈 대화 2023:30475: 아바타는 연두 의자(33871c043e), 나무 스툴(51be0a544b), 회색 바퀴 의자(f77c03c1bf).
+                // 오늘의 드르륵 대화들 카드에는 따봉이 없다(피그마 2096:22857, 2100:24606 그대로).
+                let text = ReportText.current
                 VStack(alignment: .leading, spacing: 12) {
                     SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요")
                     VStack(spacing: 8) {
                         BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "M-end-avatar-lime", exported: true)
-                        BestCard(name: "따딱한 나무 스툴12", text: "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ", likes: nil, asset: "M-end-avatar-stool", exported: true)
+                        BestCard(name: text.secondName, text: text.secondLine, likes: nil, asset: "M-end-avatar-stool", exported: true)
                         BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "M-end-avatar-swivel", exported: true)
                     }
                 }
                 VStack(alignment: .leading, spacing: 24) {
-                    SectionHead(title: "도움이 된 유저가 있었나요?", desc: "좋은 이야기를 나눠준 유저를 추천해주세요")
-                    if kind == .end {
-                        SingleChairPicker()
-                    } else {
-                        RecommendPicker(cell: 72, showCount: false, compact: true)
-                    }
+                    SectionHead(title: "도움이 된 유저가 있었나요?", desc: text.recommendDesc)
+                    PagedChairPicker()
                 }
             }
         }
@@ -1448,7 +1486,7 @@ private struct ReportScreen: View {
     @ViewBuilder private var buttons: some View {
         if kind == .end {
             ReportButtons(primary: "커뮤니티에 고민 올리기", secondary: "올리지 않고 홈으로", filled: true,
-                          onPrimary: { router.select(.community) }, onSecondary: { router.popToRoot() })
+                          onPrimary: { router.select(.community) }, onSecondary: { router.select(.home) })
         } else {
             ReportButtons(primary: "함께 드르륵 앉기", secondary: "새 방 만들기", filled: false,
                           onPrimary: { router.popToRoot(); router.push(.room) }, onSecondary: { router.popToRoot() })

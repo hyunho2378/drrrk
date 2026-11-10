@@ -16,6 +16,10 @@ const OPEN_MS = 300;
 const CLOSE_MS = 220;
 
 const hide = (el) => { el.style.visibility = 'hidden'; };
+// 고민 배너가 펼쳐지면 room.js가 퀵슬롯을 transform으로 104px 내린다. 새로 붙이는 목록과 알약은 피그마 기본 자리(top)에 두고
+// 그 내림 값만 이어받는다. 예전에는 내려간 자리를 top으로 굳혀서, 배너를 접어도 퀵슬롯이 296에 남아 이름표와 채팅 위에 겹쳤다(11. 10. 팀 메모 2116:28613).
+const baseTop = (el) => parseFloat(el.style.top || getComputedStyle(el).top) || 192;
+const follow = (el, from) => { el.style.transition = 'none'; el.style.transform = from ? from.style.transform : ''; };
 const show = (el) => { el.style.visibility = 'visible'; };
 
 function bindPill(root, st) {
@@ -24,8 +28,9 @@ function bindPill(root, st) {
   pill.dataset.qs = '1';
   pill.style.cursor = 'pointer';
   pill.style.touchAction = 'manipulation';
-  const up = () => { pill.style.transition = 'transform 120ms ' + EASE; pill.style.transform = ''; };
-  pill.addEventListener('pointerdown', () => { pill.style.transition = 'transform 70ms ' + EASE; pill.style.transform = 'scale(0.93)'; });
+  // 누름 반응은 scale 속성으로 한다(transform은 배너가 펼쳐질 때 내려가는 값이 쓰고 있다).
+  const up = () => { pill.style.transition = 'scale 120ms ' + EASE + ', transform ' + 300 + 'ms ' + EASE; pill.style.scale = ''; };
+  pill.addEventListener('pointerdown', () => { pill.style.transition = 'scale 70ms ' + EASE; pill.style.scale = '0.93'; });
   pill.addEventListener('pointerup', up);
   pill.addEventListener('pointercancel', up);
   pill.addEventListener('pointerleave', up);
@@ -52,13 +57,15 @@ async function expand(root, st) {
     panel = await cloneOf(28, PANEL);
     if (!panel || !root.isConnected) { st.busy = false; return; }
     if (st.fix) st.fix(panel);
-    const top = st.pill ? relRect(root, st.pill).y : 192;
+    const top = st.pill ? baseTop(st.pill) : 192;
     Object.assign(panel.style, { top: top + 'px', zIndex: '20' });
+    follow(panel, st.pill);
     root.appendChild(panel);
     st.panel = panel;
     attachThrow(root);
     bindPanel(root, st);
   } else {
+    follow(panel, st.pill);
     show(panel);
   }
   const H = relRect(root, panel).h;
@@ -88,12 +95,13 @@ async function collapse(root, st) {
   if (!st.pill) {
     const pill = await cloneOf(29, PILL);
     if (!pill || !root.isConnected) { st.busy = false; return; }
-    Object.assign(pill.style, { top: pr.y + 'px', zIndex: '19' });
+    Object.assign(pill.style, { top: baseTop(panel) + 'px', zIndex: '19' });
     root.appendChild(pill);
     st.pill = pill;
     bindPill(root, st);
   }
   const pill = st.pill;
+  follow(pill, panel);
   show(pill);
   pill.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, delay: 70, easing: 'linear', fill: 'backwards' });
   const a = panel.animate(

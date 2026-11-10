@@ -7,6 +7,7 @@
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText, wait } from './dom.js';
 import { cloneOf } from './donor.js';
+import { SSANG } from './scene.js';
 
 const BAR = '[data-figma="input/속성 14"]';
 
@@ -27,6 +28,35 @@ export function toast(root, text) {
 }
 
 // ---------- 1) 플러스 메뉴 ----------
+// 팀 피그마 이모지 컴포넌트(2096:22600, 프레임 2096:22531): 62 x 230 세로 칸, 모서리 30, 검정 바탕, 1px #222628 선(칸 배치에 1px 포함, 첫 칸 y 525), 여백 6, 칸 간격 8.
+// 칸은 48 x 48 원(#222628, 불투명도 0.8), 고른 칸은 불투명도 1과 안쪽 2px #2EE59D 링. 얼굴은 24 x 24 그림(sob, laugh, angry, thinking)을 피그마에서 SVG로 받은 파일이다.
+// 생성 화면(1807:23281)의 옛 얼굴과 투명 테두리를 이 값으로 바꾼다. 마지막으로 고른 얼굴이 선택 칸으로 남는다.
+const EMOJI_FACE = { '웃김': 'sob', '토닥': 'laugh', '응원': 'angry', '공감': 'thinking' };
+let emojiPicked = '';
+const faceUrl = (k) => new URL('assets/room2/emo-' + k + '.svg', document.baseURI).href;
+function styleEmojiMenu(menu) {
+  Object.assign(menu.style, { background: '#000000', border: '1px solid #222628', boxShadow: 'none', borderRadius: '30px', padding: '6px', gap: '8px', width: '62px', height: '230px', boxSizing: 'border-box' });
+  q(menu, '[data-figma^="emoji ·"]').forEach((it) => {
+    const key = (it.getAttribute('data-figma') || '').replace(/^emoji · /, '');
+    const on = key === emojiPicked;
+    Object.assign(it.style, { width: '48px', height: '48px', borderRadius: '24px', background: '#222628', border: '0', boxSizing: 'border-box', opacity: on ? '1' : '0.8', boxShadow: on ? 'inset 0 0 0 2px #2EE59D' : 'none' });
+    // 생성 화면이 칸 바탕과 링을 따로 그린 그림(span[aria-hidden])은 숨긴다. 바탕과 링은 위 값으로 칸이 직접 그린다.
+    q(it, ':scope > span[aria-hidden]').forEach((o) => (o.style.display = 'none'));
+    const emo = it.querySelector('[data-figma="Reaction Emoji"]');
+    const face = EMOJI_FACE[key];
+    if (emo && face && !emo.dataset.face) {
+      emo.dataset.face = face;
+      emo.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = faceUrl(face);
+      img.alt = '';
+      img.draggable = false;
+      Object.assign(img.style, { display: 'block', width: '24px', height: '24px' });
+      emo.appendChild(img);
+    }
+  });
+}
+
 export function attachEmoji(root) {
   const bar = root.querySelector(BAR);
   const plus = bar && bar.querySelector('[data-figma="btn_더보기"]');
@@ -67,6 +97,7 @@ export function attachEmoji(root) {
     const [menu, x] = await Promise.all([cloneOf(31, '[data-figma="플러스 메뉴 · 이모지"]'), cloneOf(31, '[data-figma="btn_더보기"]', BAR)]);
     busy = false;
     if (!menu || pop || !root.isConnected) return;
+    styleEmojiMenu(menu);
     const shift = relRect(root, bar).y - 754;
     menu.style.top = 518 + shift + 'px';
     menu.style.zIndex = '25';
@@ -83,8 +114,8 @@ export function attachEmoji(root) {
     const items = q(menu, '[data-figma^="emoji ·"]');
     items.forEach((it, i) => {
       it.style.cursor = 'pointer';
-      it.animate([{ opacity: 0, transform: 'translateY(14px) scale(0.9)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: 340, delay: 80 + (items.length - 1 - i) * 60, easing: motion.emphasizedDecel, fill: 'backwards' });
-      it.addEventListener('click', (e) => { e.stopPropagation(); fly(it); close(); });
+      it.animate([{ opacity: 0, transform: 'translateY(14px) scale(0.9)' }, { opacity: Number(it.style.opacity) || 1, transform: 'translateY(0) scale(1)' }], { duration: 340, delay: 80 + (items.length - 1 - i) * 60, easing: motion.emphasizedDecel, fill: 'backwards' });
+      it.addEventListener('click', (e) => { e.stopPropagation(); emojiPicked = (it.getAttribute('data-figma') || '').replace(/^emoji · /, ''); styleEmojiMenu(menu); fly(it); close(); });
     });
     document.addEventListener('pointerdown', onDoc, true);
   };
@@ -133,8 +164,9 @@ export function attachBanner(root) {
     const e = await cloneOf(43, '[data-figma="고민 주제"]');
     if (!e || !root.isConnected) { busy = false; return; }
     if (!solo) {
-      // 새 방 장면(scene.js patchRoom2가 바꾼 화면)은 새 고민 글을, 그 밖의 방은 옛 글을 쓴다.
-      const B = root.dataset.room2 ? LIVE.bannerRoom2 : { title: null, body: LIVE.bannerBody, tags: LIVE.bannerTags };
+      // 함께 드르륵 방(scene.js patchRoom2가 이야기를 적어 둔 화면)은 그 이야기의 고민 글을(쌍밍아웃 2096:22269, 사진보정 2100:24227), 그 밖의 방은 옛 글을 쓴다.
+      const st = root.dataset.room2;
+      const B = st === 'ssang' ? SSANG.banner : st ? LIVE.bannerRoom2 : { title: null, body: LIVE.bannerBody, tags: LIVE.bannerTags };
       const ps = q(e, 'p[data-outline]');
       const body = ps.slice().sort((a, b) => b.textContent.length - a.textContent.length)[0];
       setText(body, B.body);

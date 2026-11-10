@@ -1,7 +1,8 @@
 import { LIVE_LIST } from './liveList.js';
 import { currentMode } from './sort.js';
 import { setText } from './dom.js';
-import { motion } from '../tokens.js';
+import { motion, live as LIVE } from '../tokens.js';
+import { setStory } from './story.js';
 // 라이브 목록 카드 v2. 팀 피그마 "라이브 · 리스트 시안 v2"(1972:22375)와 "라이브 리스트 카드 · 상태 정의"(1972:22488) 값을 그대로 옮겼다.
 // 카드(342 x 112, #222628, 모서리 16)는 그대로 두고, 오른쪽 장면 썸네일과 타이머, 말하는 사람 수를 지운 뒤
 // 아래 줄(보는 사람 수, 점, 남은 시간)과 오른쪽 아래 의자 얼굴 묶음을 상태별로 그린다. iOS LiveRoomCard와 같은 값이다.
@@ -117,6 +118,27 @@ function metaRow(state, views, left) {
 
 // 목록에서 누른 카드(방 구경 37의 제목과 보는 수에 쓴다). 한 번 쓰면 비운다(위 가로 카드로 들어가면 37 기본 글자 그대로).
 let picked = null;
+// 사진보정 이야기 카드(라이브 목록 첫 카드, 위 가로 카드 첫 장). 이 카드로 들어가면 방 구경과 방이 사진보정 이야기다(팀 메모 2100:24023).
+export const PHOTO_TITLE = '둘이 찍은 사진인데\n지만 보정해서 올린 여우';
+const flat = (t) => String(t || '').replace(/\s+/g, '');
+export const isPhotoCard = (card) => flat(card && (card.title || card)) === flat(PHOTO_TITLE);
+// 방 구경(37)에 들어가기 전에 고른 카드와 이야기 값을 정한다. card는 LIVE_LIST 카드 모양({ title, views, meta, st, timer }).
+// 사진보정 카드면 setStory('photo'), 다른 카드는 setStory('ssang').
+export function pickWatch(card) {
+  setStory(isPhotoCard(card) ? 'photo' : 'ssang');
+  picked = card ? { title: String(card.title).replace(/ \n/g, '\n'), views: String(card.views ?? ''), left: leftOf(card) } : null;
+}
+// 위 가로 카드 두 장 값(피그마 2100:23638 Carousel / 1, 2의 제목, 보는 수, 시계). iOS LiveData.featured와 같다.
+const FEATURED = [
+  { title: PHOTO_TITLE, views: '22', meta: '04:30 남음', st: 'talk' },
+  { title: '남친이 1주년 선물로\n다이소 틴트 사줌', views: '15', meta: '07:50 남음', st: 'talk' },
+];
+// 방 구경(37)으로 들어간다. 알림 키워드 카드처럼 라이브 목록 밖에서도 부른다.
+// 예: openWatch(LIVE_LIST[10][0]) 은 사진보정 방 구경, openWatch({ title: '3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?', views: '22', meta: '12:32 남음', st: 'talk' }).
+export function openWatch(card) {
+  pickWatch(card);
+  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 37, t: 'push' } }));
+}
 // 방 구경(37)의 시계가 시작할 초. 누른 카드의 남은 시간(카드 글 "12:32 남음", 곧 끝 카드는 03:00 배지)에서 시작한다. 방금 열린 방과 기다리는 방은 20:00.
 // 위 가로 카드로 들어오면 피그마 값 06:12.
 let watchLeft = 372;
@@ -134,7 +156,7 @@ function orderList(list, mode) {
     if (mode === 'new') return [x.c.st === 'fresh' ? 0 : x.c.st === 'alone' ? 1 : 2, -secsOf(x.c), x.i];
     // 친구 이야기와 썸, 연애 이야기가 둘 다 있는 글이 가장 가깝고, 그다음 한쪽만 있는 글, 친구와 연애 탭 글, 나머지 순이다.
     if (mode === 'match') { const t = x.c.title; const sc = (/친구|베프|동기/.test(t) ? 1 : 0) + (/썸|남친|애인|여친/.test(t) ? 1 : 0); return [-sc, MATCH_TITLES.has(t) ? 0 : 1, x.i]; }
-    // 인기순은 보는 수가 큰 방부터다(같으면 피그마 목록 순서). 시트 설명 "보는 사람과 공감이 많은 방부터"와 맞춘다(11/09 QA: 목록 순서 그대로 쓰면 11, 7, 10, 22 순이라 인기순이 아니었다).
+    // 인기순은 보는 수 큰 순, 같으면 피그마 목록 순서다(11/09 사용자 지적 정렬 오류로 정한 규칙, iOS LiveView와 같다).
     return [-(parseInt(x.c.views, 10) || 0), x.i];
   };
   a.sort((p, q) => { const kp = key(p), kq = key(q); for (let k = 0; k < kp.length; k++) if (kp[k] !== kq[k]) return kp[k] - kq[k]; return 0; });
@@ -159,10 +181,7 @@ function cardOf(c) {
     card.appendChild(pill);
   }
   if (c.st === 'fresh') card.appendChild(el('span', { position: 'absolute', left: '8px', top: '24px', width: '6px', height: '6px', borderRadius: '50%', background: '#36D2FF' }));
-  card.addEventListener('click', () => {
-    picked = { title: c.title.replace(/ \n/g, '\n'), views: c.views, left: leftOf(c) };
-    window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 37, t: 'push' } }));
-  });
+  card.addEventListener('click', () => openWatch(c));
   return card;
 }
 
@@ -193,12 +212,20 @@ export function patchLiveV2(root, n) {
   olds.forEach((o) => (o.style.display = 'none'));
   const nav = root.querySelector('[data-figma="bottom_navigation"]');
   const navTop = nav ? parseFloat(nav.style.top || getComputedStyle(nav).top) || 760 : 760;
-  const box = el('div', { position: 'absolute', left: '0', top: top + 'px', width: '390px', height: Math.max(120, navTop - top) + 'px', overflowY: 'auto', overflowX: 'hidden', zIndex: '2' });
+  // 화면 스크롤(live.js scrollerOf)이 있는 화면(10, 48~52)은 목록을 따로 스크롤하지 않고 카드 높이만큼 길게 깔아서,
+  // 위 가로 카드와 탭과 목록이 한 장으로 같이 올라간다(피그마 2100:23638 목록 칸 1476 높이, iOS LiveView FigmaScroll과 같은 동작).
+  // 11/10 메모 "지금 라이브 부분 스크롤이 이상해요(전체 탭만)": 목록 안 스크롤과 화면 스크롤이 따로 놀아 화면 스크롤이 위쪽만 64 올리고
+  // 목록은 제자리에 남아 탭 아래 빈 띠가 생겼다. 전체 탭은 카드가 12장이라 목록 안 스크롤이 길어 이 어긋남이 늘 보였다.
+  const pageScroll = LIVE.scrollScreens.includes(n);
+  const box = el('div', pageScroll
+    ? { position: 'absolute', left: '0', top: top + 'px', width: '390px', zIndex: '2' }
+    : { position: 'absolute', left: '0', top: top + 'px', width: '390px', height: Math.max(120, navTop - top) + 'px', overflowY: 'auto', overflowX: 'hidden', zIndex: '2' });
   box.className = 'lv2-scroll';
   box.dataset.figma = '라이브 목록';
-  // 화면 전체 끌기와 휠 처리(live.js)가 목록 스크롤을 막지 않게, 목록 안에서 난 입력은 위로 올려 보내지 않는다.
-  ['wheel', 'pointerdown', 'touchstart', 'touchmove'].forEach((ev) => box.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
-  const col = el('div', { display: 'flex', flexDirection: 'column', gap: '12px', padding: '0 24px 24px 24px' });
+  // 화면 스크롤이 없는 화면만 목록 안 스크롤을 쓴다. 이때는 화면 전체 끌기와 휠 처리(live.js)가 목록 스크롤을 막지 않게 입력을 위로 올려 보내지 않는다.
+  if (!pageScroll) ['wheel', 'pointerdown', 'touchstart', 'touchmove'].forEach((ev) => box.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
+  // 맨 끝 여백은 화면 스크롤 쪽(LIVE.scrollPad 24)이 둔다. 마지막 카드 아래가 아래 탭 윗선에서 24 떨어진다(iOS와 같은 값).
+  const col = el('div', { display: 'flex', flexDirection: 'column', gap: '12px', padding: pageScroll ? '0 24px' : '0 24px 24px 24px' });
   const cards = list.map((c) => cardOf(c));
   orderList(list, currentMode()).forEach((x) => col.appendChild(cards[x.i]));
   box.appendChild(col);
@@ -206,7 +233,7 @@ export function patchLiveV2(root, n) {
   root.__lv2Sort = (mode, animate) => {
     const before = new Map(cards.map((k) => [k, k.offsetTop]));
     orderList(list, mode).forEach((x) => col.appendChild(cards[x.i]));
-    box.scrollTop = 0;
+    if (!pageScroll) box.scrollTop = 0;
     if (!animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     cards.forEach((k) => {
       const dy = before.get(k) - k.offsetTop;
@@ -220,6 +247,13 @@ export function patchLiveV2(root, n) {
   layer.querySelectorAll('[data-hotspot]').forEach((h) => {
     const y = parseFloat(h.style.top), x = parseFloat(h.style.left), w = parseFloat(h.style.width);
     if (y >= top - 2 && Math.abs(x - 24) < 2 && Math.abs(w - 342) < 2) h.style.display = 'none';
+    // 위 가로 카드 두 장(피그마 Carousel / 1, 2). 누르면 그 카드 값으로 방 구경에 들어간다. 첫 장은 사진보정 이야기, 둘째 장은 쌍밍아웃 이야기다.
+    // 화면 이동은 원래 누름 자리(flow.js "라이브 방 구경")가 하고, 여기서는 그보다 먼저 카드와 이야기 값만 정한다.
+    const feat = Math.abs(y - 128) < 2 && Math.abs(w - 318) < 2 ? FEATURED[Math.abs(x - 24) < 2 ? 0 : Math.abs(x - 354) < 2 ? 1 : -1] : null;
+    if (feat && !h.dataset.lv2Pick) {
+      h.dataset.lv2Pick = '1';
+      h.addEventListener('click', () => pickWatch(feat), true);
+    }
   });
 }
 

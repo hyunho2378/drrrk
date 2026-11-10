@@ -45,16 +45,16 @@ struct RoomView: View {
     @State private var emojiOpen = false
     @State private var flying: [FlyingEmoji] = []
     @State private var lastMinute = false
-    @State private var drag: (id: String, asset: String, at: CGPoint)?
-    @State private var overTable = false
+    /// 끌고 있는 주전부리. 손을 떼거나 화면이 바뀌어 끌기가 취소되면 저절로 비워진다(예전 @State는 취소되면 남아 끄는 그림과 테이블 빛이 멈춰 있었다).
+    @GestureState private var drag: SnackDrag?
     @Namespace private var dockSpace
 
     var body: some View {
         GeometryReader { geo in
             let map = SceneMap(size: geo.size)
             ZStack(alignment: .topLeading) {
-                // 피그마 1979:27516 "image 1208091463"(해시 eadc5541)을 3배로 받은 장면
-                Image("E-room-scene-new")
+                // 이야기별 장면: 쌍밍아웃은 room-scene(2096:22172), 사진보정은 E-room-scene-new(2100:24130과 같은 그림)
+                Image(model.content.scene)
                     .resizable()
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
@@ -101,6 +101,9 @@ struct RoomView: View {
             guard !Task.isCancelled else { return }
             withAnimation(DS.Motion.emphasizedDecel) { model.stage = 1 }
         }
+        .onChange(of: drag?.over ?? false) { _, over in
+            if over { UISelectionFeedbackGenerator().selectionChanged() }
+        }
         .toolbar(.hidden, for: .navigationBar)
     }
 
@@ -108,7 +111,8 @@ struct RoomView: View {
 
     @ViewBuilder
     private func sceneLayer(_ map: SceneMap) -> some View {
-        let table = map.rect(RoomModel.tableDrop)
+        let table = map.rect(model.dropRect)
+        let overTable = drag?.over ?? false
         Ellipse()
             .fill(DS.Palette.success.opacity(0.16))
             .overlay(Ellipse().strokeBorder(DS.Palette.success, lineWidth: 2))
@@ -154,12 +158,15 @@ struct RoomView: View {
             TopicBanner(model: model)
                 .padding(.horizontal, 24)
                 .padding(.top, 5)
-            HStack {
-                Spacer()
-                dock(map)
-            }
-            .padding(.trailing, 24)
-            .padding(.top, 28)
+                // 퀵슬롯은 고민 배너 아래 28에 붙어 배너를 펼치면 함께 내려간다(피그마 접힘 y 192, 펼침 2096:22269와 2100:24227 y 296).
+                // 세로 줄의 자리는 차지하지 않는다. 예전에는 세로 줄 안에 있어 배너를 펼치면 퀵슬롯이 채팅과 입력줄을 밀어내 화면 밖으로 넘치며 겹쳤다.
+                // 이름표 줄(장면 위)은 그대로 있고, 퀵슬롯은 채팅보다 위에 그린다(피그마 순서: 장면, 이름표, 채팅, 배너, 퀵슬롯).
+                .overlay(alignment: .bottomTrailing) {
+                    dock(map)
+                        .padding(.trailing, 24)
+                        .alignmentGuide(.bottom) { d in d[.top] - 28 }
+                }
+                .zIndex(1)
             Spacer(minLength: 0)
             ChatColumn(model: model)
                 .padding(.horizontal, 24)
@@ -196,11 +203,20 @@ struct RoomView: View {
                 .accessibilityLabel("퀵슬롯 접기")
                 .padding(.bottom, 2)
 
-                ForEach(model.snacks) { snack in
-                    SnackSlot(snack: snack)
-                        .matchedGeometryEffect(id: snack.id, in: dockSpace, isSource: model.dockOpen)
-                        .gesture(throwGesture(snack, map))
-                        .accessibilityLabel(snack.name)
+                // 쿨타임 동안만 시계를 돌려 덮개를 줄이고, 끝나는 시각이 지나면 칸이 다시 살아난다.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: model.coolingID == nil)) { ctx in
+                    let cooling = model.isCooling(at: ctx.date)
+                    VStack(spacing: 6) {
+                        ForEach(model.snacks) { snack in
+                            let mine = cooling && model.coolingID == snack.id
+                            SnackSlot(snack: snack, selected: mine, cooldown: mine ? model.cooldownLeft(at: ctx.date) : 0)
+                                .opacity(drag?.id == snack.id ? 0.45 : 1)
+                                .matchedGeometryEffect(id: snack.id, in: dockSpace, isSource: model.dockOpen)
+                                .onTapGesture { tapSlot(snack) }
+                                .gesture(throwGesture(snack, map))
+                                .accessibilityLabel(snack.name)
+                        }
+                    }
                 }
             }
             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.9, anchor: .top)), removal: .opacity))
@@ -216,30 +232,31 @@ struct RoomView: View {
         }
     }
 
+    /// 칸을 끌지 않고 누르기만 하면 웹과 같은 안내를 띄운다(웹 tokens.js live.throwHintText, throwEmptyText).
+    private func tapSlot(_ snack: RoomModel.Snack) {
+        if snack.count == 0 {
+            RoomToastCenter.shared.show("남은 주전부리가 없어요")
+        } else if !model.isCooling() {
+            RoomToastCenter.shared.show("가운데 테이블로 끌어서 던져요")
+        }
+    }
+
     private func throwGesture(_ snack: RoomModel.Snack, _ map: SceneMap) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .named("room"))
-            .onChanged { v in
+            .updating($drag) { v, state, _ in
+                // 개수가 0이거나 쉬는 중이면 끌리지 않는다.
                 guard model.canThrow(snack) else { return }
-                if drag == nil {
+                if state == nil {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
-                drag = (snack.id, snack.asset, v.location)
-                let inside = map.rect(RoomModel.tableDrop).contains(v.location)
-                if inside != overTable {
-                    overTable = inside
-                    if inside {
-                        UISelectionFeedbackGenerator().selectionChanged()
-                    }
-                }
+                state = SnackDrag(id: snack.id, asset: snack.asset, at: v.location, over: map.rect(model.dropRect).contains(v.location))
             }
             .onEnded { v in
-                let inside = map.rect(RoomModel.tableDrop).contains(v.location)
-                drag = nil
-                overTable = false
-                guard inside else { return }
+                guard model.canThrow(snack), map.rect(model.dropRect).contains(v.location) else { return }
                 withAnimation(DS.Motion.decel(0.62)) {
                     if let item = model.throwSnack(snack.id) {
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        RoomToastCenter.shared.show("주전부리를 테이블에 올렸어요")
                         Task {
                             // 서서히 사라지는 움직임은 LandedSnack이 맡고, 다 사라진 뒤 목록에서만 지운다.
                             try? await Task.sleep(for: .seconds(LandedSnack.stay))
@@ -272,7 +289,8 @@ struct RoomView: View {
                 }
             }
             if left <= 0 {
-                router.push(.roomMorning)
+                // 해가 뜨면 종료 리포트(피그마 2096:22857, 2100:24606)로 간다. 웹 flow.js AUTO 35와 같다.
+                router.push(.roomEnd)
                 return
             }
             try? await Task.sleep(for: .seconds(0.25))
@@ -286,6 +304,14 @@ struct RoomView: View {
             try? await Task.sleep(for: .seconds(.random(in: 2.2 ... 4.6)))
         }
     }
+}
+
+/// 끌고 있는 주전부리(손가락 자리와 테이블 위인지)
+struct SnackDrag: Equatable {
+    let id: String
+    let asset: String
+    let at: CGPoint
+    let over: Bool
 }
 
 // MARK: - 부품
@@ -604,10 +630,20 @@ struct RoomInputBar: View {
             Button {
                 withAnimation(emojiOpen ? DS.Motion.emphasizedAccel : DS.Motion.decel(0.42)) { emojiOpen.toggle() }
             } label: {
-                Image("icon-plus").renderingMode(.template).foregroundStyle(DS.Palette.textPrimary)
-                    .rotationEffect(.degrees(emojiOpen ? 45 : 0))
-                    .frame(width: 48, height: 48)
-                    .background(.black, in: Circle())
+                // 피그마 btn_더보기: 닫힘은 검정 원에 #F8F8F8 플러스, 열림(속성 1=닫기, 2096:22594)은 #F8F8F8 원에 검정 X 24
+                ZStack {
+                    Circle().fill(.black)
+                    Circle().fill(DS.Palette.textPrimary).opacity(emojiOpen ? 1 : 0)
+                    Image("icon-plus").renderingMode(.template).foregroundStyle(DS.Palette.textPrimary)
+                        .rotationEffect(.degrees(emojiOpen ? 90 : 0))
+                        .opacity(emojiOpen ? 0 : 1)
+                    Image("C-close").renderingMode(.template).resizable()
+                        .foregroundStyle(.black)
+                        .frame(width: 24, height: 24)
+                        .rotationEffect(.degrees(emojiOpen ? 0 : -90))
+                        .opacity(emojiOpen ? 1 : 0)
+                }
+                .frame(width: 48, height: 48)
             }
             .buttonStyle(PressStyle())
             .accessibilityLabel(emojiOpen ? "이모지 닫기" : "이모지 열기")
@@ -696,7 +732,8 @@ struct RoomToastLayer: View {
     RoomView().environment(Router())
 }
 
-// MARK: - 이모지 메뉴(피그마 "플러스 메뉴 · 이모지" 62 x 230, 검정 알약, 칸 48, 간격 8)
+// MARK: - 이모지 메뉴(피그마 2096:22600 "플러스 메뉴 · 이모지" 62 x 230: 검정 바탕, #222628 1 안쪽 선, 모서리 30, 안쪽 7,
+// 칸 48 원 #222628 투명도 80%, 사이 8, 얼굴 24. 고른 칸은 투명도 100%에 초록 #2EE59D 2 안쪽 선.)
 
 struct FlyingEmoji: Identifiable {
     let id = UUID()
@@ -705,29 +742,51 @@ struct FlyingEmoji: Identifiable {
 
 struct EmojiMenu: View {
     let onPick: (String) -> Void
-    static let items = ["B-emoji-laugh", "B-emoji-pat", "B-emoji-cheer", "B-emoji-agree"]
+    /// 피그마 칸 이름과 얼굴 컴포넌트 순서 그대로(웃김 sob, 토닥 laugh, 응원 angry, 공감 thinking)
+    static let items: [(asset: String, label: String)] = [
+        ("Q-emoji-sob", "웃김"),
+        ("Q-emoji-laugh", "토닥"),
+        ("Q-emoji-angry", "응원"),
+        ("Q-emoji-thinking", "공감"),
+    ]
     @State private var shown = false
+    @State private var picked: String?
     var body: some View {
         VStack(spacing: 8) {
-            ForEach(Array(Self.items.enumerated()), id: \.offset) { i, asset in
-                Button { onPick(asset) } label: {
-                    Image(asset).resizable().scaledToFit()
+            ForEach(Array(Self.items.enumerated()), id: \.offset) { i, item in
+                let on = picked == item.asset
+                Button { pick(item.asset) } label: {
+                    Image(item.asset).resizable().scaledToFit()
                         .frame(width: 24, height: 24)
                         .frame(width: 48, height: 48)
                         .background(DS.Palette.bgElevated, in: Circle())
+                        .overlay(Circle().strokeBorder(DS.Palette.success, lineWidth: 2).opacity(on ? 1 : 0))
+                        .opacity(on ? 1 : 0.8)
+                        .animation(DS.Motion.stateIn, value: on)
                 }
                 .buttonStyle(PressStyle())
+                .disabled(picked != nil)
                 .opacity(shown ? 1 : 0)
                 .offset(y: shown ? 0 : 14)
                 .scaleEffect(shown ? 1 : 0.9)
                 // 아래 칸부터 60ms 간격으로 올라온다.
                 .animation(DS.Motion.decel(0.34).delay(0.08 + Double(Self.items.count - 1 - i) * 0.06), value: shown)
-                .accessibilityLabel(["웃김", "토닥", "응원", "공감"][i])
+                .accessibilityLabel(item.label)
             }
         }
-        .padding(6)
-        .background(.black, in: Capsule())
+        .padding(7)
+        .background(.black, in: RoundedRectangle(cornerRadius: 30))
+        .overlay(RoundedRectangle(cornerRadius: 30).strokeBorder(DS.Palette.bgElevated, lineWidth: 1))
         .onAppear { shown = true }
+    }
+
+    /// 고른 칸에 선택 표시가 잠깐 보인 뒤 얼굴이 날아가고 메뉴가 닫힌다.
+    private func pick(_ asset: String) {
+        picked = asset
+        Task {
+            try? await Task.sleep(for: .seconds(0.16))
+            onPick(asset)
+        }
     }
 }
 
@@ -766,15 +825,16 @@ struct SystemLine: View {
 }
 
 /// 혼자 방 퀵슬롯(피그마 1647:25199 접힘, 1647:24874 펼침). 펼치면 칸마다 남은 개수가 붙고,
-/// 칸을 누르면 그 주전부리가 장면 속 테이블로 떨어진 뒤 3초 쿨타임 동안 하늘색 테두리와 어두운 덮개가 줄어든다.
+/// 칸을 누르면 그 주전부리가 장면 속 테이블로 떨어진 뒤 3초(RoomModel.throwCooldownSeconds) 동안 하늘색 테두리와 어두운 덮개가 줄어든다.
+/// 쉬는 상태는 모델(coolingID, coolingUntil)에 있어 퀵슬롯을 접었다 펴도 이어지고, 끝나는 시각이 지나면 개수가 남은 칸은 반드시 다시 눌린다.
 struct SoloQuickSlot: View {
     @Bindable var model: RoomModel
     let onThrow: (RoomModel.Snack) -> Void
-    @State private var cooling: String?
-    @State private var cooldown: Double = 0
     @Namespace private var ns
 
-    static let cooldownSeconds: Double = 3
+    static var cooldownSeconds: Double {
+        RoomModel.throwCooldownSeconds
+    }
 
     var body: some View {
         if model.dockOpen {
@@ -787,14 +847,20 @@ struct SoloQuickSlot: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("퀵슬롯 접기")
                 .padding(.bottom, 2)
-                ForEach(model.snacks) { snack in
-                    Button { tap(snack) } label: {
-                        SnackSlot(snack: snack, showCount: true, selected: cooling == snack.id, cooldown: cooling == snack.id ? cooldown : 0)
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: model.coolingID == nil)) { ctx in
+                    let cooling = model.isCooling(at: ctx.date)
+                    VStack(spacing: 6) {
+                        ForEach(model.snacks) { snack in
+                            let mine = cooling && model.coolingID == snack.id
+                            Button { tap(snack) } label: {
+                                SnackSlot(snack: snack, showCount: true, selected: mine, cooldown: mine ? model.cooldownLeft(at: ctx.date) : 0)
+                            }
+                            .buttonStyle(RoomPressStyle())
+                            .disabled(snack.count == 0 || cooling)
+                            .matchedGeometryEffect(id: snack.id, in: ns, isSource: model.dockOpen)
+                            .accessibilityLabel("\(snack.name) \(snack.count)개")
+                        }
                     }
-                    .buttonStyle(RoomPressStyle())
-                    .disabled(snack.count == 0 || cooling != nil)
-                    .matchedGeometryEffect(id: snack.id, in: ns, isSource: model.dockOpen)
-                    .accessibilityLabel("\(snack.name) \(snack.count)개")
                 }
             }
             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.9, anchor: .top)), removal: .opacity))
@@ -811,14 +877,8 @@ struct SoloQuickSlot: View {
     }
 
     private func tap(_ snack: RoomModel.Snack) {
-        guard cooling == nil, snack.count > 0 else { return }
+        guard model.canThrow(snack) else { return }
+        // 던지기와 쉬는 시간 시작은 model.throwSnack 한 곳에서 한다.
         onThrow(snack)
-        cooling = snack.id
-        cooldown = 1
-        withAnimation(.linear(duration: Self.cooldownSeconds)) { cooldown = 0 }
-        Task {
-            try? await Task.sleep(for: .seconds(Self.cooldownSeconds))
-            withAnimation(DS.Motion.stateIn) { cooling = nil }
-        }
     }
 }

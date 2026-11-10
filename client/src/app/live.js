@@ -24,6 +24,7 @@ import { fixWraps } from './wrapFix.js';
 import { patchSolo } from './solo.js';
 import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
+import { patchReportStory } from './reportPatch.js';
 
 export { setText };
 
@@ -44,6 +45,15 @@ export function resolveTo(l) {
   if (l.act === 'commit' && !commitDraft()) {
     window.dispatchEvent(new Event('drrrk:chair-locked'));
     return null;
+  }
+  // 방에 어디서 들어왔는지 적어 둔다. 라이브 방 구경에서 앉아 들어온 방은 나가면 라이브 목록으로 돌아간다(11/10 수정사항: 라이브 흐름).
+  if (l.to === 29 && (l.from === 37 || l.from === 27 || l.from === 42)) {
+    try { sessionStorage.setItem('drrrk-room-from', l.from === 37 ? 'live' : 'home'); } catch (e) { /* 기본값 home */ }
+  }
+  if (l.t === 'back' && l.to === 25 && [28, 29, 30, 31, 32].includes(l.from)) {
+    let origin = 'home';
+    try { origin = sessionStorage.getItem('drrrk-room-from') || 'home'; } catch (e) { /* 기본값 home */ }
+    if (origin === 'live') return Object.assign({}, l, { to: 10 });
   }
   if (l.to === 20) openStudio(l.act === 'fresh');
   if (l.item) pickItem(l.item, l.from);
@@ -725,16 +735,18 @@ export async function prepare(layer, n, prevN) {
   attachThrow(root);
   attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachSort(root, n, true);
+  // 라이브 목록(liveV2.js)을 먼저 깔아야 화면 스크롤(attachDrag)이 새 카드 목록 끝까지 잰다(11/10 전체 탭 스크롤 수정).
+  patchLiveV2(root, n);
   attachDrag(layer, root, n);
   prepLoveDot(root, n);
   fixIcons(root);
   patchLounge(root, n);
-  patchLiveV2(root, n);
   patchWatchSeats(root, n);
   if ([19, 36, 53, 54].includes(n)) patchMyChair(root);
   attachPost(root);
   patchPill(root, n);
   patchReport(root, n);
+  patchReportStory(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
   if (n === LIVE.itemScreen) await fillItem(root);
   await patchSkinPopup(root, n);
@@ -769,12 +781,12 @@ export function attach(layer, n, go, prevN) {
   attachInputs(root, n, go);
   attachTaps(root, n, go, prevN);
   attachSort(root, n, false);
+  patchLiveV2(root, n);
   attachDrag(layer, root, n);
   attachLoveDot(root, n);
   attachPost(root);
   fixIcons(root);
   patchLounge(root, n);
-  patchLiveV2(root, n);
   patchWatchSeats(root, n);
   patchCommunity(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }

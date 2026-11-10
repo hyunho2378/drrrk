@@ -1,6 +1,14 @@
 import SwiftUI
 
-// 커뮤니티 목록(피그마 1953:19406)과 글 상세(1953:12298, 댓글 포함). 프로필 사진은 사람마다 다른 의자(Avatars)다.
+// 커뮤니티 목록(피그마 1953:19406)과 글 상세(v5 2100:23295, 댓글 모음 2100:23497). 프로필 사진은 사람마다 다른 의자(Avatars)다.
+// 11. 10. 팀 메모 반영(웹 CommunityPost.jsx와 같은 값):
+//  상단 바는 뒤로가기만(공유는 아래 액션줄에만, 2100:23637). 액션줄은 좋아요 24와 숫자 16, 공유 24와 "공유" 16이고 댓글 수는 뺐다(2100:23633, Actions 2100:23321).
+//  댓글마다 의자 프로필(2100:23632). 대화 다시보기 카드는 모양만 맞추고 누른 뒤 화면은 만들지 않는다(2100:23495, 2100:23496).
+
+extension CommunityData {
+    /// 목록에서 연 글 제목. 글 상세 제목에 쓴다(웹 community.js pickedPostTitle과 같은 규칙). 기본은 사진보정 글이고 본문과 댓글은 같다.
+    nonisolated(unsafe) static var openedTitle = WatchPick.photoTitle
+}
 
 struct CommunityView: View {
     @Environment(Router.self) private var router
@@ -33,7 +41,10 @@ struct CommunityView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 22)
-                    FeaturedCarousel(items: featured, page: $page) { router.push(.communityDetail) }
+                    FeaturedCarousel(items: featured, page: $page) {
+                        CommunityData.openedTitle = featured[min(page, featured.count - 1)].title
+                        router.push(.communityDetail)
+                    }
                         .padding(.top, 18)
                     PageDots(count: 5, index: page).frame(maxWidth: .infinity).padding(.top, 12)
                     CategoryTabs(selected: $category, showDot: !loveDots.communityLoveSeen).padding(.top, 18)
@@ -49,7 +60,10 @@ struct CommunityView: View {
                     .padding(.top, 24)
                     VStack(spacing: 12) {
                         ForEach(posts) { post in
-                            Button { router.push(.communityDetail) } label: { PostCard(post: post) }
+                            Button {
+                                CommunityData.openedTitle = post.title
+                                router.push(.communityDetail)
+                            } label: { PostCard(post: post) }
                                 .buttonStyle(PressStyle())
                         }
                     }
@@ -122,6 +136,8 @@ struct CommunityDetailView: View {
     @State private var likedComments: Set<UUID> = []
     @State private var comments = CommunityData.comments
     @State private var draft = ""
+    @State private var title = CommunityData.openedTitle
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var typing: Bool
 
     private let likes = 48
@@ -137,12 +153,6 @@ struct CommunityDetailView: View {
                 .buttonStyle(PressStyle())
                 .accessibilityLabel("뒤로")
                 Spacer()
-                ShareLink(item: "둘이 찍은 사진인데 지만 보정해서 올린 여우") {
-                    Image("C-share").renderingMode(.template).resizable().frame(width: 24, height: 24)
-                        .foregroundStyle(DS.Palette.textPrimary).frame(width: 44, height: 44)
-                }
-                .buttonStyle(PressStyle())
-                .accessibilityLabel("공유")
             }
             .padding(.horizontal, 14)
             .frame(height: 56)
@@ -186,7 +196,7 @@ struct CommunityDetailView: View {
                 Text(CommunityData.detailAuthor).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
                 Text("· 방금").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
             }
-            Text("둘이 찍은 사진인데\n지만 보정해서 올린 여우").suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary)
+            Text(title).suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary)
                 .padding(.top, 16)
             Text(CommunityData.detailBody).suit(15, .regular, lineHeight: 24).foregroundStyle(Color(hex: 0xD9DBDE))
                 .padding(.top, 12)
@@ -221,39 +231,41 @@ struct CommunityDetailView: View {
             .background(Color(hex: 0x1F2226))
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .padding(.top, 24)
-            HStack(spacing: 6) {
+            // 피그마 Actions 2100:23321: 342 x 36. 좋아요(채운 엄지 24, 사이 8, 숫자 16 Bold 자간 -4%), 오른쪽 공유(아이콘 24, 사이 4, "공유" 16 Bold 자간 -4%). 색 #9AA1A6, 누르면 #36D2FF.
+            HStack(spacing: 0) {
                 Button {
                     withAnimation(DS.Motion.stateIn) { liked.toggle() }
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 } label: {
-                    HStack(spacing: 6) {
-                        Image(liked ? "C-thumb-up" : "C-thumb-up-outline").renderingMode(.template).resizable().frame(width: 16, height: 16)
-                        Text("\(likes + (liked ? 1 : 0))").suit(12, .bold, tracking: -0.48).contentTransition(.numericText())
+                    HStack(spacing: 8) {
+                        Image("C-thumb-up").renderingMode(.template).resizable().frame(width: 24, height: 24)
+                            // 웹과 같은 튀는 움직임: 360ms 동안 1.38배, -14도까지 갔다가 돌아온다(40% 지점이 꼭대기).
+                            // 줄인 움직임을 켠 사람에게는 trigger가 바뀌지 않아 튀지 않는다(숫자와 색만 바뀐다).
+                            .keyframeAnimator(initialValue: 1.0, trigger: reduceMotion ? false : liked) { view, k in
+                                view.scaleEffect(k).rotationEffect(.degrees((k - 1) / 0.38 * -14))
+                            } keyframes: { _ in
+                                CubicKeyframe(1.38, duration: 0.144)
+                                CubicKeyframe(1.0, duration: 0.216)
+                            }
+                        Text("\(likes + (liked ? 1 : 0))").suit(16, .bold, tracking: -0.64).contentTransition(.numericText())
                     }
                     .foregroundStyle(liked ? DS.Palette.brandPrimary : DS.Palette.textSecondary)
                     .frame(minHeight: 44)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(PressStyle())
-                .accessibilityLabel(liked ? "공감 취소" : "공감")
-                // 댓글 수를 누르면 아래 댓글 입력칸에 바로 커서가 간다(같은 화면).
-                Button { typing = true } label: {
-                    HStack(spacing: 6) {
-                        Image("C-comment").renderingMode(.template).resizable().frame(width: 16, height: 16).padding(.leading, 2)
-                        Text("댓글 \(comments.count + 16)").suit(12, .bold, tracking: -0.48)
-                    }
-                    .frame(minHeight: 36)
-                }
-                .buttonStyle(PressStyle())
-                .accessibilityLabel("댓글 달기")
+                .accessibilityLabel(liked ? "좋아요 취소" : "좋아요")
                 Spacer()
-                ShareLink(item: "둘이 찍은 사진인데 지만 보정해서 올린 여우") {
-                    HStack(spacing: 6) {
-                        Image("C-share").renderingMode(.template).resizable().frame(width: 16, height: 16)
-                        Text("공유").suit(12, .bold, tracking: -0.48)
+                ShareLink(item: title.replacingOccurrences(of: "\n", with: " ")) {
+                    HStack(spacing: 4) {
+                        Image("C-share").renderingMode(.template).resizable().frame(width: 24, height: 24)
+                        Text("공유").suit(16, .bold, tracking: -0.64)
                     }
-                    .frame(minHeight: 36)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(PressStyle())
+                .accessibilityLabel("공유")
             }
             .foregroundStyle(DS.Palette.textSecondary)
             .frame(height: 36)

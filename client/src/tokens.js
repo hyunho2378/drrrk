@@ -70,7 +70,7 @@ export const live = {
   defaultLeft: 180,
   // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 남으면 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35).
   // C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
-  rooms: { A: [{ at: 60, to: 40 }, { at: 0, to: 2 }], B: [{ at: 0, to: 35 }] },
+  rooms: { A: [{ at: 60, to: 40 }, { at: 0, to: 1 }], B: [{ at: 0, to: 35 }] },
   // 입력칸으로 살릴 안내 글(이 글이 있는 칸만 실제로 쓸 수 있게 한다).
   inputHint: /한마디|댓글|메시지/,
   // 카드를 이만큼(px) 넘게 끌면 다음 카드로 넘긴다.
@@ -163,6 +163,8 @@ export const live = {
   throwTable: { x: 110, y: 440, w: 170, h: 190 },
   throwLand: { x: 150, y: 500, w: 90, h: 18 },
   throwStayMs: 6000,
+  // 던진 뒤 쿨타임(초). 던진 칸에 하늘색 2px 안쪽 선과 검정 60% 부채꼴 덮개가 이 시간 동안 줄어들고, 그동안 모든 칸은 눌리지 않는다(iOS RoomModel.throwCooldownSeconds와 같은 값).
+  throwCooldownSec: 3,
   // 테이블에 올라간 주전부리는 머무는 6초의 마지막 1.2초 동안 투명해지며 조금 작아진다(1 → 0.9).
   throwFadeMs: 1200,
   throwFadeScale: 0.9,

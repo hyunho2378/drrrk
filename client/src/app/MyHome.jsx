@@ -5,23 +5,26 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { BottomNavigation } from '../figma/components/BottomNavigation';
 import { getSaved, subscribe, big, KINDS } from './chairs.js';
-import { pickItem, itemFrom, pickedSlot } from './my.js';
+import { pickItem, itemFrom, pickedSlot, pickedName, chairGetSeen, markChairGetSeen, crossRatio, CHAIR_GET } from './my.js';
 import { cameFrom } from './lastScreen.js';
+import { ITEM_COPY, LOCKED_COPY, itemChips, keyOf } from './itemCopy.js';
+import { playItem } from './sfx.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const EASE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
 const A = (import.meta.env.BASE_URL || '/') + 'assets/my2/';
+const A3 = (import.meta.env.BASE_URL || '/') + 'assets/my3/';
 
+// key는 itemCopy.js의 아이템 키(시트 글과 소리)다. 끝의 두 칸은 잠긴 칸이라 누르면 미획득 시트(2116:28586)가 열린다.
 const ITEMS = [
-  { name: '새우깡', img: 's-shrimp', count: 3 },
-  { name: '마지막처럼', img: 's-soju', count: 2 },
-  { name: '오징어땅콩', img: 's-peanut', count: 1 },
-  { name: '노가리', img: 's-nogari', count: 4 },
-  { name: '드르라', img: 's-drrra', count: 2 },
-  { name: '오징어', img: 's-squid', count: 1 },
-  // 잠긴 두 칸도 나의 편의점(53, 피그마 MY2)에서는 보유 칸(몬스타 5개, 마지막처럼 1개)이라 상세에 그 개수를 쓴다.
-  { name: '몬스타', img: 's-monster', locked: true, count: 5 },
-  { name: '마지막처럼', img: 's-soju', locked: true, count: 1 },
+  { key: 'shrimp', name: '새우깡', img: 's-shrimp' },
+  { key: 'soju', name: '마지막처럼', img: 's-soju' },
+  { key: 'peanut', name: '오징어땅콩', img: 's-peanut' },
+  { key: 'nogari', name: '노가리', img: 's-nogari' },
+  { key: 'drrra', name: '드르라', img: 's-drrra' },
+  { key: 'squid', name: '오징어', img: 's-squid' },
+  { key: 'monster', name: '몬스타', img: 's-monster', locked: true },
+  { key: 'soju', name: '마지막처럼', img: 's-soju', locked: true },
 ];
 
 const CSS = `
@@ -29,10 +32,10 @@ const CSS = `
 .mh-btn{border:0;background:none;padding:0;margin:0;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;font-family:${FONT};transition:transform 120ms cubic-bezier(.2,0,0,1)}
 .mh-btn:active{transform:scale(.96)}
 .mh-btn:focus-visible{outline:2px solid #36D2FF;outline-offset:2px;border-radius:12px}
+.mh-hero{transition:transform 120ms cubic-bezier(.2,0,0,1),opacity 120ms cubic-bezier(.2,0,0,1)}
+.mh-hero:active{transform:scale(.97);opacity:.85;transition-duration:90ms}
 .mh-nav [data-figma="name=my, state=selected"]{position:absolute!important;left:312px!important;top:12px!important;margin:0!important}
 `;
-
-const DESC = '라이브에서 던지면 가운데 테이블 위에 바삭하게 올라가요.';
 
 // 마이 안의 화면(나의 편의점 53, 아이템 상세 54, 스킨 팝업 19, 의자 꾸미기 20)에서 돌아오면 엉따 막대를 다시 채우지 않는다.
 const INSIDE = [36, 53, 54, 19, 20];
@@ -51,11 +54,24 @@ function Title({ text }) {
   );
 }
 
-/// 아이템 상세 시트(iOS MyItemSheet와 같은 값): 높이 411, #121415, 위 모서리 24. 바깥을 누르면 마이로 돌아간다.
+/// 아이템 상세 시트(팀 피그마 "Section 1" 2116:28581 시트 9장, iOS MyItemSheet와 같은 값): 390 x 393(미획득 397), #121415, 위 모서리 24.
+// 위에서부터 손잡이(10, 40 x 4), 그림 칸(38, 132 x 132, 모서리 28, 흰 6%, 그림 112), 이름(186, Bold 20, 행간 28),
+// 설명(232, Regular 14, 행간 21, 자간 -4%, 가운데, 두 줄), 칩 줄(290, 칩 높이 27, 사이 8). 피그마 시트에 보유 개수 줄이 없어 뺐다.
+// 그림 칸을 누르면 그 아이템 소리가 난다(sfx.js playItem). 바깥을 누르면 마이로 돌아간다.
 // 시트는 처음부터 끝까지 불투명 단색이다. 올라올 때와 내려갈 때 모두 translateY로만 움직이고, 뒤 딤 덮개만 투명도로 나타나고 사라진다.
 // 화면 전환(페이드)이 시트를 반투명으로 섞지 않게 36과 54 사이는 전환 없이 바로 바꾸고, 시트가 스스로 올라오고 내려간다.
-function ItemSheet({ slot }) {
+function sheetKey(slot) {
+  if (itemFrom() === 53) return keyOf(pickedName());
   const it = ITEMS[slot] || ITEMS[0];
+  return it.locked ? 'locked' : it.key;
+}
+
+function ItemSheet({ slot }) {
+  const key = sheetKey(slot);
+  const locked = key === 'locked';
+  const copy = locked ? LOCKED_COPY : ITEM_COPY[key];
+  const chips = locked ? LOCKED_COPY.chips : itemChips();
+  const H = locked ? 397 : 393;
   const [y0, setY0] = useState(null);
   const [dy, setDy] = useState(0);
   const sheetRef = useRef(null);
@@ -126,18 +142,23 @@ function ItemSheet({ slot }) {
         onPointerDown={(e) => { if (up && !closing.current) setY0(e.clientY); }}
         onPointerMove={(e) => { if (y0 != null) setDy(Math.max(0, e.clientY - y0)); }}
         onPointerUp={() => { if (dy > 120) close(); else setDy(0); setY0(null); }}
-        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 411, background: '#121415', borderRadius: '24px 24px 0 0', zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 24px', boxSizing: 'border-box', transform: !up ? 'translateY(100%)' : 'translateY(' + dy + 'px)', touchAction: 'none' }}>
-        <span style={{ width: 40, height: 4, borderRadius: 2, background: '#6E767C', marginTop: 10 }} />
-        <span style={{ marginTop: 24, width: 132, height: 132, borderRadius: 28, background: 'rgba(255,255,255,.06)', display: 'grid', placeItems: 'center' }}>
-          <img alt="" src={A + it.img + '.png'} style={{ width: 112, height: 112, objectFit: 'contain' }} />
+        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: H, background: '#121415', borderRadius: '24px 24px 0 0', zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 24px 0', boxSizing: 'border-box', transform: !up ? 'translateY(100%)' : 'translateY(' + dy + 'px)', touchAction: 'none' }}>
+        <span data-figma="handle" style={{ width: 40, height: 4, borderRadius: 2, background: '#6E767C', flex: 'none' }} />
+        <button type="button" className="mh-btn mh-hero" data-figma="item hero" aria-label={locked ? '잠긴 아이템 소리 듣기' : copy.name + ' 소리 듣기'}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => playItem(key)}
+          style={{ marginTop: 24, width: 132, height: 132, borderRadius: 28, background: 'rgba(255,255,255,.06)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+          {locked
+            ? <img alt="" src={A3 + 'lock.svg'} style={{ width: 40, height: 40 }} />
+            : <img alt="" draggable={false} src={copy.img} style={{ width: 112, height: 112, objectFit: 'contain' }} />}
+        </button>
+        <span data-figma="item name" style={{ marginTop: 16, height: 28, fontSize: 20, fontWeight: 700, lineHeight: '28px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>{copy.name}</span>
+        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: locked ? 0 : '-0.56px', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
+        <span data-figma="정보 칩" style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+          {chips.map((c, i) => (
+            <span key={i} data-figma={i === 0 ? 'chip 쿨타임' : 'chip 라이브 전용'} style={{ padding: '5px 10px', borderRadius: 8, background: 'rgba(255,255,255,.08)', fontSize: locked ? 14 : 12, fontWeight: locked ? 400 : 500, lineHeight: locked ? '21px' : '17px', color: '#CCD1D6', whiteSpace: 'nowrap' }}>{c}</span>
+          ))}
         </span>
-        <span style={{ marginTop: 16, fontSize: 20, fontWeight: 700, lineHeight: '28px', color: '#F8F8F8' }}>{it.name}</span>
-        <span style={{ marginTop: 4, display: 'flex', gap: 4, fontSize: 13, lineHeight: '18px' }}>
-          <span style={{ fontWeight: 500, color: '#9AA1A6' }}>보유</span>
-          <span style={{ fontWeight: 700, color: '#36D2FF' }}>{it.count}개</span>
-        </span>
-        <span style={{ marginTop: 14, fontSize: 14, fontWeight: 400, lineHeight: '21px', color: '#CCD1D6', textAlign: 'center' }}>{DESC}</span>
-        <span style={{ marginTop: 16, height: 27, padding: '0 10px', borderRadius: 8, background: 'rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', fontSize: 12, fontWeight: 500, color: '#CCD1D6' }}>라이브 전용</span>
       </div>
     </>
   );
@@ -147,13 +168,48 @@ function ItemSheet({ slot }) {
 // 화면 함수(MyItem)를 이 파일에서 내보내면 화면 목록이 36번에도 MyItem을 골라 마이가 늘 시트가 열린 채로 떴다(11/09). 그래서 MyItem은 MyItem.jsx에 둔다.
 export const pickedItem = () => pickedSlot();
 
-export default function MyHome({ item }) {
+// 엉따 막대가 39도를 넘는 순간 의자 획득 장면(19)으로 넘어간다. 다른 화면에서 들어와 막대가 차오를 때만, 같은 세션에서 한 번만.
+// 19의 "나중에 할게요"는 마이로 돌아오고(19는 마이 안의 화면이라 막대가 다시 차오르지 않는다), "지금 앉아보기"는 의자 꾸미기(20)로 간다.
+function useChairGet(fillRef, on) {
+  useEffect(() => {
+    if (!on || chairGetSeen()) return undefined;
+    let raf = 0;
+    let done = false;
+    const fire = () => {
+      if (done) return;
+      done = true;
+      cancelAnimationFrame(raf);
+      window.clearTimeout(timer);
+      markChairGetSeen();
+      go(19, 'none');
+    };
+    // 실제 막대 길이(scaleX)를 매 프레임 읽어 39 / 39.2에 닿으면 넘어간다. 프레임을 못 받는 경우를 대비해 계산한 시각에도 넘어간다.
+    const watch = () => {
+      const el = fillRef.current;
+      if (el) {
+        const m = /matrix\(([^,]+)/.exec(getComputedStyle(el).transform);
+        const sx = m ? parseFloat(m[1]) : 1;
+        if (sx >= crossRatio() - 1e-4) { fire(); return; }
+      }
+      raf = requestAnimationFrame(watch);
+    };
+    const timer = window.setTimeout(fire, CHAIR_GET.crossMs + 120);
+    raf = requestAnimationFrame(watch);
+    return () => { done = true; cancelAnimationFrame(raf); window.clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
+export default function MyHome({ item, still }) {
   const saved = useSyncExternalStore(subscribe, getSaved, getSaved);
   const [chairOk, setChairOk] = useState(true);
   useEffect(() => setChairOk(true), [saved.k, saved.c]);
   const kind = KINDS[saved.k];
   // 엉따 막대는 다른 화면에서 마이로 들어올 때만 채운다. 마이 안의 화면에서 돌아오면 처음부터 최종 길이다.
-  const [fillGauge] = useState(() => !INSIDE.includes(cameFrom(item != null ? 54 : 36)));
+  // still: 획득 장면(19) 아래에 깔린 마이. 막대는 처음부터 최종 길이이고 획득 장면을 다시 부르지 않는다.
+  const [fillGauge] = useState(() => !still && !INSIDE.includes(cameFrom(item != null ? 54 : 36)));
+  const fillRef = useRef(null);
+  useChairGet(fillRef, fillGauge && item == null && !still);
   const step = (342 - 76) / 3;
   // 생성된 아래 탭은 마이 칸이 오른쪽 밖으로 밀리고 글자가 MY로 나온다. 피그마 자리(312, 12)와 글자 "마이"로 맞춘다.
   const navRef = useRef(null);
@@ -204,7 +260,7 @@ export default function MyHome({ item }) {
           </svg>
         </span>
         <div style={{ position: 'relative', marginTop: 12, width: 342, height: 6, borderRadius: 3, background: 'rgba(110,118,124,.4)', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', left: 0, top: 0, width: 244.8, height: 6, borderRadius: 3, background: 'linear-gradient(90deg,#36D2FF,#FF9A4D)', transformOrigin: '0 50%', animation: fillGauge ? `mhGauge 1000ms ${EASE} 200ms both` : undefined }} />
+          <div ref={fillRef} data-figma="gauge fill" style={{ position: 'absolute', left: 0, top: 0, width: 244.8, height: 6, borderRadius: 3, background: 'linear-gradient(90deg,#36D2FF,#FF9A4D)', transformOrigin: '0 50%', animation: fillGauge ? `mhGauge ${CHAIR_GET.fillMs}ms ${EASE} ${CHAIR_GET.delayMs}ms both` : undefined }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 40, marginTop: 12 }}>
           <img alt="" src={A + 'next.png'} style={{ width: 40, height: 40 }} />
@@ -230,8 +286,8 @@ export default function MyHome({ item }) {
       <div style={{ position: 'absolute', left: 24, top: 534, width: 342, height: 198 }}>
         {ITEMS.map((it, i) => (
           <button key={i} className="mh-btn" aria-label={it.locked ? '잠긴 칸' : it.name}
-            onClick={() => { if (it.locked) return; pickItem(it.name, 36, i); go(54, 'none'); }}
-            style={{ position: 'absolute', left: (i % 4) * step, top: Math.floor(i / 4) * 105, width: 76, height: 93, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, cursor: it.locked ? 'default' : 'pointer' }}>
+            onClick={() => { playItem(it.locked ? 'locked' : it.key); pickItem(it.locked ? '???' : it.name, 36, i); go(54, 'none'); }}
+            style={{ position: 'absolute', left: (i % 4) * step, top: Math.floor(i / 4) * 105, width: 76, height: 93, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <span style={{ position: 'relative', width: 72, height: 72, display: 'grid', placeItems: 'center' }}>
               <img alt="" src={A + it.img + '.png'} style={{ width: 68, height: 68, objectFit: 'contain', opacity: it.locked ? 0.35 : 1 }} />
               {it.locked && <img alt="" src={A + 'lock.png'} style={{ position: 'absolute', width: 24, height: 24 }} />}

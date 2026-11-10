@@ -26,6 +26,21 @@ if (typeof document !== 'undefined' && !window.__drrrkItemSlot) {
   }, true);
 }
 export const itemFrom = () => state.from;
+// 54가 열 아이템 이름(53에서 누른 칸의 이름표, 36에서 누른 칸의 이름)
+export const pickedName = () => state.item;
+
+// 마이 엉따 막대가 39도를 넘는 순간 의자 획득 장면(19)을 보여 주고, 같은 세션에서는 다시 보여 주지 않는다(11. 10. 메모).
+// 막대 전체 길이(244.8)가 지금 온도 39.2도라서, 채움 비율이 39 / 39.2에 닿는 순간이 39도를 넘는 순간이다.
+// 막대는 200ms 뒤 1000ms 동안 cubic-bezier(0.05, 0.7, 0.1, 1)로 차오르므로 그 비율에 닿는 시각은 시작 후 약 1011ms다(iOS도 같은 값).
+export const CHAIR_GET = { temp: 39, now: 39.2, key: 'drrrk:chairGetSeen', delayMs: 200, fillMs: 1000, crossMs: 1011 };
+export const crossRatio = () => CHAIR_GET.temp / CHAIR_GET.now;
+export function chairGetSeen() {
+  try { return window.sessionStorage.getItem(CHAIR_GET.key) === '1'; } catch (e) { return !!window.__drrrkChairGetSeen; }
+}
+export function markChairGetSeen() {
+  window.__drrrkChairGetSeen = true;
+  try { window.sessionStorage.setItem(CHAIR_GET.key, '1'); } catch (e) { /* 저장소를 못 쓰면 창 안 값만 쓴다 */ }
+}
 
 // 연애 카테고리를 한 번 열면 빨간 점이 사라진다.
 export function attachTabs(root, n) {

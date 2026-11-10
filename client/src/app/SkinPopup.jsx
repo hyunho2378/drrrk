@@ -1,9 +1,12 @@
 // 스킨 획득 팝업(19): 팀 피그마 "MY · 리디자인"(1972:22149) 값 그대로. iOS MySkinModal과 같다.
 // 새 마이(MyHome) 위에 짙은 덮개(#05080A 88%)를 깔고, 빛과 빛줄기, 소파 230, 반짝이 6개, 새로운 디자인 칩, 이름,
 // 36°~40° 막대(39°까지 차오름), 안내 글, 지금 앉아보기, 나중에 할게요 순서로 놓는다.
+// 11. 10. 메모 "마이에서 엉따 온도 올라가서 의자 획득하는 장면 나오게": 마이 엉따 막대가 39°를 넘는 순간 이 화면이 이어서 뜬다(MyHome useChairGet).
+// 피그마 의자 획득 장면 2100:28164와 같은 값이다. 한 번 뜨면 같은 세션에서는 마이에 다시 들어와도 뜨지 않는다.
 import React, { useEffect, useState } from 'react';
 import MyHome from './MyHome.jsx';
 import { big, openStudio } from './chairs.js';
+import { markChairGetSeen } from './my.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const EASE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
@@ -17,25 +20,27 @@ const CSS = `
 .sk-btn:focus-visible{outline:2px solid #F8F8F8;outline-offset:2px}
 `;
 
-function go(to, t) {
-  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t } }));
+function go(to, t, act) {
+  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t, act } }));
 }
 
 export default function SkinPopup() {
   const [shown, setShown] = useState(false);
   const [fill, setFill] = useState(0);
   useEffect(() => {
+    markChairGetSeen();
     const a = requestAnimationFrame(() => setShown(true));
     const b = window.setTimeout(() => setFill(1), 250);
     return () => { cancelAnimationFrame(a); window.clearTimeout(b); };
   }, []);
-  const sit = () => { openStudio(true); go(20, 'push'); };
+  // 화면 이동이 의자 꾸미기를 열 때 act가 'fresh'여야 지금 의자 대신 새로 얻은 푹신한 가죽 소파가 골라진 채로 열린다(live.js resolveTo).
+  const sit = () => { openStudio(true); go(20, 'push', 'fresh'); };
   const later = () => go(36, 'fade');
   const fade = (ms, d = 0) => ({ transition: `opacity ${ms}ms ${EASE} ${d}ms, transform ${ms}ms ${EASE} ${d}ms` });
   return (
     <div style={{ position: 'relative', width: 390, height: 844, overflow: 'hidden', fontFamily: FONT }}>
       <style>{CSS}</style>
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}><MyHome /></div>
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}><MyHome still /></div>
       <div onClick={later} style={{ position: 'absolute', inset: 0, background: 'rgba(5,8,10,.88)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', opacity: shown ? 1 : 0, ...fade(350) }} />
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: shown ? 1 : 0, ...fade(350) }}>
         <img alt="" src={BASE + 'D2-skin-glow.webp'} style={{ position: 'absolute', left: 5, top: 101, width: 380, height: 380 }} />

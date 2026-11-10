@@ -23,6 +23,8 @@ enum MyShelfData {
     static let squid = MyShelfItem(id: "squid", name: "오징어", asset: "D-snack-squid", count: 1, group: "안주")
     static let monster = MyShelfItem(id: "monster", name: "몬스타", asset: "D-snack-monster", count: 5, group: "음료", isNew: true)
     static let byeollo = MyShelfItem(id: "byeollo", name: "별로", asset: "D-snack-byeollo", count: 1, group: "음료")
+    /// 잠긴 칸을 누르면 여는 미획득 시트(피그마 2116:28586)
+    static let locked = MyShelfItem(id: "locked", name: "???", asset: "", count: 0, group: "")
 
     /// 마이 업적 편의점 격자(피그마 1972:22735 순서 그대로). 끝의 두 칸(몬스타, 마지막처럼)은 아직 잠긴 칸이다.
     static let main: [MyShelfItem] = [shrimp, soju, peanut, nogari, drrra, squid, monster, soju]
@@ -30,7 +32,15 @@ enum MyShelfData {
     // 나의 편의점 전체(8종 19개)
     static let all: [MyShelfItem] = [shrimp, soju, peanut, nogari, drrra, squid, monster, byeollo]
     static let filters = ["전체", "과자", "음료", "안주"]
-    static let itemDesc = "라이브에서 던지면 가운데 테이블 위에 바삭하게 올라가요."
+}
+
+/// 마이 엉따 막대가 39도를 넘는 순간 의자 획득 장면을 띄운다(11. 10. 메모 "마이에서 엉따 온도 올라가서 의자 획득하는 장면 나오게").
+/// 막대 전체 길이(244.8)가 지금 온도 39.2도라서 채움 비율이 39 / 39.2에 닿는 순간이 39도를 넘는 순간이다.
+/// 막대는 0.2초 뒤 1.0초 동안 timingCurve(0.05, 0.7, 0.1, 1)로 차오르므로 그 비율에 닿는 시각은 시작 후 약 1.011초다(웹 my.js CHAIR_GET과 같은 값).
+/// 앱이 켜져 있는 동안 한 번만 띄운다.
+enum MyChairGet {
+    static let crossSeconds = 1.011
+    @MainActor static var seen = false
 }
 
 enum MyOverlay: Equatable {
@@ -101,7 +111,7 @@ private struct MyHome: View {
                 BottomNav().frame(maxHeight: .infinity, alignment: .bottom)
             }
 
-            MySheet(isPresented: item != nil, height: 411, dim: 0.6, background: DS.Palette.bgSurface, onClose: closeItem) {
+            MySheet(isPresented: item != nil, height: item?.id == MyShelfData.locked.id ? 397 : 393, dim: 0.6, background: DS.Palette.bgSurface, onClose: closeItem) {
                 if let item {
                     MyItemSheet(item: item)
                 }
@@ -135,6 +145,15 @@ private struct MyHome: View {
             // 같은 화면이 남아 있어 gauge가 이미 1이므로 다시 비우거나 채우지 않는다.
             if gauge < 1 {
                 withAnimation(DS.Motion.decel(1.0).delay(0.2)) { gauge = 1 }
+                // 다른 화면에서 들어와 막대가 차오를 때만, 39도를 넘는 순간 의자 획득 장면으로 넘어간다.
+                if startOverlay == .none, startItem == nil, !MyChairGet.seen {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(MyChairGet.crossSeconds))
+                        guard !MyChairGet.seen, overlay == .none, item == nil else { return }
+                        MyChairGet.seen = true
+                        withAnimation(DS.Motion.decel(0.35)) { overlay = .skin }
+                    }
+                }
             }
         }
     }
@@ -275,11 +294,9 @@ private struct MyHome: View {
                 let it = items[i]
                 let locked = i >= MyShelfData.lockedFrom
                 Button {
-                    if locked {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    } else {
-                        open(it)
-                    }
+                    // 칸을 누르면 그 아이템 소리가 나고 상세 시트가 열린다. 잠긴 칸은 잠금 소리와 미획득 시트다.
+                    ItemSound.shared.play(locked ? "locked" : it.id)
+                    open(locked ? MyShelfData.locked : it)
                 } label: {
                     VStack(spacing: 4) {
                         ZStack {
@@ -542,32 +559,55 @@ private struct MyShelfSheet: View {
     }
 }
 
-/// 아이템 상세(피그마 54). 설명 문구는 던지는 곳이 가운데 테이블이라는 웹 문구, 쿨타임 칩은 쿨타임이 없어져 뺐다.
+/// 아이템 상세 시트(팀 피그마 "Section 1" 2116:28581 시트 9장, 웹 MyHome.jsx ItemSheet와 같은 값): 390 x 393(미획득 397).
+/// 손잡이(위 10, 40 x 4) 아래로 그림 칸(24 띄움, 132 x 132, 모서리 28, 흰 6%, 그림 112), 이름(16 띄움, Bold 20, 행간 28),
+/// 설명(18 띄움, Regular 14, 행간 21, 자간 -4%, 가운데, 두 줄), 칩 줄(16 띄움, 칩 높이 27, 사이 8). 피그마 시트에 보유 개수 줄이 없어 뺐다.
+/// 그림 칸을 누르면 그 아이템 소리가 난다.
 private struct MyItemSheet: View {
     let item: MyShelfItem
+
+    private var isLocked: Bool { item.id == MyShelfData.locked.id }
+    private var copy: ItemCopy { isLocked ? ItemCopyData.locked : ItemCopyData.copy(for: item.id) }
+    private var chips: [String] { isLocked ? ItemCopyData.lockedChips : ItemCopyData.chips }
+
     var body: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 24)
-            Image(item.asset).resizable().scaledToFit()
-                .frame(width: 112, height: 112)
-                .padding(10)
+            Button {
+                ItemSound.shared.play(isLocked ? "locked" : item.id)
+            } label: {
+                ZStack {
+                    if isLocked {
+                        Image("D-icon-lock").renderingMode(.template).resizable()
+                            .foregroundStyle(.white)
+                            .frame(width: 40, height: 40)
+                    } else {
+                        Image(item.asset).resizable().scaledToFit()
+                            .frame(width: 112, height: 112)
+                    }
+                }
+                .frame(width: 132, height: 132)
                 .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28))
-            Spacer().frame(height: 16)
-            Text(item.name).suit(20, .bold).foregroundStyle(DS.Palette.textPrimary).frame(height: 28)
-            Spacer().frame(height: 4)
-            HStack(spacing: 4) {
-                Text("보유").suit(13, .medium).foregroundStyle(DS.Palette.textSecondary)
-                Text("\(item.count)개").suit(13, .bold).foregroundStyle(DS.Palette.brandPrimary)
+                .contentShape(RoundedRectangle(cornerRadius: 28))
             }
-            .frame(height: 18)
-            Spacer().frame(height: 14)
-            Text(MyShelfData.itemDesc).suit(14, .regular, lineHeight: 21)
+            .buttonStyle(PressStyle())
+            .accessibilityLabel(isLocked ? "잠긴 아이템 소리 듣기" : "\(copy.name) 소리 듣기")
+            Spacer().frame(height: 16)
+            Text(copy.name).suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary).frame(height: 28)
+            Spacer().frame(height: 18)
+            Text(copy.text).suit(14, .regular, tracking: isLocked ? 0 : -0.56, lineHeight: 21)
                 .foregroundStyle(Color(hex: 0xCCD1D6))
                 .multilineTextAlignment(.center)
+                .fixedSize()
             Spacer().frame(height: 16)
-            Text("라이브 전용").suit(12, .medium).foregroundStyle(Color(hex: 0xCCD1D6))
-                .padding(.horizontal, 10).frame(height: 27)
-                .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+            HStack(spacing: 8) {
+                ForEach(chips.indices, id: \.self) { i in
+                    Text(chips[i]).suit(isLocked ? 14 : 12, isLocked ? .regular : .medium, lineHeight: isLocked ? 21 : 17)
+                        .foregroundStyle(Color(hex: 0xCCD1D6))
+                        .padding(.horizontal, 10).padding(.vertical, 5)
+                        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                }
+            }
         }
         .padding(.horizontal, 24)
         .id(item.id)
@@ -649,6 +689,7 @@ private struct MySkinModal: View {
         }
         .ignoresSafeArea()
         .onAppear {
+            MyChairGet.seen = true
             withAnimation(DS.Motion.decel(0.35)) { shown = true }
             withAnimation(DS.Motion.decel(0.9).delay(0.25)) { fill = 1 }
         }
