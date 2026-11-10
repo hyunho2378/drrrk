@@ -162,9 +162,14 @@ struct WatchLine: Identifiable, Hashable {
 }
 
 /// 방 구경 채팅이 라이브 방송처럼 계속 올라온다(11/10 팀원 피드백 "라이브-눌러서 라방 보듯이 할라면 계속 새 메시지가 올라오는 것 처럼 해야할듯").
+/// 화면이 처음 뜰 때 채팅 칸은 비어 있다(11. 10. 팀 요청 "처음에 시작했을 때 댓글 아무 것도 없다가 하나씩 생겨나는 느낌으로").
+/// 0.7초 뒤 첫 줄, 처음 4줄까지는 1.0초에서 1.8초 사이 간격, 그 뒤는 2.4초에서 4.2초 사이 간격.
 /// 웹 client/src/app/watchChat.js와 같은 값, 같은 글 순서, 같은 간격 수열이다.
 enum WatchFeed {
-    static let firstDelay: Double = 0.8
+    static let firstDelay: Double = 0.7
+    static let fastCount = 4
+    static let fastMinGap: Double = 1.0
+    static let fastMaxGap: Double = 1.8
     static let minGap: Double = 2.4
     static let maxGap: Double = 4.2
     static let seed: UInt32 = 1110
@@ -172,8 +177,13 @@ enum WatchFeed {
     /// 줄이 밀려 올라가고 나타나는 움직임 220ms, 표준 곡선
     static let motion = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.22)
 
-    static var initial: [WatchLine] {
-        WatchData.comments.map { WatchLine(name: $0.0, text: $0.1, mine: false) } + WatchData.myComments.map { WatchLine(name: "", text: $0, mine: true) }
+    /// 처음 칸은 비어 있다. 피그마 댓글 두 줄은 글 후보(lines) 끝에서 차례가 오면 나온다.
+    static var initial: [WatchLine] { [] }
+
+    /// 이미 올라온 줄 수(shown) 다음의 간격. 4번째 줄까지는 빠른 간격, 그 뒤는 보통 간격(웹 watchChat.js delay와 같다).
+    static func gap(after shown: Int, _ random: inout Random) -> Double {
+        let r = random.next()
+        return shown < fastCount ? fastMinGap + r * (fastMaxGap - fastMinGap) : minGap + r * (maxGap - minGap)
     }
 
     /// 글 후보: 지금 이야기 방 채팅 줄(들어온 직후와 무르익은 뒤의 다른 의자 줄), 다른 이야기 줄, 커뮤니티 글 상세 댓글, 방 구경 댓글 순서.

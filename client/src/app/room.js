@@ -7,7 +7,7 @@
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText, wait } from './dom.js';
 import { cloneOf } from './donor.js';
-import { bannerSpec } from './roomConcern.js';
+import { bannerSpec, styleBannerLine, styleBannerBody, fitStaticBanners } from './roomConcern.js';
 
 const BAR = '[data-figma="input/속성 14"]';
 
@@ -138,6 +138,8 @@ export function attachBanner(root) {
     const bp = [...col.querySelectorAll(':scope > p')].find((p) => p.textContent.trim() !== '고민');
     if (bp && bp.textContent !== line) { bp.dataset.sync = '1'; setText(bp, line); }
   }
+  // 접힌 한 줄 행간 140%(피그마 1884:11512). 함께 방과 혼자 방, 일반 모드, 시트 뒤 화면이 모두 같은 컴포넌트라 모두 맞춘다.
+  styleBannerLine([...col.querySelectorAll(':scope > p')].find((p) => p.textContent.trim() !== '고민'));
   if (col.dataset.live) return;
   col.dataset.live = 'banner';
   col.style.cursor = 'pointer';
@@ -145,8 +147,9 @@ export function attachBanner(root) {
   const radius = () => (parseFloat(getComputedStyle(col).borderTopLeftRadius) || 14) + 'px';
   // 배너가 펼쳐지면 그 아래 퀵슬롯(접힌 알약이나 열린 목록)이 펼쳐진 만큼 부드럽게 내려간다.
   const dockEls = () => q(root, ':scope > [data-figma="주전부리 퀵슬롯"], :scope > [data-figma="퀵슬롯 · 접힘"]');
-  const pushDock = (down, instant) => {
-    const dy = down ? LIVE.dockShift : 0;
+  // 내려가는 거리는 펼친 높이에서 접힌 높이를 뺀 값이다(배너 아래와 퀵슬롯 사이 28 유지). 144 배너는 104(피그마 2096:22269 192에서 296), 153 배너는 113.
+  const pushDock = (down, instant, shift) => {
+    const dy = down ? (shift || LIVE.dockShift) : 0;
     dockEls().forEach((d) => {
       d.style.transition = instant ? 'none' : 'transform ' + LIVE.bannerMs + 'ms ' + (down ? motion.emphasizedDecel : motion.emphasizedAccel);
       d.style.transform = 'translateY(' + dy + 'px)';
@@ -198,9 +201,12 @@ export function attachBanner(root) {
     root.appendChild(e);
     exp = e;
     bannerOpen = true;
-    pushDock(true, instant === true);
-    // 펼친 배너 높이는 실제 그려진 높이를 쓴다(함께 드르륵 방 144, 현장 모드 162).
-    const h = Math.round(e.getBoundingClientRect().height / ((root.getBoundingClientRect().width / LIVE.screenW) || 1)) || LIVE.bannerOpenH, c = LIVE.bannerClosedH;
+    // 펼친 본문 행간 140%와 줄 수에 맞춘 박스 높이(피그마 1884:11599, 3줄 153, 2줄 133.4).
+    const body = q(e, 'p[data-outline]').sort((a, b) => b.textContent.length - a.textContent.length)[0];
+    const fit = styleBannerBody(e, body);
+    // 펼친 배너 높이는 실제 그려진 높이를 쓴다.
+    const h = fit || Math.round(e.getBoundingClientRect().height / ((root.getBoundingClientRect().width / LIVE.screenW) || 1)) || LIVE.bannerOpenH, c = LIVE.bannerClosedH;
+    pushDock(true, instant === true, h - c);
     e.dataset.openH = String(h);
     col.style.opacity = '0';
     if (instant === true) { busy = false; } else {
@@ -561,6 +567,7 @@ export function attachRoom(root, n) {
   fixCommentBar(root);
   attachEmoji(root);
   attachBanner(root);
+  fitStaticBanners(root);
   attachMic(root);
   attachSpeakers(root);
   if (n === LIVE.onboardScreen) patchOnboarding(root);

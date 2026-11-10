@@ -94,6 +94,13 @@ struct RoomNormalView: View {
     @State private var flying: [FlyingEmoji] = []
     @State private var sent: [String] = []
     private let people = RoomPeople.normal
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var chat: RoomChat { RoomChat.shared }
+    /// 일반 모드 채팅 칸 줄 수(상대 두 줄과 내 말풍선 하나)
+    private var normalChatCount: Int { min(2, model.chats.count) + 1 }
+    private var chatRise: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .offset(y: RoomChat.rise))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -142,18 +149,23 @@ struct RoomNormalView: View {
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: 8) {
-                ForEach(model.chats.suffix(2)) { line in
+                // 채팅 줄은 현장 모드와 같은 RoomChat 수만큼 위에서부터 하나둘씩 나타난다(상대 두 줄, 내 말풍선 순서).
+                ForEach(Array(model.chats.suffix(2).prefix(chat.shown))) { line in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(line.name).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary.opacity(0.5))
                         Text(line.text).suit(14, .medium, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
                             .padding(.horizontal, 12).padding(.vertical, 8)
                             .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
                     }
+                    .transition(chatRise)
                 }
-                Text("나만 예민한 거 아니지?").suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
-                    .padding(.horizontal, 12).padding(.vertical, 8)
-                    .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                if chat.shown >= normalChatCount {
+                    Text("나만 예민한 거 아니지?").suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .transition(chatRise)
+                }
                 // 입력줄에서 보낸 말은 최근 두 줄까지 내 말풍선으로 이어 붙는다.
                 ForEach(Array(sent.suffix(2).enumerated()), id: \.offset) { _, t in
                     Text(t).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
@@ -186,6 +198,9 @@ struct RoomNormalView: View {
         .background(DS.Palette.bgSurface.ignoresSafeArea())
         .overlay { RoomToastLayer() }
         .toolbar(.hidden, for: .navigationBar)
+        // 현장 모드에서 넘어왔으면 이미 나온 줄을 그대로 두고 이어서 달고, 바로 열렸으면 비운 채 시작한다.
+        .onAppear { RoomChat.shared.join(model) }
+        .task { await RoomChat.shared.run { normalChatCount } }
         .task {
             try? await Task.sleep(for: .seconds(1.6))
             while !Task.isCancelled {
@@ -854,7 +869,7 @@ struct RoomSoloView: View {
         }
     }
 
-    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 180초). 0이 되면 종료 리포트(함께 방과 같은 화면)로 넘어간다.
+    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 RoomModel.realSeconds 90초). 0이 되면 종료 리포트(함께 방과 같은 화면)로 넘어간다.
     private func watchClock() async {
         while !Task.isCancelled {
             if model.remaining(at: .now) <= 0 {

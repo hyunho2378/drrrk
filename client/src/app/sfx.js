@@ -1,6 +1,6 @@
 // 효과음. 짧은 효과음은 소리 파일 없이 브라우저 오디오(Web Audio)로 만든다. 첫 터치 때 켜지고(사파리 규칙), 소리 크기는 작게 둔다.
 // 아이템 소리와 방 대사는 팀이 녹음한 mp3(itemSounds.js)를 같은 오디오로 낸다. 파일을 못 불러오면 아이템은 아래 합성 소리로 대신한다.
-import { SOUND_FILES } from './itemSounds.js';
+import { SOUND_FILES, UNIQUE_SOUND_KEYS } from './itemSounds.js';
 const AC = typeof window !== 'undefined' ? window.AudioContext || window.webkitAudioContext : null;
 let ctx = null;
 
@@ -52,12 +52,13 @@ function burst(at, dur, freq, q, vol, out) {
 
 // 아이템 소리(11. 10. 메모 "아이템 눌렀을때 사운드 들어볼 수 있으면 좋겠어요", 피그마 댓글 "소리 코드에 넣기 필요").
 // 소리 파일 없이 tone과 burst로 아이템마다 0.5초에서 1초 길이로 만든다. 묶음 음량은 0.5다.
-// 사용자가 누를 때만 부른다. 150ms 안에 다시 누르면 무시하고, 그보다 늦게 누르면 앞 소리를 30ms 만에 줄여 끊은 뒤 새로 낸다(겹쳐 쌓이지 않는다).
+// 사용자가 누를 때만 부른다. 같은 아이템을 150ms 안에 다시 누르면 무시하고, 그보다 늦게 누르면 그 아이템의 앞 소리만 30ms 만에 줄여 끊은 뒤 새로 낸다.
+// 서로 다른 아이템의 소리는 서로를 끊지 않고 겹쳐서 끝까지 난다(11. 10. 밤 팀 요청 "동시에 여러 개 놓을 수 있게").
 // 아이폰이 무음 모드면 사파리의 Web Audio도 소리가 나지 않을 뿐 오류는 없다.
 const ITEM_GAP_MS = 150;
 const ITEM_VOL = 0.5;
-let itemBus = null;
-let itemAt = 0;
+const itemBus = {};
+const itemAt = {};
 
 const crunch = (out, at, n, freq, gap, vol) => {
   for (let i = 0; i < n; i++) burst(at + i * gap + (i % 2) * 0.012, 0.05 + (i % 3) * 0.012, freq + (i % 3) * 420, 1.3, vol * (1 - i / (n + 1)), out);
@@ -111,8 +112,8 @@ const ITEM_SOUND = {
 function playItemNow(key) {
   const make = ITEM_SOUND[key] || ITEM_SOUND.shrimp;
   const t = ctx.currentTime;
-  if (itemBus) {
-    const old = itemBus;
+  const old = itemBus[key];
+  if (old) {
     old.gain.cancelScheduledValues(t);
     old.gain.setValueAtTime(old.gain.value, t);
     old.gain.linearRampToValueAtTime(0, t + 0.03);
@@ -121,9 +122,9 @@ function playItemNow(key) {
   const bus = ctx.createGain();
   bus.gain.value = ITEM_VOL;
   bus.connect(ctx.destination);
-  itemBus = bus;
+  itemBus[key] = bus;
   make(bus);
-  window.setTimeout(() => { if (itemBus === bus) { bus.disconnect(); itemBus = null; } }, 1200);
+  window.setTimeout(() => { if (itemBus[key] === bus) { bus.disconnect(); itemBus[key] = null; } }, 1200);
 }
 
 // 아이템 소리를 낸다. 키는 itemCopy.js의 아이템 키(shrimp, soju, peanut, nogari, drrra, squid, monster, byeollo)이거나 locked다.
@@ -131,25 +132,29 @@ function playItemNow(key) {
 export function playItem(key) {
   if (!AC) return false;
   const now = Date.now();
-  if (now - itemAt < ITEM_GAP_MS) return false;
-  itemAt = now;
+  if (now - (itemAt[key] || 0) < ITEM_GAP_MS) return false;
+  itemAt[key] = now;
   if (!ctx) ctx = new AC();
   const synth = () => { if (ok()) playItemNow(key); };
   if (key !== 'locked' && SOUND_FILES[key]) {
-    playSound(key, { channel: 'item', fallback: synth });
+    playSound(key, { channel: itemChannel(key), fallback: synth });
     return true;
   }
-  stopChannel('item');
+  stopChannel(itemChannel(key));
   if (ctx.state === 'running') playItemNow(key);
   else ctx.resume().then(synth);
   return true;
 }
-// 마이 화면에 들어오면 8개 아이템 파일을 미리 받아 둔다(첫 누름 소리가 늦지 않게).
-export const preloadItemSounds = () => preloadSounds(['shrimp', 'soju', 'peanut', 'nogari', 'drrra', 'squid', 'monster', 'byeollo']);
+// 아이템마다 따로 쓰는 소리 통로 이름. 마이 아이템 누름과 방 착지 소리가 같은 이름을 쓴다(같은 아이템만 앞 소리를 끊는다).
+export const itemChannel = (key) => 'item:' + key;
+// 마이 화면에 들어오면 아이템 소리 파일 4개(건어물, 과자, 캔, 소주)를 미리 받아 둔다(첫 누름 소리가 늦지 않게). 8개 아이템이 이 4개를 둘씩 함께 쓴다.
+export const preloadItemSounds = () => preloadSounds(UNIQUE_SOUND_KEYS);
 
 // ---------- 녹음 파일 재생 ----------
 // 파일은 fetch로 받아 decodeAudioData로 풀어 두고(오디오가 아직 잠겨 있어도 풀 수 있다), 부를 때 바로 낸다.
 // 통로(channel)마다 소리는 하나만 난다: 같은 소리를 150ms 안에 다시 부르면 무시하고, 새 소리가 오면 앞 소리를 30ms 만에 줄여 끊는다.
+// 통로가 다르면 서로 끊지 않는다. 아이템 소리는 아이템마다 통로가 따로라서(itemChannel) 여러 개가 겹쳐 난다. 소리마다 새 AudioBufferSource를 만든다.
+// 풀어 둔 소리는 파일 주소 단위로 한 번만 받는다(새우깡과 오징어땅콩처럼 같은 파일을 쓰는 아이템은 같은 버퍼를 함께 쓴다).
 // 음량은 0.8이다. 브라우저는 사용자가 화면을 한 번 누르기 전에는 소리를 막는다. 그때 부른 소리는 내지 않고 기록에 blocked로 남긴다.
 const SOUND_VOL = 0.8;
 const SOUND_GAP_MS = 150;
@@ -168,17 +173,18 @@ const note = (key, channel, result) => {
 };
 
 export function loadSound(key) {
-  if (bufs[key]) return Promise.resolve(bufs[key]);
-  if (loading[key]) return loading[key];
   const url = SOUND_FILES[key];
+  if (!url) return Promise.resolve(null);
+  if (bufs[url]) return Promise.resolve(bufs[url]);
+  if (loading[url]) return loading[url];
   const c = ensureCtx();
-  if (!url || !c) return Promise.resolve(null);
-  loading[key] = fetch(url)
+  if (!c) return Promise.resolve(null);
+  loading[url] = fetch(url)
     .then((r) => { if (!r.ok) throw new Error('http ' + r.status); return r.arrayBuffer(); })
     .then((ab) => new Promise((res, rej) => c.decodeAudioData(ab, res, rej)))
-    .then((b) => (bufs[key] = b))
-    .catch(() => { loading[key] = null; return null; });
-  return loading[key];
+    .then((b) => (bufs[url] = b))
+    .catch(() => { loading[url] = null; return null; });
+  return loading[url];
 }
 export const preloadSounds = (keys) => keys.forEach((k) => loadSound(k));
 
@@ -199,7 +205,8 @@ export function stopChannel(channel) {
 }
 
 // 소리를 낸다. onEnded는 끝까지 재생되었을 때만 부른다(끊긴 경우는 부르지 않는다). fallback은 파일을 못 불러왔을 때 부른다.
-export function playSound(key, { channel = 'item', vol = SOUND_VOL, onEnded, fallback } = {}) {
+// offset(초)을 주면 파일의 그 지점부터 낸다(앞 무음을 건너뛸 때).
+export function playSound(key, { channel = 'item', vol = SOUND_VOL, onEnded, fallback, offset = 0 } = {}) {
   const c = ensureCtx();
   if (!c) { note(key, channel, 'noaudio'); if (fallback) fallback(); return false; }
   const now = performance.now();
@@ -227,17 +234,18 @@ export function playSound(key, { channel = 'item', vol = SOUND_VOL, onEnded, fal
       if (chans[channel] === playing) chans[channel] = null;
       if (!playing.stopped && onEnded) onEnded();
     };
-    src.start();
+    src.start(0, Math.max(0, Math.min(offset, buf.duration - 0.05)));
     note(key, channel, 'played');
   };
   const go = (buf) => (c.state === 'running' ? start(buf) : c.resume().then(() => start(buf), () => start(buf)));
-  if (bufs[key]) go(bufs[key]);
+  const ready = bufs[SOUND_FILES[key]];
+  if (ready) go(ready);
   else loadSound(key).then(go);
   return true;
 }
 export const channelBusy = (channel) => !!chans[channel];
 // 확인용: 지금 오디오 상태와 아이템 소리 묶음이 살아 있는지
-export const itemAudioState = () => ({ state: ctx ? ctx.state : 'none', busy: !!itemBus });
+export const itemAudioState = () => ({ state: ctx ? ctx.state : 'none', busy: Object.values(itemBus).some(Boolean) });
 
 export const sfx = {
   pick: () => tone(520, 760, 0.09, 'sine', 0.14),

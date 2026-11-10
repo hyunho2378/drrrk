@@ -1,6 +1,7 @@
 // 방 대사 녹음. 함께 드르륵 방에서 내 말풍선(파란 말풍선, data-figma "내 채팅")이 나타날 때 같은 대사의 녹음을 낸다(11. 10. 팀 음성 파일).
-// 짝: "아니 오늘 나 뭔일 있었냐면"은 무슨 일이 있었냐면.mp3, 끝나고 0.4초 뒤 개킹받아 최종.mp3. "나만 예민한 거 아니지?"는 나만예민한거아니지.mp3.
-// 개킹받아 최종은 같은 글의 말풍선이 앱에 없어 첫 말풍선 뒤에 잇는다(임시 배치).
+// 짝: "아니 오늘 나 뭔일 있었냐면"은 무슨 일이 있었냐면.mp3(voice-museun-il), "나만 예민한 거 아니지?"는 나만예민한거아니지.mp3(voice-naman-yemin).
+// 무슨 일이 있었냐면은 앞 0.9초가 무음이라 0.9초 지점부터 재생해 말풍선이 나타나는 순간 목소리가 바로 나온다. 나만 예민한은 처음부터 재생한다.
+// (11. 10. 팀 요청 "보이스 중에 들어봐봐 보이스만 넣고 개킹받아 부분 빼기"로 개킹받아 최종 녹음은 뺐다.)
 // 내는 조건: 방 화면이 보이고, 방 온보딩 덮개가 없고, 내 마이크가 꺼짐(빨강)이 아닐 때. 말풍선이 새로 나타나는 한 번에 한 번만 낸다.
 // 말풍선이 온보딩 덮개 아래에서 나타나면 덮개가 닫힐 때까지 기다렸다가 낸다. 재생 중에 덮개가 뜨거나, 마이크를 끄거나, 방을 나가면 멈춘다.
 // 말하는 표시(초록 바와 테두리)는 나에게 붙이지 않는다(기존 규칙). 이 모듈은 소리만 낸다.
@@ -9,8 +10,8 @@ import { playSound, stopChannel, preloadSounds } from './sfx.js';
 import { micState } from './room.js';
 
 const VOICE_LINES = [
-  { text: '아니 오늘 나 뭔일 있었냐면', keys: ['voiceMuseun', 'voiceGaeking'] },
-  { text: '나만 예민한 거 아니지?', keys: ['voiceNaman'] },
+  { text: '아니 오늘 나 뭔일 있었냐면', keys: ['voiceMuseun'], offset: 0.9 },
+  { text: '나만 예민한 거 아니지?', keys: ['voiceNaman'], offset: 0 },
 ];
 const NEXT_GAP_MS = 400;
 const WAIT_MAX_MS = 120000;
@@ -56,7 +57,7 @@ export function stopVoice(why) {
 export function voiceOnScreen(n, scene) {
   if (scene !== curScene && (watch || nextTimer)) stopVoice('screen ' + n);
   curScene = scene;
-  if (scene) preloadSounds(['voiceMuseun', 'voiceGaeking', 'voiceNaman']);
+  if (scene) preloadSounds(['voiceMuseun', 'voiceNaman']);
 }
 
 // 말풍선 하나가 나타날 때 부른다(live.js staggerChat). 내 말풍선이 아니거나 대사 짝이 없으면 아무것도 하지 않는다.
@@ -77,6 +78,7 @@ export function voiceOnBubble(el, root) {
     step = i;
     playSound(line.keys[i], {
       channel: CH,
+      offset: i === 0 ? line.offset || 0 : 0,
       onEnded: () => {
         if (my !== token) return;
         if (i + 1 >= line.keys.length) { window.clearInterval(watch); watch = 0; note('done'); return; }
@@ -89,7 +91,7 @@ export function voiceOnBubble(el, root) {
         }, NEXT_GAP_MS);
       },
     });
-    note('play', { key: line.keys[i] });
+    note('play', { key: line.keys[i], offset: i === 0 ? line.offset || 0 : 0, at: Math.round(performance.now()) });
   };
   const check = () => {
     if (my !== token) return;

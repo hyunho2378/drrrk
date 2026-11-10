@@ -4,10 +4,11 @@ import SwiftUI
 /// 현장 모드 방의 상태. 팀 피그마 "주전부리 · 퀵슬롯 (기본)"(1979:27515)과 웹 프로토타입 동작을 따른다.
 @Observable
 final class RoomModel {
-    // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어들고, 실제로는 3분(180초)에 끝난다(웹 tokens.js realRoomSeconds와 같은 값).
+    // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어들고, 실제로는 1분 30초(90초)에 끝난다(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로", 웹 tokens.js realRoomSeconds와 같은 값).
+    // 방 시계, 방 구경 시계(LiveWatchView), 혼자 방 시계가 모두 이 두 값의 비(1초에 13.33초)로 줄어든다.
     static let shownSeconds: Double = 20 * 60
-    static let realSeconds: Double = 180
-    /// 화면 시계가 01:12에 닿으면 해 뜨기 1분 전 장면(피그마 1979:27780)으로 바뀐다.
+    static let realSeconds: Double = 90
+    /// 화면 시계가 01:12에 닿으면 해 뜨기 1분 전 장면(피그마 1979:27780)으로 바뀌고 해뜨기 영상이 재생된다(SunriseVideo.swift). 01:12에서 0까지 실제 5.4초.
     static let lastMinuteShown: Double = 72
 
     struct Snack: Identifiable, Hashable {
@@ -254,12 +255,19 @@ final class RoomModel {
     /// 입력줄에서 보낸 내 말. 단계 글 뒤에 이어 붙고, 채팅 칸에는 최근 네 줄만 남는다.
     var sentChats: [String] = []
 
-    var visibleEntries: [ChatEntry] {
-        let base: [ChatEntry] = switch stage {
+    /// 지금 단계의 장면 채팅 줄(나오기 전 포함, 위에서 아래 순서)
+    var stageEntries: [ChatEntry] {
+        switch stage {
         case 0: content.opening
         case 1: content.talk
         default: content.lastMinute
         }
+    }
+
+    /// 채팅 칸에 그릴 줄. 장면 줄은 RoomChat이 내준 수만큼 앞에서부터 하나둘씩 나타나고, 입력줄에서 보낸 내 말은 바로 붙는다.
+    @MainActor
+    var visibleEntries: [ChatEntry] {
+        let base = Array(stageEntries.prefix(RoomChat.shared.shown))
         guard !sentChats.isEmpty else { return base }
         let sent = sentChats.enumerated().map { ChatEntry.sent($0.offset, $0.element) }
         return Array((base + sent).suffix(4))
@@ -335,40 +343,43 @@ final class RoomModel {
     // MARK: 던진 뒤 쉬는 시간(쿨타임)
     // 쉬는 칸과 끝나는 시각을 화면이 아니라 모델에 둔다. 퀵슬롯을 접었다 펴거나 화면이 다시 만들어져도 남고,
     // 끝나는 시각이 지나면 isCooling이 저절로 false가 되어 개수가 남은 칸은 다시 던질 수 있다(개수 0인 칸만 계속 쉰다).
+    // 쿨타임은 던진 그 칸에만 걸린다. 다른 칸은 바로(날아가는 중에도) 던질 수 있다(11. 10. 밤 팀 요청 "동시에 여러 개 놓을 수 있게", 웹 throw.js와 같은 규칙).
 
-    /// 방금 던진 칸(하늘색 선과 덮개가 붙는 칸)
-    var coolingID: String?
-    var coolingUntil: Date = .distantPast
-    private var coolingSerial = 0
+    /// 칸 id별 쉬는 시간이 끝나는 시각
+    var coolingUntil: [String: Date] = [:]
+    /// 지금 쉬는 칸이 하나라도 있으면 true(쿨타임 덮개 시계를 돌릴지 정한다). 끝난 칸은 startCooldown의 Task가 지운다.
+    var anyCooling: Bool { !coolingUntil.isEmpty }
+    private var coolingSerial: [String: Int] = [:]
 
-    func isCooling(at date: Date = .now) -> Bool {
-        date < coolingUntil
+    func isCooling(_ id: String, at date: Date = .now) -> Bool {
+        guard let until = coolingUntil[id] else { return false }
+        return date < until
     }
 
-    /// 남은 쉬는 시간 비율(1에서 0으로 줄어든다)
-    func cooldownLeft(at date: Date = .now) -> Double {
-        max(0, min(1, coolingUntil.timeIntervalSince(date) / Self.throwCooldownSeconds))
+    /// 그 칸의 남은 쉬는 시간 비율(1에서 0으로 줄어든다)
+    func cooldownLeft(_ id: String, at date: Date = .now) -> Double {
+        guard let until = coolingUntil[id] else { return 0 }
+        return max(0, min(1, until.timeIntervalSince(date) / Self.throwCooldownSeconds))
     }
 
     func canThrow(_ snack: Snack, at date: Date = .now) -> Bool {
-        snack.count > 0 && !isCooling(at: date)
+        snack.count > 0 && !isCooling(snack.id, at: date)
     }
 
     private func startCooldown(_ id: String) {
-        coolingSerial += 1
-        let mine = coolingSerial
-        coolingID = id
-        coolingUntil = Date().addingTimeInterval(Self.throwCooldownSeconds)
+        let mine = (coolingSerial[id] ?? 0) + 1
+        coolingSerial[id] = mine
+        coolingUntil[id] = Date().addingTimeInterval(Self.throwCooldownSeconds)
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(Self.throwCooldownSeconds))
-            // 취소되거나 늦게 깨어나도 같은 쿨타임이면 반드시 푼다(그 사이 새로 던졌으면 새 쿨타임에 맡긴다).
-            guard let self, mine == self.coolingSerial else { return }
-            withAnimation(DS.Motion.stateIn) { self.coolingID = nil }
+            // 취소되거나 늦게 깨어나도 같은 쿨타임이면 반드시 푼다(그 사이 같은 칸을 새로 던졌으면 새 쿨타임에 맡긴다).
+            guard let self, mine == self.coolingSerial[id] else { return }
+            withAnimation(DS.Motion.stateIn) { _ = self.coolingUntil.removeValue(forKey: id) }
         }
     }
 
     func throwSnack(_ id: String) -> Landed? {
-        guard !isCooling(), let i = snacks.firstIndex(where: { $0.id == id }), snacks[i].count > 0 else { return nil }
+        guard !isCooling(id), let i = snacks.firstIndex(where: { $0.id == id }), snacks[i].count > 0 else { return nil }
         snacks[i].count -= 1
         startCooldown(id)
         let r = landRect

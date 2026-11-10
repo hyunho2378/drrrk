@@ -3,9 +3,11 @@ import { COMMENTS } from './communityPostData.js';
 import { getStory } from './story.js';
 // 방 구경(37, 피그마 1943:12838) 채팅이 라이브 방송처럼 계속 올라온다(11/10 팀원 피드백 "라이브-눌러서 라방 보듯이 할라면 계속 새 메시지가 올라오는 것 처럼 해야할듯").
 // 채팅 칸(댓글 (라이브 채팅), 342 x 150)과 안내줄, 입력칸은 피그마 그대로 두고, 칸 안에 새 줄을 아래에 붙인다.
-// 화면이 보이고 0.8초 뒤 첫 줄, 그다음은 2.4초에서 4.2초 사이 간격. 간격은 시작 값 1110으로 고정한 같은 수열이라 웹과 iOS(LiveWatchView)가 같은 순서를 만든다.
+// 화면이 처음 뜰 때 채팅 칸은 비어 있다(11. 10. 팀 요청 "처음에 시작했을 때 댓글 아무 것도 없다가 하나씩 생겨나는 느낌으로").
+// 0.7초 뒤 첫 줄, 처음 4줄까지는 1.0초에서 1.8초 사이 간격(칸이 빨리 차서 살아 있는 느낌), 그 뒤는 2.4초에서 4.2초 사이 간격.
+// 간격은 시작 값 1110으로 고정한 같은 수열이라 웹과 iOS(LiveWatchView)가 같은 순서를 만든다.
 // 칸 안 줄은 최대 5개, 이전 줄은 줄 높이만큼 위로 밀려 올라가고(220ms), 칸 위로 넘어간 줄은 옅어진다. 새 줄은 아래에서 8px 올라오며 나타난다.
-export const WATCH_CHAT = { firstMs: 800, minMs: 2400, maxMs: 4200, seed: 1110, maxRows: 5, moveMs: 220, rise: 8, fadeOver: 32 };
+export const WATCH_CHAT = { firstMs: 700, fastCount: 4, fastMinMs: 1000, fastMaxMs: 1800, minMs: 2400, maxMs: 4200, seed: 1110, maxRows: 5, moveMs: 220, rise: 8, fadeOver: 32 };
 const EASE = 'cubic-bezier(0.2, 0, 0, 1)';
 
 // 글 후보는 앱에 이미 있는 글만 쓴다. 이야기별 방 채팅 줄(iOS RoomModel.ssang, photo의 opening과 talk 중 다른 의자 줄, 웹 방 화면 글과 같다),
@@ -47,6 +49,15 @@ export function makeRandom(seed) {
 const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
 const ROW = '[data-figma^="댓글 · "]';
 
+// 피그마 줄(댓글 두 줄과 내 댓글)을 틀로 돌리고 숨긴다. 들어오는 전환 동안에도 칸이 비어 보이게 live.js prepare(전환 전)와 startWatchChat이 함께 부른다.
+// 내 댓글 틀은 보내기(live.js postLiveComment)가 복제해 쓴다.
+export function prepareWatchChat(root, n) {
+  if (n !== 37 || !root) return;
+  const box = root.querySelector('[data-figma="댓글 (라이브 채팅)"]');
+  if (!box) return;
+  [...box.children].forEach((c) => { if (c.dataset && c.dataset.figma && !c.dataset.watchRow) { c.dataset.watchTpl = '1'; c.style.display = 'none'; } });
+}
+
 // live.js attach가 부른다(화면이 다 보인 뒤). 같은 화면에 한 번만 붙는다. 화면을 떠나면 타이머와 감시를 정리한다.
 export function startWatchChat(root, n) {
   if (n !== 37 || !root || root.dataset.watchChat) return;
@@ -56,6 +67,8 @@ export function startWatchChat(root, n) {
   root.dataset.watchChat = '1';
   const base = tpl.cloneNode(true);
   base.removeAttribute('data-node');
+  delete base.dataset.watchTpl;
+  base.style.display = '';
   base.querySelectorAll('[data-node]').forEach((e) => e.removeAttribute('data-node'));
   // 칸 높이와 자리는 피그마 그대로 두고, 줄을 아래부터 쌓아 넘친 줄이 칸 위쪽으로 잘려 나가게 한다(내 댓글 보내기와 같은 방식).
   Object.assign(box.style, { justifyContent: 'flex-end', overflow: 'hidden' });
@@ -66,8 +79,9 @@ export function startWatchChat(root, n) {
   let timer = 0;
   let mine = false;
   const lastTop = new Map();
-  const rows = () => [...box.children].filter((c) => c.dataset && c.dataset.figma);
-  rows().forEach((r) => lastTop.set(r, r.offsetTop));
+  // 칸은 빈 채로 시작한다(피그마 줄은 틀로만 남긴다).
+  prepareWatchChat(root, n);
+  const rows = () => [...box.children].filter((c) => c.dataset && c.dataset.figma && !c.dataset.watchTpl);
 
   // 줄이 붙은 뒤 자리 정리: 5줄을 넘는 오래된 줄을 지우고, 남은 줄은 이전 자리에서 새 자리로 미끄러지고, 칸 위로 넘어간 만큼 옅어진다.
   const settle = (added) => {
@@ -100,6 +114,7 @@ export function startWatchChat(root, n) {
     const [name, text] = lines[idx % lines.length];
     idx += 1;
     const node = base.cloneNode(true);
+    node.dataset.watchRow = '1';
     node.setAttribute('data-figma', '댓글 · ' + name);
     const ps = [...node.querySelectorAll('p')];
     const np = ps[0];
@@ -127,7 +142,10 @@ export function startWatchChat(root, n) {
   };
   const onHash = () => { if (!alive()) stop(); };
   window.addEventListener('hashchange', onHash);
-  const delay = () => WATCH_CHAT.minMs + rnd() * (WATCH_CHAT.maxMs - WATCH_CHAT.minMs);
+  // idx는 이미 올라온 줄 수다. 4번째 줄까지는 빠른 간격, 그 뒤는 보통 간격.
+  const delay = () => (idx < WATCH_CHAT.fastCount
+    ? WATCH_CHAT.fastMinMs + rnd() * (WATCH_CHAT.fastMaxMs - WATCH_CHAT.fastMinMs)
+    : WATCH_CHAT.minMs + rnd() * (WATCH_CHAT.maxMs - WATCH_CHAT.minMs));
   const step = () => {
     if (!alive()) { stop(); return; }
     push();

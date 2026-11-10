@@ -58,19 +58,37 @@ export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lin
 // keep은 빈 띠마다 남기는 최소 높이, bgMin 이상 높이는 배경 그림으로 본다.
 export const mobile = { maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600, bgAnchor: 0.6, bottomSeed: 100, clusterMin: 300, clusterGap: 28, homeBar: [134, 5], pinZ: 3 };
 
+// 방 시계는 화면에 20:00에서 시작해 00:00까지 줄어들고, 이 20분이 실제로는 1분 30초(90초)에 지나간다(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로").
+// 그래서 시계는 1초에 13.33초씩 줄어든다(1200 / 90). 방 시계(live.js), 방 구경 시계(37), 이어받기(roomClockHandoff.js)가 모두 이 빠르기를 쓴다. iOS RoomModel.realSeconds와 같다.
+const ROOM_REAL_SECONDS = 90;
+const ROOM_TIME_SCALE = 1200 / ROOM_REAL_SECONDS;
+// 해 뜨는 단계(40)가 시작하는 화면 시계 값. 피그마 "해 뜨기까지 01:12". 01:12에서 0까지 실제 72 / 13.33 = 5.4초라 해뜨기 영상(5.17초)과 맞는다. iOS RoomModel.lastMinuteShown과 같다.
+const SUNRISE_AT = 72;
+// 시계가 0이 된 뒤 영상 마지막 장면(해 뜬 아침)에 머무는 실제 시간(ms). 예전 해 뜬 순간(35)이 종료로 넘어가던 시간(flow.js AUTO 35, 3000)과 같다.
+const SUN_HOLD_MS = 3000;
+
 // 화면 위에서 실제로 움직이는 것들의 값(live.js).
 export const live = {
   screenW: 390,
   screenH: 844,
-  // 방 시계는 화면에 20:00에서 시작해 00:00까지 줄어들고, 이 20분이 실제로는 3분(180초)에 지나간다.
-  // 그래서 시계는 1초에 6.67초씩 줄어든다(1200 / 180).
-  realRoomSeconds: 180,
-  timeScale: 1200 / 180,
+  realRoomSeconds: ROOM_REAL_SECONDS,
+  timeScale: ROOM_TIME_SCALE,
   roomSeconds: 1200,
   defaultLeft: 180,
-  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. A 소파 장면: 1분 남으면 1분 전(40), 0에 종료(2). B 길거리 장면: 0에 해 뜬 순간(35).
-  // C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
-  rooms: { A: [{ at: 60, to: 40 }, { at: 0, to: 1 }], B: [{ at: 0, to: 35 }] },
+  sunriseAt: SUNRISE_AT,
+  sunHoldMs: SUN_HOLD_MS,
+  // 해 뜨는 단계 배경 영상(sunriseVideo.js). 이야기마다 하나. 첫 장면이 그려지면 장면 그림이 이 시간(ms) 동안 옅어진다.
+  sunriseVideo: { ssang: 'sunrise/sunrise-ssang.mp4', photo: 'sunrise/sunrise-photo.mp4' },
+  sunriseFadeMs: 120,
+  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
+  // A 옛 방(9): 01:12에 해 뜨는 단계(40), 0에 종료(1).
+  // B 함께 드르륵 방(28, 29, 쌍밍아웃과 사진보정 둘 다): 01:12에 해 뜨는 단계(40, 해뜨기 영상), 0이 된 뒤 영상 마지막 장면에 3초 머물고 종료(1).
+  //   예전 B는 0에 해 뜬 순간(35)으로 가서 40과 영상을 건너뛰었다. 이제 영상 마지막 장면이 35의 역할을 하므로 35를 거치지 않는다.
+  //   머무는 3초는 시계 값으로 0 아래 40초(3 x 13.33)다. 화면 시계는 00:00에 멈춰 보인다.
+  rooms: {
+    A: [{ at: SUNRISE_AT, to: 40 }, { at: 0, to: 1 }],
+    B: [{ at: SUNRISE_AT, to: 40 }, { at: -(SUN_HOLD_MS / 1000) * ROOM_TIME_SCALE, to: 1 }],
+  },
   // 입력칸으로 살릴 안내 글(이 글이 있는 칸만 실제로 쓸 수 있게 한다).
   inputHint: /한마디|댓글|메시지/,
   // 카드를 이만큼(px) 넘게 끌면 다음 카드로 넘긴다.
@@ -163,7 +181,7 @@ export const live = {
   throwTable: { x: 110, y: 440, w: 170, h: 190 },
   throwLand: { x: 150, y: 500, w: 90, h: 18 },
   throwStayMs: 6000,
-  // 던진 뒤 쿨타임(초). 던진 칸에 하늘색 2px 안쪽 선과 검정 60% 부채꼴 덮개가 이 시간 동안 줄어들고, 그동안 모든 칸은 눌리지 않는다(iOS RoomModel.throwCooldownSeconds와 같은 값).
+  // 던진 뒤 쿨타임(초). 던진 칸에 하늘색 2px 안쪽 선과 검정 60% 부채꼴 덮개가 이 시간 동안 줄어들고, 그동안 그 칸만 눌리지 않는다. 다른 칸은 바로 던질 수 있다(iOS RoomModel.throwCooldownSeconds와 같은 값).
   throwCooldownSec: 3,
   // 테이블에 올라간 주전부리는 머무는 6초의 마지막 1.2초 동안 투명해지며 조금 작아진다(1 → 0.9).
   throwFadeMs: 1200,

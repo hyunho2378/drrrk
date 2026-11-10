@@ -51,3 +51,43 @@ export function bannerSpec(story) {
     tags: c.tag ? ['#' + c.tag] : base.tags,
   };
 }
+
+// ---------- 고민 글 행간 140% (11. 10. 피그마 댓글 1884:11435 "행간 140%", 답글 "같은 컴포넌트인 것들 다 반영") ----------
+// 피그마 1884:11599(펼침)와 1884:11512(접힘)의 본문은 SUIT Medium 14, 행간 140%(19.6px), 자간 -4%이다.
+// 작은 글(고민 11, 나 의 고민 12, AI가 읽은 맥락 11, 해시태그 11)은 150% 그대로 두고 본문 두 가지만 바꾼다.
+export const BANNER_LH = 19.6;
+// 펼친 박스 높이: 위 여백 14, 라벨 줄 18, 간격 12, 본문(줄 수 x 19.6 + 1.2), 간격 12, AI 맥락 줄 25, 아래 여백 12.
+// 피그마 본문 글 상자가 3줄에 60(58.8 + 1.2)이라 3줄 153, 2줄 133.4이고 줄 하나마다 19.6씩 달라진다.
+export const BANNER_BODY_PAD = 1.2;
+export const bannerOpenHeight = (lines) => 14 + 18 + 12 + lines * BANNER_LH + BANNER_BODY_PAD + 12 + 25 + 12;
+
+// 접힌 한 줄: 피그마 1884:11512는 글 상자 높이 17, 위 맞춤이라 19.6 줄 상자가 상자 위에서 시작한다.
+// 상자 높이를 19.6으로 늘리고 아래 여백을 -2.6으로 두어 가운데 정렬 기준(17 상자, 위 11.5)은 그대로, 글자 아래가 잘리지 않게 한다.
+export function styleBannerLine(p) {
+  if (!p) return;
+  Object.assign(p.style, { fontSize: '14px', lineHeight: BANNER_LH + 'px', letterSpacing: '-0.56px', height: BANNER_LH + 'px', marginBottom: (17 - BANNER_LH) + 'px' });
+}
+
+// 펼친 본문: 행간 19.6, 높이는 줄 수대로. 박스 높이를 줄 수에 맞춰 다시 정하고 그 높이를 돌려준다.
+export function styleBannerBody(box, body) {
+  if (!box || !body) return 0;
+  // 혼자 방 생성 화면(43)의 본문은 끝에 빈 줄이 붙어 있어 줄 수가 늘어 보인다. 글자만 있는 본문이면 끝 빈 줄을 지운다.
+  if (!body.children.length && /\s$/.test(body.textContent)) body.textContent = body.textContent.replace(/\s+$/, '');
+  Object.assign(body.style, { lineHeight: BANNER_LH + 'px', height: 'auto', paddingBottom: BANNER_BODY_PAD + 'px', boxSizing: 'content-box' });
+  const lines = Math.max(1, Math.round((body.scrollHeight - BANNER_BODY_PAD) / BANNER_LH));
+  const h = Math.round(bannerOpenHeight(lines) * 10) / 10;
+  box.style.height = h + 'px';
+  box.dataset.lines = String(lines);
+  return h;
+}
+
+// 화면에 처음부터 펼쳐 그려진 고민 배너(혼자 방 43, 피그마 1647:25052 153)도 같은 행간과 높이로 맞춘다.
+export function fitStaticBanners(root) {
+  if (!root) return;
+  root.querySelectorAll(':scope > [data-figma="고민 주제"]').forEach((box) => {
+    if (box.dataset.lh || box.dataset.openH) return;
+    const ps = [...box.querySelectorAll('p[data-outline]')];
+    const body = ps.sort((a, b) => b.textContent.length - a.textContent.length)[0];
+    if (styleBannerBody(box, body)) box.dataset.lh = '1';
+  });
+}

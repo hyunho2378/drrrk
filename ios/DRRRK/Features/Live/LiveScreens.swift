@@ -667,12 +667,12 @@ struct PressStyle: ButtonStyle {
 struct LiveWatchView: View {
     @Environment(Router.self) private var router
     @State private var draft = ""
-    /// 채팅 칸 줄(최대 5개). 처음에는 피그마 댓글 두 줄과 내 댓글 한 줄이고, 새 줄이 아래에 붙는다(WatchFeed).
+    /// 채팅 칸 줄(최대 5개). 처음에는 비어 있고, 새 줄이 아래에 하나씩 붙는다(WatchFeed).
     @State private var feed: [WatchLine] = WatchFeed.initial
     @State private var feedRandom = WatchFeed.Random()
     @State private var feedIndex = 0
     @FocusState private var focused: Bool
-    /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 빠르기(20분이 실제 3분)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
+    /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 빠르기(RoomModel.shownSeconds / realSeconds, 20분이 실제 1분 30초)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
     @State private var left: Double = 372
     private let clock = Timer.publish(every: 0.25, on: .main, in: .common).autoconnect()
     private var watchClock: String {
@@ -711,18 +711,22 @@ struct LiveWatchView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { left = Double(router.watch?.left ?? 372) }
         .onReceive(clock) { _ in left = max(0, left - 0.25 * (RoomModel.shownSeconds / RoomModel.realSeconds)) }
-        // 화면이 보이고 0.8초 뒤 첫 줄, 그다음 2.4초에서 4.2초 사이 간격(시작 값 고정). 화면을 나가면 작업이 취소되어 멈춘다.
+        // 화면이 보이고 0.7초 뒤 첫 줄, 처음 4줄까지 1.0초에서 1.8초, 그 뒤 2.4초에서 4.2초 사이 간격(시작 값 고정). 화면을 나가면 작업이 취소되어 멈춘다.
         .task { await runFeed() }
     }
 
     private func runFeed() async {
+        // 화면이 다시 보일 때마다(앉기로 방에 갔다가 돌아온 때 포함) 빈 칸과 같은 수열에서 새로 시작한다.
+        feed = WatchFeed.initial
+        feedRandom = WatchFeed.Random()
+        feedIndex = 0
         let lines = WatchFeed.lines(Story.current)
         try? await Task.sleep(for: .seconds(WatchFeed.firstDelay))
         while !Task.isCancelled {
             let l = lines[feedIndex % lines.count]
             feedIndex += 1
             withAnimation(WatchFeed.motion) { WatchFeed.push(&feed, WatchLine(name: l.0, text: l.1, mine: false)) }
-            let gap = WatchFeed.minGap + feedRandom.next() * (WatchFeed.maxGap - WatchFeed.minGap)
+            let gap = WatchFeed.gap(after: feedIndex, &feedRandom)
             try? await Task.sleep(for: .seconds(gap))
         }
     }
