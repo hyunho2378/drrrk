@@ -7,9 +7,12 @@
 import { watchStart } from './liveV2.js';
 import { motion, live as LIVE } from '../tokens.js';
 import { patchLiveV2, patchWatchSeats } from './liveV2.js';
+import { startWatchChat } from './watchChat.js';
+import { handOff, handoffNow, takeRoomStart, stepReady } from './roomClockHandoff.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
+import { voiceOnBubble, voiceOnScreen } from './roomVoice.js';
 import { attachQuickSlot } from './quickSlot.js';
 import { attachTaps } from './taps.js';
 import { prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
@@ -49,6 +52,8 @@ export function resolveTo(l) {
   // 방에 어디서 들어왔는지 적어 둔다. 라이브 방 구경에서 앉아 들어온 방은 나가면 라이브 목록으로 돌아간다(11/10 수정사항: 라이브 흐름).
   if (l.to === 29 && (l.from === 37 || l.from === 27 || l.from === 42)) {
     try { sessionStorage.setItem('drrrk-room-from', l.from === 37 ? 'live' : 'home'); } catch (e) { /* 기본값 home */ }
+    // 방 구경에서 앉는 순간의 시계 값을 방 시계로 넘긴다(roomClockHandoff.js).
+    if (l.from === 37 && room.scene === 'W') handOff(remaining());
   }
   if (l.t === 'back' && l.to === 25 && [28, 29, 30, 31, 32].includes(l.from)) {
     let origin = 'home';
@@ -122,6 +127,7 @@ function staggerChat(root) {
     window.setTimeout(() => {
       el.style.opacity = '';
       el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
+      voiceOnBubble(el, root);
     }, LIVE.chatFirst + i * LIVE.chatGap);
   });
 }
@@ -715,7 +721,7 @@ function prepareRoomClock(root, n) {
   const sc = sceneOf(n);
   if (!sc) return;
   const same = room.scene === sc && room.kind === timerKind(root);
-  const txt = fmtMMSS(same ? remaining() : n === 37 ? watchStart() : LIVE.roomSeconds);
+  const txt = fmtMMSS(same ? remaining() : n === 37 ? watchStart() : handoffNow(LIVE.roomSeconds));
   timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
 }
 
@@ -788,19 +794,24 @@ export function attach(layer, n, go, prevN) {
   fixIcons(root);
   patchLounge(root, n);
   patchWatchSeats(root, n);
+  startWatchChat(root, n);
   patchCommunity(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);
+  voiceOnScreen(n, sc);
   if (sc) {
     const kind = timerKind(root);
     if (room.scene !== sc || room.kind !== kind) {
       if (room.scene !== sc) room.chatDone = false;
       room.scene = sc;
       room.kind = kind;
-      room.left = n === 37 ? watchStart() : LIVE.roomSeconds;
-      room.at = performance.now();
+      const start = n === 37 ? { left: watchStart(), at: performance.now() } : takeRoomStart(LIVE.roomSeconds);
+      room.left = start.left;
+      room.at = start.at;
       room.fired = {};
+      room.entered = performance.now();
+      room.stepAt = 0;
     }
     // 해 뜨기 1분 전(40)은 피그마처럼 01:12에서 센다. 더 많이 남은 시계로 들어오면 01:12로 맞춘다.
     if (n === 40 && remaining() > 72) {
@@ -834,8 +845,11 @@ function tick() {
   for (const step of rule) {
     // 그 단계의 화면(1분 전 40)에 이미 와 있으면 지나간 것으로 센다. 안 그러면 40에서 일반 모드로 갈 때 0.5초 뒤 40으로 되돌아왔다(11/09 QA).
     if (step.to === current.n) room.fired[step.at] = true;
+    // 방에 들어온 직후와 앞 단계 직후 3초는 다음 단계로 넘기지 않는다(이어받은 시계가 이미 짧을 때, roomClockHandoff.js).
+    if (left <= step.at && !room.fired[step.at] && step.to !== current.n && !stepReady(room)) break;
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
       room.fired[step.at] = true;
+      room.stepAt = performance.now();
       current.go({ to: step.to, t: 'fade' });
       break;
     }

@@ -9,7 +9,7 @@ import { Icon } from '../figma/Icon';
 import svg from '../assets/svg-map';
 import { motion, live as LIVE } from '../tokens.js';
 import { INFO_SVG } from './homeInfo.js';
-import { setStory } from './story.js';
+import { setStory, setConcern } from './story.js';
 import { KEYS, shifted, addJamo, backJamo, isJamo } from './homeKeyboard.js';
 
 const cx = (...a) => a.filter(Boolean).join(' ');
@@ -29,7 +29,7 @@ function setHash(n) {
 }
 // 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(story.js).
 const goTo = (to, t) => {
-  if (to === 26) setStory('ssang');
+  if (to === 26) { setStory('ssang'); setConcern(null); }
   window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t } }));
 };
 

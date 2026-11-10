@@ -2,7 +2,7 @@ import { LIVE_LIST } from './liveList.js';
 import { currentMode } from './sort.js';
 import { setText } from './dom.js';
 import { motion, live as LIVE } from '../tokens.js';
-import { setStory } from './story.js';
+import { setStory, setConcern } from './story.js';
 // 라이브 목록 카드 v2. 팀 피그마 "라이브 · 리스트 시안 v2"(1972:22375)와 "라이브 리스트 카드 · 상태 정의"(1972:22488) 값을 그대로 옮겼다.
 // 카드(342 x 112, #222628, 모서리 16)는 그대로 두고, 오른쪽 장면 썸네일과 타이머, 말하는 사람 수를 지운 뒤
 // 아래 줄(보는 사람 수, 점, 남은 시간)과 오른쪽 아래 의자 얼굴 묶음을 상태별로 그린다. iOS LiveRoomCard와 같은 값이다.
@@ -124,8 +124,12 @@ const flat = (t) => String(t || '').replace(/\s+/g, '');
 export const isPhotoCard = (card) => flat(card && (card.title || card)) === flat(PHOTO_TITLE);
 // 방 구경(37)에 들어가기 전에 고른 카드와 이야기 값을 정한다. card는 LIVE_LIST 카드 모양({ title, views, meta, st, timer }).
 // 사진보정 카드면 setStory('photo'), 다른 카드는 setStory('ssang').
+// 카드별 고민(방 고민 탭이 읽는다): 사진보정 카드는 null, 그 밖의 카드는 { title: 카드 제목, tag: 카드가 속한 탭 이름 }.
+// 알림 키워드 카드와 위 가로 카드도 이 함수를 지나서 같은 규칙을 받는다.
 export function pickWatch(card) {
-  setStory(isPhotoCard(card) ? 'photo' : 'ssang');
+  const photo = isPhotoCard(card);
+  setStory(photo ? 'photo' : 'ssang');
+  setConcern(photo || !card ? null : { title: card.title, tag: tabOf(card.title) });
   picked = card ? { title: String(card.title).replace(/ \n/g, '\n'), views: String(card.views ?? ''), left: leftOf(card) } : null;
 }
 // 위 가로 카드 두 장 값(피그마 2100:23638 Carousel / 1, 2의 제목, 보는 수, 시계). iOS LiveData.featured와 같다.
@@ -143,6 +147,14 @@ export function openWatch(card) {
 // 위 가로 카드로 들어오면 피그마 값 06:12.
 let watchLeft = 372;
 export const watchStart = () => watchLeft;
+// 카드가 속한 탭 이름. 친구(48), 연애(49), 가족(50), 학교(51), 진로(52) 목록에서 같은 제목(빈칸과 줄바꿈 무시)을 찾는다.
+// 전체(10)에만 있거나 어느 탭에도 없는 제목은 빈 글자. iOS LiveData.tab(for:)와 같은 규칙이다.
+const TABS = [[48, '친구'], [49, '연애'], [50, '가족'], [51, '학교'], [52, '진로']];
+export function tabOf(title) {
+  const t = flat(title);
+  const hit = TABS.find(([n]) => (LIVE_LIST[n] || []).some((c) => flat(c.title) === t));
+  return hit ? hit[1] : '';
+}
 const secOf = (s) => { const m = /(\d{1,2}):(\d{2})/.exec(s || ''); return m ? +m[1] * 60 + +m[2] : null; };
 const leftOf = (c) => (c.st === 'soon' ? secOf(c.timer || '03:00') : secOf(c.meta)) ?? 1200;
 

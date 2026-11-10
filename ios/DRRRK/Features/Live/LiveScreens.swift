@@ -667,7 +667,10 @@ struct PressStyle: ButtonStyle {
 struct LiveWatchView: View {
     @Environment(Router.self) private var router
     @State private var draft = ""
-    @State private var mine = WatchData.myComments
+    /// 채팅 칸 줄(최대 5개). 처음에는 피그마 댓글 두 줄과 내 댓글 한 줄이고, 새 줄이 아래에 붙는다(WatchFeed).
+    @State private var feed: [WatchLine] = WatchFeed.initial
+    @State private var feedRandom = WatchFeed.Random()
+    @State private var feedIndex = 0
     @FocusState private var focused: Bool
     /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 빠르기(20분이 실제 3분)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
     @State private var left: Double = 372
@@ -677,9 +680,9 @@ struct LiveWatchView: View {
         return String(format: "%02d:%02d", v / 60, v % 60)
     }
 
-    /// 피그마 단위 내용 높이: 내 댓글 하나(658~690) 뒤로 새 댓글마다 40, 입력창(754부터) 위로 띄운다.
+    /// 피그마 단위 내용 높이. 채팅 칸(540~690)은 높이가 고정이고 줄이 위로 밀려 올라가므로 화면 높이 그대로다.
     private var contentHeight: CGFloat {
-        max(844, 690 + CGFloat(mine.count - 1) * 40 + (844 - 754) + 24)
+        844
     }
 
     var body: some View {
@@ -699,7 +702,6 @@ struct LiveWatchView: View {
                     comments.offset(x: 24, y: 540)
                 }
             }
-            .onChange(of: mine.count) { _, _ in withAnimation(DS.Motion.standard) { proxy.scrollTo(FigmaScrollEnd.id, anchor: .bottom) } }
         }
         .overlay { topBar }
         .overlay(alignment: .bottom) {
@@ -709,6 +711,20 @@ struct LiveWatchView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { left = Double(router.watch?.left ?? 372) }
         .onReceive(clock) { _ in left = max(0, left - 0.25 * (RoomModel.shownSeconds / RoomModel.realSeconds)) }
+        // 화면이 보이고 0.8초 뒤 첫 줄, 그다음 2.4초에서 4.2초 사이 간격(시작 값 고정). 화면을 나가면 작업이 취소되어 멈춘다.
+        .task { await runFeed() }
+    }
+
+    private func runFeed() async {
+        let lines = WatchFeed.lines(Story.current)
+        try? await Task.sleep(for: .seconds(WatchFeed.firstDelay))
+        while !Task.isCancelled {
+            let l = lines[feedIndex % lines.count]
+            feedIndex += 1
+            withAnimation(WatchFeed.motion) { WatchFeed.push(&feed, WatchLine(name: l.0, text: l.1, mine: false)) }
+            let gap = WatchFeed.minGap + feedRandom.next() * (WatchFeed.maxGap - WatchFeed.minGap)
+            try? await Task.sleep(for: .seconds(gap))
+        }
     }
 
     /// 고민 묶음(24, 321): 제목 21 굵게 행간 28, "대화 중 3"(12 아래), 의자 자리 58 칸 사이 14(12 아래), 원 54 흰 바탕, 이름 11 #9AA1A6, 빈 자리 #06303C 하늘색 점선 1.5.
@@ -732,7 +748,8 @@ struct LiveWatchView: View {
                     }
                     .frame(width: 58)
                 }
-                Button { router.push(.room) } label: {
+                // 앉는 순간의 방 구경 시계 값을 방 시계로 넘긴다(RoomClockHandoff).
+                Button { RoomClockHandoff.give(left: left); router.push(.room) } label: {
                     VStack(spacing: 6) {
                         Image("C-plus").renderingMode(.template).resizable().frame(width: 22, height: 22)
                             .foregroundStyle(DS.Palette.brandPrimary)
@@ -751,25 +768,35 @@ struct LiveWatchView: View {
     }
 
     /// 댓글(24, 540): 이름 11 #6E767C, 4 아래 말풍선(12 / 7, 모서리 14, 13 글자), 댓글 사이 8. 내 댓글은 하늘색 말풍선 오른쪽 끝.
+    /// 칸 높이 150(피그마 댓글 (라이브 채팅) 342 x 150). 줄은 아래부터 쌓이고, 칸 위로 넘어간 줄은 넘은 만큼 옅어진다(32만큼 넘으면 0, 반쯤 걸린 줄은 흐리게 남는다. 웹 watchChat.js fadeOver와 같다).
     private var comments: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(WatchData.comments, id: \.0) { c in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(c.0).suit(11, .medium, lineHeight: 15).foregroundStyle(DS.Palette.textTertiary)
-                    Text(c.1).suit(13, .medium, lineHeight: 18).foregroundStyle(DS.Palette.textPrimary)
-                        .padding(.horizontal, 12).padding(.vertical, 7)
-                        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 14))
+            ForEach(feed) { line in
+                Group {
+                    if line.mine {
+                        Text(line.text).suit(13, .medium, lineHeight: 18).foregroundStyle(.black)
+                            .padding(.horizontal, 12).padding(.vertical, 7)
+                            .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 14))
+                            .frame(width: 342, alignment: .trailing)
+                    } else {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(line.name).suit(11, .medium, lineHeight: 15).foregroundStyle(DS.Palette.textTertiary)
+                            Text(line.text).suit(13, .medium, lineHeight: 18).foregroundStyle(DS.Palette.textPrimary)
+                                .padding(.horizontal, 12).padding(.vertical, 7)
+                                .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 14))
+                        }
+                    }
                 }
-            }
-            ForEach(Array(mine.enumerated()), id: \.offset) { _, t in
-                Text(t).suit(13, .medium, lineHeight: 18).foregroundStyle(.black)
-                    .padding(.horizontal, 12).padding(.vertical, 7)
-                    .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: 14))
-                    .frame(width: 342, alignment: .trailing)
-                    .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: 8)), removal: .opacity))
+                .visualEffect { content, proxy in
+                    content.opacity(min(1, max(0, 1 + proxy.frame(in: .named("watchFeed")).minY / 32)))
+                }
+                .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: 8)), removal: .opacity))
             }
         }
-        .frame(width: 342, alignment: .topLeading)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: 342, height: 150, alignment: .bottomLeading)
+        .clipped()
+        .coordinateSpace(.named("watchFeed"))
     }
 
     /// 뒤로(24, 79), 보는 중(313, 78), 시계(266, 120). 스크롤해도 같은 자리에 있다.
@@ -816,7 +843,7 @@ struct LiveWatchView: View {
     private func send() {
         let t = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return }
-        withAnimation(DS.Motion.emphasizedDecel) { mine.append(t) }
+        withAnimation(WatchFeed.motion) { WatchFeed.push(&feed, WatchLine(name: "", text: t, mine: true)) }
         draft = ""
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }

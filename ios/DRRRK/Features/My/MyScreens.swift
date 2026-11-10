@@ -40,6 +40,8 @@ enum MyShelfData {
 /// 앱이 켜져 있는 동안 한 번만 띄운다.
 enum MyChairGet {
     static let crossSeconds = 1.011
+    /// 39도를 넘은 뒤 획득 장면이 뜨기 전에 마이를 보여 주는 시간(11/10 팀원 피드백 "텁이 좀 더 있어야"). 웹 my.js CHAIR_GET.popGapMs와 같은 값.
+    static let popGapSeconds = 1.1
     @MainActor static var seen = false
 }
 
@@ -140,6 +142,8 @@ private struct MyHome: View {
         .onAppear {
             overlay = startOverlay
             item = startItem
+            // 아이템 녹음 파일 8개를 미리 열어 둔다(첫 누름 소리가 늦지 않게).
+            ItemSound.shared.preloadFiles()
             // 엉따 막대는 다른 탭이나 화면에서 마이로 들어올 때만 0에서 차오른다.
             // 그때는 이 화면이 새로 만들어져 gauge가 0이다. 의자 꾸미기에서 뒤로 오거나 시트와 팝업을 닫을 때는
             // 같은 화면이 남아 있어 gauge가 이미 1이므로 다시 비우거나 채우지 않는다.
@@ -148,7 +152,7 @@ private struct MyHome: View {
                 // 다른 화면에서 들어와 막대가 차오를 때만, 39도를 넘는 순간 의자 획득 장면으로 넘어간다.
                 if startOverlay == .none, startItem == nil, !MyChairGet.seen {
                     Task { @MainActor in
-                        try? await Task.sleep(for: .seconds(MyChairGet.crossSeconds))
+                        try? await Task.sleep(for: .seconds(MyChairGet.crossSeconds + MyChairGet.popGapSeconds))
                         guard !MyChairGet.seen, overlay == .none, item == nil else { return }
                         MyChairGet.seen = true
                         withAnimation(DS.Motion.decel(0.35)) { overlay = .skin }

@@ -92,6 +92,11 @@ struct RoomView: View {
             }
         }
         .onAppear { OnboardingSeen.together = true }
+        // 대사 녹음(RoomVoice): 방에 들어오면 파일을 미리 열고, 내 말풍선이 새로 나타나면 같은 대사를 낸다. 방을 나가면 멈춘다.
+        .onAppear { RoomVoice.shared.enter(covered: showOnboarding); RoomVoice.shared.show(mineTexts) }
+        .onDisappear { RoomVoice.shared.leave() }
+        .onChange(of: showOnboarding) { _, up in RoomVoice.shared.setCovered(up) }
+        .onChange(of: mineTexts) { _, texts in RoomVoice.shared.show(texts) }
         .task { await rotateSpeakers() }
         .task { await watchClock() }
         .task(id: showOnboarding) {
@@ -143,7 +148,7 @@ struct RoomView: View {
             }
             .buttonStyle(PressStyle())
             .position(p)
-            .animation(DS.Motion.emphasizedDecel, value: model.speaker)
+            .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.2), value: model.speaker)
             .accessibilityLabel(seat.name + " 프로필")
         }
     }
@@ -241,6 +246,11 @@ struct RoomView: View {
         }
     }
 
+    /// 지금 채팅 칸에 보이는 내 말풍선 글(대사 녹음 짝 찾기용).
+    private var mineTexts: [String] {
+        model.visibleEntries.compactMap { if case let .mine(t) = $0 { t } else { nil } }
+    }
+
     private func throwGesture(_ snack: RoomModel.Snack, _ map: SceneMap) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .named("room"))
             .updating($drag) { v, state, _ in
@@ -256,7 +266,14 @@ struct RoomView: View {
                 withAnimation(DS.Motion.decel(0.62)) {
                     if let item = model.throwSnack(snack.id) {
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        RoomToastCenter.shared.show("주전부리를 테이블에 올렸어요")
+                        // 안내 글은 던진 주전부리 이름을 말한다(예: 새우깡을 테이블에 올렸어요, SoundFiles.throwDoneText).
+                        RoomToastCenter.shared.show(SoundFiles.throwDoneText(snack.id))
+                        // 착지하는 순간(날아가는 0.62초, 웹 throwFlyMs와 같은 값) 그 주전부리의 녹음 파일을 낸다.
+                        let soundKey = snack.id
+                        Task {
+                            try? await Task.sleep(for: .seconds(0.62))
+                            FileSound.shared.play(soundKey, channel: "item")
+                        }
                         Task {
                             // 서서히 사라지는 움직임은 LandedSnack이 맡고, 다 사라진 뒤 목록에서만 지운다.
                             try? await Task.sleep(for: .seconds(LandedSnack.stay))
@@ -280,15 +297,19 @@ struct RoomView: View {
 
     /// 해 뜨기 1분(화면 시계) 전에는 시계가 빨개지고 안내가 한 줄 뜬다. 0이 되면 아침 화면으로 넘어간다.
     private func watchClock() async {
+        // 방에 들어온 직후와 앞 단계 직후 3초는 다음 단계로 넘기지 않는다(방 구경에서 이어받은 시계가 이미 짧을 때, RoomClockHandoff).
+        var stepAt = model.enteredAt
         while !Task.isCancelled {
             let left = model.remaining(at: .now)
-            if left <= RoomModel.lastMinuteShown, !lastMinute {
+            let ready = Date.now.timeIntervalSince(stepAt) >= RoomClockHandoff.graceSeconds
+            if left <= RoomModel.lastMinuteShown, !lastMinute, ready {
                 withAnimation(DS.Motion.emphasizedDecel) {
                     lastMinute = true
                     model.stage = 2
                 }
+                stepAt = .now
             }
-            if left <= 0 {
+            if left <= 0, lastMinute, Date.now.timeIntervalSince(stepAt) >= RoomClockHandoff.graceSeconds {
                 // 해가 뜨면 종료 리포트(피그마 2096:22857, 2100:24606)로 간다. 웹 flow.js AUTO 35와 같다.
                 router.push(.roomEnd)
                 return
@@ -300,7 +321,8 @@ struct RoomView: View {
     private func rotateSpeakers() async {
         try? await Task.sleep(for: .seconds(1.6))
         while !Task.isCancelled {
-            withAnimation(DS.Motion.emphasizedDecel) { model.nextSpeaker() }
+            // 말하는 이름표가 바뀔 때 글자 색(회색에서 흰색), 초록 점, 파동이 0.2초 표준 곡선으로 같은 이름표에서 함께 바뀐다(웹 room.js 200ms).
+            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.2)) { model.nextSpeaker() }
             try? await Task.sleep(for: .seconds(.random(in: 2.2 ... 4.6)))
         }
     }
@@ -656,6 +678,7 @@ struct RoomInputBar: View {
                 .frame(height: 48)
             Button {
                 withAnimation(DS.Motion.stateIn) { micOn.toggle() }
+                RoomVoice.shared.setMic(on: micOn)
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
             } label: {
                 // 피그마 1979:27492: 끈 상태도 검정 아이콘, 바탕만 빨강

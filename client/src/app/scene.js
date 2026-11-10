@@ -5,7 +5,7 @@
 import { setText } from './dom.js';
 import { cloneOf } from './donor.js';
 import { attachSpeakers } from './room.js';
-import { getStory } from './story.js';
+import { roomStory, STORY_BANNER } from './roomConcern.js';
 
 const FILES = {
   base: 'room2/scene.webp',
@@ -21,7 +21,8 @@ const FILES = {
 export const SCENE_OF = { 28: 'base', 29: 'base', 30: 'base', 31: 'fold', 40: 'base', 41: 'field', 42: 'field', 43: 'field', 46: 'far' };
 // 쌍밍아웃 이야기(ssang)의 함께 드르륵 방 장면.
 const SSANG_OF = { 28: 'ssang', 29: 'ssang', 30: 'ssang', 31: 'ssangEmoji', 40: 'ssang' };
-const keyOf = (n) => (getStory() === 'ssang' && SSANG_OF[n]) || SCENE_OF[n];
+// 카드별 고민으로 들어온 방도 쌍밍아웃 장면이다(roomConcern.js roomStory).
+const keyOf = (n) => (roomStory() === 'ssang' && SSANG_OF[n]) || SCENE_OF[n];
 export const sceneUrl = (key) => new URL('assets/' + FILES[key], document.baseURI).href;
 export const sceneFiles = (n) => (keyOf(n) ? ['assets/' + FILES[keyOf(n)]] : []);
 
@@ -106,11 +107,8 @@ export const SSANG = {
   dot: [188, 40],
   wave: [219, 0],
   // 펼친 고민 배너(2096:22269 고민 주제 I2096:22334)의 제목과 글, 키워드. 글의 줄바꿈도 피그마 그대로다.
-  banner: {
-    title: '나 의 고민',
-    body: '친구가 썸남 앞에서 내 쌍밍아웃함. 셋이 떡볶이 먹으러\n가고 있었는데 나보고 볼 때마다 00이 쌍수 참 예쁘게 잘되지\n않았냐고 그러는거야. 걔 완전 미친거 아니야? 하..',
-    tags: ['#친구관계', '#연애고민'],
-  },
+  // 글은 roomConcern.js 한 곳에 둔다.
+  banner: STORY_BANNER.ssang,
   // 해 뜨기 1분 전(40): 사진보정 프레임 2100:24394의 줄 자리에 이 이야기의 이름과 생성 화면(1647:24788) 채팅 글을 넣는다.
   rows: {
     40: {
@@ -210,7 +208,7 @@ async function patchSsang(root, n) {
 export async function patchRoom2(root, n) {
   if (!ROOM2_SCREENS.includes(n) || !root || root.dataset.room2) return;
   // 어느 이야기를 그릴지는 story.js 한 곳에서 읽는다. 이 값은 펼친 고민 배너 글(room.js)도 읽는다.
-  const story = getStory();
+  const story = roomStory();
   root.dataset.room2 = story;
   if (story === 'ssang') { await patchSsang(root, n); return; }
   // 1) 이름표 묶음. 옛 접힘 프레임(1807:23214)에는 묶음이 없어서 28번 화면에서 빌려 온다.

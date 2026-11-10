@@ -5,7 +5,8 @@
 // 던지는 대상은 사람이 아니라 테이블이다. 받는 사람이나 온도와는 관계가 없다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText } from './dom.js';
-import { sfx } from './sfx.js';
+import { sfx, playSound, preloadSounds } from './sfx.js';
+import { SLOT_ITEM, throwDoneText } from './itemSounds.js';
 import { toast } from './room.js';
 
 // 던진 기록은 화면을 옮기거나 퀵슬롯을 접었다 펴도 남는다(이름별 남은 개수, 쿨타임 중인 칸과 시작과 끝 시각).
@@ -19,6 +20,8 @@ export function attachThrow(root) {
   const dock = root.querySelector('[data-figma="주전부리 퀵슬롯"]');
   if (!dock || dock.dataset.live) return;
   dock.dataset.live = 'throw';
+  // 방에 들어오면 칸마다의 녹음 파일을 미리 받아 둔다(착지 소리가 늦지 않게, itemSounds.js).
+  preloadSounds(Object.values(SLOT_ITEM));
   const group = root.querySelector('[data-figma="Group 2147229349"]');
   const slots = q(dock, '[data-figma^="slot · "]');
   const toRoot = (ev) => {
@@ -175,6 +178,7 @@ export function attachThrow(root) {
         const ty = rand(t.land.y, t.land.y + t.land.h) - 20;
         const rot = rand(-14, 14);
         sfx.throw();
+        const soundKey = SLOT_ITEM[nameOf(slot)];
         const a = ghost.animate([
           { transform: from },
           { transform: 'translate(' + (tx + (pt.x - 20 - tx) * 0.4) + 'px,' + (Math.min(ty, pt.y) - 60) + 'px) scale(1.15) rotate(-16deg)', offset: 0.5 },
@@ -182,6 +186,8 @@ export function attachThrow(root) {
         ], { duration: LIVE.throwFlyMs, easing: motion.emphasizedDecel, fill: 'forwards' });
         a.onfinish = () => {
           sfx.land();
+          // 착지하는 순간 그 주전부리의 녹음 파일(11. 10. 피드백 "주전부리 올렸을때 소리 반영").
+          if (soundKey) playSound(soundKey, { channel: 'item' });
           ghost.animate([{ transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + (ty - 12) + 'px) scale(1.1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }], { duration: 240, easing: motion.standard });
           // 머무는 시간의 마지막 throwFadeMs 동안 서서히 투명해지며 작아진 뒤 지운다(갑자기 없어지지 않게).
           const at = 'translate(' + tx + 'px,' + ty + 'px) rotate(' + rot + 'deg) ';
@@ -205,7 +211,8 @@ export function attachThrow(root) {
         cool.until = cool.start + LIVE.throwCooldownSec * 1000;
         paintAll();
         armEnd();
-        toast(root, LIVE.throwDoneText);
+        // 안내 글은 던진 주전부리 이름을 말한다(예: 새우깡을 테이블에 올렸어요). 이름을 모르는 칸은 예전 글 그대로다.
+        toast(root, SLOT_ITEM[name] ? throwDoneText(name) : LIVE.throwDoneText);
       };
       window.addEventListener('pointermove', move);
       window.addEventListener('pointerup', done);

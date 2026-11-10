@@ -93,10 +93,12 @@ final class RoomModel {
         seats: [
             .init(id: "lime", name: "진실의 의자10", x: 56.5, y: 396, isMe: false),
             .init(id: "stool", name: "딱딱한 나무 스툴12", x: 146.5, y: 382, isMe: false),
-            .init(id: "swivel", name: "새벽2시 피시방", x: 261, y: 331.5, isMe: false),
+            // 새벽2시 피시방은 나다. 말하는 표시(흰 글자, 초록 점, 파동)를 받지 않는다(웹 room.js와 같은 규칙).
+            .init(id: "swivel", name: "새벽2시 피시방", x: 261, y: 331.5, isMe: true),
             .init(id: "white", name: "차가운 새벽의자92", x: 344.5, y: 396, isMe: false),
         ],
-        firstSpeaker: "새벽2시 피시방",
+        // 피그마는 내 이름표(새벽2시 피시방)가 말하는 모습이지만 나는 말하는 표시를 받지 않아서, 웹과 같이 진실의 의자10부터 말한다.
+        firstSpeaker: "진실의 의자10",
         opening: [
             .other(.init(name: "진실의 의자10", text: "잼얘 없음?", opacity: 0.8)),
             .other(.init(name: "차가운 새벽의자92", text: "님선 ㄱㄱ", opacity: 1)),
@@ -185,6 +187,9 @@ final class RoomModel {
     }
 
     init(story: StoryKind = Story.current) {
+        // 카드별 고민(Story.concern)으로 들어온 방은 홈 흐름과 같은 쌍밍아웃 장면과 의자 이름표를 쓴다(웹 roomConcern.js roomStory).
+        let concern = Story.concern
+        let story: StoryKind = concern == nil ? story : .ssang
         self.story = story
         let c = Self.content(story)
         seats = c.seats
@@ -195,9 +200,31 @@ final class RoomModel {
         topicTags = c.topicTags
         dropRect = c.tableDrop
         landRect = c.tableLand
+        // 고민 탭: 접힌 한 줄은 카드 제목 한 줄, 펼친 글은 카드가 쓴 두 줄 그대로, 키워드는 "#"+탭 이름 하나(웹 roomConcern.js bannerSpec과 같다).
+        if let concern, !concern.title.isEmpty {
+            topicShort = concern.title
+            topicBody = Self.cardTwoLines(concern.title)
+            if !concern.tag.isEmpty { topicTags = ["#" + concern.tag] }
+        }
+    }
+
+    /// 카드 제목의 두 줄(카드가 쓴 줄바꿈)을 라이브 목록 데이터에서 찾는다. 못 찾으면 한 줄 그대로 둔다.
+    static func cardTwoLines(_ title: String) -> String {
+        let flat: (String) -> String = { $0.split(whereSeparator: \.isWhitespace).joined(separator: " ") }
+        let key = flat(title)
+        for list in LiveData.cards.values {
+            if let hit = list.first(where: { flat($0.title) == key }) {
+                return hit.title.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }.joined(separator: "\n")
+            }
+        }
+        return key
     }
 
     var startedAt = Date()
+    /// 시계 시작 값(초). 홈 흐름은 20:00, 방 구경에서 앉아 들어오면 앉는 순간의 방 구경 시계 값(RoomClockHandoff).
+    var startLeft: Double = RoomModel.shownSeconds
+    /// 방에 들어온 시각. 단계 전환(해 뜨기 1분 전, 끝)은 이 시각에서 RoomClockHandoff.graceSeconds가 지나야 걸린다.
+    var enteredAt = Date()
     var bannerOpen = false
     // 방에 처음 들어오면 퀵슬롯은 접혀 있다(피그마 2096:22459 "주전부리 · 퀵슬롯 (접힘)").
     var dockOpen = false
@@ -254,7 +281,12 @@ final class RoomModel {
 
     /// 함께 드르륵 현장 모드 방. 지금 이야기(Story.current)를 읽어 장면과 글을 정한다.
     static func field() -> RoomModel {
-        RoomModel(story: Story.current)
+        let m = RoomModel(story: Story.current)
+        if let h = RoomClockHandoff.take() {
+            m.startLeft = h.left
+            m.startedAt = h.at
+        }
+        return m
     }
 
     /// 혼자 드르륵 방(피그마 1647:25199, 1647:25052, 1647:24874). 고민 글과 AI가 읽은 맥락이 다르다.
@@ -283,7 +315,7 @@ final class RoomModel {
 
     func remaining(at date: Date) -> Double {
         let real = date.timeIntervalSince(startedAt)
-        return max(0, Self.shownSeconds - real * (Self.shownSeconds / Self.realSeconds))
+        return max(0, startLeft - real * (Self.shownSeconds / Self.realSeconds))
     }
 
     func clockText(at date: Date) -> String {
@@ -291,7 +323,8 @@ final class RoomModel {
         return String(format: "%02d:%02d", s / 60, s % 60)
     }
 
-    /// 말하는 사람은 장면 속 네 사람 중에서 돌아가며 바뀐다(나는 이름표가 없어 말하는 표시가 붙지 않는다).
+    /// 말하는 사람은 장면 속 이름표 중에서 돌아가며 바뀐다. 나(isMe, 쌍밍아웃의 새벽2시 피시방)는 뽑지 않는다.
+    /// 한 번에 한 이름표만 말하고, 그 이름표만 흰 글자와 초록 점과 파동을 받는다(RoomView SeatLabel, 바뀌는 시간 0.2초).
     func nextSpeaker() {
         let pool = seats.filter { !$0.isMe && $0.name != speaker }
         if let next = pool.randomElement() {

@@ -2,7 +2,7 @@ import AVFoundation
 import Foundation
 
 // 아이템 소리(11. 10. 메모 "아이템 눌렀을때 사운드 들어볼 수 있으면 좋겠어요", 피그마 댓글 "소리 코드에 넣기 필요").
-// 소리 파일 없이 웹 sfx.js의 tone과 burst를 같은 값으로 옮겨 PCM 버퍼로 만들고 AVAudioEngine으로 낸다.
+// 8개 아이템은 팀 녹음 파일을 내고(SoundFiles.swift), 미획득 소리와 파일을 못 열 때의 대체 소리는 웹 sfx.js의 tone과 burst를 같은 값으로 옮겨 PCM 버퍼로 만들어 AVAudioEngine으로 낸다.
 // 아이템마다 0.5초에서 1초 길이, 묶음 음량 0.5. 사용자가 누를 때만 부른다.
 // 150ms 안에 다시 누르면 무시하고, 그보다 늦게 누르면 앞 소리를 멈추고 새로 낸다(겹쳐 쌓이지 않는다).
 // 오디오 세션은 .ambient라서 무음 스위치를 켠 기기에서는 소리가 나지 않을 뿐 오류가 없고, 다른 앱 음악도 끊지 않는다.
@@ -26,14 +26,25 @@ final class ItemSound {
     }
 
     /// key: shrimp, soju, peanut, nogari, drrra, squid, monster, byeollo, locked
+    /// 8개 아이템은 팀 녹음 파일(SoundFiles, FileSound)을 내고, 파일을 못 열면 아래 합성 소리로 대신한다. 미획득(locked)은 합성 소리 그대로다.
     func play(_ key: String) {
         let now = Date()
         guard now.timeIntervalSince(lastPlay) >= gapSeconds else { return }
         lastPlay = now
+        if key != "locked", SoundFiles.names[key] != nil, FileSound.shared.play(key, channel: "item") {
+            if ready { player.stop() }
+            return
+        }
+        FileSound.shared.stop("item")
         guard prepare(), let buffer = buffer(for: key) else { return }
         player.stop()
         player.scheduleBuffer(buffer, at: nil, options: [])
         player.play()
+    }
+
+    /// 마이 화면에 들어오면 8개 아이템 파일을 미리 열어 둔다(첫 누름 소리가 늦지 않게).
+    func preloadFiles() {
+        FileSound.shared.preload(["shrimp", "soju", "peanut", "nogari", "drrra", "squid", "monster", "byeollo"])
     }
 
     private func prepare() -> Bool {
