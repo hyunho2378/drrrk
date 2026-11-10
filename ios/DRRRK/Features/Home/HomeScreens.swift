@@ -265,6 +265,7 @@ struct HomeView: View {
         close()
         // 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(App/Story.swift).
         Story.current = .ssang
+        Story.concern = nil
         router.push(.analysis)
     }
 }

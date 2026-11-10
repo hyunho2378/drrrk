@@ -8,7 +8,7 @@ import { getSaved, subscribe, big, KINDS } from './chairs.js';
 import { pickItem, itemFrom, pickedSlot, pickedName, chairGetSeen, markChairGetSeen, crossRatio, CHAIR_GET } from './my.js';
 import { cameFrom } from './lastScreen.js';
 import { ITEM_COPY, LOCKED_COPY, itemChips, keyOf } from './itemCopy.js';
-import { playItem } from './sfx.js';
+import { playItem, preloadItemSounds } from './sfx.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const EASE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
@@ -175,13 +175,18 @@ function useChairGet(fillRef, on) {
     if (!on || chairGetSeen()) return undefined;
     let raf = 0;
     let done = false;
+    let gapTimer = 0;
     const fire = () => {
       if (done) return;
       done = true;
       cancelAnimationFrame(raf);
       window.clearTimeout(timer);
-      markChairGetSeen();
-      go(19, 'none');
+      // 막대가 다 차오른 뒤 잠깐 마이를 보여 주고 획득 장면이 뜨도록 텐을 둔다(11/10 팀원 피드백). 그사이 다른 화면으로 가면 뜨지 않는다.
+      gapTimer = window.setTimeout(() => {
+        if (chairGetSeen()) return;
+        markChairGetSeen();
+        go(19, 'none');
+      }, CHAIR_GET.popGapMs);
     };
     // 실제 막대 길이(scaleX)를 매 프레임 읽어 39 / 39.2에 닿으면 넘어간다. 프레임을 못 받는 경우를 대비해 계산한 시각에도 넘어간다.
     const watch = () => {
@@ -195,7 +200,7 @@ function useChairGet(fillRef, on) {
     };
     const timer = window.setTimeout(fire, CHAIR_GET.crossMs + 120);
     raf = requestAnimationFrame(watch);
-    return () => { done = true; cancelAnimationFrame(raf); window.clearTimeout(timer); };
+    return () => { done = true; cancelAnimationFrame(raf); window.clearTimeout(timer); window.clearTimeout(gapTimer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
@@ -204,6 +209,8 @@ export default function MyHome({ item, still }) {
   const saved = useSyncExternalStore(subscribe, getSaved, getSaved);
   const [chairOk, setChairOk] = useState(true);
   useEffect(() => setChairOk(true), [saved.k, saved.c]);
+  // 아이템 녹음 파일 8개를 미리 받아 둔다(첫 누름 소리가 늦지 않게).
+  useEffect(() => { preloadItemSounds(); }, []);
   const kind = KINDS[saved.k];
   // 엉따 막대는 다른 화면에서 마이로 들어올 때만 채운다. 마이 안의 화면에서 돌아오면 처음부터 최종 길이다.
   // still: 획득 장면(19) 아래에 깔린 마이. 막대는 처음부터 최종 길이이고 획득 장면을 다시 부르지 않는다.

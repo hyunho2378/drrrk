@@ -7,7 +7,7 @@
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText, wait } from './dom.js';
 import { cloneOf } from './donor.js';
-import { SSANG } from './scene.js';
+import { bannerSpec } from './roomConcern.js';
 
 const BAR = '[data-figma="input/속성 14"]';
 
@@ -131,10 +131,16 @@ let bannerOpen = false;
 export function attachBanner(root) {
   const col = root.querySelector('[data-figma="고민 주제 · 최소화 (탭하면 자세히)"]');
   if (!col) { bannerOpen = false; return; }
+  const solo = !!root.querySelector('[data-figma="AI 드르륵 의자"]');
+  // 접힌 한 줄: 모든 함께 방(새 방, 일반 모드, 옛 방)이 같은 글(roomConcern.js)을 쓴다. 넘치는 글은 생성 화면의 말줄임(text-overflow)으로 줄인다.
+  if (!solo) {
+    const line = bannerSpec(root.dataset.room2).line;
+    const bp = [...col.querySelectorAll(':scope > p')].find((p) => p.textContent.trim() !== '고민');
+    if (bp && bp.textContent !== line) { bp.dataset.sync = '1'; setText(bp, line); }
+  }
   if (col.dataset.live) return;
   col.dataset.live = 'banner';
   col.style.cursor = 'pointer';
-  const solo = !!root.querySelector('[data-figma="AI 드르륵 의자"]');
   let exp = null, busy = false;
   const radius = () => (parseFloat(getComputedStyle(col).borderTopLeftRadius) || 14) + 'px';
   // 배너가 펼쳐지면 그 아래 퀵슬롯(접힌 알약이나 열린 목록)이 펼쳐진 만큼 부드럽게 내려간다.
@@ -164,9 +170,9 @@ export function attachBanner(root) {
     const e = await cloneOf(43, '[data-figma="고민 주제"]');
     if (!e || !root.isConnected) { busy = false; return; }
     if (!solo) {
-      // 함께 드르륵 방(scene.js patchRoom2가 이야기를 적어 둔 화면)은 그 이야기의 고민 글을(쌍밍아웃 2096:22269, 사진보정 2100:24227), 그 밖의 방은 옛 글을 쓴다.
-      const st = root.dataset.room2;
-      const B = st === 'ssang' ? SSANG.banner : st ? LIVE.bannerRoom2 : { title: null, body: LIVE.bannerBody, tags: LIVE.bannerTags };
+      // 함께 방은 모두 이야기의 고민 글(쌍밍아웃 2096:22269, 사진보정 2100:24227)이나 카드별 고민(카드 제목 두 줄과 탭 키워드)을 쓴다.
+      // 새 방은 patchRoom2가 적어 둔 이야기(root.dataset.room2)를, 일반 모드와 옛 방은 지금 이야기를 읽는다.
+      const B = bannerSpec(root.dataset.room2);
       const ps = q(e, 'p[data-outline]');
       const body = ps.slice().sort((a, b) => b.textContent.length - a.textContent.length)[0];
       setText(body, B.body);
@@ -177,6 +183,8 @@ export function attachBanner(root) {
       const tags = ps.filter((p) => /^#/.test(p.textContent.trim()));
       // 키워드 칩: 팀 글자 길이에 맞춘 고정 폭을 풀고 글자 길이대로 늘어나게 한다(좌우 여백이 같아야 한다).
       tags.forEach((t, i) => {
+        // 카드별 고민은 키워드가 하나다. 남는 칩은 숨긴다.
+        if (t.parentElement) t.parentElement.style.display = B.tags[i] ? '' : 'none';
         if (!B.tags[i]) return;
         setText(t, B.tags[i]);
         Object.assign(t.style, { width: 'auto', whiteSpace: 'nowrap' });
@@ -298,11 +306,6 @@ const pickFrom = (cands, cur) => {
   const pool = cands.filter((i) => i !== cur);
   const list = pool.length ? pool : cands;
   return list[Math.floor(Math.random() * list.length)];
-};
-const pickNext = (n, cur, meIdx) => {
-  const cands = [];
-  for (let i = 0; i < n; i++) if (i !== meIdx) cands.push(i);
-  return pickFrom(cands, cur);
 };
 
 const TILE_SEL = '[data-figma^="참여자 타일"], [data-figma^="Participant Tile"]';
@@ -434,32 +437,52 @@ export function attachSpeakers(root) {
     const dot = group.querySelector(':scope > [data-figma="Ellipse"]');
     const wave = group.querySelector(':scope > [data-figma="Group 2147229021"]');
     const labels = q(group, ':scope > p[data-outline]');
-    if (!dot || !wave || labels.length < 4) return;
-    root.dataset.speakers = 'floor';
-    // 새 방 장면(팀 피그마 1979:27515, 11. 9.)에는 "나" 이름표가 없다. 이름표 4명이 모두 돌아가며 말한다.
-    // 초록 점과 파동이 처음 붙어 있는 이름표(피그마의 말하는 사람, 보라돌이 의자71)를 기준 자리로 삼고 거기서 시작한다.
-    const rects = labels.map((p) => relRect(root, p));
-    const d0 = relRect(root, dot), w0 = relRect(root, wave);
-    const homeIdx = rects.reduce((b, r, i) => (Math.abs(r.y - d0.y) + Math.abs(r.x - d0.x) < Math.abs(rects[b].y - d0.y) + Math.abs(rects[b].x - d0.x) ? i : b), 0);
-    const m0 = rects[homeIdx];
-    // 옛 장면(새벽2시 이름표가 나인 화면)은 나를 빼고 돌린다. 말하는 표시는 나에게 붙지 않는다.
+    if (!dot || !wave || labels.length < 2) return;
+    // 나(새벽2시 피시방)는 말하는 표시를 받지 않는다. 남은 이름표가 돌아가며 말한다(옛 방 9는 이름표 둘 중 하나만 남는다).
     const meIdx = labels.findIndex((p) => /새벽2시/.test(p.textContent));
-    let cur = meIdx >= 0 ? (meIdx + 1) % labels.length : homeIdx;
-    [dot, wave].forEach((e) => (e.style.transition = 'transform 320ms ' + motion.emphasizedDecel + ', opacity 200ms'));
-    const place = (i) => {
-      const r = rects[i];
-      const dx = r.x - m0.x, dy = r.y - m0.y;
-      const cx = (r.x + r.w / 2) - (m0.x + m0.w / 2);
-      dot.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-      wave.style.transform = 'translate(' + cx + 'px,' + dy + 'px)';
+    const cands = labels.map((_, i) => i).filter((i) => i !== meIdx);
+    if (!cands.length) return;
+    root.dataset.speakers = 'floor';
+    // 이름표 글자(11/10 피드백 "말하는거 활성화 된 의자 이름이 회색-화이트로"): 평소는 피그마 회색(#F8F8F8 50%, Medium 11),
+    // 말하는 이름표만 흰색(#F8F8F8, Bold 12, 피그마 2100:24129와 2096:22171의 말하는 이름표 값). 색은 200ms로 바뀐다.
+    // 생성 화면이 이름표마다 덧그린 글자 그림(그림자 포함 SVG)은 피그마 처음 색과 굵기로 고정돼 있어서 지우고, 같은 그림자(흐림 4, 검정 50%, 말하는 이름표 25%)를 글자에 직접 준다.
+    labels.forEach((p) => q(p, ':scope > span[aria-hidden]').forEach((o) => o.remove()));
+    const paint = (i) => labels.forEach((p, k) => {
+      const on = k === i;
+      p.dataset.speaking = on ? '1' : '';
+      Object.assign(p.style, { transition: 'color 200ms ' + motion.standard, textShadow: on ? '0 0 4px rgba(0, 0, 0, 0.25)' : '0 0 4px rgba(0, 0, 0, 0.5)', webkitTextFillColor: 'currentColor', color: on ? '#F8F8F8' : 'rgba(248, 248, 248, 0.5)', fontWeight: on ? '700' : '500', fontSize: on ? '12px' : '11px', lineHeight: on ? '15px' : '14px', letterSpacing: on ? '-0.48px' : '-0.44px', height: on ? '15px' : '14px', width: 'auto', whiteSpace: 'pre' });
+    });
+    // 기준 자리: 피그마에서 초록 점과 파동이 붙어 있는 이름표. 점은 이름표 왼쪽, 파동은 이름표 가운데 위에 같은 간격으로 붙는다.
+    const d0 = relRect(root, dot), w0 = relRect(root, wave);
+    const rects0 = labels.map((p) => relRect(root, p));
+    const homeIdx = rects0.reduce((b, r, i) => (Math.abs(r.y - d0.y) + Math.abs(r.x - d0.x) < Math.abs(rects0[b].y - d0.y) + Math.abs(rects0[b].x - d0.x) ? i : b), 0);
+    paint(homeIdx);
+    const m0 = relRect(root, labels[homeIdx]);
+    const dotOff = { x: d0.x - m0.x, y: d0.y - m0.y };
+    const waveOff = { x: (w0.x + w0.w / 2) - (m0.x + m0.w / 2), y: w0.y - m0.y };
+    const marks = [dot, wave];
+    const put = (i) => {
+      paint(i);
+      const r = relRect(root, labels[i]);
+      dot.style.transform = 'translate(' + (r.x + dotOff.x - d0.x) + 'px,' + (r.y + dotOff.y - d0.y) + 'px)';
+      wave.style.transform = 'translate(' + ((r.x + r.w / 2) + waveOff.x - (w0.x + w0.w / 2)) + 'px,' + (r.y + waveOff.y - w0.y) + 'px)';
+    };
+    // 바뀔 때는 점과 파동이 100ms에 사라지고, 새 이름표에서 흰 글자(200ms)와 같이 나타난다. 다른 의자로 미끄러지는 동안 어긋나 보이지 않게 한다.
+    const move = (i) => {
+      marks.forEach((e) => { e.style.transition = 'opacity 100ms ' + motion.standard; e.style.opacity = '0'; });
+      window.setTimeout(() => {
+        if (!root.isConnected) return;
+        put(i);
+        marks.forEach((e) => { e.style.transition = 'opacity 200ms ' + motion.standard; e.style.opacity = '1'; });
+      }, 100);
     };
     q(wave, '[data-figma="voice wave"]').forEach((b, k) => b.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(0.45)' }, { transform: 'scaleY(1.25)' }, { transform: 'scaleY(0.7)' }], { duration: 620 + k * 110, iterations: Infinity, easing: 'ease-in-out' }));
-    void d0; void w0;
-    place(cur);
+    let cur = cands.includes(homeIdx) ? homeIdx : cands[0];
+    put(cur);
     const step = () => {
       if (!root.isConnected) return;
-      cur = pickNext(labels.length, cur, meIdx);
-      place(cur);
+      const next = pickFrom(cands, cur);
+      if (next !== cur) { cur = next; move(cur); }
       window.setTimeout(step, LIVE.speakMin + Math.random() * (LIVE.speakMax - LIVE.speakMin));
     };
     window.setTimeout(step, LIVE.speakFirst);

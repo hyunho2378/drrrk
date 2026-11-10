@@ -117,6 +117,17 @@ enum LiveData {
         .init(title: "남친이 1주년 선물로\n다이소 틴트 사줌", versus: "헤어질까 말까", time: "07:50", viewers: "15", scene: "D3-live-scene-2"),
     ]
     static let bell = "C-4fdd18ce8a29"
+
+    /// 카드가 속한 탭 이름. 친구, 연애, 가족, 학교, 진로 목록에서 같은 제목(빈칸과 줄바꿈 무시)을 찾는다.
+    /// 전체에만 있거나 어느 탭에도 없는 제목은 빈 글자. 웹 liveV2.js tabOf와 같은 규칙이다.
+    static func tab(for title: String) -> String {
+        let flat: (String) -> String = { $0.filter { !$0.isWhitespace } }
+        let t = flat(title)
+        for name in ["친구", "연애", "가족", "학교", "진로"] where (cards[name] ?? []).contains(where: { flat($0.title) == t }) {
+            return name
+        }
+        return ""
+    }
 }
 
 struct WatchSeat: Identifiable, Hashable {
@@ -140,6 +151,59 @@ enum WatchData {
     ]
     static let comments: [(String, String)] = [("구경하는 스툴3", "가죽소파님 목소리 너무 차분해서 더 슬픔"), ("폭신한 방석20", "그 친구 원래 그런 스타일이야?")]
     static let myComments = ["가죽소파님 힘내요!!"]
+}
+
+/// 방 구경 채팅 한 줄. mine이면 내 댓글(하늘색 말풍선, 이름 없음).
+struct WatchLine: Identifiable, Hashable {
+    let id = UUID()
+    let name: String
+    let text: String
+    let mine: Bool
+}
+
+/// 방 구경 채팅이 라이브 방송처럼 계속 올라온다(11/10 팀원 피드백 "라이브-눌러서 라방 보듯이 할라면 계속 새 메시지가 올라오는 것 처럼 해야할듯").
+/// 웹 client/src/app/watchChat.js와 같은 값, 같은 글 순서, 같은 간격 수열이다.
+enum WatchFeed {
+    static let firstDelay: Double = 0.8
+    static let minGap: Double = 2.4
+    static let maxGap: Double = 4.2
+    static let seed: UInt32 = 1110
+    static let maxRows = 5
+    /// 줄이 밀려 올라가고 나타나는 움직임 220ms, 표준 곡선
+    static let motion = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.22)
+
+    static var initial: [WatchLine] {
+        WatchData.comments.map { WatchLine(name: $0.0, text: $0.1, mine: false) } + WatchData.myComments.map { WatchLine(name: "", text: $0, mine: true) }
+    }
+
+    /// 글 후보: 지금 이야기 방 채팅 줄(들어온 직후와 무르익은 뒤의 다른 의자 줄), 다른 이야기 줄, 커뮤니티 글 상세 댓글, 방 구경 댓글 순서.
+    /// 사진보정 카드는 photo 줄을, 그 밖의 카드는 ssang 줄을 먼저 쓴다. 순서대로 돌아 같은 줄이 연달아 나오지 않는다.
+    static func lines(_ story: StoryKind) -> [(String, String)] {
+        func talk(_ c: RoomModel.StoryContent) -> [(String, String)] {
+            (c.opening + c.talk).compactMap { entry in
+                if case let .other(line) = entry { return (line.name, line.text) }
+                return nil
+            }
+        }
+        let first = talk(RoomModel.content(story))
+        let second = talk(RoomModel.content(story == .photo ? .ssang : .photo))
+        return first + second + CommunityData.comments.map { ($0.name, $0.text) } + WatchData.comments
+    }
+
+    /// 새 줄을 아래에 붙이고 오래된 줄을 지워 5줄을 넘지 않게 한다.
+    static func push(_ feed: inout [WatchLine], _ line: WatchLine) {
+        feed.append(line)
+        if feed.count > maxRows { feed.removeFirst(feed.count - maxRows) }
+    }
+
+    /// 같은 시작 값이면 같은 수열(32비트 선형 합동). 웹 makeRandom과 같은 식이다.
+    struct Random {
+        var state: UInt32 = WatchFeed.seed
+        mutating func next() -> Double {
+            state = state &* 1_664_525 &+ 1_013_904_223
+            return Double(state) / 4_294_967_296
+        }
+    }
 }
 
 struct CommunityPost: Identifiable, Hashable {
@@ -214,7 +278,10 @@ enum Avatars {
 /// 사진보정 카드(둘이 찍은 사진인데 지만 보정해서 올린 여우)면 Story.current = .photo, 다른 카드는 .ssang(팀 메모 2100:24023).
 extension Router {
     func openWatch(_ pick: WatchPick) {
-        Story.current = WatchPick.isPhoto(pick.title) ? .photo : .ssang
+        let photo = WatchPick.isPhoto(pick.title)
+        Story.current = photo ? .photo : .ssang
+        // 카드별 고민(방 고민 탭이 읽는다): 사진보정 카드는 nil, 그 밖의 카드는 제목(줄바꿈 없이 빈칸 하나)과 카드가 속한 탭 이름. 웹 liveV2.js pickWatch와 같다.
+        Story.concern = photo ? nil : (title: pick.title.split(whereSeparator: \.isWhitespace).joined(separator: " "), tag: LiveData.tab(for: pick.title))
         watch = pick
         push(.liveWatch)
     }

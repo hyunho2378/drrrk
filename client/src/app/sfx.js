@@ -1,4 +1,6 @@
-// 효과음. 소리 파일 없이 브라우저 오디오(Web Audio)로 짧게 만든다. 첫 터치 때 켜지고(사파리 규칙), 소리 크기는 작게 둔다.
+// 효과음. 짧은 효과음은 소리 파일 없이 브라우저 오디오(Web Audio)로 만든다. 첫 터치 때 켜지고(사파리 규칙), 소리 크기는 작게 둔다.
+// 아이템 소리와 방 대사는 팀이 녹음한 mp3(itemSounds.js)를 같은 오디오로 낸다. 파일을 못 불러오면 아이템은 아래 합성 소리로 대신한다.
+import { SOUND_FILES } from './itemSounds.js';
 const AC = typeof window !== 'undefined' ? window.AudioContext || window.webkitAudioContext : null;
 let ctx = null;
 
@@ -125,16 +127,115 @@ function playItemNow(key) {
 }
 
 // 아이템 소리를 낸다. 키는 itemCopy.js의 아이템 키(shrimp, soju, peanut, nogari, drrra, squid, monster, byeollo)이거나 locked다.
+// 8개 아이템은 녹음 파일을 내고, 파일을 못 불러오면 합성 소리를 낸다. 미획득(locked)은 합성 소리 그대로다.
 export function playItem(key) {
   if (!AC) return false;
   const now = Date.now();
   if (now - itemAt < ITEM_GAP_MS) return false;
   itemAt = now;
   if (!ctx) ctx = new AC();
+  const synth = () => { if (ok()) playItemNow(key); };
+  if (key !== 'locked' && SOUND_FILES[key]) {
+    playSound(key, { channel: 'item', fallback: synth });
+    return true;
+  }
+  stopChannel('item');
   if (ctx.state === 'running') playItemNow(key);
-  else ctx.resume().then(() => { if (ok()) playItemNow(key); });
+  else ctx.resume().then(synth);
   return true;
 }
+// 마이 화면에 들어오면 8개 아이템 파일을 미리 받아 둔다(첫 누름 소리가 늦지 않게).
+export const preloadItemSounds = () => preloadSounds(['shrimp', 'soju', 'peanut', 'nogari', 'drrra', 'squid', 'monster', 'byeollo']);
+
+// ---------- 녹음 파일 재생 ----------
+// 파일은 fetch로 받아 decodeAudioData로 풀어 두고(오디오가 아직 잠겨 있어도 풀 수 있다), 부를 때 바로 낸다.
+// 통로(channel)마다 소리는 하나만 난다: 같은 소리를 150ms 안에 다시 부르면 무시하고, 새 소리가 오면 앞 소리를 30ms 만에 줄여 끊는다.
+// 음량은 0.8이다. 브라우저는 사용자가 화면을 한 번 누르기 전에는 소리를 막는다. 그때 부른 소리는 내지 않고 기록에 blocked로 남긴다.
+const SOUND_VOL = 0.8;
+const SOUND_GAP_MS = 150;
+const SOUND_FADE = 0.03;
+const bufs = {};
+const loading = {};
+const chans = {};
+const asked = {};
+const ensureCtx = () => { if (!AC) return null; if (!ctx) ctx = new AC(); return ctx; };
+
+// 확인용 기록: 부른 시각, 파일, 오디오 상태, 결과(played, gap, blocked, late, fallback). 개발 도구에서 window.__drrrkSound 로 읽는다.
+const soundLog = typeof window !== 'undefined' ? (window.__drrrkSound = window.__drrrkSound || []) : [];
+const note = (key, channel, result) => {
+  soundLog.push({ t: Math.round(performance.now()), key, file: (SOUND_FILES[key] || '').split('/').pop(), channel, state: ctx ? ctx.state : 'none', result });
+  if (soundLog.length > 80) soundLog.shift();
+};
+
+export function loadSound(key) {
+  if (bufs[key]) return Promise.resolve(bufs[key]);
+  if (loading[key]) return loading[key];
+  const url = SOUND_FILES[key];
+  const c = ensureCtx();
+  if (!url || !c) return Promise.resolve(null);
+  loading[key] = fetch(url)
+    .then((r) => { if (!r.ok) throw new Error('http ' + r.status); return r.arrayBuffer(); })
+    .then((ab) => new Promise((res, rej) => c.decodeAudioData(ab, res, rej)))
+    .then((b) => (bufs[key] = b))
+    .catch(() => { loading[key] = null; return null; });
+  return loading[key];
+}
+export const preloadSounds = (keys) => keys.forEach((k) => loadSound(k));
+
+// 통로의 지금 소리를 30ms 만에 줄여 끊는다. 받는 중인 소리도 내지 않게 한다.
+export function stopChannel(channel) {
+  asked[channel] = null;
+  const cur = chans[channel];
+  if (!cur || !ctx) return;
+  chans[channel] = null;
+  cur.stopped = true;
+  const t = ctx.currentTime;
+  try {
+    cur.gain.gain.cancelScheduledValues(t);
+    cur.gain.gain.setValueAtTime(cur.gain.gain.value, t);
+    cur.gain.gain.linearRampToValueAtTime(0, t + SOUND_FADE);
+    cur.src.stop(t + SOUND_FADE + 0.01);
+  } catch (e) { /* 이미 끝난 소리 */ }
+}
+
+// 소리를 낸다. onEnded는 끝까지 재생되었을 때만 부른다(끊긴 경우는 부르지 않는다). fallback은 파일을 못 불러왔을 때 부른다.
+export function playSound(key, { channel = 'item', vol = SOUND_VOL, onEnded, fallback } = {}) {
+  const c = ensureCtx();
+  if (!c) { note(key, channel, 'noaudio'); if (fallback) fallback(); return false; }
+  const now = performance.now();
+  const last = asked[channel];
+  if (last && last.key === key && now - last.at < SOUND_GAP_MS) { note(key, channel, 'gap'); return false; }
+  const me = { key, at: now };
+  asked[channel] = me;
+  const start = (buf) => {
+    // 받는 동안 같은 통로에 다른 소리가 왔거나 끊으라고 했으면 내지 않는다.
+    if (asked[channel] !== me) return;
+    if (!buf) { note(key, channel, 'fallback'); if (fallback) fallback(); return; }
+    if (c.state !== 'running') { note(key, channel, 'blocked'); return; }
+    // 파일을 받는 동안 1.5초가 지나면 늦은 소리가 되므로 내지 않는다.
+    if (performance.now() - now > 1500) { note(key, channel, 'late'); return; }
+    const prev = chans[channel];
+    if (prev) { asked[channel] = null; stopChannel(channel); asked[channel] = me; }
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const gain = c.createGain();
+    gain.gain.value = vol;
+    src.connect(gain).connect(c.destination);
+    const playing = { key, src, gain, stopped: false };
+    chans[channel] = playing;
+    src.onended = () => {
+      if (chans[channel] === playing) chans[channel] = null;
+      if (!playing.stopped && onEnded) onEnded();
+    };
+    src.start();
+    note(key, channel, 'played');
+  };
+  const go = (buf) => (c.state === 'running' ? start(buf) : c.resume().then(() => start(buf), () => start(buf)));
+  if (bufs[key]) go(bufs[key]);
+  else loadSound(key).then(go);
+  return true;
+}
+export const channelBusy = (channel) => !!chans[channel];
 // 확인용: 지금 오디오 상태와 아이템 소리 묶음이 살아 있는지
 export const itemAudioState = () => ({ state: ctx ? ctx.state : 'none', busy: !!itemBus });
 
