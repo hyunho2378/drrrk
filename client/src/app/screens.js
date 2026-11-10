@@ -6,7 +6,7 @@ export const SCREENS = [
   "id": "2023:30658",
   "name": "종료",
   "file": "Screen1647_26726",
-  "h": 1708
+  "h": 844
  },
  {
   "n": 2,

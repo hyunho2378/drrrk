@@ -47,6 +47,8 @@ struct RoomView: View {
     @State private var lastMinute = false
     /// 해뜨기 영상(SunriseVideo.swift). 방에 들어오면 만들어 미리 받고, 해 뜨는 단계(lastMinute)가 시작되면 한 번 재생한다.
     @State private var sunrise: SunrisePlayer?
+    /// 방 입장 영상(RoomEnterVideo.swift). 이 방이 처음 나타날 때만 만들어 한 번 재생한다. 일반 모드에서 돌아와도 다시 재생하지 않는다.
+    @State private var entry: RoomEnterPlayer?
     /// 끌고 있는 주전부리. 손을 떼거나 화면이 바뀌어 끌기가 취소되면 저절로 비워진다(예전 @State는 취소되면 남아 끄는 그림과 테이블 빛이 멈춰 있었다).
     @GestureState private var drag: SnackDrag?
     @Namespace private var dockSpace
@@ -62,6 +64,14 @@ struct RoomView: View {
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
                     .opacity(sunrise?.shown == true ? 0 : 1)
+
+                // 방 입장 영상: 장면 그림 바로 위. 끝나면 0.12초 동안 옅어지며 같은 구도의 장면 그림으로 이어진다.
+                if let entry, entry.player != nil, entry.visible {
+                    RoomEnterVideoView(entry: entry)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
 
                 // 해뜨기 영상: 장면 그림 바로 위, 이름표와 채팅 아래. 첫 장면이 그려지기 전에는 보이지 않는다.
                 if let sunrise, sunrise.player != nil {
@@ -113,10 +123,17 @@ struct RoomView: View {
         .onAppear {
             // 해뜨기 영상을 미리 받는다. 일반 모드에서 돌아왔고 영상이 도중이면 이어 재생한다.
             if sunrise == nil { sunrise = SunrisePlayer(story: model.story) }
+            // 방 입장 영상: 이 방이 처음 나타날 때만 만든다. 온보딩 덮개가 떠 있으면 첫 장면에 세워 두고 닫히면 재생한다.
+            if entry == nil {
+                let e = RoomEnterPlayer(story: model.story)
+                entry = e
+                if !showOnboarding { e.start() }
+            }
             else if let s = sunrise, s.startedAt != nil, s.endedAt == nil { s.player?.play() }
         }
         .onDisappear {
             sunrise?.stop()
+            entry?.stop()
             RoomVoice.shared.leave()
             // 방을 나갔을 때만(현장 모드 방이 길에서 빠졌을 때) 채팅을 닫는다. 일반 모드로 넘어갈 때는 이어 간다.
             if !router.path.contains(.room), !router.path.contains(.onboardingTogether) { RoomChat.shared.leave() }
@@ -127,6 +144,9 @@ struct RoomView: View {
             await RoomChat.shared.run { model.stageEntries.count }
         }
         .onChange(of: showOnboarding) { _, up in RoomVoice.shared.setCovered(up) }
+        .onChange(of: showOnboarding) { _, up in if !up { entry?.start() } }
+        // 해 뜨는 단계가 시작되면 입장 영상은 멈추고 뺀다(해뜨기 영상과 겹치지 않게). 웹은 40번 화면이 붙을 때 같은 일을 한다.
+        .onChange(of: lastMinute) { _, on in if on { entry?.stop() } }
         .onChange(of: mineTexts) { _, texts in RoomVoice.shared.show(texts) }
         .task { await rotateSpeakers() }
         .task { await watchClock() }
@@ -702,6 +722,8 @@ private struct ChatColumn: View {
                 }
             }
         }
+        // 줄이 한두 줄뿐이라 폭이 좁을 때 가운데로 모이지 않고 피그마처럼 왼쪽 끝(24)에 붙게 한다(11/11 시뮬레이터 확인).
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

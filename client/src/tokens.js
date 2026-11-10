@@ -56,7 +56,7 @@ export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lin
 
 // 휴대폰에서 꽉 채우기(mobileFit.js). 폭 600 이하를 휴대폰으로 본다. crop은 숨기는 피그마 상태바 줄 높이, head는 머리말 끝,
 // keep은 빈 띠마다 남기는 최소 높이, bgMin 이상 높이는 배경 그림으로 본다.
-export const mobile = { maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600, bgAnchor: 0.6, bottomSeed: 100, clusterMin: 300, clusterGap: 28, homeBar: [134, 5], pinZ: 3 };
+export const mobile = { scrollOnly: ['2023:30658'], maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600, bgAnchor: 0.6, bottomSeed: 100, clusterMin: 300, clusterGap: 28, homeBar: [134, 5], pinZ: 3 };
 
 // 방 시계는 화면에 20:00에서 시작해 00:00까지 줄어들고, 이 20분이 실제로는 1분 30초(90초)에 지나간다(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로").
 // 그래서 시계는 1초에 13.33초씩 줄어든다(1200 / 90). 방 시계(live.js), 방 구경 시계(37), 이어받기(roomClockHandoff.js)가 모두 이 빠르기를 쓴다. iOS RoomModel.realSeconds와 같다.
@@ -80,6 +80,11 @@ export const live = {
   // 해 뜨는 단계 배경 영상(sunriseVideo.js). 이야기마다 하나. 첫 장면이 그려지면 장면 그림이 이 시간(ms) 동안 옅어진다.
   sunriseVideo: { ssang: 'sunrise/sunrise-ssang.mp4', photo: 'sunrise/sunrise-photo.mp4' },
   sunriseFadeMs: 120,
+  // 함께 드르륵 방 입장 영상(roomEnterVideo.js, 피그마 댓글 1807:23214 "영상으로 반영"). 3.08초 한 번 재생하고, 끝나면 이 시간(ms) 동안 옅어지며 방 사진으로 이어진다.
+  // 영상 소리 음량(0에서 1). 0이면 소리를 끈다. iOS RoomEnterPlayer.volume과 같다.
+  roomEnterVideo: { ssang: 'roomenter/room-enter-ssang.mp4', photo: 'roomenter/room-enter-photo.mp4' },
+  roomEnterFadeMs: 120,
+  roomEnterVolume: 0.6,
   // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
   // A 옛 방(9): 01:12에 해 뜨는 단계(40), 0에 종료(1).
   // B 함께 드르륵 방(28, 29, 쌍밍아웃과 사진보정 둘 다): 01:12에 해 뜨는 단계(40, 해뜨기 영상), 0이 된 뒤 영상 마지막 장면에 3초 머물고 종료(1).
@@ -96,11 +101,14 @@ export const live = {
   // 카드 아래 점 사이 간격(피그마 Page Dots 값).
   dotGap: 6,
   // 위아래로 움직이는 화면(라이브 10, 라운지 카테고리 48~52, 글 상세 38, 커뮤니티 39). 머리말 아래(112)부터 움직이고, 맨 끝 내용 아래로 여백을 둔다.
-  scrollScreens: [10, 38, 39, 48, 49, 50, 51, 52],
+  // 종료(1)도 화면 크기(390 x 844) 창 안에서 움직인다(의정 1647:26726 "스크롤 화면 크기로 수정", 11. 11.).
+  scrollScreens: [1, 10, 38, 39, 48, 49, 50, 51, 52],
   // 스크롤하지 않고 제자리에 두는 요소(글 상세의 댓글 입력줄).
   pinNames: { 38: ['input'] },
   scrollTop: 112,
   scrollPad: 24,
+  // 화면별 맨 끝 여백. 종료(1)는 피그마 1708 프레임에서 마지막 글(올리지 않고 홈으로) 아래가 40이다.
+  scrollPadBy: { 1: 40 },
   chatFirst: 350,
   chatGap: 900,
   chatSpacing: 12,
@@ -168,6 +176,10 @@ export const live = {
   // MY 엉따 온도 막대
   gaugeMs: 1000,
   gaugeDelay: 200,
+  // 종료(1) 덩어리 펼침(reportMotion.js): 420ms, 아래 16px에서 올라옴, 줄 사이 60ms, 첫 덩어리 0.1초 뒤, 화면 아래 80px 안으로 들어오면 시작.
+  reportMotion: { ms: 420, dy: 16, rowGap: 60, firstDelay: 100, enterBand: 80 },
+  // 아침(2)과 오늘 나눈 대화(3)의 고정 버튼 막대 위 바탕색 띠 높이.
+  reportBand: 24,
   // MY 화면들(엉따 온도 막대가 차는 화면)과 아이템 상세, 미리 그려 둘 화면
   myScreens: [1, 2, 36, 53, 54],
   itemScreen: 54,

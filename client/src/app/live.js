@@ -29,7 +29,9 @@ import { patchSolo } from './solo.js';
 import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
 import { patchReportStory } from './reportPatch.js';
+import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.js';
 import { prefetchSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
+import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 
 export { setText };
 
@@ -374,7 +376,9 @@ function scrollerOf(layer, root, n) {
   const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
   const named = (LIVE.pinNames[n] || []).map((nm) => root.querySelector(':scope > [data-figma="' + nm + '"]')).filter(Boolean);
   const pins = [...(fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : []), ...named];
-  const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : LIVE.screenH;
+  // 종료(1)는 바닥 요소가 없고, 휴대폰에서는 뿌리 칸이 보이는 창 바닥까지 늘어난다(mobileFit.js). 그 바닥까지 움직인다.
+  const floor = n === 1 ? endFloor(root) : LIVE.screenH;
+  const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : floor;
   const box = root.querySelector(':scope > [data-figma="Scroll"]');
   let items, top;
   if (box) {
@@ -395,11 +399,13 @@ function scrollerOf(layer, root, n) {
       if (rr.h > 0) end = Math.max(end, rr.y + rr.h);
     });
   });
-  const max = Math.max(0, end + LIVE.scrollPad - bottom);
+  const max = Math.max(0, end + (LIVE.scrollPadBy[n] ?? LIVE.scrollPad) - bottom);
   if (!max) return null;
   const hot = q(layer, '[data-hotspot]').filter((b) => {
     const t = parseFloat(b.style.top);
-    return t >= top - 0.5 && t < bottom && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
+    // 종료(1)의 아래 버튼(y1590, 1640)은 창 아래(844 넘어)에 있다가 스크롤로 올라온다. 누르는 자리도 같이 움직인다.
+    const below = n === 1 && t >= LIVE.screenH;
+    return ((t >= top - 0.5 && t < bottom) || below) && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
   });
   const clipNeeded = !box;
   const y0 = new Map(items.map((el) => [el, relRect(root, el).y]));
@@ -702,6 +708,30 @@ function patchReport(root, n) {
     root.appendChild(cta);
     Object.assign(cta.style, { position: 'absolute', left: rr.x + 'px', top: rr.y + 'px' });
   }
+  // 아래 버튼 막대(huisu 1647:27027 "이 하단 바가 계속 따라오게", 11. 11.): 막대는 이미 창 바닥(y726)에 고정이다.
+  // 막대 뒤로 지나가는 글이 버튼 윗선에서 잘려 보이지 않게 막대 바로 위에 바탕색에서 투명으로 가는 24px 띠를 둔다.
+  // 띠는 막대의 첫 자식으로 넣어 휴대폰 맞춤(mobileFit.js)에서 막대가 옮겨져도 같이 따라간다.
+  // 막대 윗선 아래는 피그마 검은 그라데이션(Rectangle 1954141374, y632 높이 212, 73.24%에서 검정)이 빈 바탕 위에 그리는 색을 그대로 이어 칠한다.
+  // 띠 아래로 내용이 비쳐 경계선처럼 보이는 일을 막고, 내용이 없을 때의 모습은 피그마와 같다.
+  // 띠는 버튼 글자 밑에 깔리도록 막대를 따로 쌓고(isolation) 띠를 그 안 맨 아래(z -1)에 둔다.
+  const bar = root.querySelector(':scope > [data-figma="Frame 2147249293"]');
+  const scrim = root.querySelector(':scope > [data-figma="Rectangle 1954141374"]');
+  if (bar && scrim && !bar.querySelector(':scope > [data-report-band]')) {
+    const band = document.createElement('div');
+    band.setAttribute('aria-hidden', 'true');
+    band.setAttribute('data-report-band', '');
+    const br = relRect(root, bar), sr = relRect(root, scrim);
+    const blackAt = sr.y + sr.h * 0.7324;
+    const a = Math.max(0, Math.min(1, (br.y - sr.y) / (blackAt - sr.y)));
+    const rgb = (bg.match(/\d+/g) || [18, 20, 21]).slice(0, 3).map((v) => Math.round(v * (1 - a)));
+    const below = sr.y + sr.h - br.y;
+    const B = LIVE.reportBand;
+    const grad = 'linear-gradient(to bottom, transparent 0px, rgb(' + rgb.join(', ') + ') ' + B + 'px, #000 ' + (B + Math.max(0, blackAt - br.y)) + 'px, #000 ' + (B + below) + 'px)';
+    Object.assign(band.style, { position: 'absolute', left: -br.x + 'px', top: -B + 'px', width: LIVE.screenW + 'px', height: B + below + 'px', pointerEvents: 'none', background: grad });
+    band.style.zIndex = '-1';
+    Object.assign(bar.style, { overflow: 'visible', isolation: 'isolate' });
+    bar.prepend(band);
+  }
 }
 
 // 새 의자 팝업(19) 뒤 화면: 옛 뱃지 시트(불꽃 드륵 등)는 쓰지 않는다. MY 화면(36)의 나의 업적 편의점 시트로 바꾼다.
@@ -759,11 +789,14 @@ export async function prepare(layer, n, prevN) {
   patchPill(root, n);
   patchReport(root, n);
   patchReportStory(root, n);
+  prepReportMotion(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
   if (n === LIVE.itemScreen) await fillItem(root);
   await patchSkinPopup(root, n);
   if (n === LIVE.analysisScreen) initAnalysis(root);
   prepareRoomClock(root, n);
+  // 방 입장 영상: 새로 들어오는 함께 드르륵 방(B)이면 장면 그림 위에 첫 장면을 깔아 둔다(roomEnterVideo.js).
+  prepareRoomEnter(root, n, sceneOf(n) === 'B' && room.scene !== 'B');
   prepareChat(root, n);
   patchCommunity(root, n);
 }
@@ -803,12 +836,15 @@ export function attach(layer, n, go, prevN) {
   startWatchChat(root, n);
   patchCommunity(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
+  attachReportMotion(root, n);
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);
   voiceOnScreen(n, sc);
   // 해뜨기 영상: 방(B)과 방 구경(W)에 들어오면 미리 받고, 해 뜨는 단계(40)에서 재생한다. 다른 화면이면 멈추고 뺀다(sunriseVideo.js).
   if (sc === 'B' || sc === 'W') prefetchSunrise();
   attachSunrise(root, n);
+  // 방 입장 영상: 새로 들어온 방이면 한 번 재생하고, 같은 방 안 전환이면 이어 가거나 멈춘다(roomEnterVideo.js). room.scene이 바뀌기 전에 부른다.
+  attachRoomEnter(root, n, sc === 'B' && room.scene !== 'B');
   if (sc) {
     const kind = timerKind(root);
     if (room.scene !== sc || room.kind !== kind) {

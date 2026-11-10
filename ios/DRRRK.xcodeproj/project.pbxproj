@@ -10,6 +10,7 @@
 		0AA854BF8B8315F2BE279590 /* snack-can.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FEE1755FB237620D0E2AE9A5 /* snack-can.mp3 */; };
 		0CFEDF0125B4CB879D2DCA23 /* SUIT-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 37CF8AE0BD5CC76AEC12E9B2 /* SUIT-ExtraBold.otf */; };
 		1253C405282A608123A76EE6 /* sunrise-photo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */; };
+		1C8D73314E7F0E4B41EDFD33 /* RoomEnterVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */; };
 		2086FB2D2C7FC1046CDB9399 /* LiveScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */; };
 		21BC378FC93A374C180C79FE /* RoomClockHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1735AA7C558ED37465659F5F /* RoomClockHandoff.swift */; };
 		23E31936A51E28D4ACEB49C9 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4533C63C25CFFB9BEEE5F247 /* Tokens.swift */; };
@@ -20,6 +21,7 @@
 		2E5A7D4A2F4691C314A86806 /* voice-museun-il.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4D30BE6685A6E7CBEA027AA7 /* voice-museun-il.mp3 */; };
 		35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8873B83148F8763D3B5E0993 /* HomeScreens.swift */; };
 		3860CFEDB8EE5FF8211E993F /* SunriseVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F9271AE4A903499C7D1C58 /* SunriseVideo.swift */; };
+		3AA9D92D641C4E6CE0012504 /* ReportMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */; };
 		3BC2C129F9EA63AE7592263A /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A4A2BA30C7DB329308DD9B /* RoomView.swift */; };
 		3F4E0A7FEF2177ECCA5A335E /* SUIT-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6467F779520715C87E712F41 /* SUIT-Medium.otf */; };
 		41A44E31079DD018324A741C /* ClipSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A58B17C0F22880FD7E18C587 /* ClipSheets.swift */; };
@@ -39,6 +41,7 @@
 		8DEFB64716B3EB82B2678540 /* clip-scenes.json in Resources */ = {isa = PBXBuildFile; fileRef = 9F99D7E82EC9E11C197E5C06 /* clip-scenes.json */; };
 		8DFE97107118D796AB06FC10 /* ClipScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */; };
 		932983BB634B5A0F513D4CFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5C3CA32A15F62294981BB03 /* Assets.xcassets */; };
+		9DE5146244173ADB7ED4F45D /* room-enter-ssang.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */; };
 		A12048B40400EBB52FA8F9DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DD6D0BE274C4209DEA4486 /* Router.swift */; };
 		A72736B578829C9EDD5A4D07 /* snack-soju.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B3B5FDB33CEBC883BD517974 /* snack-soju.mp3 */; };
 		A854281C465947E88B00A76A /* ItemSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13A6A48C689B76171BBDB00 /* ItemSound.swift */; };
@@ -54,6 +57,7 @@
 		E901701EBADC7258D253319F /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AE12650DE60F318392041F22 /* SUIT-Regular.otf */; };
 		F0CBC41FD77253486E8F2854 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC665468AD22F020707AA567 /* RootView.swift */; };
 		F1570ED9E8EB8993EC34B676 /* sunrise-ssang.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0F31ED16836268E045ED6C57 /* sunrise-ssang.mp4 */; };
+		FEA54EC24EE2DA9AF4135DBD /* room-enter-photo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +82,7 @@
 		60A5CBC8CD8F61B0E7E42708 /* DRRRK.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DRRRK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6467F779520715C87E712F41 /* SUIT-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Medium.otf"; sourceTree = "<group>"; };
 		6B4862DF05D28CBDBD44A4E3 /* MyScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyScreens.swift; sourceTree = "<group>"; };
+		6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */ = {isa = PBXFileReference; path = "room-enter-ssang.mp4"; sourceTree = "<group>"; };
 		6CC4616163EFF5713ABE2E4C /* snack-chips.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-chips.mp3"; sourceTree = "<group>"; };
 		705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityScreens.swift; sourceTree = "<group>"; };
 		71995CDE44FF241C9D51C4E3 /* SUIT-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Bold.otf"; sourceTree = "<group>"; };
@@ -89,18 +94,21 @@
 		83F9271AE4A903499C7D1C58 /* SunriseVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseVideo.swift; sourceTree = "<group>"; };
 		8873B83148F8763D3B5E0993 /* HomeScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreens.swift; sourceTree = "<group>"; };
 		8B487C08A1B7EC0175936B1F /* RoomModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomModel.swift; sourceTree = "<group>"; };
+		91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomEnterVideo.swift; sourceTree = "<group>"; };
 		9D390999B1CC4FB625BD4D1F /* voice-naman-yemin.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "voice-naman-yemin.mp3"; sourceTree = "<group>"; };
 		9F99D7E82EC9E11C197E5C06 /* clip-scenes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clip-scenes.json"; sourceTree = "<group>"; };
 		A58B17C0F22880FD7E18C587 /* ClipSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipSheets.swift; sourceTree = "<group>"; };
 		AC665468AD22F020707AA567 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		AE12650DE60F318392041F22 /* SUIT-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Regular.otf"; sourceTree = "<group>"; };
 		B3B5FDB33CEBC883BD517974 /* snack-soju.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-soju.mp3"; sourceTree = "<group>"; };
+		B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */ = {isa = PBXFileReference; path = "room-enter-photo.mp4"; sourceTree = "<group>"; };
 		BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScreens.swift; sourceTree = "<group>"; };
 		C13A6A48C689B76171BBDB00 /* ItemSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSound.swift; sourceTree = "<group>"; };
 		D2DD6D0BE274C4209DEA4486 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		D88CDC61C1AC45D9164E2648 /* ClipScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScene.swift; sourceTree = "<group>"; };
 		E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingKit.swift; sourceTree = "<group>"; };
 		E5C3CA32A15F62294981BB03 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMotion.swift; sourceTree = "<group>"; };
 		EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStudioView.swift; sourceTree = "<group>"; };
 		EE389391EFD2C0E26081D3F7 /* ItemCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCopy.swift; sourceTree = "<group>"; };
 		FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScreens.swift; sourceTree = "<group>"; };
@@ -173,6 +181,8 @@
 		59249A41957494967FDA77FC /* Videos */ = {
 			isa = PBXGroup;
 			children = (
+				B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */,
+				6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */,
 				5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */,
 				0F31ED16836268E045ED6C57 /* sunrise-ssang.mp4 */,
 			);
@@ -307,7 +317,9 @@
 		EE3738FC29836FDBA9155398 /* Room */ = {
 			isa = PBXGroup;
 			children = (
+				ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */,
 				05962FBA580675C788F4D5DF /* RoomChat.swift */,
+				91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */,
 				8B487C08A1B7EC0175936B1F /* RoomModel.swift */,
 				7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */,
 				23A4A2BA30C7DB329308DD9B /* RoomView.swift */,
@@ -395,6 +407,8 @@
 				DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */,
 				8DEFB64716B3EB82B2678540 /* clip-scenes.json in Resources */,
 				63EC4390B346CD0C760147D7 /* logo-motion.mp4 in Resources */,
+				FEA54EC24EE2DA9AF4135DBD /* room-enter-photo.mp4 in Resources */,
+				9DE5146244173ADB7ED4F45D /* room-enter-ssang.mp4 in Resources */,
 				0AA854BF8B8315F2BE279590 /* snack-can.mp3 in Resources */,
 				2C2E11DA76D75D80E1850BBE /* snack-chips.mp3 in Resources */,
 				7D2DE5D8D1BCB1AE1F668A00 /* snack-dried.mp3 in Resources */,
@@ -430,8 +444,10 @@
 				5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */,
 				C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */,
 				48F0D0EA9E7B55B9CDE3592F /* OnboardingVisuals.swift in Sources */,
+				3AA9D92D641C4E6CE0012504 /* ReportMotion.swift in Sources */,
 				64FD68FDB86E4B51FD5303A4 /* RoomChat.swift in Sources */,
 				21BC378FC93A374C180C79FE /* RoomClockHandoff.swift in Sources */,
+				1C8D73314E7F0E4B41EDFD33 /* RoomEnterVideo.swift in Sources */,
 				D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */,
 				5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */,
 				3BC2C129F9EA63AE7592263A /* RoomView.swift in Sources */,

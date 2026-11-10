@@ -175,6 +175,8 @@ struct RoomNormalView: View {
                         .transition(.opacity.combined(with: .offset(y: 8)))
                 }
             }
+            // 줄이 한두 줄뿐일 때 가운데로 모이지 않게 왼쪽 끝에 붙인다.
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 24)
             .overlay(alignment: .bottomLeading) {
                 if emojiOpen {
@@ -962,6 +964,8 @@ private struct ReportText {
 
 /// 00 엉따온도 카드(342 x 188, #222628, 모서리 20, 안쪽 24 / 20)
 private struct WarmthCard: View {
+    /// 막대 채움(0에서 1). 화면에 들어오는 순간 왼쪽에서 오른쪽으로 찬다(ReportMotion.swift GaugeFill). 색과 그라데이션은 그대로 두고 드러내기만 한다.
+    @State private var fill: CGFloat = 0
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             (Text("오늘 대화에서 의자가\n").foregroundColor(DS.Palette.textPrimary)
@@ -985,9 +989,11 @@ private struct WarmthCard: View {
                         Capsule().fill(DS.Palette.bgSurface)
                         Capsule().fill(LinearGradient(colors: [DS.Palette.brandPrimary, DS.Palette.accentOrange], startPoint: .leading, endPoint: .trailing))
                             .frame(width: g.size.width * 224 / 302)
+                            .mask(alignment: .leading) { Rectangle().frame(width: g.size.width * 224 / 302 * fill) }
                     }
                 }
                 .frame(height: 12)
+                .modifier(GaugeFill(fill: $fill))
             }
         }
         .padding(.vertical, 24).padding(.horizontal, 20)
@@ -1037,6 +1043,7 @@ private struct TalkTimeline: View {
                     Text(text.worry).fig(12, .medium, DS.Palette.textTertiary)
                 }
             }
+            .endRow(3, 0)
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(steps.indices, id: \.self) { i in
                     let last = i == steps.count - 1
@@ -1054,6 +1061,7 @@ private struct TalkTimeline: View {
                         .padding(.top, 4).padding(.bottom, last ? 0 : 20)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .endRow(3, i + 1)
                 }
             }
         }
@@ -1383,8 +1391,9 @@ private struct ReportBody: View {
     let kind: ReportKind
     var body: some View {
         VStack(alignment: .leading, spacing: kind == .morning ? 40 : 36) {
-            if kind != .summary { WarmthCard() }
-            TalkTimeline(gap: kind == .morning ? 20 : 12, morning: kind == .morning)
+            // 종료의 덩어리 번호(ReportMotion.swift): 0 제목, 1 해, 2 엉따 카드, 3 오늘 나눈 대화, 4 오늘의 드르륵 대화들, 5 도움이 된 유저, 6 버튼. 웹 reportMotion.js와 같은 줄 나눔이다.
+            if kind != .summary { WarmthCard().endRow(2, 0).endBlock(2, rows: 1) }
+            TalkTimeline(gap: kind == .morning ? 20 : 12, morning: kind == .morning).endBlock(3, rows: 4)
             if kind == .morning {
                 VStack(alignment: .leading, spacing: 12) {
                     SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
@@ -1403,17 +1412,19 @@ private struct ReportBody: View {
                 // 오늘의 드르륵 대화들 카드에는 따봉이 없다(피그마 2096:22857, 2100:24606 그대로).
                 let text = ReportText.current
                 VStack(alignment: .leading, spacing: 12) {
-                    SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요")
+                    SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요").endRow(4, 0)
                     VStack(spacing: 8) {
-                        BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "M-end-avatar-lime", exported: true)
-                        BestCard(name: text.secondName, text: text.secondLine, likes: nil, asset: "M-end-avatar-stool", exported: true)
-                        BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "M-end-avatar-swivel", exported: true)
+                        BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "M-end-avatar-lime", exported: true).endRow(4, 1)
+                        BestCard(name: text.secondName, text: text.secondLine, likes: nil, asset: "M-end-avatar-stool", exported: true).endRow(4, 2)
+                        BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "M-end-avatar-swivel", exported: true).endRow(4, 3)
                     }
                 }
+                .endBlock(4, rows: 4)
                 VStack(alignment: .leading, spacing: 24) {
-                    SectionHead(title: "도움이 된 유저가 있었나요?", desc: text.recommendDesc)
-                    PagedChairPicker()
+                    SectionHead(title: "도움이 된 유저가 있었나요?", desc: text.recommendDesc).endRow(5, 0)
+                    PagedChairPicker().endRow(5, 1)
                 }
+                .endBlock(5, rows: 2)
             }
         }
     }
@@ -1434,35 +1445,42 @@ private struct ReportButtons: View {
                     .background(filled ? DS.Palette.brandPrimary : DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 28))
             }
             .buttonStyle(RoomPressStyle())
+            .endRow(6, 0)
             Button(action: onSecondary) {
                 Text(secondary).fig(14, .bold, DS.Palette.textSecondary).frame(maxWidth: .infinity).frame(height: 20)
             }
             .buttonStyle(PressStyle())
+            .endRow(6, 1)
         }
     }
 }
 
-/// 결과 화면 틀. 뒤로 가기(24, 79)와 본문 스크롤. 아침과 오늘 나눈 대화는 아래 버튼이 검은 그라데이션(632에서 844, 높이 212) 위에 고정되고,
-/// 종료는 긴 화면(1708) 맨 끝에 버튼이 붙는다(본문 끝 1548, 버튼 1590, 아래 여백 40).
+/// 결과 화면 틀. 화면 크기 창 안에서 본문이 스크롤되고, 뒤로 가기(24, 79)와 위 바탕 띠는 제자리에 있다(웹 live.js와 같은 구성).
+/// 아침과 오늘 나눈 대화는 아래 버튼이 검은 그라데이션(632에서 844, 높이 212, 73.24%에서 검정) 위에 고정되고,
+/// 종료는 내용 맨 끝에 버튼이 붙는다(본문 끝 1548, 버튼 1590, 아래 여백 40). 피그마 종료 프레임에는 아래 그라데이션이 없고 버튼이 내용 끝에 이어져 있다.
 /// 고정 버튼 화면은 본문 끝에 그라데이션 높이(212)만큼 빈 자리를 두어 맨 아래까지 밀면 마지막 줄이 버튼 묶음(위 726) 위로 올라온다.
+/// 종료는 덩어리가 화면에 들어오는 차례로 펼쳐지고(EndReveal), 엉따 막대는 보이는 순간 찬다(ReportMotion.swift).
 private struct ReportScreen: View {
     let kind: ReportKind
     @Environment(Router.self) private var router
+    @State private var reveal = EndReveal(reduceMotion: UIAccessibility.isReduceMotionEnabled)
+    @State private var viewH: CGFloat = 844
 
     var body: some View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    backButton.padding(.top, 79 - 62)
+                    Color.clear.frame(width: 24, height: 24).padding(.top, 79 - 62)
                     if kind == .summary {
                         ReportBody(kind: kind).padding(.top, 160 - 103)
                     } else {
-                        Text("아침이 밝아\n대화가 종료되었어요").fig(28, .bold, DS.Palette.textPrimary).padding(.top, 160 - 103)
+                        Text("아침이 밝아\n대화가 종료되었어요").fig(28, .bold, DS.Palette.textPrimary)
+                            .endRow(0, 0).endBlock(0, rows: 1).padding(.top, 160 - 103)
                         hero
                         ReportBody(kind: kind)
                     }
                     if kind == .end {
-                        buttons.padding(.top, 42).padding(.bottom, 40)
+                        buttons.endBlock(6, rows: 2).padding(.top, 42).padding(.bottom, 40)
                     } else {
                         Color.clear.frame(height: 212)
                     }
@@ -1470,17 +1488,53 @@ private struct ReportScreen: View {
                 .padding(.horizontal, 24)
             }
             .scrollIndicators(.hidden)
+            .coordinateSpace(name: ReportMotion.space)
+            .background(GeometryReader { g in
+                Color.clear
+                    .onAppear { viewH = g.size.height }
+                    .onChange(of: g.size.height) { _, h in viewH = h }
+            })
+            .environment(\.endReveal, kind == .end ? reveal : nil)
+            .environment(\.reportViewportHeight, viewH)
             if kind != .end {
                 ZStack(alignment: .bottom) {
-                    LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.7324)],
+                                   startPoint: .top, endPoint: .bottom)
                         .frame(height: 212).allowsHitTesting(false)
+                    bottomBand
                     buttons.padding(.horizontal, 24).padding(.bottom, 40)
                 }
             }
         }
+        .overlay(alignment: .topLeading) { header }
         .background(DS.Palette.bgSurface.ignoresSafeArea())
         .ignoresSafeArea(edges: .bottom)
         .toolbar(.hidden, for: .navigationBar)
+    }
+
+    /// 위 머리: 바탕색 띠(화면 위 0에서 98까지 바탕색, 112에서 투명)와 뒤로 가기. 스크롤한 글이 상태바와 뒤로 가기 밑으로 비치지 않는다(웹 live.js patchReport와 같은 값).
+    private var header: some View {
+        ZStack(alignment: .topLeading) {
+            LinearGradient(stops: [.init(color: DS.Palette.bgSurface, location: 0), .init(color: DS.Palette.bgSurface, location: 36 / 50),
+                                   .init(color: DS.Palette.bgSurface.opacity(0), location: 1)],
+                           startPoint: .top, endPoint: .bottom)
+                .frame(height: 112 - 62)
+                .background(DS.Palette.bgSurface.ignoresSafeArea(edges: .top))
+                .allowsHitTesting(false)
+            backButton.padding(.top, 79 - 62).padding(.leading, 24)
+        }
+    }
+
+    /// 고정 버튼 막대 위 띠(huisu 1647:27027 "이 하단 바가 계속 따라오게"). 막대 윗선(726) 위 24는 바탕색에서 투명으로 가고,
+    /// 그 아래는 피그마 검은 그라데이션이 빈 바탕 위에 그리는 색을 그대로 이어 칠해 지나가는 글이 버튼 사이로 비치지 않는다(웹 live.js와 같은 값).
+    private var bottomBand: some View {
+        // 막대 윗선 726에서 그라데이션 세기 (726 - 632) / (212 x 0.7324) = 0.605, 검정이 되는 자리 787.3. 띠는 702에서 844까지 142.
+        let a = (726.0 - 632.0) / (212.0 * 0.7324)
+        let edge = Color(red: 18 / 255 * (1 - a), green: 20 / 255 * (1 - a), blue: 21 / 255 * (1 - a))
+        return LinearGradient(stops: [.init(color: edge.opacity(0), location: 0), .init(color: edge, location: 24 / 142),
+                                      .init(color: .black, location: (787.3 - 702) / 142), .init(color: .black, location: 1)],
+                              startPoint: .top, endPoint: .bottom)
+            .frame(height: 142).allowsHitTesting(false)
     }
 
     private var backButton: some View {
@@ -1495,6 +1549,7 @@ private struct ReportScreen: View {
     /// 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작. 아침(1951:20746)과 종료(2023:30769)가 같은 그림(해시 23749c04da)이다.
     private var hero: some View {
         Image("B-morning-sun").resizable().scaledToFit().frame(width: 146, height: 146)
+            .endRow(1, 0).endBlock(1, rows: 1)
             .frame(maxWidth: .infinity).padding(.top, 273 - 240).padding(.bottom, 452 - 419)
     }
 

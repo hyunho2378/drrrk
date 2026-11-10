@@ -256,10 +256,10 @@ enum CommunityData {
         .init(name: "푹신푹신 리클라이너17", time: "2시간 전", text: "내가 봤을 때는 백퍼 글쓴이 질투하는듯\n웃으면서 나도 보정 좀 해주지~라고 댓글 달아봐", likes: 48, avatar: "C-ad4a14569046"),
         .init(name: "딱딱한 나무스툴12", time: "1시간 전", text: "근데 사이 틀어질지도.. 괜히 어사되면 어캄", likes: 12, reply: true, avatar: "C-90255286edc8"),
         .init(name: "새벽2시 소파", time: "41분 전", text: "나도 똑같은 일 있었는데 물어보니까 진짜 걍 생각없이 올린거였음", likes: 9, avatar: "C-4a2fafbdd2df"),
-        .init(name: "퇴근길 편의점 의자", time: "1시간 전", text: "사람들이 너무 많아서 한참 기다렸다가 탄 기억이 나네요", likes: 15, avatar: "C-b5c25c4caef8"),
-        .init(name: "주말 아침 나무스툴", time: "3시간 전", text: "조용한 분위기와 향긋한 커피 덕분에 힐링했어요", likes: 23, avatar: "C-d7b0bb5005bf"),
-        .init(name: "비 오는 날 바퀴달린의자", time: "5시간 전", text: "갑자기 비가 쏟아져서 우산 없이 고생했어요", likes: 8, avatar: "C-cf2670f44f76"),
-        .init(name: "길거리 편의점 의자", time: "7시간 전", text: "우연히 본 벽화가 너무 예뻐서 사진 찍었네요", likes: 12, avatar: "C-33871c043e7c"),
+        .init(name: "퇴근길 편의점 의자", time: "1시간 전", text: "그건 선 넘었다 ㅋㅋ", likes: 15, avatar: "C-b5c25c4caef8"),
+        .init(name: "주말 아침 나무스툴", time: "3시간 전", text: "근데 그걸 까먹을 수가 있나?", likes: 23, avatar: "C-d7b0bb5005bf"),
+        .init(name: "비 오는 날 바퀴달린의자", time: "5시간 전", text: "쫀득하게 자기만 보정하면 어떡해ㅠㅠ 속상했겠다...", likes: 8, avatar: "C-cf2670f44f76"),
+        .init(name: "길거리 편의점 의자", time: "7시간 전", text: "너도 그런거 하나 올려봐ㅋㅋㅋ 역지사지가 되어야함", likes: 12, avatar: "C-33871c043e7c"),
     ]
 }
 
