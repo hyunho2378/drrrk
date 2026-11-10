@@ -7,107 +7,113 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AA854BF8B8315F2BE279590 /* snack-can.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FEE1755FB237620D0E2AE9A5 /* snack-can.mp3 */; };
 		0CFEDF0125B4CB879D2DCA23 /* SUIT-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 37CF8AE0BD5CC76AEC12E9B2 /* SUIT-ExtraBold.otf */; };
-		13F7B460915233D04279FA34 /* snack-saewookkang.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72B9672BDE17967C382A54C3 /* snack-saewookkang.mp3 */; };
+		1253C405282A608123A76EE6 /* sunrise-photo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */; };
+		1C8D73314E7F0E4B41EDFD33 /* RoomEnterVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */; };
 		2086FB2D2C7FC1046CDB9399 /* LiveScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */; };
 		21BC378FC93A374C180C79FE /* RoomClockHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1735AA7C558ED37465659F5F /* RoomClockHandoff.swift */; };
 		23E31936A51E28D4ACEB49C9 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4533C63C25CFFB9BEEE5F247 /* Tokens.swift */; };
 		242B7984567E6875D7130D6B /* ClipScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88CDC61C1AC45D9164E2648 /* ClipScene.swift */; };
 		2A2CBCF2BE1448905ACFADB5 /* SUIT-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 71995CDE44FF241C9D51C4E3 /* SUIT-Bold.otf */; };
 		2B4D99386681E340CDB6F331 /* LiveData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D150C196D9839A3AC05BC6 /* LiveData.swift */; };
+		2C2E11DA76D75D80E1850BBE /* snack-chips.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6CC4616163EFF5713ABE2E4C /* snack-chips.mp3 */; };
 		2E5A7D4A2F4691C314A86806 /* voice-museun-il.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4D30BE6685A6E7CBEA027AA7 /* voice-museun-il.mp3 */; };
 		35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8873B83148F8763D3B5E0993 /* HomeScreens.swift */; };
+		3860CFEDB8EE5FF8211E993F /* SunriseVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F9271AE4A903499C7D1C58 /* SunriseVideo.swift */; };
+		3AA9D92D641C4E6CE0012504 /* ReportMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */; };
 		3BC2C129F9EA63AE7592263A /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A4A2BA30C7DB329308DD9B /* RoomView.swift */; };
 		3F4E0A7FEF2177ECCA5A335E /* SUIT-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6467F779520715C87E712F41 /* SUIT-Medium.otf */; };
 		41A44E31079DD018324A741C /* ClipSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A58B17C0F22880FD7E18C587 /* ClipSheets.swift */; };
 		48F0D0EA9E7B55B9CDE3592F /* OnboardingVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750CE6725CCE720A9C573997 /* OnboardingVisuals.swift */; };
 		4FCAF319D037C63665BA6129 /* RoomVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395C3228E5E835DBD4E76582 /* RoomVoice.swift */; };
 		5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5D62597EB5736F98D562A0 /* NotiScreens.swift */; };
-		5A15F0D8DE591DBD0445F87C /* snack-monsta.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D16D43338A4123959700D67 /* snack-monsta.mp3 */; };
 		5AE4CBC169CDA200AA9E51DB /* DRRRKApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071502F7C6300EB6A419D22B /* DRRRKApp.swift */; };
 		5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */; };
 		63EC4390B346CD0C760147D7 /* logo-motion.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 79E359FEC2985AFFE94377DB /* logo-motion.mp4 */; };
-		6EA72D220A8D82DCF093AA67 /* snack-nogari.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 8B397B05392E72408685CE98 /* snack-nogari.mp3 */; };
+		64FD68FDB86E4B51FD5303A4 /* RoomChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05962FBA580675C788F4D5DF /* RoomChat.swift */; };
 		705C4C4474C514AC5599A5A9 /* ChairStudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */; };
-		7411F44CF2DB129F93AF1723 /* snack-byeollo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BC36112AEB4BEE5D23E1E560 /* snack-byeollo.mp3 */; };
-		7A3BF75D08F3E2AC762E7289 /* voice-gaeking.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FC24853C76BDAB3766BC9F3A /* voice-gaeking.mp3 */; };
 		7A78EB1BF73C0ABF4DA8FE38 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C8A91E1BC0B6EBCFA76A45 /* Story.swift */; };
+		7D2DE5D8D1BCB1AE1F668A00 /* snack-dried.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 818122680277DB88A74433B1 /* snack-dried.mp3 */; };
 		80FD4EDF4E7657CE2BE60C78 /* ChairStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355454814EF792BE3C446D3C /* ChairStore.swift */; };
-		81EB0A7CFE99E03FCCE6C02C /* snack-drrra.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A648CF762567759142D016B4 /* snack-drrra.mp3 */; };
 		8501F6C0AD82CEBBC1D99ADE /* voice-naman-yemin.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9D390999B1CC4FB625BD4D1F /* voice-naman-yemin.mp3 */; };
 		856CF2631A345DE00B0E82B2 /* MyScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4862DF05D28CBDBD44A4E3 /* MyScreens.swift */; };
 		8DEFB64716B3EB82B2678540 /* clip-scenes.json in Resources */ = {isa = PBXBuildFile; fileRef = 9F99D7E82EC9E11C197E5C06 /* clip-scenes.json */; };
 		8DFE97107118D796AB06FC10 /* ClipScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */; };
 		932983BB634B5A0F513D4CFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5C3CA32A15F62294981BB03 /* Assets.xcassets */; };
+		9DE5146244173ADB7ED4F45D /* room-enter-ssang.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */; };
 		A12048B40400EBB52FA8F9DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DD6D0BE274C4209DEA4486 /* Router.swift */; };
+		A72736B578829C9EDD5A4D07 /* snack-soju.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B3B5FDB33CEBC883BD517974 /* snack-soju.mp3 */; };
 		A854281C465947E88B00A76A /* ItemSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13A6A48C689B76171BBDB00 /* ItemSound.swift */; };
 		AAE8AE5F7B7F908B3E51409E /* ScreenRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */; };
-		B6164E2CE563FD947130461B /* snack-ojingeottangkong.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 34D4CDD7B9516CC598D8D907 /* snack-ojingeottangkong.mp3 */; };
 		C337B1A6C586DC8ADD91ADF0 /* SUIT-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 14456F248BBE7E155D47906C /* SUIT-Heavy.otf */; };
 		C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */; };
 		C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */; };
 		C7F69FEB9B42A8902644FB38 /* LoveDotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */; };
 		D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B487C08A1B7EC0175936B1F /* RoomModel.swift */; };
-		D701D950E92F2CDF192F988A /* snack-ojingeo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3B46102180FC917453674087 /* snack-ojingeo.mp3 */; };
 		D811BC96F15441A069092895 /* ItemCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE389391EFD2C0E26081D3F7 /* ItemCopy.swift */; };
 		DB4F11647ADD3DCEE201A1D4 /* SoundFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201069A4B4C8636439181ECD /* SoundFiles.swift */; };
 		DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 501E8B9CBA004BB542AF4AF8 /* SUIT-SemiBold.otf */; };
 		E901701EBADC7258D253319F /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AE12650DE60F318392041F22 /* SUIT-Regular.otf */; };
 		F0CBC41FD77253486E8F2854 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC665468AD22F020707AA567 /* RootView.swift */; };
-		F55579C99218873F4E7E73F9 /* snack-majimak.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 04B312F0D39D2050E345D815 /* snack-majimak.mp3 */; };
+		F1570ED9E8EB8993EC34B676 /* sunrise-ssang.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0F31ED16836268E045ED6C57 /* sunrise-ssang.mp4 */; };
+		FEA54EC24EE2DA9AF4135DBD /* room-enter-photo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		01C8A91E1BC0B6EBCFA76A45 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
-		04B312F0D39D2050E345D815 /* snack-majimak.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-majimak.mp3"; sourceTree = "<group>"; };
+		05962FBA580675C788F4D5DF /* RoomChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomChat.swift; sourceTree = "<group>"; };
 		071502F7C6300EB6A419D22B /* DRRRKApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DRRRKApp.swift; sourceTree = "<group>"; };
+		0F31ED16836268E045ED6C57 /* sunrise-ssang.mp4 */ = {isa = PBXFileReference; path = "sunrise-ssang.mp4"; sourceTree = "<group>"; };
 		14456F248BBE7E155D47906C /* SUIT-Heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Heavy.otf"; sourceTree = "<group>"; };
 		1735AA7C558ED37465659F5F /* RoomClockHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomClockHandoff.swift; sourceTree = "<group>"; };
 		201069A4B4C8636439181ECD /* SoundFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundFiles.swift; sourceTree = "<group>"; };
 		23A4A2BA30C7DB329308DD9B /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
 		28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRegistry.swift; sourceTree = "<group>"; };
-		34D4CDD7B9516CC598D8D907 /* snack-ojingeottangkong.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-ojingeottangkong.mp3"; sourceTree = "<group>"; };
 		355454814EF792BE3C446D3C /* ChairStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStore.swift; sourceTree = "<group>"; };
 		37CF8AE0BD5CC76AEC12E9B2 /* SUIT-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-ExtraBold.otf"; sourceTree = "<group>"; };
 		395C3228E5E835DBD4E76582 /* RoomVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomVoice.swift; sourceTree = "<group>"; };
-		3B46102180FC917453674087 /* snack-ojingeo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-ojingeo.mp3"; sourceTree = "<group>"; };
 		40F105367036182C7BD07158 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		4533C63C25CFFB9BEEE5F247 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		4D30BE6685A6E7CBEA027AA7 /* voice-museun-il.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "voice-museun-il.mp3"; sourceTree = "<group>"; };
 		501E8B9CBA004BB542AF4AF8 /* SUIT-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-SemiBold.otf"; sourceTree = "<group>"; };
+		5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */ = {isa = PBXFileReference; path = "sunrise-photo.mp4"; sourceTree = "<group>"; };
 		57D150C196D9839A3AC05BC6 /* LiveData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveData.swift; sourceTree = "<group>"; };
 		60A5CBC8CD8F61B0E7E42708 /* DRRRK.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DRRRK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6467F779520715C87E712F41 /* SUIT-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Medium.otf"; sourceTree = "<group>"; };
 		6B4862DF05D28CBDBD44A4E3 /* MyScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyScreens.swift; sourceTree = "<group>"; };
+		6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */ = {isa = PBXFileReference; path = "room-enter-ssang.mp4"; sourceTree = "<group>"; };
+		6CC4616163EFF5713ABE2E4C /* snack-chips.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-chips.mp3"; sourceTree = "<group>"; };
 		705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityScreens.swift; sourceTree = "<group>"; };
 		71995CDE44FF241C9D51C4E3 /* SUIT-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Bold.otf"; sourceTree = "<group>"; };
-		72B9672BDE17967C382A54C3 /* snack-saewookkang.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-saewookkang.mp3"; sourceTree = "<group>"; };
 		7354575B5B2406A0040950A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		750CE6725CCE720A9C573997 /* OnboardingVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingVisuals.swift; sourceTree = "<group>"; };
 		79E359FEC2985AFFE94377DB /* logo-motion.mp4 */ = {isa = PBXFileReference; path = "logo-motion.mp4"; sourceTree = "<group>"; };
 		7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScreens.swift; sourceTree = "<group>"; };
-		7D16D43338A4123959700D67 /* snack-monsta.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-monsta.mp3"; sourceTree = "<group>"; };
+		818122680277DB88A74433B1 /* snack-dried.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-dried.mp3"; sourceTree = "<group>"; };
+		83F9271AE4A903499C7D1C58 /* SunriseVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseVideo.swift; sourceTree = "<group>"; };
 		8873B83148F8763D3B5E0993 /* HomeScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreens.swift; sourceTree = "<group>"; };
-		8B397B05392E72408685CE98 /* snack-nogari.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-nogari.mp3"; sourceTree = "<group>"; };
 		8B487C08A1B7EC0175936B1F /* RoomModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomModel.swift; sourceTree = "<group>"; };
+		91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomEnterVideo.swift; sourceTree = "<group>"; };
 		9D390999B1CC4FB625BD4D1F /* voice-naman-yemin.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "voice-naman-yemin.mp3"; sourceTree = "<group>"; };
 		9F99D7E82EC9E11C197E5C06 /* clip-scenes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clip-scenes.json"; sourceTree = "<group>"; };
 		A58B17C0F22880FD7E18C587 /* ClipSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipSheets.swift; sourceTree = "<group>"; };
-		A648CF762567759142D016B4 /* snack-drrra.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-drrra.mp3"; sourceTree = "<group>"; };
 		AC665468AD22F020707AA567 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		AE12650DE60F318392041F22 /* SUIT-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Regular.otf"; sourceTree = "<group>"; };
+		B3B5FDB33CEBC883BD517974 /* snack-soju.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-soju.mp3"; sourceTree = "<group>"; };
+		B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */ = {isa = PBXFileReference; path = "room-enter-photo.mp4"; sourceTree = "<group>"; };
 		BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScreens.swift; sourceTree = "<group>"; };
-		BC36112AEB4BEE5D23E1E560 /* snack-byeollo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-byeollo.mp3"; sourceTree = "<group>"; };
 		C13A6A48C689B76171BBDB00 /* ItemSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSound.swift; sourceTree = "<group>"; };
 		D2DD6D0BE274C4209DEA4486 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		D88CDC61C1AC45D9164E2648 /* ClipScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScene.swift; sourceTree = "<group>"; };
 		E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingKit.swift; sourceTree = "<group>"; };
 		E5C3CA32A15F62294981BB03 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMotion.swift; sourceTree = "<group>"; };
 		EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStudioView.swift; sourceTree = "<group>"; };
 		EE389391EFD2C0E26081D3F7 /* ItemCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCopy.swift; sourceTree = "<group>"; };
 		FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScreens.swift; sourceTree = "<group>"; };
-		FC24853C76BDAB3766BC9F3A /* voice-gaeking.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "voice-gaeking.mp3"; sourceTree = "<group>"; };
 		FD5D62597EB5736F98D562A0 /* NotiScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiScreens.swift; sourceTree = "<group>"; };
+		FEE1755FB237620D0E2AE9A5 /* snack-can.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-can.mp3"; sourceTree = "<group>"; };
 		FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveDotStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -170,6 +176,17 @@
 				79E359FEC2985AFFE94377DB /* logo-motion.mp4 */,
 			);
 			path = Media;
+			sourceTree = "<group>";
+		};
+		59249A41957494967FDA77FC /* Videos */ = {
+			isa = PBXGroup;
+			children = (
+				B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */,
+				6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */,
+				5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */,
+				0F31ED16836268E045ED6C57 /* sunrise-ssang.mp4 */,
+			);
+			path = Videos;
 			sourceTree = "<group>";
 		};
 		5E795B3483852E6DE74B2A59 /* Community */ = {
@@ -258,6 +275,7 @@
 				7FCCEAC4015B90EFF2AB5248 /* Fonts */,
 				39177511A360980883721DA0 /* Media */,
 				C2492D4AC5ECDF116FD27A2D /* Sounds */,
+				59249A41957494967FDA77FC /* Videos */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -265,15 +283,10 @@
 		C2492D4AC5ECDF116FD27A2D /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
-				BC36112AEB4BEE5D23E1E560 /* snack-byeollo.mp3 */,
-				A648CF762567759142D016B4 /* snack-drrra.mp3 */,
-				04B312F0D39D2050E345D815 /* snack-majimak.mp3 */,
-				7D16D43338A4123959700D67 /* snack-monsta.mp3 */,
-				8B397B05392E72408685CE98 /* snack-nogari.mp3 */,
-				3B46102180FC917453674087 /* snack-ojingeo.mp3 */,
-				34D4CDD7B9516CC598D8D907 /* snack-ojingeottangkong.mp3 */,
-				72B9672BDE17967C382A54C3 /* snack-saewookkang.mp3 */,
-				FC24853C76BDAB3766BC9F3A /* voice-gaeking.mp3 */,
+				FEE1755FB237620D0E2AE9A5 /* snack-can.mp3 */,
+				6CC4616163EFF5713ABE2E4C /* snack-chips.mp3 */,
+				818122680277DB88A74433B1 /* snack-dried.mp3 */,
+				B3B5FDB33CEBC883BD517974 /* snack-soju.mp3 */,
 				4D30BE6685A6E7CBEA027AA7 /* voice-museun-il.mp3 */,
 				9D390999B1CC4FB625BD4D1F /* voice-naman-yemin.mp3 */,
 			);
@@ -304,10 +317,14 @@
 		EE3738FC29836FDBA9155398 /* Room */ = {
 			isa = PBXGroup;
 			children = (
+				ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */,
+				05962FBA580675C788F4D5DF /* RoomChat.swift */,
+				91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */,
 				8B487C08A1B7EC0175936B1F /* RoomModel.swift */,
 				7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */,
 				23A4A2BA30C7DB329308DD9B /* RoomView.swift */,
 				395C3228E5E835DBD4E76582 /* RoomVoice.swift */,
+				83F9271AE4A903499C7D1C58 /* SunriseVideo.swift */,
 			);
 			path = Room;
 			sourceTree = "<group>";
@@ -390,15 +407,14 @@
 				DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */,
 				8DEFB64716B3EB82B2678540 /* clip-scenes.json in Resources */,
 				63EC4390B346CD0C760147D7 /* logo-motion.mp4 in Resources */,
-				7411F44CF2DB129F93AF1723 /* snack-byeollo.mp3 in Resources */,
-				81EB0A7CFE99E03FCCE6C02C /* snack-drrra.mp3 in Resources */,
-				F55579C99218873F4E7E73F9 /* snack-majimak.mp3 in Resources */,
-				5A15F0D8DE591DBD0445F87C /* snack-monsta.mp3 in Resources */,
-				6EA72D220A8D82DCF093AA67 /* snack-nogari.mp3 in Resources */,
-				D701D950E92F2CDF192F988A /* snack-ojingeo.mp3 in Resources */,
-				B6164E2CE563FD947130461B /* snack-ojingeottangkong.mp3 in Resources */,
-				13F7B460915233D04279FA34 /* snack-saewookkang.mp3 in Resources */,
-				7A3BF75D08F3E2AC762E7289 /* voice-gaeking.mp3 in Resources */,
+				FEA54EC24EE2DA9AF4135DBD /* room-enter-photo.mp4 in Resources */,
+				9DE5146244173ADB7ED4F45D /* room-enter-ssang.mp4 in Resources */,
+				0AA854BF8B8315F2BE279590 /* snack-can.mp3 in Resources */,
+				2C2E11DA76D75D80E1850BBE /* snack-chips.mp3 in Resources */,
+				7D2DE5D8D1BCB1AE1F668A00 /* snack-dried.mp3 in Resources */,
+				A72736B578829C9EDD5A4D07 /* snack-soju.mp3 in Resources */,
+				1253C405282A608123A76EE6 /* sunrise-photo.mp4 in Resources */,
+				F1570ED9E8EB8993EC34B676 /* sunrise-ssang.mp4 in Resources */,
 				2E5A7D4A2F4691C314A86806 /* voice-museun-il.mp3 in Resources */,
 				8501F6C0AD82CEBBC1D99ADE /* voice-naman-yemin.mp3 in Resources */,
 			);
@@ -428,7 +444,10 @@
 				5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */,
 				C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */,
 				48F0D0EA9E7B55B9CDE3592F /* OnboardingVisuals.swift in Sources */,
+				3AA9D92D641C4E6CE0012504 /* ReportMotion.swift in Sources */,
+				64FD68FDB86E4B51FD5303A4 /* RoomChat.swift in Sources */,
 				21BC378FC93A374C180C79FE /* RoomClockHandoff.swift in Sources */,
+				1C8D73314E7F0E4B41EDFD33 /* RoomEnterVideo.swift in Sources */,
 				D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */,
 				5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */,
 				3BC2C129F9EA63AE7592263A /* RoomView.swift in Sources */,
@@ -438,6 +457,7 @@
 				AAE8AE5F7B7F908B3E51409E /* ScreenRegistry.swift in Sources */,
 				DB4F11647ADD3DCEE201A1D4 /* SoundFiles.swift in Sources */,
 				7A78EB1BF73C0ABF4DA8FE38 /* Story.swift in Sources */,
+				3860CFEDB8EE5FF8211E993F /* SunriseVideo.swift in Sources */,
 				23E31936A51E28D4ACEB49C9 /* Tokens.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

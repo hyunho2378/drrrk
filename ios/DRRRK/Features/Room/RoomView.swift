@@ -45,6 +45,10 @@ struct RoomView: View {
     @State private var emojiOpen = false
     @State private var flying: [FlyingEmoji] = []
     @State private var lastMinute = false
+    /// 해뜨기 영상(SunriseVideo.swift). 방에 들어오면 만들어 미리 받고, 해 뜨는 단계(lastMinute)가 시작되면 한 번 재생한다.
+    @State private var sunrise: SunrisePlayer?
+    /// 방 입장 영상(RoomEnterVideo.swift). 이 방이 처음 나타날 때만 만들어 한 번 재생한다. 일반 모드에서 돌아와도 다시 재생하지 않는다.
+    @State private var entry: RoomEnterPlayer?
     /// 끌고 있는 주전부리. 손을 떼거나 화면이 바뀌어 끌기가 취소되면 저절로 비워진다(예전 @State는 취소되면 남아 끄는 그림과 테이블 빛이 멈춰 있었다).
     @GestureState private var drag: SnackDrag?
     @Namespace private var dockSpace
@@ -59,6 +63,23 @@ struct RoomView: View {
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
+                    .opacity(sunrise?.shown == true ? 0 : 1)
+
+                // 방 입장 영상: 장면 그림 바로 위. 끝나면 0.12초 동안 옅어지며 같은 구도의 장면 그림으로 이어진다.
+                if let entry, entry.player != nil, entry.visible {
+                    RoomEnterVideoView(entry: entry)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
+
+                // 해뜨기 영상: 장면 그림 바로 위, 이름표와 채팅 아래. 첫 장면이 그려지기 전에는 보이지 않는다.
+                if let sunrise, sunrise.player != nil {
+                    SunriseVideoView(sunrise: sunrise)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .opacity(sunrise.shown ? 1 : 0)
+                        .allowsHitTesting(false)
+                }
 
                 sceneLayer(map)
 
@@ -93,9 +114,39 @@ struct RoomView: View {
         }
         .onAppear { OnboardingSeen.together = true }
         // 대사 녹음(RoomVoice): 방에 들어오면 파일을 미리 열고, 내 말풍선이 새로 나타나면 같은 대사를 낸다. 방을 나가면 멈춘다.
-        .onAppear { RoomVoice.shared.enter(covered: showOnboarding); RoomVoice.shared.show(mineTexts) }
-        .onDisappear { RoomVoice.shared.leave() }
+        // 채팅 줄(RoomChat): 새 방이면 비운 채 시작하고, 일반 모드에서 돌아오면 이미 나온 줄이 남는다. 녹음도 같은 방이면 한 번 난 말풍선에 다시 나지 않는다.
+        .onAppear {
+            let fresh = RoomChat.shared.enter(model)
+            RoomVoice.shared.enter(covered: showOnboarding, fresh: fresh)
+            RoomVoice.shared.show(mineTexts)
+        }
+        .onAppear {
+            // 해뜨기 영상을 미리 받는다. 일반 모드에서 돌아왔고 영상이 도중이면 이어 재생한다.
+            if sunrise == nil { sunrise = SunrisePlayer(story: model.story) }
+            // 방 입장 영상: 이 방이 처음 나타날 때만 만든다. 온보딩 덮개가 떠 있으면 첫 장면에 세워 두고 닫히면 재생한다.
+            if entry == nil {
+                let e = RoomEnterPlayer(story: model.story)
+                entry = e
+                if !showOnboarding { e.start() }
+            }
+            else if let s = sunrise, s.startedAt != nil, s.endedAt == nil { s.player?.play() }
+        }
+        .onDisappear {
+            sunrise?.stop()
+            entry?.stop()
+            RoomVoice.shared.leave()
+            // 방을 나갔을 때만(현장 모드 방이 길에서 빠졌을 때) 채팅을 닫는다. 일반 모드로 넘어갈 때는 이어 간다.
+            if !router.path.contains(.room), !router.path.contains(.onboardingTogether) { RoomChat.shared.leave() }
+        }
+        // 온보딩 덮개가 떠 있는 동안은 채팅 시계가 멈추고, 닫히면 0.8초 뒤 첫 줄부터 달린다.
+        .task(id: showOnboarding) {
+            guard !showOnboarding else { return }
+            await RoomChat.shared.run { model.stageEntries.count }
+        }
         .onChange(of: showOnboarding) { _, up in RoomVoice.shared.setCovered(up) }
+        .onChange(of: showOnboarding) { _, up in if !up { entry?.start() } }
+        // 해 뜨는 단계가 시작되면 입장 영상은 멈추고 뺀다(해뜨기 영상과 겹치지 않게). 웹은 40번 화면이 붙을 때 같은 일을 한다.
+        .onChange(of: lastMinute) { _, on in if on { entry?.stop() } }
         .onChange(of: mineTexts) { _, texts in RoomVoice.shared.show(texts) }
         .task { await rotateSpeakers() }
         .task { await watchClock() }
@@ -208,13 +259,12 @@ struct RoomView: View {
                 .accessibilityLabel("퀵슬롯 접기")
                 .padding(.bottom, 2)
 
-                // 쿨타임 동안만 시계를 돌려 덮개를 줄이고, 끝나는 시각이 지나면 칸이 다시 살아난다.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: model.coolingID == nil)) { ctx in
-                    let cooling = model.isCooling(at: ctx.date)
+                // 쉬는 칸이 있는 동안만 시계를 돌려 덮개를 줄이고, 끝나는 시각이 지나면 그 칸이 다시 살아난다. 덮개는 던진 칸에만 붙는다.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: !model.anyCooling)) { ctx in
                     VStack(spacing: 6) {
                         ForEach(model.snacks) { snack in
-                            let mine = cooling && model.coolingID == snack.id
-                            SnackSlot(snack: snack, selected: mine, cooldown: mine ? model.cooldownLeft(at: ctx.date) : 0)
+                            let mine = model.isCooling(snack.id, at: ctx.date)
+                            SnackSlot(snack: snack, selected: mine, cooldown: mine ? model.cooldownLeft(snack.id, at: ctx.date) : 0)
                                 .opacity(drag?.id == snack.id ? 0.45 : 1)
                                 .matchedGeometryEffect(id: snack.id, in: dockSpace, isSource: model.dockOpen)
                                 .onTapGesture { tapSlot(snack) }
@@ -241,7 +291,7 @@ struct RoomView: View {
     private func tapSlot(_ snack: RoomModel.Snack) {
         if snack.count == 0 {
             RoomToastCenter.shared.show("남은 주전부리가 없어요")
-        } else if !model.isCooling() {
+        } else if !model.isCooling(snack.id) {
             RoomToastCenter.shared.show("가운데 테이블로 끌어서 던져요")
         }
     }
@@ -254,7 +304,7 @@ struct RoomView: View {
     private func throwGesture(_ snack: RoomModel.Snack, _ map: SceneMap) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .named("room"))
             .updating($drag) { v, state, _ in
-                // 개수가 0이거나 쉬는 중이면 끌리지 않는다.
+                // 개수가 0이거나 그 칸이 쉬는 중이면 끌리지 않는다(다른 칸은 그대로 끌린다).
                 guard model.canThrow(snack) else { return }
                 if state == nil {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -268,11 +318,13 @@ struct RoomView: View {
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         // 안내 글은 던진 주전부리 이름을 말한다(예: 새우깡을 테이블에 올렸어요, SoundFiles.throwDoneText).
                         RoomToastCenter.shared.show(SoundFiles.throwDoneText(snack.id))
+                        // 여러 개를 연달아 던지면 안내 글은 쌓이지 않고 가장 나중 글로 바뀌며 2.4초를 다시 센다(RoomToastCenter).
                         // 착지하는 순간(날아가는 0.62초, 웹 throwFlyMs와 같은 값) 그 주전부리의 녹음 파일을 낸다.
+                        // 아이템마다 통로가 따로라 먼저 던진 다른 주전부리 소리를 끊지 않고 겹쳐 난다.
                         let soundKey = snack.id
                         Task {
                             try? await Task.sleep(for: .seconds(0.62))
-                            FileSound.shared.play(soundKey, channel: "item")
+                            FileSound.shared.play(soundKey, channel: SoundFiles.channel(soundKey))
                         }
                         Task {
                             // 서서히 사라지는 움직임은 LandedSnack이 맡고, 다 사라진 뒤 목록에서만 지운다.
@@ -299,6 +351,8 @@ struct RoomView: View {
     private func watchClock() async {
         // 방에 들어온 직후와 앞 단계 직후 3초는 다음 단계로 넘기지 않는다(방 구경에서 이어받은 시계가 이미 짧을 때, RoomClockHandoff).
         var stepAt = model.enteredAt
+        var zeroAt: Date?
+        if lastMinute, sunrise?.startedAt == nil { sunrise?.start() }
         while !Task.isCancelled {
             let left = model.remaining(at: .now)
             let ready = Date.now.timeIntervalSince(stepAt) >= RoomClockHandoff.graceSeconds
@@ -307,10 +361,15 @@ struct RoomView: View {
                     lastMinute = true
                     model.stage = 2
                 }
+                // 해 뜨는 단계가 시작되는 순간 해뜨기 영상을 처음부터 재생한다. 01:12에서 0까지 실제 5.4초라 영상 5.17초와 맞는다.
+                sunrise?.start()
                 stepAt = .now
             }
-            if left <= 0, lastMinute, Date.now.timeIntervalSince(stepAt) >= RoomClockHandoff.graceSeconds {
-                // 해가 뜨면 종료 리포트(피그마 2096:22857, 2100:24606)로 간다. 웹 flow.js AUTO 35와 같다.
+            if left <= 0, zeroAt == nil { zeroAt = .now }
+            // 해가 뜨면(시계 0) 영상 마지막 장면(해 뜬 아침)에 3초 머문 뒤 종료 리포트(피그마 2096:22857, 2100:24606)로 간다.
+            // 예전 해 뜬 순간 화면(웹 35, 3초 뒤 종료)의 역할을 영상 마지막 장면이 한다. 영상이 늦게 시작했으면 끝나고 3초 뒤까지 기다린다. 웹 tokens.js live.rooms.B와 sunriseHolding과 같다.
+            if let zeroAt, lastMinute, Date.now.timeIntervalSince(stepAt) >= RoomClockHandoff.graceSeconds,
+               Date.now.timeIntervalSince(zeroAt) >= SunrisePlayer.holdSeconds, sunrise?.holding() != true {
                 router.push(.roomEnd)
                 return
             }
@@ -556,9 +615,17 @@ struct PieSlice: Shape {
 
 struct TopicBanner: View {
     @Bindable var model: RoomModel
+    // 본문 행간 140%(11. 10. 피그마 댓글 1884:11435 "행간 140%", 답글 "같은 컴포넌트인 것들 다 반영"). 웹 roomConcern.js와 같은 값이다.
+    // SUIT 14 한 줄의 자연 높이는 17.472(글꼴 파일 ascent 13.832 + descent 3.640, leading 0을 CoreText로 쟸 값)이다.
+    // SwiftUI lineSpacing은 줄 사이에만 더해지므로 줄 사이 19.6 - 17.472 = 2.128을 두고, 첫 줄 위와 끝 줄 아래에 반씩(1.064)을 더해 피그마 줄 상자와 같게 한다.
+    // 피그마 1884:11599 본문 글 상자는 3줄에 60(58.8 + 1.2)이라 끝에 1.2를 더 둔다. 펼친 박스는 3줄 153, 2줄 133.4이다.
+    private static let bodyLine: CGFloat = 19.6
+    private static let naturalLine: CGFloat = 17.472
+    private static var halfLeading: CGFloat { (bodyLine - naturalLine) / 2 }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if model.bannerOpen {
+                // 라벨 줄 높이 18(피그마 "top" 310 x 18, 화살표는 가운데 y 15)
                 HStack {
                     HStack(spacing: 8) {
                         Text("고민").suit(11, .bold, tracking: -0.44).foregroundStyle(DS.Palette.brandPrimary)
@@ -571,15 +638,22 @@ struct TopicBanner: View {
                     Image("icon-chevron-up").renderingMode(.template).resizable()
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 16, height: 16)
                 }
+                .frame(height: 18)
                 Text(model.topicBody)
-                    .suit(14, .medium, tracking: -0.56)
+                    .font(.custom(SUITWeight.medium.rawValue, fixedSize: 14))
+                    .tracking(-0.56)
+                    .lineSpacing(Self.bodyLine - Self.naturalLine)
+                    .padding(.top, Self.halfLeading)
+                    .padding(.bottom, Self.halfLeading + 1.2)
                     .foregroundStyle(DS.Palette.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
                     .transition(.opacity.combined(with: .offset(y: -6)))
+                // AI 맥락 줄 높이 25(키워드 칩: 위아래 4 + 글 상자 17, 피그마 1884:11599 "AI 맥락")
                 HStack(spacing: 6) {
                     Text("AI가 읽은 맥락").suit(11, .medium, tracking: -0.44).foregroundStyle(DS.Palette.textTertiary)
                     ForEach(model.topicTags, id: \.self) { tag in
                         Text(tag).suit(11, .bold, tracking: -0.44).foregroundStyle(DS.Palette.brandPrimary)
+                            .frame(height: 17)
                             .padding(.horizontal, 9).padding(.vertical, 4)
                             .background(DS.Palette.brandSubtle, in: RoundedRectangle(cornerRadius: 11))
                     }
@@ -588,12 +662,17 @@ struct TopicBanner: View {
             } else {
                 HStack(spacing: 8) {
                     Text("고민").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.brandPrimary)
+                    // 접힌 한 줄도 행간 140%(피그마 1884:11512). 피그마 글 상자는 높이 17, 위 11.5, 위 맞춤이라 19.6 줄 상자의 글자가
+                    // 가운데 정렬보다 1.3 아래에 놓인다(웹 roomConcern.js styleBannerLine과 같은 자리).
                     Text(model.topicShort).suit(14, .medium, tracking: -0.56)
                         .foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                        .offset(y: (Self.bodyLine - 17) / 2)
                     Spacer(minLength: 0)
                     Image("icon-chevron-down").renderingMode(.template).resizable()
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 16, height: 16)
                 }
+                // 접힌 박스 높이 40(위아래 여백 10 + 줄 20, 피그마 1884:11512)
+                .frame(height: 20)
             }
         }
         .padding(.horizontal, model.bannerOpen ? 16 : 14)
@@ -612,6 +691,12 @@ struct TopicBanner: View {
 /// 현장 모드 채팅 칸(피그마 1979:27515, 1979:27708, 1979:27780). 줄 사이 8, 이름과 말풍선 사이 4.
 private struct ChatColumn: View {
     let model: RoomModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// 줄이 아래에서 8 올라오며 옛게 나타난다(RoomChat). 줄인 움직임을 켜면 옛게만 나타난다.
+    private var rise: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .offset(y: RoomChat.rise))
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(model.visibleEntries) { entry in
@@ -624,19 +709,21 @@ private struct ChatColumn: View {
                             .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
                     }
                     .opacity(line.opacity)
-                    .transition(.opacity)
+                    .transition(rise)
                 case let .mine(text), let .sent(_, text):
                     Text(text).suit(14, .medium, tracking: -0.56).foregroundStyle(.black)
                         .padding(.horizontal, 12).padding(.vertical, 8)
                         .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .transition(.opacity)
+                        .transition(rise)
                 case let .system(text):
                     SystemLine(text: text)
-                        .transition(.opacity.combined(with: .offset(y: 8)))
+                        .transition(rise)
                 }
             }
         }
+        // 줄이 한두 줄뿐이라 폭이 좁을 때 가운데로 모이지 않고 피그마처럼 왼쪽 끝(24)에 붙게 한다(11/11 시뮬레이터 확인).
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -849,7 +936,7 @@ struct SystemLine: View {
 
 /// 혼자 방 퀵슬롯(피그마 1647:25199 접힘, 1647:24874 펼침). 펼치면 칸마다 남은 개수가 붙고,
 /// 칸을 누르면 그 주전부리가 장면 속 테이블로 떨어진 뒤 3초(RoomModel.throwCooldownSeconds) 동안 하늘색 테두리와 어두운 덮개가 줄어든다.
-/// 쉬는 상태는 모델(coolingID, coolingUntil)에 있어 퀵슬롯을 접었다 펴도 이어지고, 끝나는 시각이 지나면 개수가 남은 칸은 반드시 다시 눌린다.
+/// 쉬는 상태는 모델(칸별 coolingUntil)에 있어 퀵슬롯을 접었다 펴도 이어지고, 끝나는 시각이 지나면 개수가 남은 칸은 반드시 다시 눌린다. 쉬는 동안 그 칸만 막힌다.
 struct SoloQuickSlot: View {
     @Bindable var model: RoomModel
     let onThrow: (RoomModel.Snack) -> Void
@@ -870,16 +957,15 @@ struct SoloQuickSlot: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("퀵슬롯 접기")
                 .padding(.bottom, 2)
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: model.coolingID == nil)) { ctx in
-                    let cooling = model.isCooling(at: ctx.date)
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: !model.anyCooling)) { ctx in
                     VStack(spacing: 6) {
                         ForEach(model.snacks) { snack in
-                            let mine = cooling && model.coolingID == snack.id
+                            let mine = model.isCooling(snack.id, at: ctx.date)
                             Button { tap(snack) } label: {
-                                SnackSlot(snack: snack, showCount: true, selected: mine, cooldown: mine ? model.cooldownLeft(at: ctx.date) : 0)
+                                SnackSlot(snack: snack, showCount: true, selected: mine, cooldown: mine ? model.cooldownLeft(snack.id, at: ctx.date) : 0)
                             }
                             .buttonStyle(RoomPressStyle())
-                            .disabled(snack.count == 0 || cooling)
+                            .disabled(snack.count == 0 || mine)
                             .matchedGeometryEffect(id: snack.id, in: ns, isSource: model.dockOpen)
                             .accessibilityLabel("\(snack.name) \(snack.count)개")
                         }

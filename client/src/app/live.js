@@ -1,18 +1,19 @@
 // 화면 위에서 실제로 움직이는 것들. 피그마 생성물(src/figma)은 고치지 않고, 그려진 화면의 요소를 이름(data-figma)으로 찾아 덧붙인다.
 // 1) 상태바 시계: 왼쪽 시간을 실제 시각으로(강릉페이 리뉴얼과 같은 방식, 오른쪽 아이콘은 그대로).
-// 2) 방 시계: 해 뜨기까지 남은 시간을 10배 빠르게 줄이고, 1분 전과 0에서 다음 화면으로 넘긴다.
+// 2) 방 시계: 해 뜨기까지 남은 시간을 tokens.js live.timeScale 빠르기로 줄이고, 01:12(해 뜨는 단계)과 0에서 다음 화면으로 넘긴다.
 // 3) 채팅: 방에 처음 들어가면 대화가 하나씩 올라온다.
 // 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
 import { watchStart } from './liveV2.js';
 import { motion, live as LIVE } from '../tokens.js';
 import { patchLiveV2, patchWatchSeats } from './liveV2.js';
-import { startWatchChat } from './watchChat.js';
+import { startWatchChat, prepareWatchChat } from './watchChat.js';
 import { handOff, handoffNow, takeRoomStart, stepReady } from './roomClockHandoff.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
 import { voiceOnBubble, voiceOnScreen } from './roomVoice.js';
+import { roomChatPrepare, roomChatAttach, roomChatLeave } from './roomChat.js';
 import { attachQuickSlot } from './quickSlot.js';
 import { attachTaps } from './taps.js';
 import { prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
@@ -28,11 +29,15 @@ import { patchSolo } from './solo.js';
 import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
 import { patchReportStory } from './reportPatch.js';
+import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.js';
+import { prefetchSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
+import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 
 export { setText };
 
 // 방마다 묶은 화면. W는 라운지에서 구경하는 방(시계만 흐르고 화면은 넘기지 않는다).
-export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23, 40], B: [29, 28, 30, 31, 32, 33, 35], C: [46, 43, 41, 42], W: [37] };
+// 해 뜨는 단계(40)는 함께 드르륵 방(B)에 둔다. 그래서 29에서 40으로 넘어가도 같은 방 시계가 이어진다(11/10 해뜨기 영상).
+export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23], B: [29, 28, 30, 31, 32, 33, 35, 40], C: [46, 43, 41, 42], W: [37] };
 export const sceneOf = (n) => Object.keys(ROOMS).find((k) => ROOMS[k].includes(n)) || null;
 
 const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
@@ -55,7 +60,7 @@ export function resolveTo(l) {
     // 방 구경에서 앉는 순간의 시계 값을 방 시계로 넘긴다(roomClockHandoff.js).
     if (l.from === 37 && room.scene === 'W') handOff(remaining());
   }
-  if (l.t === 'back' && l.to === 25 && [28, 29, 30, 31, 32].includes(l.from)) {
+  if (l.t === 'back' && l.to === 25 && [28, 29, 30, 31, 32, 40].includes(l.from)) {
     let origin = 'home';
     try { origin = sessionStorage.getItem('drrrk-room-from') || 'home'; } catch (e) { /* 기본값 home */ }
     if (origin === 'live') return Object.assign({}, l, { to: 10 });
@@ -119,17 +124,14 @@ const remaining = () => room.left - ((performance.now() - room.at) / 1000) * LIV
 
 // ---------- 3) 채팅이 하나씩 ----------
 const CHAT_SEL = '[data-figma^="row ·"], [data-figma^="내 채팅"], [data-figma^="Chat Bubble"]';
-function staggerChat(root) {
-  const items = q(root, CHAT_SEL).filter((el) => !el.closest('[data-figma^="input"]'));
-  items.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
-  items.forEach((el) => (el.style.opacity = '0'));
-  items.forEach((el, i) => {
-    window.setTimeout(() => {
-      el.style.opacity = '';
-      el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
-      voiceOnBubble(el, root);
-    }, LIVE.chatFirst + i * LIVE.chatGap);
-  });
+// 방 구경(37) 채팅 칸 줄은 watchChat.js가 맡으니 뺀다. 입력줄 안 글도 뺀다.
+const chatItems = (root) => {
+  const items = q(root, CHAT_SEL).filter((el) => !el.closest('[data-figma^="input"]') && !el.closest('[data-figma="댓글 (라이브 채팅)"]'));
+  return items.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+};
+// 줄을 언제 보일지는 roomChat.js가 정한다(0.8초 뒤 첫 줄, 1.3초에서 2.0초 간격, 덮개가 떠 있으면 멈춤, 같은 방 안에서는 이어짐).
+function staggerChat(root, n, fresh) {
+  roomChatAttach(root, n, chatItems(root), fresh, (el) => voiceOnBubble(el, root));
 }
 
 // ---------- 4) 입력 ----------
@@ -164,6 +166,10 @@ function postLiveComment(root, text) {
   if (!tpl) return;
   const node = tpl.cloneNode(true);
   node.removeAttribute('data-node');
+  // 처음 뜨는 방 구경 채팅 칸은 비어 있고 피그마 줄은 틀로만 숨겨 둔다(watchChat.js). 틀을 복제한 내 댓글은 보이게 한다.
+  node.style.display = '';
+  delete node.dataset.watchTpl;
+  node.dataset.watchRow = '1';
   setText(node.querySelector('p[data-outline]'), text);
   q(node, '[data-figma="bubble"], p[data-outline]').forEach((el) => Object.assign(el.style, { width: 'auto' }));
   Object.assign(box.style, { justifyContent: 'flex-end', overflow: 'hidden' });
@@ -370,7 +376,9 @@ function scrollerOf(layer, root, n) {
   const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
   const named = (LIVE.pinNames[n] || []).map((nm) => root.querySelector(':scope > [data-figma="' + nm + '"]')).filter(Boolean);
   const pins = [...(fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : []), ...named];
-  const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : LIVE.screenH;
+  // 종료(1)는 바닥 요소가 없고, 휴대폰에서는 뿌리 칸이 보이는 창 바닥까지 늘어난다(mobileFit.js). 그 바닥까지 움직인다.
+  const floor = n === 1 ? endFloor(root) : LIVE.screenH;
+  const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : floor;
   const box = root.querySelector(':scope > [data-figma="Scroll"]');
   let items, top;
   if (box) {
@@ -391,11 +399,13 @@ function scrollerOf(layer, root, n) {
       if (rr.h > 0) end = Math.max(end, rr.y + rr.h);
     });
   });
-  const max = Math.max(0, end + LIVE.scrollPad - bottom);
+  const max = Math.max(0, end + (LIVE.scrollPadBy[n] ?? LIVE.scrollPad) - bottom);
   if (!max) return null;
   const hot = q(layer, '[data-hotspot]').filter((b) => {
     const t = parseFloat(b.style.top);
-    return t >= top - 0.5 && t < bottom && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
+    // 종료(1)의 아래 버튼(y1590, 1640)은 창 아래(844 넘어)에 있다가 스크롤로 올라온다. 누르는 자리도 같이 움직인다.
+    const below = n === 1 && t >= LIVE.screenH;
+    return ((t >= top - 0.5 && t < bottom) || below) && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
   });
   const clipNeeded = !box;
   const y0 = new Map(items.map((el) => [el, relRect(root, el).y]));
@@ -698,6 +708,30 @@ function patchReport(root, n) {
     root.appendChild(cta);
     Object.assign(cta.style, { position: 'absolute', left: rr.x + 'px', top: rr.y + 'px' });
   }
+  // 아래 버튼 막대(huisu 1647:27027 "이 하단 바가 계속 따라오게", 11. 11.): 막대는 이미 창 바닥(y726)에 고정이다.
+  // 막대 뒤로 지나가는 글이 버튼 윗선에서 잘려 보이지 않게 막대 바로 위에 바탕색에서 투명으로 가는 24px 띠를 둔다.
+  // 띠는 막대의 첫 자식으로 넣어 휴대폰 맞춤(mobileFit.js)에서 막대가 옮겨져도 같이 따라간다.
+  // 막대 윗선 아래는 피그마 검은 그라데이션(Rectangle 1954141374, y632 높이 212, 73.24%에서 검정)이 빈 바탕 위에 그리는 색을 그대로 이어 칠한다.
+  // 띠 아래로 내용이 비쳐 경계선처럼 보이는 일을 막고, 내용이 없을 때의 모습은 피그마와 같다.
+  // 띠는 버튼 글자 밑에 깔리도록 막대를 따로 쌓고(isolation) 띠를 그 안 맨 아래(z -1)에 둔다.
+  const bar = root.querySelector(':scope > [data-figma="Frame 2147249293"]');
+  const scrim = root.querySelector(':scope > [data-figma="Rectangle 1954141374"]');
+  if (bar && scrim && !bar.querySelector(':scope > [data-report-band]')) {
+    const band = document.createElement('div');
+    band.setAttribute('aria-hidden', 'true');
+    band.setAttribute('data-report-band', '');
+    const br = relRect(root, bar), sr = relRect(root, scrim);
+    const blackAt = sr.y + sr.h * 0.7324;
+    const a = Math.max(0, Math.min(1, (br.y - sr.y) / (blackAt - sr.y)));
+    const rgb = (bg.match(/\d+/g) || [18, 20, 21]).slice(0, 3).map((v) => Math.round(v * (1 - a)));
+    const below = sr.y + sr.h - br.y;
+    const B = LIVE.reportBand;
+    const grad = 'linear-gradient(to bottom, transparent 0px, rgb(' + rgb.join(', ') + ') ' + B + 'px, #000 ' + (B + Math.max(0, blackAt - br.y)) + 'px, #000 ' + (B + below) + 'px)';
+    Object.assign(band.style, { position: 'absolute', left: -br.x + 'px', top: -B + 'px', width: LIVE.screenW + 'px', height: B + below + 'px', pointerEvents: 'none', background: grad });
+    band.style.zIndex = '-1';
+    Object.assign(bar.style, { overflow: 'visible', isolation: 'isolate' });
+    bar.prepend(band);
+  }
 }
 
 // 새 의자 팝업(19) 뒤 화면: 옛 뱃지 시트(불꽃 드륵 등)는 쓰지 않는다. MY 화면(36)의 나의 업적 편의점 시트로 바꾼다.
@@ -713,15 +747,16 @@ async function patchSkinPopup(root, n) {
 
 function prepareChat(root, n) {
   const sc = sceneOf(n);
-  if (!sc || (room.scene === sc && room.chatDone)) return;
-  root.dataset.chatHide = '1';
-  q(root, CHAT_SEL).filter((el) => !el.closest('[data-figma^="input"]')).forEach((el) => (el.style.opacity = '0'));
+  if (!sc) return;
+  // 새 방이면 줄을 모두 숨기고, 같은 방의 다음 화면이면 아직 나오지 않은 줄만 숨긴다(roomChat.js).
+  roomChatPrepare(chatItems(root), !(room.scene === sc && room.chatDone));
 }
 function prepareRoomClock(root, n) {
   const sc = sceneOf(n);
   if (!sc) return;
   const same = room.scene === sc && room.kind === timerKind(root);
-  const txt = fmtMMSS(same ? remaining() : n === 37 ? watchStart() : handoffNow(LIVE.roomSeconds));
+  const raw = same ? remaining() : n === 37 ? watchStart() : handoffNow(LIVE.roomSeconds);
+  const txt = fmtMMSS(n === 40 ? Math.min(raw, LIVE.sunriseAt) : raw);
   timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
 }
 
@@ -748,16 +783,20 @@ export async function prepare(layer, n, prevN) {
   fixIcons(root);
   patchLounge(root, n);
   patchWatchSeats(root, n);
+  prepareWatchChat(root, n);
   if ([19, 36, 53, 54].includes(n)) patchMyChair(root);
   attachPost(root);
   patchPill(root, n);
   patchReport(root, n);
   patchReportStory(root, n);
+  prepReportMotion(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
   if (n === LIVE.itemScreen) await fillItem(root);
   await patchSkinPopup(root, n);
   if (n === LIVE.analysisScreen) initAnalysis(root);
   prepareRoomClock(root, n);
+  // 방 입장 영상: 새로 들어오는 함께 드르륵 방(B)이면 장면 그림 위에 첫 장면을 깔아 둔다(roomEnterVideo.js).
+  prepareRoomEnter(root, n, sceneOf(n) === 'B' && room.scene !== 'B');
   prepareChat(root, n);
   patchCommunity(root, n);
 }
@@ -797,9 +836,15 @@ export function attach(layer, n, go, prevN) {
   startWatchChat(root, n);
   patchCommunity(root, n);
   if (root.dataset.gauge === '1') { root.dataset.gauge = '2'; animateGauge(root); }
+  attachReportMotion(root, n);
   warm(LIVE.warmDonors);
   const sc = sceneOf(n);
   voiceOnScreen(n, sc);
+  // 해뜨기 영상: 방(B)과 방 구경(W)에 들어오면 미리 받고, 해 뜨는 단계(40)에서 재생한다. 다른 화면이면 멈추고 뺀다(sunriseVideo.js).
+  if (sc === 'B' || sc === 'W') prefetchSunrise();
+  attachSunrise(root, n);
+  // 방 입장 영상: 새로 들어온 방이면 한 번 재생하고, 같은 방 안 전환이면 이어 가거나 멈춘다(roomEnterVideo.js). room.scene이 바뀌기 전에 부른다.
+  attachRoomEnter(root, n, sc === 'B' && room.scene !== 'B');
   if (sc) {
     const kind = timerKind(root);
     if (room.scene !== sc || room.kind !== kind) {
@@ -814,17 +859,14 @@ export function attach(layer, n, go, prevN) {
       room.stepAt = 0;
     }
     // 해 뜨기 1분 전(40)은 피그마처럼 01:12에서 센다. 더 많이 남은 시계로 들어오면 01:12로 맞춘다.
-    if (n === 40 && remaining() > 72) {
-      room.left = 72;
+    if (n === 40 && remaining() > LIVE.sunriseAt) {
+      room.left = LIVE.sunriseAt;
       room.at = performance.now();
     }
-    if (!room.chatDone) {
-      room.chatDone = true;
-      staggerChat(root);
-    } else if (root.dataset.chatHide === '1') {
-      q(root, CHAT_SEL).forEach((el) => { if (!el.closest('[data-figma^="input"]') && el.style.opacity === '0') el.style.opacity = ''; });
-    }
-  } else room.scene = null;
+    const freshChat = !room.chatDone;
+    room.chatDone = true;
+    staggerChat(root, n, freshChat);
+  } else { room.scene = null; roomChatLeave(); }
   if (n === LIVE.analysisScreen) { initAnalysis(root); playAnalysis(root, LIVE.analysisMs); }
   if (!ticker) ticker = window.setInterval(tick, 250);
   tick();
@@ -847,6 +889,8 @@ function tick() {
     if (step.to === current.n) room.fired[step.at] = true;
     // 방에 들어온 직후와 앞 단계 직후 3초는 다음 단계로 넘기지 않는다(이어받은 시계가 이미 짧을 때, roomClockHandoff.js).
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n && !stepReady(room)) break;
+    // 해 뜨는 단계(40)에서는 해뜨기 영상이 끝나고 마지막 장면이 머문 뒤에 종료로 넘긴다(sunriseVideo.js).
+    if (left <= step.at && !room.fired[step.at] && step.to !== current.n && current.n === 40 && sunriseHolding()) break;
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
       room.fired[step.at] = true;
       room.stepAt = performance.now();

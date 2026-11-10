@@ -1,18 +1,21 @@
 // 주전부리 던지기: 퀵슬롯의 주전부리를 손가락이나 마우스로 끌어서 방 한가운데 테이블 위에 놓으면 테이블에 던져 올린다.
 // 끄는 동안 테이블이 빛나고, 놓으면 날아가 테이블 위에 떨어지며 효과음이 난다. 개수가 보이는 칸은 한 번 던지면 개수가 줄어든다.
 // 던진 뒤 쿨타임(tokens live.throwCooldownSec, 3초) 동안 던진 칸에 하늘색 2px 안쪽 선과 검정 60% 부채꼴 덮개가 줄어들고(혼자 방 1647:24874 표시),
-// 그동안 모든 칸은 눌리지 않는다. 끝나면 다시 던질 수 있다. 개수가 0이 된 칸만 계속 40% 투명이다.
+// 쿨타임과 잠금은 던진 그 칸에만 걸린다. 다른 칸은 바로(날아가는 중에도) 끌어 던질 수 있다(11. 10. 밤 팀 요청 "동시에 여러 개 놓을 수 있게").
+// 끝나면 다시 던질 수 있다. 개수가 0이 된 칸만 계속 40% 투명이다. 착지 소리는 아이템마다 통로가 따로라서 서로 끊지 않고 겹쳐 난다.
 // 던지는 대상은 사람이 아니라 테이블이다. 받는 사람이나 온도와는 관계가 없다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText } from './dom.js';
-import { sfx, playSound, preloadSounds } from './sfx.js';
-import { SLOT_ITEM, throwDoneText } from './itemSounds.js';
+import { sfx, playSound, preloadSounds, itemChannel } from './sfx.js';
+import { SLOT_ITEM, UNIQUE_SOUND_KEYS, throwDoneText } from './itemSounds.js';
 import { toast } from './room.js';
 
-// 던진 기록은 화면을 옮기거나 퀵슬롯을 접었다 펴도 남는다(이름별 남은 개수, 쿨타임 중인 칸과 시작과 끝 시각).
+// 던진 기록은 화면을 옮기거나 퀵슬롯을 접었다 펴도 남는다(이름별 남은 개수, 칸 이름별 쿨타임 시작과 끝 시각).
 const inv = {};
-const cool = { name: '', start: 0, until: 0 };
-const cooling = () => Date.now() < cool.until;
+const cools = {};
+const cooling = (name) => !!cools[name] && Date.now() < cools[name].until;
+// 던진 뒤 안내 글은 하나만 둔다. 여러 개를 연달아 던지면 앞 글을 지우고 가장 나중 글이 그 자리에 다시 나타난다(표시 시간도 다시 시작).
+let lastToast = null;
 const nameOf = (slot) => (slot.getAttribute('data-figma') || '').replace(/^slot · /, '');
 const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -20,8 +23,8 @@ export function attachThrow(root) {
   const dock = root.querySelector('[data-figma="주전부리 퀵슬롯"]');
   if (!dock || dock.dataset.live) return;
   dock.dataset.live = 'throw';
-  // 방에 들어오면 칸마다의 녹음 파일을 미리 받아 둔다(착지 소리가 늦지 않게, itemSounds.js).
-  preloadSounds(Object.values(SLOT_ITEM));
+  // 방에 들어오면 주전부리 소리 파일 4개를 미리 받아 둔다(착지 소리가 늦지 않게, itemSounds.js). 칸 7개가 이 4개를 함께 쓴다.
+  preloadSounds(UNIQUE_SOUND_KEYS);
   const group = root.querySelector('[data-figma="Group 2147229349"]');
   const slots = q(dock, '[data-figma^="slot · "]');
   const toRoot = (ev) => {
@@ -90,7 +93,8 @@ export function attachThrow(root) {
     c.appendChild(ring);
     slot.appendChild(c);
     const ms = LIVE.throwCooldownSec * 1000;
-    const at = Math.min(ms, Math.max(0, Date.now() - cool.start));
+    const cs = cools[nameOf(slot)];
+    const at = Math.min(ms, Math.max(0, Date.now() - (cs ? cs.start : Date.now())));
     const opt = { duration: ms, easing: 'linear', fill: 'both' };
     const l = left.animate([{ transform: 'rotate(180deg)' }, { transform: 'rotate(0deg)', offset: 0.5 }, { transform: 'rotate(0deg)' }], opt);
     const r = right.animate([{ transform: 'rotate(180deg)' }, { transform: 'rotate(180deg)', offset: 0.5 }, { transform: 'rotate(0deg)' }], opt);
@@ -101,18 +105,22 @@ export function attachThrow(root) {
   const paintCool = (slot) => {
     const st = inv[nameOf(slot)];
     const empty = !!st && st.count === 0;
-    const mine = cooling() && cool.name === nameOf(slot);
+    const mine = cooling(nameOf(slot));
     slot.dataset.cool = empty ? 'empty' : mine ? '1' : '';
     slot.style.opacity = empty ? '0.4' : '';
     if (mine && !coverOf(slot)) makeCover(slot);
     if (!mine) dropCover(slot);
   };
   const paintAll = () => slots.forEach(paintCool);
-  let endTimer = 0;
+  // 칸마다 쿨타임이 끝나는 시각에 그 칸을 다시 그린다.
+  const endTimers = {};
   const armEnd = () => {
-    window.clearTimeout(endTimer);
-    if (!cooling()) return;
-    endTimer = window.setTimeout(() => { if (root.isConnected) paintAll(); }, cool.until - Date.now() + 10);
+    slots.forEach((slot) => {
+      const name = nameOf(slot);
+      window.clearTimeout(endTimers[name]);
+      if (!cooling(name)) return;
+      endTimers[name] = window.setTimeout(() => { if (root.isConnected) paintCool(slot); }, cools[name].until - Date.now() + 10);
+    });
   };
   // 이미 던진 기록을 화면에 다시 적용한다.
   slots.forEach((slot) => {
@@ -129,8 +137,8 @@ export function attachThrow(root) {
     slot.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       if (slot.dataset.cool === 'empty') { sfx.deny(); toast(root, LIVE.throwEmptyText); return; }
-      // 쿨타임 중에는 어느 칸도 들리지 않는다.
-      if (cooling()) { sfx.deny(); return; }
+      // 쿨타임 중인 그 칸만 들리지 않는다. 다른 칸은 그대로 끌 수 있다.
+      if (cooling(nameOf(slot))) { sfx.deny(); return; }
       const sx = e.clientX, sy = e.clientY;
       const img = slot.querySelector(':scope > [data-figma]:not([data-figma="count"])');
       if (!img) return;
@@ -187,7 +195,8 @@ export function attachThrow(root) {
         a.onfinish = () => {
           sfx.land();
           // 착지하는 순간 그 주전부리의 녹음 파일(11. 10. 피드백 "주전부리 올렸을때 소리 반영").
-          if (soundKey) playSound(soundKey, { channel: 'item' });
+          // 아이템마다 통로가 따로라 먼저 던진 다른 주전부리 소리를 끊지 않는다(같은 파일을 쓰는 새우깡과 오징어땅콩도 둘 다 난다).
+          if (soundKey) playSound(soundKey, { channel: itemChannel(soundKey) });
           ghost.animate([{ transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + (ty - 12) + 'px) scale(1.1) rotate(' + rot + 'deg)' }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(' + rot + 'deg)' }], { duration: 240, easing: motion.standard });
           // 머무는 시간의 마지막 throwFadeMs 동안 서서히 투명해지며 작아진 뒤 지운다(갑자기 없어지지 않게).
           const at = 'translate(' + tx + 'px,' + ty + 'px) rotate(' + rot + 'deg) ';
@@ -206,13 +215,15 @@ export function attachThrow(root) {
           inv[name] = Object.assign(inv[name] || {}, { count: next });
           if (cp) setText(cp, String(next));
         }
-        cool.name = name;
-        cool.start = Date.now();
-        cool.until = cool.start + LIVE.throwCooldownSec * 1000;
-        paintAll();
+        const start = Date.now();
+        cools[name] = { start, until: start + LIVE.throwCooldownSec * 1000 };
+        paintCool(slot);
         armEnd();
         // 안내 글은 던진 주전부리 이름을 말한다(예: 새우깡을 테이블에 올렸어요). 이름을 모르는 칸은 예전 글 그대로다.
+        if (lastToast && lastToast.isConnected) lastToast.remove();
         toast(root, SLOT_ITEM[name] ? throwDoneText(name) : LIVE.throwDoneText);
+        const made = root.lastElementChild;
+        lastToast = made && made.getAttribute('role') === 'status' ? made : null;
       };
       window.addEventListener('pointermove', move);
       window.addEventListener('pointerup', done);

@@ -4,7 +4,8 @@ import Foundation
 // 아이템 소리(11. 10. 메모 "아이템 눌렀을때 사운드 들어볼 수 있으면 좋겠어요", 피그마 댓글 "소리 코드에 넣기 필요").
 // 8개 아이템은 팀 녹음 파일을 내고(SoundFiles.swift), 미획득 소리와 파일을 못 열 때의 대체 소리는 웹 sfx.js의 tone과 burst를 같은 값으로 옮겨 PCM 버퍼로 만들어 AVAudioEngine으로 낸다.
 // 아이템마다 0.5초에서 1초 길이, 묶음 음량 0.5. 사용자가 누를 때만 부른다.
-// 150ms 안에 다시 누르면 무시하고, 그보다 늦게 누르면 앞 소리를 멈추고 새로 낸다(겹쳐 쌓이지 않는다).
+// 같은 아이템을 150ms 안에 다시 누르면 무시하고, 그보다 늦게 누르면 그 아이템의 앞 소리만 멈추고 새로 낸다.
+// 서로 다른 아이템의 소리는 서로를 끊지 않고 겹쳐 끝까지 난다(11. 10. 밤 팀 요청 "동시에 여러 개 놓을 수 있게", 웹 sfx.js playItem과 같은 규칙).
 // 오디오 세션은 .ambient라서 무음 스위치를 켠 기기에서는 소리가 나지 않을 뿐 오류가 없고, 다른 앱 음악도 끊지 않는다.
 
 @MainActor
@@ -18,7 +19,7 @@ final class ItemSound {
     private let player = AVAudioPlayerNode()
     private let format: AVAudioFormat
     private var buffers: [String: AVAudioPCMBuffer] = [:]
-    private var lastPlay: Date = .distantPast
+    private var lastPlay: [String: Date] = [:]
     private var ready = false
 
     private init() {
@@ -29,22 +30,21 @@ final class ItemSound {
     /// 8개 아이템은 팀 녹음 파일(SoundFiles, FileSound)을 내고, 파일을 못 열면 아래 합성 소리로 대신한다. 미획득(locked)은 합성 소리 그대로다.
     func play(_ key: String) {
         let now = Date()
-        guard now.timeIntervalSince(lastPlay) >= gapSeconds else { return }
-        lastPlay = now
-        if key != "locked", SoundFiles.names[key] != nil, FileSound.shared.play(key, channel: "item") {
-            if ready { player.stop() }
+        guard now.timeIntervalSince(lastPlay[key] ?? .distantPast) >= gapSeconds else { return }
+        lastPlay[key] = now
+        if key != "locked", SoundFiles.names[key] != nil, FileSound.shared.play(key, channel: SoundFiles.channel(key)) {
             return
         }
-        FileSound.shared.stop("item")
+        FileSound.shared.stop(SoundFiles.channel(key))
         guard prepare(), let buffer = buffer(for: key) else { return }
         player.stop()
         player.scheduleBuffer(buffer, at: nil, options: [])
         player.play()
     }
 
-    /// 마이 화면에 들어오면 8개 아이템 파일을 미리 열어 둔다(첫 누름 소리가 늦지 않게).
+    /// 마이 화면에 들어오면 아이템 소리 파일 4개(건어물, 과자, 캔, 소주)를 미리 열어 둔다(첫 누름 소리가 늦지 않게). 8칸이 이 4개를 둘씩 함께 쓴다.
     func preloadFiles() {
-        FileSound.shared.preload(["shrimp", "soju", "peanut", "nogari", "drrra", "squid", "monster", "byeollo"])
+        FileSound.shared.preload(SoundFiles.uniqueSnackKeys)
     }
 
     private func prepare() -> Bool {

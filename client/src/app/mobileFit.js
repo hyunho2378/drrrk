@@ -27,6 +27,11 @@ export function fitMobile(container, root, visibleH) {
   });
   root.__fit = { rest: 0, pinned: new Set(), native: false, input: false };
   if (Math.abs(delta) < 1) return;
+  // 창 안에서 내용 전체가 움직이는 화면(종료 1번, live.js scrollerOf): 빈 띠를 줄이거나 바닥에 붙이지 않고 뿌리 칸 높이만 보이는 창 바닥에 맞춘다.
+  if (M.scrollOnly.includes(root.getAttribute('data-node'))) {
+    root.style.height = H0 - delta + 'px';
+    return;
+  }
   const kids = Array.from(root.children).map((el) => {
     const cs = getComputedStyle(el);
     const t = px(cs.top), h = px(cs.height);

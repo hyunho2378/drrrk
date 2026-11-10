@@ -95,13 +95,17 @@ private struct PostCard: View {
                 Text(post.title).suit(16, .bold, tracking: -0.64).foregroundStyle(DS.Palette.textPrimary)
                     .multilineTextAlignment(.leading).lineSpacing(2)
                 Spacer(minLength: 8)
+                // 피그마 1953:19406 stats(2223:13623 등, 의정 11. 10. "좋아요/댓글 사이 간격 수정"): 따봉 16, 숫자, 댓글 16, 숫자를 간격 4로만 잇는다.
+                // 줄 높이 16, 카드 위에서 76(아래 여백 20), 글자색 #9AA1A6.
                 HStack(spacing: 4) {
-                    Image("C-thumb-up-outline").renderingMode(.template).resizable().frame(width: 14, height: 14)
+                    Image("C-thumb-up-outline").renderingMode(.template).resizable().frame(width: 16, height: 16)
                     Text("\(post.likes)").suit(12, .medium, tracking: -0.48)
-                    Image("C-comment").renderingMode(.template).resizable().frame(width: 14, height: 14).padding(.leading, 8)
+                    Image("C-comment").renderingMode(.template).resizable().frame(width: 16, height: 16)
                     Text("\(post.comments)").suit(12, .medium, tracking: -0.48)
                 }
-                .foregroundStyle(DS.Palette.textTertiary)
+                .frame(height: 16)
+                .padding(.bottom, 4)
+                .foregroundStyle(DS.Palette.textSecondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             ZStack(alignment: .bottomTrailing) {

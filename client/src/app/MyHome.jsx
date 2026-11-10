@@ -209,7 +209,7 @@ export default function MyHome({ item, still }) {
   const saved = useSyncExternalStore(subscribe, getSaved, getSaved);
   const [chairOk, setChairOk] = useState(true);
   useEffect(() => setChairOk(true), [saved.k, saved.c]);
-  // 아이템 녹음 파일 8개를 미리 받아 둔다(첫 누름 소리가 늦지 않게).
+  // 아이템 소리 파일 4개(건어물, 과자, 캔, 소주)를 미리 받아 둔다(첫 누름 소리가 늦지 않게). 8칸이 이 4개를 둘씩 함께 쓴다.
   useEffect(() => { preloadItemSounds(); }, []);
   const kind = KINDS[saved.k];
   // 엉따 막대는 다른 화면에서 마이로 들어올 때만 채운다. 마이 안의 화면에서 돌아오면 처음부터 최종 길이다.

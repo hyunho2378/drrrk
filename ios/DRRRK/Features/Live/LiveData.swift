@@ -162,9 +162,14 @@ struct WatchLine: Identifiable, Hashable {
 }
 
 /// 방 구경 채팅이 라이브 방송처럼 계속 올라온다(11/10 팀원 피드백 "라이브-눌러서 라방 보듯이 할라면 계속 새 메시지가 올라오는 것 처럼 해야할듯").
+/// 화면이 처음 뜰 때 채팅 칸은 비어 있다(11. 10. 팀 요청 "처음에 시작했을 때 댓글 아무 것도 없다가 하나씩 생겨나는 느낌으로").
+/// 0.7초 뒤 첫 줄, 처음 4줄까지는 1.0초에서 1.8초 사이 간격, 그 뒤는 2.4초에서 4.2초 사이 간격.
 /// 웹 client/src/app/watchChat.js와 같은 값, 같은 글 순서, 같은 간격 수열이다.
 enum WatchFeed {
-    static let firstDelay: Double = 0.8
+    static let firstDelay: Double = 0.7
+    static let fastCount = 4
+    static let fastMinGap: Double = 1.0
+    static let fastMaxGap: Double = 1.8
     static let minGap: Double = 2.4
     static let maxGap: Double = 4.2
     static let seed: UInt32 = 1110
@@ -172,8 +177,13 @@ enum WatchFeed {
     /// 줄이 밀려 올라가고 나타나는 움직임 220ms, 표준 곡선
     static let motion = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.22)
 
-    static var initial: [WatchLine] {
-        WatchData.comments.map { WatchLine(name: $0.0, text: $0.1, mine: false) } + WatchData.myComments.map { WatchLine(name: "", text: $0, mine: true) }
+    /// 처음 칸은 비어 있다. 피그마 댓글 두 줄은 글 후보(lines) 끝에서 차례가 오면 나온다.
+    static var initial: [WatchLine] { [] }
+
+    /// 이미 올라온 줄 수(shown) 다음의 간격. 4번째 줄까지는 빠른 간격, 그 뒤는 보통 간격(웹 watchChat.js delay와 같다).
+    static func gap(after shown: Int, _ random: inout Random) -> Double {
+        let r = random.next()
+        return shown < fastCount ? fastMinGap + r * (fastMaxGap - fastMinGap) : minGap + r * (maxGap - minGap)
     }
 
     /// 글 후보: 지금 이야기 방 채팅 줄(들어온 직후와 무르익은 뒤의 다른 의자 줄), 다른 이야기 줄, 커뮤니티 글 상세 댓글, 방 구경 댓글 순서.
@@ -246,10 +256,10 @@ enum CommunityData {
         .init(name: "푹신푹신 리클라이너17", time: "2시간 전", text: "내가 봤을 때는 백퍼 글쓴이 질투하는듯\n웃으면서 나도 보정 좀 해주지~라고 댓글 달아봐", likes: 48, avatar: "C-ad4a14569046"),
         .init(name: "딱딱한 나무스툴12", time: "1시간 전", text: "근데 사이 틀어질지도.. 괜히 어사되면 어캄", likes: 12, reply: true, avatar: "C-90255286edc8"),
         .init(name: "새벽2시 소파", time: "41분 전", text: "나도 똑같은 일 있었는데 물어보니까 진짜 걍 생각없이 올린거였음", likes: 9, avatar: "C-4a2fafbdd2df"),
-        .init(name: "퇴근길 편의점 의자", time: "1시간 전", text: "사람들이 너무 많아서 한참 기다렸다가 탄 기억이 나네요", likes: 15, avatar: "C-b5c25c4caef8"),
-        .init(name: "주말 아침 나무스툴", time: "3시간 전", text: "조용한 분위기와 향긋한 커피 덕분에 힐링했어요", likes: 23, avatar: "C-d7b0bb5005bf"),
-        .init(name: "비 오는 날 바퀴달린의자", time: "5시간 전", text: "갑자기 비가 쏟아져서 우산 없이 고생했어요", likes: 8, avatar: "C-cf2670f44f76"),
-        .init(name: "길거리 편의점 의자", time: "7시간 전", text: "우연히 본 벽화가 너무 예뻐서 사진 찍었네요", likes: 12, avatar: "C-33871c043e7c"),
+        .init(name: "퇴근길 편의점 의자", time: "1시간 전", text: "그건 선 넘었다 ㅋㅋ", likes: 15, avatar: "C-b5c25c4caef8"),
+        .init(name: "주말 아침 나무스툴", time: "3시간 전", text: "근데 그걸 까먹을 수가 있나?", likes: 23, avatar: "C-d7b0bb5005bf"),
+        .init(name: "비 오는 날 바퀴달린의자", time: "5시간 전", text: "쫀득하게 자기만 보정하면 어떡해ㅠㅠ 속상했겠다...", likes: 8, avatar: "C-cf2670f44f76"),
+        .init(name: "길거리 편의점 의자", time: "7시간 전", text: "너도 그런거 하나 올려봐ㅋㅋㅋ 역지사지가 되어야함", likes: 12, avatar: "C-33871c043e7c"),
     ]
 }
 

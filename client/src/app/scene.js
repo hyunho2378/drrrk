@@ -5,7 +5,7 @@
 import { setText } from './dom.js';
 import { cloneOf } from './donor.js';
 import { attachSpeakers } from './room.js';
-import { roomStory, STORY_BANNER } from './roomConcern.js';
+import { roomStory, STORY_BANNER, styleBannerLine } from './roomConcern.js';
 
 const FILES = {
   base: 'room2/scene.webp',
@@ -182,7 +182,8 @@ async function patchSsang(root, n) {
   // 2) 접힌 고민 배너 글자 값(2096:22512, SUIT Medium 14, 자간 -4%). 글은 생성 화면 그대로다.
   const ban = root.querySelector('[data-figma="고민 주제 · 최소화 (탭하면 자세히)"]');
   const bp = ban && [...ban.querySelectorAll(':scope > p')].find((p) => p.textContent.trim() !== '고민');
-  if (bp) Object.assign(bp.style, { fontSize: '14px', lineHeight: '17px', letterSpacing: '-0.56px' });
+  // 행간은 11. 10. 피그마 댓글 "행간 140%"(1884:11512, 19.6px)로 바꾼다.
+  styleBannerLine(bp);
   const handle = root.querySelector('[data-figma="주전부리 퀵슬롯"] > [data-figma="접기 핸들"]');
   if (handle) handle.style.background = 'rgba(0, 0, 0, 0.45)';
   // 3) 해 뜨기 1분 전 채팅과 알림 자리
@@ -226,7 +227,8 @@ export async function patchRoom2(root, n) {
   const ban = root.querySelector('[data-figma="고민 주제 · 최소화 (탭하면 자세히)"]');
   const bp = ban && [...ban.querySelectorAll(':scope > p')].find((p) => p.textContent.trim() !== '고민');
   // 글자 값은 피그마 2009:12505(SUIT Medium 14, 자간 -4%, 행간 자동 17). 옛 해 뜨기 프레임(1647:24788)은 12였다.
-  if (bp) { bp.dataset.sync = '1'; setText(bp, ROOM2.banner); Object.assign(bp.style, { fontSize: '14px', lineHeight: '17px', letterSpacing: '-0.56px' }); }
+  // 행간은 11. 10. 피그마 댓글 "행간 140%"(1884:11512, 19.6px)로 바꾼다.
+  if (bp) { bp.dataset.sync = '1'; setText(bp, ROOM2.banner); styleBannerLine(bp); }
   // 퀵슬롯 접기 핸들 바탕: 피그마 1979:27597(44 x 20, 모서리 10, 검정 45%). 생성 코드가 fill로 적어 바탕이 비어 있었다.
   const handle = root.querySelector('[data-figma="주전부리 퀵슬롯"] > [data-figma="접기 핸들"]');
   if (handle) handle.style.background = 'rgba(0, 0, 0, 0.45)';
