@@ -29,8 +29,9 @@ const TEXT = {
 const SUN = { x: 122, y: 273, s: 146 };
 const BEST = '#36D2FF';
 
-// 목록(39)에서 마지막으로 누른 카드 제목. 상세(38) 제목에 넣는다.
+// 목록(39)에서 마지막으로 누른 카드 제목. 상세(38, CommunityPost.jsx) 제목에 넣는다.
 let pickedTitle = null;
+export const pickedPostTitle = () => pickedTitle;
 
 function setImg(el, file) {
   const url = A + file;
@@ -154,6 +155,8 @@ function commentAvatars(root) {
 
 export function patchCommunity(root, n) {
   if (!root) return;
+  // 38은 11. 10.부터 손으로 옮긴 v5 화면(CommunityPost.jsx, 2100:23295)이다. 옛 생성 화면용 덧칠은 하지 않는다.
+  if (n === 38 && root.dataset.node === '2100:23295') return;
   patchRest(root, n);
   const imgs = IMG[n];
   if (imgs) Object.keys(imgs).forEach((id) => { const el = root.querySelector('[data-node="' + id + '"]'); if (el) setImg(el, imgs[id]); });

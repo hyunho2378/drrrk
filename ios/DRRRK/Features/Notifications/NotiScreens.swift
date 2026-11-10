@@ -1,7 +1,9 @@
 import SwiftUI
 
-// 알림: 활동(피그마 1952:14673), 키워드 알림(1952:14700), 키워드 관리(1952:14693).
+// 알림: 활동(피그마 2100:24856), 키워드 알림(2100:25022), 키워드 관리(2100:24964). 11/10 1110코딩기준 섹션.
 // 활동과 키워드 알림은 한 화면 안 탭이다. 탭을 바꾸면 아래 목록만 바뀐다.
+// 피그마 프레임은 1093, 1479 높이로 길게 그렸지만 앱은 폰 화면 크기이고 안에서 스크롤한다(웹 NotiScreens.jsx와 같다).
+// 활동: 머리말과 탭, 칩 줄이 위에 남고 목록만 스크롤한다. 키워드 알림: 머리말과 탭이 남고 요약, 칩 줄, 목록이 함께 스크롤한다.
 
 private struct ActivityItem: Identifiable {
     let id = UUID()
@@ -12,6 +14,8 @@ private struct ActivityItem: Identifiable {
     let body: String
     let more: String?
     let unread: Bool
+    /// 누르면 갈 화면이 있는 알림인지(새 기능 안내와 친구 초대 보상은 갈 화면이 없다)
+    var link = true
 }
 
 private struct KeywordHit: Identifiable {
@@ -22,6 +26,18 @@ private struct KeywordHit: Identifiable {
     let time: String?
     let thumb: String
     let unread: Bool
+
+    /// 시계 칩의 남은 시간(초). 종료 카드는 nil
+    var secondsLeft: Int? {
+        guard let time else { return nil }
+        let p = time.split(separator: ":").compactMap { Int($0) }
+        return p.count == 2 ? p[0] * 60 + p[1] : nil
+    }
+
+    /// 메타 글의 "N명 이야기 중"에서 읽은 이야기 수
+    var talkers: String {
+        meta.split(separator: " ").first { $0.hasSuffix("명") }.map { String($0.dropLast()) } ?? ""
+    }
 }
 
 private enum NotiData {
@@ -33,6 +49,8 @@ private enum NotiData {
         .init(kind: "중요", icon: "C-noti-3", title: "신고 결과 · 중요 알림", ago: "20일 전", body: "신고해주신 ‘새벽2시 택배상자’님을 드르륵 운영정책에 따라 조치했어요. 신고해주셔서 감사해요 :)", more: nil, unread: false),
         .init(kind: "의자꾸미기", icon: "C-noti-4", title: "의자 꾸미기", ago: "21일 전", body: "새 의자 ‘푹신푹신 리클라이너’가 잠금 해제됐어요. 지금 앉아볼까요?", more: nil, unread: false),
         .init(kind: "댓글", icon: "C-noti-5", title: "댓글", ago: "22일 전", body: "내 댓글에 따봉이 5개 달렸어요.", more: nil, unread: false),
+        .init(kind: "중요", icon: "C-noti-3", title: "새 기능 안내", ago: "23일 전", body: "드르륵에 새로 추가된 '테마 변경' 기능을 사용해보세요! 나만의 스타일로 꾸며보세요.", more: nil, unread: false, link: false),
+        .init(kind: "의자꾸미기", icon: "C-noti-4", title: "친구 초대 보상", ago: "24일 전", body: "친구를 초대하면 특별한 보상을 드려요! 지금 초대하고 선물을 받아가세요.", more: nil, unread: false, link: false),
     ]
     static let sections: [(String, [KeywordHit])] = [
         ("오늘", [
@@ -180,20 +198,22 @@ struct NotiActivityView: View {
     }
 
     private var activity: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(NotiData.filters, id: \.self) { f in
-                            Button { withAnimation(DS.Motion.stateIn) { filter = f } } label: { FilterChip(title: f, on: f == filter) }
-                                .buttonStyle(PressStyle())
-                        }
+        VStack(alignment: .leading, spacing: 0) {
+            // 피그마 Keyword Chips(2100:24867): 탭 밑줄 아래 20, 안쪽 위 2, 칩 사이 8. 목록이 스크롤해도 제자리에 남는다.
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(NotiData.filters, id: \.self) { f in
+                        Button { withAnimation(DS.Motion.stateIn) { filter = f } } label: { FilterChip(title: f, on: f == filter) }
+                            .buttonStyle(PressStyle())
                     }
                 }
-                .contentMargins(.horizontal, 24, for: .scrollContent)
-                .scrollIndicators(.hidden)
-                .padding(.top, 18)
-                VStack(spacing: 0) {
+            }
+            .contentMargins(.horizontal, 24, for: .scrollContent)
+            .scrollIndicators(.hidden)
+            .padding(.top, 22)
+            ScrollView {
+                // 피그마 Activity List(2100:24878): 칩 줄 아래 14에서 시작, 안쪽 위 8, 아래 24, 줄 사이 4
+                VStack(spacing: 4) {
                     ForEach(NotiData.activity.filter { filter == "전체" || $0.kind == filter }) { a in
                         // 알림 줄과 "N건 더보기"를 누르면 그 알림이 가리키는 화면으로 간다. 신고 결과 알림은 갈 화면이 없어 줄만 보인다.
                         if let go = destination(a) {
@@ -205,16 +225,18 @@ struct NotiActivityView: View {
                         }
                     }
                 }
-                .padding(.top, 10)
+                .padding(.top, 22)
+                .padding(.bottom, 24)
                 .animation(DS.Motion.standard, value: filter)
             }
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
     }
 
     /// 알림 종류별 갈 곳: 엉따지수는 마이, 댓글은 글 상세, 업적 편의점은 나의 편의점, 의자 꾸미기는 의자 꾸미기
     private func destination(_ a: ActivityItem) -> (() -> Void)? {
-        switch a.kind {
+        guard a.link else { return nil }
+        return switch a.kind {
         case "엉따지수": { router.select(.my) }
         case "댓글": { router.push(.communityDetail) }
         case "업적 편의점": { router.push(.myShelf) }
@@ -229,27 +251,38 @@ struct NotiActivityView: View {
     private func activityRow(_ a: ActivityItem) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(a.icon).resizable().frame(width: 40, height: 40)
-            VStack(alignment: .leading, spacing: 6) {
+            // 피그마 content(2100:24882): 폭 266, 사이 4. 제목 14 Bold, 시간 12 Regular, 본문 15 Regular, 모두 행간 145% 자간 -2%.
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text(a.title).suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textPrimary)
+                    Text(a.title).suit(14, .bold, tracking: -0.28, lineHeight: 20).foregroundStyle(DS.Palette.textPrimary)
                     Spacer()
-                    Text(a.ago).suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textSecondary)
+                    Text(a.ago).suit(12, .regular, tracking: -0.24, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
                     if a.unread {
-                        Circle().fill(DS.Palette.danger).frame(width: 5, height: 5)
+                        Circle().fill(DS.Palette.danger).frame(width: 6, height: 6)
                     }
                 }
-                Text(a.body).suit(15, .medium, tracking: -0.6).foregroundStyle(DS.Palette.textPrimary).lineSpacing(4)
+                Text(a.body).suit(15, .regular, tracking: -0.3, lineHeight: 22).foregroundStyle(DS.Palette.textPrimary)
                     .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 if let more = a.more {
-                    Text(more).suit(13, .medium, tracking: -0.52).foregroundStyle(DS.Palette.textPrimary)
-                        .padding(.horizontal, 14).frame(height: 32)
+                    // 피그마 더보기 버튼: 본문 아래 12, 안쪽 7 / 14, 글자 13 Bold, 반경 8
+                    Text(more).suit(13, .bold, tracking: -0.26, lineHeight: 19).foregroundStyle(DS.Palette.textPrimary)
+                        .padding(.horizontal, 14).padding(.vertical, 7)
                         .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 8))
-                        .padding(.top, 6)
+                        .padding(.top, 8)
                 }
             }
+            .frame(width: 266, alignment: .leading)
+            // 피그마 more(2100:24892): 20 x 20, 점 셋 지름 3.2, 가운데 x 9.6, y 3.2 9.6 16
+            VStack(spacing: 3.2) {
+                ForEach(0 ..< 3, id: \.self) { _ in Circle().fill(DS.Palette.textSecondary).frame(width: 3.2, height: 3.2) }
+            }
+            .frame(width: 20, height: 20)
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 20)
+        // 피그마 줄: 왼쪽 24, 점 세 개 칸 오른쪽 끝 374(오른쪽 16)
+        .padding(.leading, 24)
+        .padding(.trailing, 16)
+        .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
     }
@@ -295,7 +328,14 @@ struct NotiActivityView: View {
                         Text(section.0).suit(14, .bold, lineHeight: 17).foregroundStyle(DS.Palette.textSecondary)
                             .padding(.horizontal, 24).padding(.top, 32).padding(.bottom, 4)
                         ForEach(hits) { h in
-                            Button { router.push(.liveWatch) } label: { hitRow(h) }.buttonStyle(PressStyle()).padding(.top, 12)
+                            // 오늘 카드(시계 칩이 있는 방)는 그 라이브의 방 구경으로 바로 간다. 제목, 남은 시간, 이야기 수는 카드 값을 넘긴다.
+                            // 어제와 이번 주의 종료 카드는 끝난 방이라 누름 반응이 없다.
+                            if let left = h.secondsLeft {
+                                Button { router.openWatch(WatchPick(title: h.title, viewers: h.talkers, left: left)) } label: { hitRow(h) }
+                                    .buttonStyle(PressStyle()).padding(.top, 12)
+                            } else {
+                                hitRow(h).padding(.top, 12)
+                            }
                         }
                     }
                 }

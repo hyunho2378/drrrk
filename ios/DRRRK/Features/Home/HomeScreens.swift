@@ -263,6 +263,8 @@ struct HomeView: View {
         guard !sending, router.path.last != .analysis else { return }
         sending = true
         close()
+        // 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(App/Story.swift).
+        Story.current = .ssang
         router.push(.analysis)
     }
 }

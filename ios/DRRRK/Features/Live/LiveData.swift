@@ -209,3 +209,28 @@ enum Avatars {
         return all[seed % all.count]
     }
 }
+
+/// 방 구경(liveWatch)으로 들어가는 한 곳. 라이브 목록, 위 가로 카드, 알림 키워드 카드가 모두 이 함수로 들어간다(웹 liveV2.js openWatch와 같은 규칙).
+/// 사진보정 카드(둘이 찍은 사진인데 지만 보정해서 올린 여우)면 Story.current = .photo, 다른 카드는 .ssang(팀 메모 2100:24023).
+extension Router {
+    func openWatch(_ pick: WatchPick) {
+        Story.current = WatchPick.isPhoto(pick.title) ? .photo : .ssang
+        watch = pick
+        push(.liveWatch)
+    }
+}
+
+extension WatchPick {
+    static let photoTitle = "둘이 찍은 사진인데\n지만 보정해서 올린 여우"
+    static func isPhoto(_ title: String) -> Bool {
+        title.filter { !$0.isWhitespace } == photoTitle.filter { !$0.isWhitespace }
+    }
+    /// 라이브 목록 카드 값으로 만든다. 남은 시간이 없는 방(방금 열림, 기다리는 방)은 20:00에서 시작한다.
+    init(card: LiveCard) {
+        self.init(title: card.title, viewers: card.viewers, left: card.remaining > 0 ? card.remaining : 1200)
+    }
+    /// 위 가로 카드 값으로 만든다(카드 시계 값에서 시작).
+    init(featured f: LiveFeatured) {
+        self.init(title: f.title, viewers: f.viewers, left: LiveCard.secs(f.time))
+    }
+}

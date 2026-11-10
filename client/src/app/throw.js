@@ -1,13 +1,17 @@
 // 주전부리 던지기: 퀵슬롯의 주전부리를 손가락이나 마우스로 끌어서 방 한가운데 테이블 위에 놓으면 테이블에 던져 올린다.
-// 끄는 동안 테이블이 빛나고, 놓으면 날아가 테이블 위에 떨어지며 효과음이 난다. 한 번 던지면 개수가 줄어든다. 쿨타임은 없다.
+// 끄는 동안 테이블이 빛나고, 놓으면 날아가 테이블 위에 떨어지며 효과음이 난다. 개수가 보이는 칸은 한 번 던지면 개수가 줄어든다.
+// 던진 뒤 쿨타임(tokens live.throwCooldownSec, 3초) 동안 던진 칸에 하늘색 2px 안쪽 선과 검정 60% 부채꼴 덮개가 줄어들고(혼자 방 1647:24874 표시),
+// 그동안 모든 칸은 눌리지 않는다. 끝나면 다시 던질 수 있다. 개수가 0이 된 칸만 계속 40% 투명이다.
 // 던지는 대상은 사람이 아니라 테이블이다. 받는 사람이나 온도와는 관계가 없다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect, scaleOf, setText } from './dom.js';
 import { sfx } from './sfx.js';
 import { toast } from './room.js';
 
-// 던진 기록은 화면을 옮겨도 남는다(이름별 남은 개수와 쿨타임이 끝나는 시각).
+// 던진 기록은 화면을 옮기거나 퀵슬롯을 접었다 펴도 남는다(이름별 남은 개수, 쿨타임 중인 칸과 시작과 끝 시각).
 const inv = {};
+const cool = { name: '', start: 0, until: 0 };
+const cooling = () => Date.now() < cool.until;
 const nameOf = (slot) => (slot.getAttribute('data-figma') || '').replace(/^slot · /, '');
 const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -50,39 +54,71 @@ export function attachThrow(root) {
     } else glow.style.opacity = '0';
   };
 
+  // 쿨타임 덮개: 칸 안에 하늘색 안쪽 선과, 오른쪽 반과 왼쪽 반 반원 두 장을 돌려 만든 부채꼴(12시에서 시계 방향, 남은 비율만큼)을 둔다.
+  // 움직임은 transform(rotate)과 opacity만 쓴다. 남은 비율 1에서 0까지 앞 절반은 왼쪽 반이, 뒤 절반은 오른쪽 반이 줄어든다.
+  const coverOf = (slot) => slot.querySelector(':scope > [data-cool]');
+  const dropCover = (slot) => {
+    const c = coverOf(slot);
+    if (!c) return;
+    c.removeAttribute('data-cool');
+    const a = c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: motion.standard, fill: 'forwards' });
+    a.onfinish = () => c.remove();
+  };
+  const makeCover = (slot) => {
+    if (getComputedStyle(slot).position === 'static') slot.style.position = 'relative';
+    const W = slot.offsetWidth || 44, D = W * 1.6, off = (W - D) / 2;
+    const c = document.createElement('div');
+    c.setAttribute('data-cool', '');
+    c.setAttribute('aria-hidden', 'true');
+    Object.assign(c.style, { position: 'absolute', left: '0', top: '0', width: W + 'px', height: W + 'px', borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none', zIndex: '2' });
+    const half = (side) => {
+      // side 'R': 오른쪽 반만 보이는 칸 안에 왼쪽 반원을 둔다. side 'L': 왼쪽 반만 보이는 칸 안에 오른쪽 반원을 둔다.
+      const clip = document.createElement('div');
+      Object.assign(clip.style, { position: 'absolute', top: off + 'px', width: D / 2 + 'px', height: D + 'px', overflow: 'hidden', left: side === 'R' ? W / 2 + 'px' : off + 'px' });
+      const disc = document.createElement('div');
+      Object.assign(disc.style, { position: 'absolute', top: '0', width: D / 2 + 'px', height: D + 'px', background: 'rgba(0,0,0,0.6)', left: side === 'R' ? -D / 2 + 'px' : D / 2 + 'px', borderRadius: side === 'R' ? D / 2 + 'px 0 0 ' + D / 2 + 'px' : '0 ' + D / 2 + 'px ' + D / 2 + 'px 0', transformOrigin: side === 'R' ? '100% 50%' : '0% 50%' });
+      clip.appendChild(disc);
+      c.appendChild(clip);
+      return disc;
+    };
+    const right = half('R'), left = half('L');
+    const ring = document.createElement('div');
+    Object.assign(ring.style, { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', borderRadius: 'inherit', boxShadow: 'inset 0 0 0 2px #36D2FF' });
+    c.appendChild(ring);
+    slot.appendChild(c);
+    const ms = LIVE.throwCooldownSec * 1000;
+    const at = Math.min(ms, Math.max(0, Date.now() - cool.start));
+    const opt = { duration: ms, easing: 'linear', fill: 'both' };
+    const l = left.animate([{ transform: 'rotate(180deg)' }, { transform: 'rotate(0deg)', offset: 0.5 }, { transform: 'rotate(0deg)' }], opt);
+    const r = right.animate([{ transform: 'rotate(180deg)' }, { transform: 'rotate(180deg)', offset: 0.5 }, { transform: 'rotate(0deg)' }], opt);
+    l.currentTime = at;
+    r.currentTime = at;
+    c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: at > 0 ? 0 : 120, easing: motion.standard });
+  };
   const paintCool = (slot) => {
-    const name = nameOf(slot);
-    const st = inv[name];
-    let badge = slot.querySelector(':scope > [data-cool]');
-    const left = st && st.until ? Math.ceil((st.until - Date.now()) / 1000) : 0;
-    const empty = st && st.count === 0;
-    if (left <= 0 && !empty) {
-      slot.style.opacity = '';
-      slot.dataset.cool = '';
-      if (badge) badge.remove();
-      return;
-    }
-    slot.dataset.cool = empty ? 'empty' : '1';
-    slot.style.opacity = '0.4';
-    if (!empty) {
-      if (!badge) {
-        badge = document.createElement('div');
-        badge.setAttribute('data-cool', '');
-        Object.assign(badge.style, { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F8F8F8', fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '15px', fontWeight: '700', pointerEvents: 'none' });
-        slot.appendChild(badge);
-      }
-      badge.textContent = String(left);
-      window.setTimeout(() => root.isConnected && paintCool(slot), 1000);
-    }
+    const st = inv[nameOf(slot)];
+    const empty = !!st && st.count === 0;
+    const mine = cooling() && cool.name === nameOf(slot);
+    slot.dataset.cool = empty ? 'empty' : mine ? '1' : '';
+    slot.style.opacity = empty ? '0.4' : '';
+    if (mine && !coverOf(slot)) makeCover(slot);
+    if (!mine) dropCover(slot);
+  };
+  const paintAll = () => slots.forEach(paintCool);
+  let endTimer = 0;
+  const armEnd = () => {
+    window.clearTimeout(endTimer);
+    if (!cooling()) return;
+    endTimer = window.setTimeout(() => { if (root.isConnected) paintAll(); }, cool.until - Date.now() + 10);
   };
   // 이미 던진 기록을 화면에 다시 적용한다.
   slots.forEach((slot) => {
     const st = inv[nameOf(slot)];
-    if (!st) return;
     const cp = slot.querySelector('[data-figma="count"] p');
-    if (cp && st.count !== undefined) setText(cp, String(st.count));
-    paintCool(slot);
+    if (st && cp && st.count !== undefined) setText(cp, String(st.count));
   });
+  paintAll();
+  armEnd();
 
   slots.forEach((slot) => {
     slot.style.touchAction = 'none';
@@ -90,6 +126,8 @@ export function attachThrow(root) {
     slot.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       if (slot.dataset.cool === 'empty') { sfx.deny(); toast(root, LIVE.throwEmptyText); return; }
+      // 쿨타임 중에는 어느 칸도 들리지 않는다.
+      if (cooling()) { sfx.deny(); return; }
       const sx = e.clientX, sy = e.clientY;
       const img = slot.querySelector(':scope > [data-figma]:not([data-figma="count"])');
       if (!img) return;
@@ -152,14 +190,21 @@ export function attachThrow(root) {
             ghost.animate([{ opacity: 1, transform: at + 'scale(1)' }, { opacity: 0, transform: at + 'scale(' + LIVE.throwFadeScale + ')' }], { duration: LIVE.throwFadeMs, easing: 'ease-out', fill: 'forwards' }).onfinish = () => ghost.remove();
           }, LIVE.throwStayMs - LIVE.throwFadeMs);
         };
-        // 개수와 쿨타임
+        // 개수와 쿨타임. 개수 글자가 없는 칸(함께 드르륵 퀵슬롯)은 개수를 세지 않는다.
+        // 예전에는 개수 글자가 없을 때 0에서 1을 빼 0개로 저장해서, 한 번 던진 칸이 영영 40% 투명으로 남았다(11. 10. 팀 메모 2116:28612).
         const name = nameOf(slot);
         const cp = slot.querySelector('[data-figma="count"] p');
-        const cur = inv[name] && inv[name].count !== undefined ? inv[name].count : parseInt((cp && cp.textContent) || '0', 10);
-        const next = Math.max(0, cur - 1);
-        inv[name] = Object.assign(inv[name] || {}, { count: next });
-        if (cp) setText(cp, String(next));
-        paintCool(slot);
+        const had = inv[name] && inv[name].count !== undefined ? inv[name].count : cp ? parseInt(cp.textContent || '0', 10) : undefined;
+        if (had !== undefined) {
+          const next = Math.max(0, had - 1);
+          inv[name] = Object.assign(inv[name] || {}, { count: next });
+          if (cp) setText(cp, String(next));
+        }
+        cool.name = name;
+        cool.start = Date.now();
+        cool.until = cool.start + LIVE.throwCooldownSec * 1000;
+        paintAll();
+        armEnd();
         toast(root, LIVE.throwDoneText);
       };
       window.addEventListener('pointermove', move);

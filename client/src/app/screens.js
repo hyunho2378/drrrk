@@ -234,9 +234,9 @@ export const SCREENS = [
  },
  {
   "n": 38,
-  "id": "1953:12298",
+  "id": "2100:23295",
   "name": "커뮤니티 / 글 상세 (v5 · 글 중심)",
-  "file": "CommunityDetail",
+  "file": "CommunityPost",
   "h": 844
  },
  {
@@ -360,9 +360,9 @@ export const SCREENS = [
  },
  {
   "n": 57,
-  "id": "1952:14673",
+  "id": "2100:24856",
   "name": "활동 알림",
-  "file": "NotiActivity",
+  "file": "NotiActivity1110",
   "h": 844
  },
  {
@@ -374,16 +374,16 @@ export const SCREENS = [
  },
  {
   "n": 59,
-  "id": "1952:14617",
+  "id": "2100:25022",
   "name": "키워드 알림 풀버전",
-  "file": "NotiKeywordFull",
-  "h": 1377
+  "file": "NotiKeyword1110",
+  "h": 844
  },
  {
   "n": 60,
-  "id": "1952:14693",
+  "id": "2100:24964",
   "name": "키워드 알림 설정",
-  "file": "NotiKeywordSettings",
+  "file": "NotiSettings1110",
   "h": 844
  }
 ];
@@ -406,6 +406,7 @@ const modules = {
   'LiveAll': () => import('../figma/screens/LiveAll.jsx'),
   'LiveWatch': () => import('../figma/screens/LiveWatch.jsx'),
   'CommunityDetail': () => import('../figma/screens/CommunityDetail.jsx'),
+  'CommunityPost': () => import('./CommunityPost.jsx'),
   'CommunityList': () => import('../figma/screens/CommunityList.jsx'),
   'SoloField1': () => import('../figma/screens/SoloField1.jsx'),
   'SoloField2': () => import('../figma/screens/SoloField2.jsx'),
@@ -421,6 +422,9 @@ const modules = {
   'NotiKeyword': () => import('../figma/screens/NotiKeyword.jsx'),
   'NotiKeywordFull': () => import('../figma/screens/NotiKeywordFull.jsx'),
   'NotiKeywordSettings': () => import('../figma/screens/NotiKeywordSettings.jsx'),
+  'NotiActivity1110': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiActivityScreen })),
+  'NotiKeyword1110': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiKeywordScreen })),
+  'NotiSettings1110': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiSettingsScreen })),
   'Screen1647_26726': () => import('../figma/screens/Screen1647_26726.jsx'),
   'Screen1647_26876': () => import('../figma/screens/Screen1647_26876.jsx'),
   'Screen1647_27027': () => import('../figma/screens/Screen1647_27027.jsx'),

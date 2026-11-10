@@ -23,24 +23,28 @@
 		5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */; };
 		63EC4390B346CD0C760147D7 /* logo-motion.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 79E359FEC2985AFFE94377DB /* logo-motion.mp4 */; };
 		705C4C4474C514AC5599A5A9 /* ChairStudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */; };
+		7A78EB1BF73C0ABF4DA8FE38 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C8A91E1BC0B6EBCFA76A45 /* Story.swift */; };
 		80FD4EDF4E7657CE2BE60C78 /* ChairStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355454814EF792BE3C446D3C /* ChairStore.swift */; };
 		856CF2631A345DE00B0E82B2 /* MyScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4862DF05D28CBDBD44A4E3 /* MyScreens.swift */; };
 		8DEFB64716B3EB82B2678540 /* clip-scenes.json in Resources */ = {isa = PBXBuildFile; fileRef = 9F99D7E82EC9E11C197E5C06 /* clip-scenes.json */; };
 		8DFE97107118D796AB06FC10 /* ClipScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */; };
 		932983BB634B5A0F513D4CFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5C3CA32A15F62294981BB03 /* Assets.xcassets */; };
 		A12048B40400EBB52FA8F9DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DD6D0BE274C4209DEA4486 /* Router.swift */; };
+		A854281C465947E88B00A76A /* ItemSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13A6A48C689B76171BBDB00 /* ItemSound.swift */; };
 		AAE8AE5F7B7F908B3E51409E /* ScreenRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */; };
 		C337B1A6C586DC8ADD91ADF0 /* SUIT-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 14456F248BBE7E155D47906C /* SUIT-Heavy.otf */; };
 		C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */; };
 		C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */; };
 		C7F69FEB9B42A8902644FB38 /* LoveDotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */; };
 		D04E936E264FBD939AE03D7C /* RoomModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B487C08A1B7EC0175936B1F /* RoomModel.swift */; };
+		D811BC96F15441A069092895 /* ItemCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE389391EFD2C0E26081D3F7 /* ItemCopy.swift */; };
 		DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 501E8B9CBA004BB542AF4AF8 /* SUIT-SemiBold.otf */; };
 		E901701EBADC7258D253319F /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AE12650DE60F318392041F22 /* SUIT-Regular.otf */; };
 		F0CBC41FD77253486E8F2854 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC665468AD22F020707AA567 /* RootView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		01C8A91E1BC0B6EBCFA76A45 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		071502F7C6300EB6A419D22B /* DRRRKApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DRRRKApp.swift; sourceTree = "<group>"; };
 		14456F248BBE7E155D47906C /* SUIT-Heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Heavy.otf"; sourceTree = "<group>"; };
 		23A4A2BA30C7DB329308DD9B /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
@@ -67,11 +71,13 @@
 		AC665468AD22F020707AA567 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		AE12650DE60F318392041F22 /* SUIT-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Regular.otf"; sourceTree = "<group>"; };
 		BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScreens.swift; sourceTree = "<group>"; };
+		C13A6A48C689B76171BBDB00 /* ItemSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSound.swift; sourceTree = "<group>"; };
 		D2DD6D0BE274C4209DEA4486 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		D88CDC61C1AC45D9164E2648 /* ClipScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScene.swift; sourceTree = "<group>"; };
 		E1E8965F9621DCE2D7F6FF81 /* OnboardingKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingKit.swift; sourceTree = "<group>"; };
 		E5C3CA32A15F62294981BB03 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStudioView.swift; sourceTree = "<group>"; };
+		EE389391EFD2C0E26081D3F7 /* ItemCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCopy.swift; sourceTree = "<group>"; };
 		FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScreens.swift; sourceTree = "<group>"; };
 		FD5D62597EB5736F98D562A0 /* NotiScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiScreens.swift; sourceTree = "<group>"; };
 		FF5F19C72E7731FCC268EA9D /* LoveDotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveDotStore.swift; sourceTree = "<group>"; };
@@ -202,6 +208,7 @@
 				AC665468AD22F020707AA567 /* RootView.swift */,
 				D2DD6D0BE274C4209DEA4486 /* Router.swift */,
 				28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */,
+				01C8A91E1BC0B6EBCFA76A45 /* Story.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -238,6 +245,8 @@
 			children = (
 				355454814EF792BE3C446D3C /* ChairStore.swift */,
 				EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */,
+				EE389391EFD2C0E26081D3F7 /* ItemCopy.swift */,
+				C13A6A48C689B76171BBDB00 /* ItemSound.swift */,
 				6B4862DF05D28CBDBD44A4E3 /* MyScreens.swift */,
 			);
 			path = My;
@@ -349,6 +358,8 @@
 				C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */,
 				5AE4CBC169CDA200AA9E51DB /* DRRRKApp.swift in Sources */,
 				35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */,
+				D811BC96F15441A069092895 /* ItemCopy.swift in Sources */,
+				A854281C465947E88B00A76A /* ItemSound.swift in Sources */,
 				2B4D99386681E340CDB6F331 /* LiveData.swift in Sources */,
 				2086FB2D2C7FC1046CDB9399 /* LiveScreens.swift in Sources */,
 				C7F69FEB9B42A8902644FB38 /* LoveDotStore.swift in Sources */,
@@ -362,6 +373,7 @@
 				F0CBC41FD77253486E8F2854 /* RootView.swift in Sources */,
 				A12048B40400EBB52FA8F9DB /* Router.swift in Sources */,
 				AAE8AE5F7B7F908B3E51409E /* ScreenRegistry.swift in Sources */,
+				7A78EB1BF73C0ABF4DA8FE38 /* Story.swift in Sources */,
 				23E31936A51E28D4ACEB49C9 /* Tokens.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -61,11 +61,12 @@ struct LiveView: View {
     private var cards: [LiveCard] {
         let list = LiveData.cards[category] ?? []
         switch sort {
-        // 인기순: 보는 수가 큰 방부터(같으면 피그마 프레임 순서)
+        // 인기순: 보는 수 큰 순, 같으면 피그마 목록 순서(11/09 사용자 지적으로 정한 규칙. 웹 liveV2.js와 같다)
         case .popular:
             return list.enumerated().sorted { a, b in
                 let x = Int(a.element.viewers) ?? 0, y = Int(b.element.viewers) ?? 0
-                return x != y ? x > y : a.offset < b.offset
+                if x != y { return x > y }
+                return a.offset < b.offset
             }.map(\.element)
         // 최신순: 방금 열린 방, 첫 대화 상대를 기다리는 방, 그다음 남은 시간이 긴 방부터
         case .latest:
@@ -100,7 +101,7 @@ struct LiveView: View {
         FigmaScroll(height: contentHeight) {
             ZStack(alignment: .topLeading) {
                 LiveHeader()
-                LiveCarousel(items: LiveData.featured, page: $page) { router.watch = nil; router.push(.liveWatch) }
+                LiveCarousel(items: LiveData.featured, page: $page) { item in router.openWatch(WatchPick(featured: item)) }
                     .offset(y: 128)
                 LiveDots(index: page).offset(x: 163, y: 372)
                 LiveTabs(selected: $category, showDot: !loveDots.liveLoveSeen)
@@ -124,7 +125,7 @@ struct LiveView: View {
                 .accessibilityLabel("정렬 " + sort.rawValue)
                 VStack(spacing: 12) {
                     ForEach(cards) { card in
-                        Button { router.watch = WatchPick(title: card.title, viewers: card.viewers, left: card.remaining > 0 ? card.remaining : 1200); router.push(.liveWatch) } label: { LiveCardView(card: card) }
+                        Button { router.openWatch(WatchPick(card: card)) } label: { LiveCardView(card: card) }
                             .buttonStyle(PressStyle())
                             .transition(.opacity)
                     }
@@ -203,12 +204,12 @@ private struct LiveHeader: View {
 private struct LiveCarousel: View {
     let items: [LiveFeatured]
     @Binding var page: Int
-    let onTap: () -> Void
+    let onTap: (LiveFeatured) -> Void
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 12) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { i, item in
-                    Button(action: onTap) { card(item, dimViewers: i > 0) }
+                    Button { onTap(item) } label: { card(item, dimViewers: i > 0) }
                         .buttonStyle(PressStyle())
                         .id(i)
                 }
