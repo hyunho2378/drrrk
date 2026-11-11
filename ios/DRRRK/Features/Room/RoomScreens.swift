@@ -781,10 +781,24 @@ struct RoomSoloView: View {
     @State private var emojiOpen = false
     @State private var flying: [FlyingEmoji] = []
     @State private var showOnboarding: Bool
+    /// 혼자 방 입장 영상(RoomEnterVideo.swift, 피그마 1647:25199 "영상"). 이 방이 처음 나타날 때만 만들어 한 번 재생한다.
+    @State private var entry: RoomEnterPlayer?
+    /// 그리드(피그마 2340:21259, 2340:21344). 머리 오른쪽 버튼으로 열고 닫는다. 같은 방 안이라 시계와 채팅, 주전부리 상태가 이어진다.
+    @State private var grid = false
 
     init(forceOnboarding: Bool = false) {
         self.forceOnboarding = forceOnboarding
         _showOnboarding = State(initialValue: forceOnboarding || !OnboardingSeen.solo)
+    }
+
+    /// 바닥 그림 하나. 입장 영상을 틀 동안은 영상 첫 장면 그림, 끝나거나 못 틀면 현장 장면(영상 마지막 장면과 같은 구도)이다.
+    private var soloBackdrop: Image {
+        if let entry {
+            if entry.visible, let img = entry.poster { return Image(uiImage: img) }
+            return Image("B-field-scene")
+        }
+        if RoomEnterPlayer.canPlay(named: RoomEnterPlayer.soloName), let img = RoomEnterPlayer.poster(named: RoomEnterPlayer.soloName) { return Image(uiImage: img) }
+        return Image("B-field-scene")
     }
 
     /// 처음 인사(1647:25199)와 이야기가 이어진 뒤(1647:24874)의 AI 드르륵 의자 말
@@ -799,8 +813,14 @@ struct RoomSoloView: View {
         GeometryReader { geo in
             let map = SceneMap(size: geo.size)
             ZStack(alignment: .topLeading) {
-                Image("B-field-scene").resizable().scaledToFill()
+                soloBackdrop.resizable().scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height).clipped()
+                if let entry, entry.player != nil, entry.visible {
+                    RoomEnterVideoView(entry: entry)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
                 ForEach(model.landed) { item in
                     LandedSnack(asset: item.asset, angle: item.angle)
                         .position(map.point(item.point.x, item.point.y))
@@ -809,6 +829,11 @@ struct RoomSoloView: View {
                 LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.65)], startPoint: .top, endPoint: .bottom)
                     .frame(height: 334).frame(maxHeight: .infinity, alignment: .bottom).allowsHitTesting(false)
                 chrome
+                if grid {
+                    SoloGridView(model: model, lines: laterLines, mine: $mine, onBack: { router.pop() }, onField: closeGrid)
+                        .transition(.opacity)
+                        .zIndex(4)
+                }
                 if found {
                     FoundModal(
                         onStay: { withAnimation(DS.Motion.emphasizedAccel) { found = false } },
@@ -834,6 +859,16 @@ struct RoomSoloView: View {
             }
         }
         .onAppear { OnboardingSeen.solo = true }
+        .onAppear {
+            // 입장 영상: 처음 나타날 때만 만든다. 온보딩 덮개가 떠 있으면 첫 장면에 세워 두고 닫히면 재생한다.
+            if entry == nil {
+                let e = RoomEnterPlayer(named: RoomEnterPlayer.soloName)
+                entry = e
+                if !showOnboarding { e.start() }
+            }
+        }
+        .onDisappear { entry?.stop() }
+        .onChange(of: showOnboarding) { _, up in if !up { entry?.start() } }
         .toolbar(.hidden, for: .navigationBar)
         .task(id: showOnboarding) { await play() }
         .task { await watchClock() }
@@ -842,9 +877,7 @@ struct RoomSoloView: View {
     private var chrome: some View {
         VStack(spacing: 0) {
             Color.clear.frame(height: max(roomTopInset(), 47))
-            RoomHeader(model: model, onBack: { router.pop() }, onToggle: {
-                UISelectionFeedbackGenerator().selectionChanged()
-            })
+            RoomHeader(model: model, onBack: { router.pop() }, onToggle: openGrid)
             .frame(height: 56)
             TopicBanner(model: model)
                 .padding(.horizontal, 24)
@@ -924,8 +957,23 @@ struct RoomSoloView: View {
         guard await wait(1.2) else { return }
         withAnimation(DS.Motion.emphasizedDecel) { mine = "고마워. 덕분에 마음이 조금 나아졌어." }
         guard await wait(2.8) else { return }
+        // 그리드를 보고 있으면 현장 모드로 돌아온 뒤에 안내 창을 띄운다(웹 41에서 42로 넘어가는 자동 전환도 그리드에서는 멈춘다).
+        while grid { guard await wait(0.3) else { return } }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         withAnimation(DS.Motion.emphasizedDecel) { found = true }
+    }
+
+    /// 그리드 열기: 입장 영상은 멈춘 자리에 세워 두고, 닫으면 이어 재생한다(웹 roomEnterVideo.js soloAgain과 같다).
+    private func openGrid() {
+        UISelectionFeedbackGenerator().selectionChanged()
+        entry?.pause()
+        withAnimation(DS.Motion.standard) { grid = true }
+    }
+
+    private func closeGrid() {
+        UISelectionFeedbackGenerator().selectionChanged()
+        withAnimation(DS.Motion.standard) { grid = false }
+        entry?.resume()
     }
 
     private func throwSnack(_ snack: RoomModel.Snack) {
@@ -961,6 +1009,137 @@ struct RoomSoloView: View {
             }
             try? await Task.sleep(for: .seconds(0.5))
         }
+    }
+}
+
+/// 혼자 드르륵 방 그리드(피그마 2340:21259 "나", 2340:21344 "AI의자", 11. 12. 팀 댓글 "혼자 드르륵도 그리드 볼 수 있도록 반영"). 웹 soloGrid.js와 같은 값이다.
+/// 큰 칸 하나(346 x 308, #222628, 모서리 16)를 두 장으로 넘긴다. 첫 장 흰 AI 의자 "AI 의자", 둘째 장 파란 내 의자 "새벽2시 피시방".
+/// 칸 안: 원 151(위 40, #121415) 안 의자 그림 109, 이름 칸(검정 모서리 16, 위아래 6 좌우 16, SUIT Bold 20 행간 24.96 자간 -0.8)은 원 아래 27.9.
+/// 점은 함께 방 일반 모드(RoomNormalView)와 같다. 끌기는 장 폭 25%를 넘기면 다음 장, 220ms 표준 곡선, 끝에서 1/3만 따라온다.
+private struct SoloGridView: View {
+    let model: RoomModel
+    let lines: [SoloLine]
+    @Binding var mine: String?
+    let onBack: () -> Void
+    let onField: () -> Void
+    @State private var page = 0
+    @State private var drag: CGFloat = 0
+    @State private var emojiOpen = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private static let pageMotion = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.22)
+    private let pages: [(name: String, asset: String)] = [("AI 의자", "solo-grid-ai"), ("새벽2시 피시방", "solo-grid-me")]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Color.clear.frame(height: max(roomTopInset(), 47))
+            HStack {
+                Button(action: onBack) {
+                    Image("icon-chevron-left").renderingMode(.template).resizable()
+                        .foregroundStyle(DS.Palette.textPrimary).frame(width: 24, height: 24)
+                        .frame(width: 44, height: 44, alignment: .leading).contentShape(Rectangle())
+                }
+                .buttonStyle(PressStyle()).accessibilityLabel("나가기")
+                Spacer()
+                ClockPill(model: model)
+                Spacer()
+                Button(action: onField) {
+                    Image("icon-view-field").renderingMode(.template).resizable().foregroundStyle(DS.Palette.textPrimary)
+                        .frame(width: 18, height: 18).frame(width: 46, height: 32)
+                        .background(DS.Palette.bgOverlay.opacity(0.6), in: Capsule())
+                }
+                .buttonStyle(PressStyle()).accessibilityLabel("현장 모드로 보기")
+            }
+            .padding(.leading, 14).padding(.trailing, 24).frame(height: 56)
+            TopicBanner(model: model)
+                .padding(.horizontal, 24).padding(.top, 5)
+            GeometryReader { geo in
+                let w = geo.size.width
+                HStack(alignment: .top, spacing: 0) {
+                    ForEach(Array(pages.enumerated()), id: \.offset) { _, p in
+                        tile(p.name, p.asset)
+                            .padding(.horizontal, 22).padding(.top, 16)
+                            .frame(width: w)
+                    }
+                }
+                .offset(x: offset(w))
+                .frame(width: w, alignment: .leading)
+                .contentShape(Rectangle())
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 10)
+                        .onChanged { v in
+                            if abs(v.translation.width) > abs(v.translation.height) || drag != 0 { drag = v.translation.width }
+                        }
+                        .onEnded { v in
+                            guard drag != 0 else { return }
+                            let dx = v.translation.width
+                            let dir = dx < -w * 0.25 ? 1 : dx > w * 0.25 ? -1 : 0
+                            withAnimation(reduceMotion ? nil : Self.pageMotion) {
+                                page = max(0, min(1, page + dir))
+                                drag = 0
+                            }
+                        }
+                )
+            }
+            .frame(height: 16 + 308)
+            .clipped()
+            HStack(spacing: 6) {
+                ForEach(0 ..< 2, id: \.self) { i in
+                    Capsule().fill(i == page ? DS.Palette.textPrimary : DS.Palette.textTertiary)
+                        .frame(width: i == page ? 16 : 6, height: 6)
+                }
+            }
+            .animation(reduceMotion ? nil : Self.pageMotion, value: page)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 27)
+            Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(lines) { line in
+                    Text(line.text).suit(14, .medium, tracking: -0.56, lineHeight: 19.6).foregroundStyle(DS.Palette.textPrimary)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                        .opacity(line.opacity)
+                }
+                if let mine {
+                    Text(mine).suit(14, .medium, tracking: -0.56, lineHeight: 19.6).foregroundStyle(.black)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(DS.Palette.brandPrimary, in: RoundedRectangle(cornerRadius: DS.Radius.bubble))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .transition(.opacity.combined(with: .offset(y: 8)))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 24)
+            RoomInputBar(emojiOpen: $emojiOpen) { t in
+                withAnimation(DS.Motion.emphasizedDecel) { mine = t }
+            }
+                .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(DS.Palette.bgSurface)
+    }
+
+    private func tile(_ name: String, _ asset: String) -> some View {
+        VStack(spacing: 27.9) {
+            Image(asset).resizable().scaledToFit()
+                .frame(width: 109, height: 109)
+                .frame(width: 151, height: 151)
+                .background(DS.Palette.bgSurface, in: Circle())
+            Text(name).suit(20, .bold, tracking: -0.8, lineHeight: 24.96).foregroundStyle(DS.Palette.textPrimary)
+                .lineLimit(1)
+                .padding(.horizontal, 16).padding(.vertical, 6)
+                .background(.black, in: RoundedRectangle(cornerRadius: 16))
+            Spacer(minLength: 0)
+        }
+        .padding(.top, 40)
+        .frame(maxWidth: .infinity).frame(height: 308)
+        .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
+    }
+
+    private func offset(_ w: CGFloat) -> CGFloat {
+        let v = -CGFloat(page) * w + drag
+        if v > 0 { return v / 3 }
+        if v < -w { return -w + (v + w) / 3 }
+        return v
     }
 }
 
@@ -1591,7 +1770,7 @@ private struct ReportButtons: View {
 
 /// 결과 화면 틀. 화면 크기 창 안에서 본문이 스크롤되고, 뒤로 가기(24, 79)와 위 바탕 띠는 제자리에 있다(웹 live.js와 같은 구성).
 /// 아침과 오늘 나눈 대화는 아래 버튼이 검은 그라데이션(632에서 844, 높이 212, 73.24%에서 검정) 위에 고정되고,
-/// 종료는 내용 맨 끝에 버튼이 붙는다(본문 끝 1548, 버튼 1590, 아래 여백 40). 피그마 종료 프레임에는 아래 그라데이션이 없고 버튼이 내용 끝에 이어져 있다.
+/// 종료는 버튼 묶음이 창 바닥에서 40 위에 고정되고(11/12, 피그마 세로 제약 BOTTOM), 본문 끝(1548)과 묶음 윗선 사이 42를 둔다. 피그마 종료 프레임에는 아래 그라데이션이 없다.
 /// 고정 버튼 화면은 본문 끝에 그라데이션 높이(212)만큼 빈 자리를 두어 맨 아래까지 밀면 마지막 줄이 버튼 묶음(위 726) 위로 올라온다.
 /// 종료는 덩어리가 화면에 들어오는 차례로 펼쳐지고(EndReveal), 엉따 막대는 보이는 순간 찬다(ReportMotion.swift).
 private struct ReportScreen: View {
@@ -1614,12 +1793,21 @@ private struct ReportScreen: View {
                         ReportBody(kind: kind)
                     }
                     if kind == .end {
-                        buttons.endBlock(6, rows: 2).padding(.top, 42).padding(.bottom, 40)
+                        // 종료 버튼 묶음은 아래 safeAreaInset으로 창 바닥에 붙는다. 본문 끝(1548)과 묶음 윗선(1590) 사이 42를 둔다.
+                        Color.clear.frame(height: 42)
                     } else {
                         Color.clear.frame(height: 212)
                     }
                 }
                 .padding(.horizontal, 24)
+            }
+            // 종료(피그마 1647:26726, 2023:30658)의 버튼 묶음(1804:13238, 2023:30766, 세로 제약 BOTTOM)은 스크롤해도 창 바닥에서 40 위에 붙어 따라온다(탁빛나 11/12 "하단바 따라오게").
+            // 피그마에 묶음 뒤 판이나 그라데이션은 없다. 묶음 윗선 아래로 지나가는 본문은 바탕색(#121415) 위로 가려져 버튼과 겹치지 않는다(웹 live.js scrollerOf가 잘라 내는 모양과 같다).
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if kind == .end {
+                    buttons.endBlock(6, rows: 2).padding(.horizontal, 24).padding(.bottom, 40)
+                        .background(DS.Palette.bgSurface)
+                }
             }
             .scrollIndicators(.hidden)
             .coordinateSpace(name: ReportMotion.space)

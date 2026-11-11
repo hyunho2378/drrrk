@@ -11,6 +11,8 @@ import UIKit
 /// 방(RoomView)이 처음 나타날 때만 만든다. 일반 모드에 갔다 돌아와도 다시 재생하지 않고, 방을 나갔다가 새로 들어오면(새 RoomView) 다시 재생한다.
 /// 온보딩 덮개가 떠 있는 동안은 첫 장면에 세워 두고 덮개가 닫히면 재생한다. 파일이 없거나 재생이 막히면 영상을 빼서 장면 그림이 그대로 남는다.
 /// 소리 세션은 RoomVoice.enter가 이미 ambient(다른 앱 소리와 섞임)로 맞추므로 여기서는 건드리지 않는다.
+/// 혼자 드르륵 방(RoomSoloView, 피그마 1647:25199 "영상", 11. 12. 팀 댓글 "영상 반영")도 같은 방식으로 room-enter-solo.mp4(640 x 1148, 30fps, 3.0초)를 한 번 재생한다.
+/// 끝나면 바닥 그림이 현장 장면(B-field-scene, 영상 마지막 장면과 같은 구도)으로 바뀐다. 그리드로 갔다 돌아오면 멈춘 자리부터 이어 재생한다(pause, resume).
 /// 웹 client/src/app/roomEnterVideo.js와 같은 동작이다. 구조는 SunriseVideo.swift를 따른다.
 @Observable
 @MainActor
@@ -32,39 +34,45 @@ final class RoomEnterPlayer {
     static func fileName(for story: StoryKind) -> String {
         story == .photo ? "room-enter-photo" : "room-enter-ssang"
     }
+    /// 혼자 드르륵 방 입장 영상 파일 이름(Resources/Videos/room-enter-solo.mp4, 첫 장면 room-enter-solo-first.jpg).
+    static let soloName = "room-enter-solo"
 
     /// 영상 첫 장면 그림(Resources/Videos/room-enter-*-first.jpg, 영상과 같은 640 x 1148). 방이 보이는 첫 순간부터 장면 그림 대신 이 그림을 바닥에 깔고,
     /// 영상이 같은 자리에서 첫 장면부터 이어서 흐르므로 보이는 변화가 없다. 미리 풀어 둔(preparingForDisplay) 그림을 이야기마다 한 번만 만든다.
-    private static var posters: [StoryKind: UIImage] = [:]
-    static func poster(for story: StoryKind) -> UIImage? {
-        if let cached = posters[story] { return cached }
-        guard let url = Bundle.main.url(forResource: fileName(for: story) + "-first", withExtension: "jpg"),
+    private static var posters: [String: UIImage] = [:]
+    static func poster(for story: StoryKind) -> UIImage? { poster(named: fileName(for: story)) }
+    static func poster(named name: String) -> UIImage? {
+        if let cached = posters[name] { return cached }
+        guard let url = Bundle.main.url(forResource: name + "-first", withExtension: "jpg"),
               let raw = UIImage(contentsOfFile: url.path) else { return nil }
         let img = raw.preparingForDisplay() ?? raw
-        posters[story] = img
+        posters[name] = img
         return img
     }
 
     /// 이 방에서 입장 영상을 틀 수 있는지(줄인 움직임 설정이 꺼져 있고 영상과 첫 장면 그림이 모두 있음). 아니면 처음부터 장면 그림만 보인다.
-    static func canPlay(story: StoryKind) -> Bool {
+    static func canPlay(story: StoryKind) -> Bool { canPlay(named: fileName(for: story)) }
+    static func canPlay(named name: String) -> Bool {
         !UIAccessibility.isReduceMotionEnabled
-            && Bundle.main.url(forResource: fileName(for: story), withExtension: "mp4") != nil
-            && poster(for: story) != nil
+            && Bundle.main.url(forResource: name, withExtension: "mp4") != nil
+            && poster(named: name) != nil
     }
 
     /// 바닥에 깔 첫 장면 그림. 영상을 보이는 동안만 있고, 끝나거나 멈추면 nil이라 같은 구도의 장면 그림으로 대체된다.
     let poster: UIImage?
 
-    init(story: StoryKind) {
-        guard Self.canPlay(story: story),
-              let url = Bundle.main.url(forResource: Self.fileName(for: story), withExtension: "mp4") else {
+    convenience init(story: StoryKind) { self.init(named: Self.fileName(for: story)) }
+
+    init(named name: String) {
+        guard Self.canPlay(named: name),
+              let url = Bundle.main.url(forResource: name, withExtension: "mp4") else {
             player = nil
             poster = nil
             visible = false
             finished = true
             return
         }
-        poster = Self.poster(for: story)
+        poster = Self.poster(named: name)
         let item = AVPlayerItem(url: url)
         let p = AVPlayer(playerItem: item)
         p.volume = Self.volume
@@ -95,6 +103,17 @@ final class RoomEnterPlayer {
         started = true
         player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
         player.play()
+    }
+
+    /// 혼자 방 그리드를 여는 동안 멈춘 자리에 세워 둔다(영상은 그대로 보인 채 멈춤). resume으로 이어 재생한다.
+    func pause() {
+        guard started, !finished else { return }
+        player?.pause()
+    }
+
+    func resume() {
+        guard started, !finished else { return }
+        player?.play()
     }
 
     /// 방 화면이 사라지면(일반 모드로 가거나 방을 나가면) 멈추고 영상을 뺀다. 돌아와도 다시 재생하지 않는다.

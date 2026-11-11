@@ -168,7 +168,9 @@ private struct FilterChip: View {
         HStack(spacing: 4) {
             Text(title).suit(14, (semibold ?? on) ? .semibold : .medium, lineHeight: 17)
             if let count {
-                Text("\(count)").suit(13, .bold, lineHeight: 16).foregroundStyle(DS.Palette.brandPrimary)
+                // 피그마 키워드 분류 프레임(2340:21569, 2340:21792, 2340:22015): 고른 칩의 숫자는 글자와 같은 #121415 SemiBold 14(행간 17), 나머지는 하늘색 Bold 13(행간 16)
+                Text("\(count)").suit(on ? 14 : 13, on ? .semibold : .bold, lineHeight: on ? 17 : 16)
+                    .foregroundStyle(on ? DS.Palette.bgSurface : DS.Palette.brandPrimary)
             }
         }
         .foregroundStyle(on ? DS.Palette.bgSurface : DS.Palette.textPrimary)
@@ -306,8 +308,10 @@ struct NotiActivityView: View {
     }
 
     private var keywordList: some View {
+        ScrollViewReader { proxy in
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                Color.clear.frame(height: 0).id("kwTop")
                 HStack(alignment: .firstTextBaseline) {
                     (Text("알림 받는 키워드 ").foregroundStyle(DS.Palette.textPrimary) + Text("\(store.keywords.count)개").foregroundStyle(DS.Palette.brandPrimary))
                         .suit(18, .bold, lineHeight: 22)
@@ -326,10 +330,12 @@ struct NotiActivityView: View {
                 .padding(.top, 24).padding(.bottom, 12)
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        Button { keywordFilter = "전체" } label: { FilterChip(title: "전체", on: keywordFilter == "전체") }.buttonStyle(PressStyle())
+                        // 칩을 누르면 목록만 바뀐다(피그마 #썸 2340:21569, #전남친 2340:21792, #남친 2340:22015). 활동 알림 칩과 같이 요약 줄과 칩 줄은 그대로고,
+                        // 목록은 180ms 교차 페이드(opacity)로 바뀌며 맨 위에서 시작한다(웹 NotiScreens.jsx keywordChips와 같다).
+                        Button { pickKeyword("전체", proxy) } label: { FilterChip(title: "전체", on: keywordFilter == "전체") }.buttonStyle(PressStyle())
                         ForEach(store.keywords, id: \.self) { k in
                             let n = NotiData.sections.flatMap(\.1).filter { $0.keyword == k }.count
-                            Button { withAnimation(DS.Motion.stateIn) { keywordFilter = k } } label: { FilterChip(title: "#" + k, on: keywordFilter == k, count: n) }
+                            Button { pickKeyword(k, proxy) } label: { FilterChip(title: "#" + k, on: keywordFilter == k, count: n) }
                                 .buttonStyle(PressStyle())
                         }
                     }
@@ -339,6 +345,8 @@ struct NotiActivityView: View {
                 .frame(height: 36)
                 // 피그마 Divider 390 x 8, #0A0B0C
                 Rectangle().fill(DS.Palette.bgOverlay).frame(height: 8).padding(.top, 12)
+                ZStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 0) {
                 ForEach(NotiData.sections, id: \.0) { section in
                     let hits = section.1.filter { keywordFilter == "전체" || $0.keyword == keywordFilter }
                     if !hits.isEmpty {
@@ -357,11 +365,22 @@ struct NotiActivityView: View {
                         }
                     }
                 }
+                }
+                .id(keywordFilter)
+                .transition(.opacity)
+                }
+                .animation(NotiData.listFade, value: keywordFilter)
                 Color.clear.frame(height: 24)
             }
-            .animation(DS.Motion.standard, value: keywordFilter)
         }
         .scrollIndicators(.hidden)
+        }
+    }
+
+    private func pickKeyword(_ k: String, _ proxy: ScrollViewProxy) {
+        guard k != keywordFilter else { return }
+        proxy.scrollTo("kwTop", anchor: .top)
+        withAnimation(NotiData.listFade) { keywordFilter = k }
     }
 
     /// 제목 안의 키워드만 하늘색으로(피그마 Title 글자 구간 색)

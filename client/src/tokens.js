@@ -93,10 +93,13 @@ export const live = {
   sunrisePoster: { ssang: 'sunrise/sunrise-ssang-first.jpg', photo: 'sunrise/sunrise-photo-first.jpg' },
   // 함께 드르륵 방 입장 영상(roomEnterVideo.js, 피그마 댓글 1807:23214 "영상으로 반영"). 3.08초 한 번 재생하고, 끝나면 이 시간(ms) 동안 옅어지며 방 사진으로 이어진다.
   // 영상 소리 음량(0에서 1). 0이면 소리를 끈다. iOS RoomEnterPlayer.volume과 같다.
-  roomEnterVideo: { ssang: 'roomenter/room-enter-ssang.mp4', photo: 'roomenter/room-enter-photo.mp4' },
+  // solo는 혼자 드르륵 방 첫 화면(46, 피그마 1647:25199 "영상" 배경의 영상 채우기 1f03a2fd48b1, 11. 12. 팀 댓글 "영상 반영")이다. 640 x 1148, 30fps, 3.0초, 소리 있음.
+  roomEnterVideo: { ssang: 'roomenter/room-enter-ssang.mp4', photo: 'roomenter/room-enter-photo.mp4', solo: 'roomenter/room-enter-solo.mp4' },
   roomEnterFadeMs: 120,
+  // 영상이 끝난 뒤 장면 칸에 남기는 정지 사진(영상 마지막 장면과 같은 구도). 함께 방은 그 화면의 방 사진을 쓰고, 혼자 방은 41, 42, 43과 같은 현장 장면이다(회색 평균 차이 1.4/255).
+  roomEnterAfter: { solo: 'images/bd5037f7eb80881c82b3de6cd35faf6073b5c925.webp' },
   // 입장 영상 첫 장면(영상 첫 프레임 그대로 뽑은 jpg). 방이 보이기 전에 장면 칸 그림을 이 그림으로 바꾸고 video poster로도 준다.
-  roomEnterPoster: { ssang: 'roomenter/room-enter-ssang-first.jpg', photo: 'roomenter/room-enter-photo-first.jpg' },
+  roomEnterPoster: { ssang: 'roomenter/room-enter-ssang-first.jpg', photo: 'roomenter/room-enter-photo-first.jpg', solo: 'roomenter/room-enter-solo-first.jpg' },
   // 영상 첫 프레임이 준비될 때까지 화면을 보이지 않고 기다리는 최대 시간(ms). 넘으면 영상 없이 방 사진으로 보인다.
   videoReadyMaxMs: 1500,
   roomEnterVolume: 0.6,
@@ -123,8 +126,8 @@ export const live = {
   pinNames: { 38: ['input'] },
   scrollTop: 112,
   scrollPad: 24,
-  // 화면별 맨 끝 여백. 종료(1)는 피그마 1708 프레임에서 마지막 글(올리지 않고 홈으로) 아래가 40이다.
-  scrollPadBy: { 1: 40 },
+  // 화면별 맨 끝 여백. 종료(1)는 아래 버튼 묶음이 창 바닥에 붙어 있어(reportMotion.js pinEndBar) 스크롤 내용 끝(Report 1548)에서 버튼 묶음 윗선(1590)까지 42를 둔다(피그마 1708 프레임 값).
+  scrollPadBy: { 1: 42 },
   chatFirst: 350,
   chatGap: 900,
   chatSpacing: 12,

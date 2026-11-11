@@ -200,7 +200,7 @@ private struct LiveHeader: View {
     }
 }
 
-/// 맨 위 카드 줄(Carousel / 1, 2: 318 x 232, 모서리 20, 사이 12, 양옆 24).
+/// 맨 위 카드 줄(피그마 1943:12396 캐러셀 다섯 장: 318 x 232, 모서리 20, 사이 12, 양옆 24).
 private struct LiveCarousel: View {
     let items: [LiveFeatured]
     @Binding var page: Int
@@ -209,7 +209,7 @@ private struct LiveCarousel: View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 12) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { i, item in
-                    Button { onTap(item) } label: { card(item, dimViewers: i > 0) }
+                    Button { onTap(item) } label: { card(item) }
                         .buttonStyle(PressStyle())
                         .id(i)
                 }
@@ -223,18 +223,20 @@ private struct LiveCarousel: View {
         .frame(width: 390, height: 232)
     }
 
-    private func card(_ item: LiveFeatured, dimViewers: Bool) -> some View {
+    private func card(_ item: LiveFeatured) -> some View {
         ZStack(alignment: .topLeading) {
+            // 피그마 Scene 은 STRETCH(칸에 맞춰 늘림)이고 그림 비율이 칸과 같다.
             Image(item.scene).resizable().scaledToFill().frame(width: 318, height: 232).clipped()
-            // 피그마 Fade: #121415, 위 35%까지 투명, 아래 끝 90%
-            LinearGradient(stops: [.init(color: DS.Palette.bgSurface.opacity(0), location: 0), .init(color: DS.Palette.bgSurface.opacity(0), location: 0.35), .init(color: DS.Palette.bgSurface.opacity(0.9), location: 1)], startPoint: .top, endPoint: .bottom)
-            Text(item.versus).suit(13, .medium, lineHeight: 16).foregroundStyle(DS.Palette.textPrimary.opacity(0.8)).offset(x: 16, y: 140)
+            // 피그마 Fade(2340:22272): 검정, 위 35%까지 투명, 아래 끝 80%
+            LinearGradient(stops: [.init(color: .black.opacity(0), location: 0.35), .init(color: .black.opacity(0.8), location: 1)], startPoint: .top, endPoint: .bottom)
+            if !item.versus.isEmpty {
+                Text(item.versus).suit(13, .medium, lineHeight: 16).foregroundStyle(DS.Palette.textPrimary.opacity(0.8)).offset(x: 16, y: 140)
+            }
             Text(item.title).suit(20, .bold, lineHeight: 24).foregroundStyle(DS.Palette.textPrimary)
                 .multilineTextAlignment(.leading).fixedSize().offset(x: 16, y: 164)
-            LiveTimerPill(time: item.time).offset(x: 12, y: 12)
-            // 피그마 Carousel / 2의 보는 중 알약은 10%로 흐리다.
-            LiveViewersPill(count: item.viewers).opacity(dimViewers ? 0.1 : 1)
-                .frame(width: 306, alignment: .trailing).offset(y: 12)
+            LiveTimerPill(time: item.time, urgent: item.urgent).offset(x: 12, y: 12)
+            // 보는 중 알약은 카드 왼쪽 253 에 붙는다(피그마 다섯 장 모두 x 253, 폭은 숫자에 따라 51~54). 흐림 없음.
+            LiveViewersPill(count: item.viewers).offset(x: 253, y: 12)
         }
         .frame(width: 318, height: 232, alignment: .topLeading)
         .background(DS.Palette.bgElevated)
@@ -243,17 +245,40 @@ private struct LiveCarousel: View {
 }
 
 /// 카드 위 시계(75 x 26, 검정 75%, 하늘색 시계 16과 13.75 굵은 글자)
+/// 곧 끝 방(urgent)은 빨간 바탕(#FF4D6A)에 검정 시계와 글자다. 시계 조각은 12시부터 36도(피그마 I2340:22406;1126:2277 경로 값).
 struct LiveTimerPill: View {
     let time: String
+    var urgent = false
     var body: some View {
         HStack(spacing: 4) {
-            Image("C-clock").renderingMode(.template).resizable().frame(width: 16, height: 16)
+            if urgent {
+                LiveClockGlyph(degrees: 36).frame(width: 16, height: 16)
+            } else {
+                Image("C-clock").renderingMode(.template).resizable().frame(width: 16, height: 16)
+            }
             Text(time).suit(13.75, .bold, lineHeight: 18).monospacedDigit()
         }
-        .foregroundStyle(DS.Palette.brandPrimary)
+        .foregroundStyle(urgent ? Color.black : DS.Palette.brandPrimary)
         .padding(.leading, 8).padding(.trailing, 8)
         .frame(height: 26)
-        .background(.black.opacity(0.75), in: Capsule())
+        .background(urgent ? AnyShapeStyle(DS.Palette.danger) : AnyShapeStyle(Color.black.opacity(0.75)), in: Capsule())
+    }
+}
+
+/// 시계 모양: 테두리 원(반지름 7.0, 굵기 2)과 12시부터 시계 방향 부채꼴(반지름 5.3). 피그마 17 칸 SVG 값을 16 칸에 맞췄다.
+struct LiveClockGlyph: View {
+    let degrees: Double
+    var body: some View {
+        Canvas { ctx, size in
+            let s = size.width / 17
+            let c = CGPoint(x: 8.5 * s, y: 8.5 * s)
+            ctx.stroke(Path(ellipseIn: CGRect(x: 1.0625 * s, y: 1.0625 * s, width: 14.875 * s, height: 14.875 * s)), with: .foreground, lineWidth: 2.09 * s)
+            var wedge = Path()
+            wedge.move(to: c)
+            wedge.addArc(center: c, radius: 5.668 * s, startAngle: .degrees(-90), endAngle: .degrees(-90 + degrees), clockwise: false)
+            wedge.closeSubpath()
+            ctx.fill(wedge, with: .foreground)
+        }
     }
 }
 

@@ -26,6 +26,28 @@ export function endFloor(root) {
   if (root.dataset.fit && h && h !== 1708) { root.style.setProperty('--end-h', h + 'px'); return h; }
   return LIVE.screenH;
 }
+// 종료(1) 아래 버튼 묶음(피그마 2023:30766, 1804:13238 "Frame 2147249293", 342 x 78, 세로 제약 BOTTOM)은 스크롤해도 창 바닥에 붙어 따라온다(탁빛나 11/12 "하단바 따라오게").
+// 피그마 1708 프레임에서 묶음 아래 여백은 40(1590 + 78 = 1668)이다. 창 바닥에서 같은 여백을 두고, 묶음 위의 누르는 자리(커뮤니티에 고민 올리기, 올리지 않고 홈으로)도 같은 만큼 올린다.
+// 피그마에 묶음 뒤 배경(판, 그라데이션)은 없다. 묶음 윗선 아래로 내려간 내용은 스크롤 칸(live.js scrollerOf)이 잘라 버튼과 겹치지 않는다.
+// 두 번 불러도 같은 결과다(처음 자리를 data-y0에 적어 둔다).
+export function pinEndBar(root, layer) {
+  const bar = root.querySelector(':scope > [data-figma="Frame 2147249293"]');
+  if (!bar) return null;
+  if (!bar.dataset.y0) bar.dataset.y0 = String(parseFloat(bar.style.top) || relRect(root, bar).y);
+  const y0 = +bar.dataset.y0;
+  const shift = y0 - (endFloor(root) - (END_H - y0));
+  bar.style.top = y0 - shift + 'px';
+  bar.style.zIndex = '3';
+  if (layer) q(layer, '[data-hotspot]').forEach((b) => {
+    if (!b.dataset.y0) b.dataset.y0 = b.style.top;
+    const t = parseFloat(b.dataset.y0);
+    if (!(t >= y0 - 0.5)) return;
+    b.style.top = t - shift + 'px';
+    b.dataset.fitPinned = '1';
+  });
+  return bar;
+}
+const END_H = 1708;
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const bars = (root) => q(root, '[data-figma="엉따온도 Card"] [data-figma="Track"] > [data-figma="Bar"]');

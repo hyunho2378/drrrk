@@ -280,9 +280,10 @@ struct ClipListView: View {
         router.push(.clipPlayer)
     }
 
+    /// 드르륵 배너는 텍스트필드만 있는 빈 홈(25)으로 간다(탁빛나 11/12 1843:40980). 에이전트 버튼은 클립이 붙은 홈(62).
     private func openBanner() {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        withAnimation(.easeOut(duration: 0.3)) { router.enterFromClip() }
+        withAnimation(.easeOut(duration: 0.3)) { router.enterFromClip(empty: true) }
     }
 
     // 위쪽: 즐겨찾기, 탭 세 개와 밑줄, 검색

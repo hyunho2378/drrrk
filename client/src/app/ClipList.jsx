@@ -1,5 +1,5 @@
 // 네이버 클립 콘텐츠 리스트(추천 탭). 팀 피그마 "클립 콘텐츠 리스트"(1843:40980)와 같은 값이다.
-// 눌리는 것은 clipState.js CLIP_TOUCH.list 에 적힌 것뿐이다: 쌍밍아웃 영상 카드(영상 보기 56), 드르륵 배너(스플래시 뒤 드르륵 홈 25), 드르륵 에이전트 버튼.
+// 눌리는 것은 clipState.js CLIP_TOUCH.list 에 적힌 것뿐이다: 쌍밍아웃 영상 카드(영상 보기 56), 드르륵 배너(스플래시 뒤 빈 홈 25, 탁빛나 11/12), 드르륵 에이전트 버튼.
 // 영상 없는 카드(혼술바, 느좋녀 패션템, 군자 카페)와 위 탭, 즐겨찾기, 검색, 아래 탭, 카드 아래 아바타와 이름은 같은 자리에 같은 모양으로 그리기만 하고 눌리지 않는다.
 // 피드는 세로로 스크롤되고 맨 위에서 아래로 당기면 80px까지 늘어났다가 돌아온다. 머리말과 아래 탭은 고정이다.
 // 드르륵 에이전트 버튼은 클립 모든 화면에서 같은 자리에 떠다닌다(ClipAgent.jsx).
@@ -137,7 +137,8 @@ function Feed({ tab, cls }) {
   const { cards } = layout(tab);
   const open = (c) => {
     if (dragged) return;
-    if (c.banner) { go(62, 'enter'); return; }
+    // 배너는 텍스트필드만 있는 빈 홈(25)으로 간다(live.js resolveTo가 drrrk-clip-done을 빈 홈 상태로 둔다). 에이전트 버튼은 클립 홈(62).
+    if (c.banner) { go(25, 'enter'); return; }
     clipPick(c.clip);
     go(56, 'push');
   };

@@ -29,9 +29,9 @@ function setHash(n) {
   if (window.location.hash !== h) window.history.replaceState(window.history.state, '', h);
 }
 // 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(story.js). 빈 홈에서 방을 찾지 못함(45)으로 가는 혼자 드르륵 흐름도 같은 이야기로 시작한다.
-const goTo = (to, t) => {
+const goTo = (to, t, from) => {
   if (to === 26 || to === 45) { setStory('ssang'); setConcern(null); }
-  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t } }));
+  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t, from } }));
 };
 
 // 눌림 반응: scale 0.97, opacity 0.85를 90ms, 떼면 120ms
@@ -49,7 +49,7 @@ function pressOff(el) {
 }
 
 // clip: 클립이 붙은 홈(62 접힘 2296:20815, 63 펼침 2296:20794). 빈 홈(25, 24)과 장면은 같고 입력칸 위에 숏츠 첨부 카드가 붙는다.
-// 보내기는 클립이 붙은 홈이면 고민 분석(26), 빈 홈이면 방을 찾지 못함(45)으로 간다(11/11 23:18 팀 흐름 변경).
+// 보내기는 두 홈 모두 고민 분석(26, 드르륵 읽는 중)으로 간다. 분석이 끝나면 클립이 붙은 홈은 추천(27), 빈 홈은 방을 찾지 못함(45)이다(탁빛나 11/12 1647:25167, live.js resolveTo).
 export default function HomeScene({ startOpen = false, clip = false, style, className }) {
   const HASH = clip ? { open: 63, shut: 62 } : { open: 24, shut: 25 };
   // 펼친 입력칸 x: 빈 홈 1671:45255는 20, 클립이 붙은 홈 2296:21031은 24(피그마 값)
@@ -100,7 +100,7 @@ export default function HomeScene({ startOpen = false, clip = false, style, clas
     setOpen(false);
     setHash(HASH.shut);
   };
-  // 보내기(화살표 버튼, 시스템 키보드 완료 키, 엔터, 화면 키보드 엔터). 글이 비어 있어도 바로 간다(클립이 붙은 홈 26, 빈 홈 45).
+  // 보내기(화살표 버튼, 시스템 키보드 완료 키, 엔터, 화면 키보드 엔터). 글이 비어 있어도 바로 고민 분석(26)으로 간다.
   // 한 번 누름에 keydown, beforeinput, form submit이 함께 올 수 있어 한 번만 이동하게 막는다.
   const sentRef = React.useRef(false);
   const send = () => {
@@ -109,7 +109,7 @@ export default function HomeScene({ startOpen = false, clip = false, style, clas
     window.setTimeout(() => { sentRef.current = false; }, 1500);
     const inp = inputRef.current;
     if (inp) inp.blur();
-    window.setTimeout(() => goTo(clip ? 26 : 45, 'push'), motion.press);
+    window.setTimeout(() => goTo(26, 'push', HASH.shut), motion.press);
   };
   // React의 onBeforeInput은 inputType을 주지 않아 진짜 beforeinput을 직접 듣는다(한글 조합 중 완료 키가 줄바꿈으로 올 때).
   React.useEffect(() => {

@@ -7,6 +7,8 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { Screen2100_24856 } from '../figma/screens/Screen2100_24856.jsx';
 import { Screen2100_25022 } from '../figma/screens/Screen2100_25022.jsx';
 import { Screen2100_24964 } from '../figma/screens/Screen2100_24964.jsx';
+import { NotiKeyword } from '../figma/screens/NotiKeyword.jsx';
+import { KW_TABS, KW_CHIP_ON, KW_ALL_OFF } from './kwTabs.js';
 import { openWatch } from './liveV2.js';
 import { pressable } from './taps.js';
 import { NOTI_TABS, NOTI_SVG } from './notiTabs.js';
@@ -24,7 +26,7 @@ let toStudio = false;
 const keepOrReset = () => {
   // 주소는 해시 경로(#/s/57)다. 다른 배포 방식도 있으니 경로와 해시를 함께 본다.
   const p = window.location.pathname + window.location.hash;
-  if (!NOTI_PATH.test(p) && !(toStudio && /\/s\/20(\D|$)/.test(p))) chipKey = 'all';
+  if (!NOTI_PATH.test(p) && !(toStudio && /\/s\/20(\D|$)/.test(p))) { chipKey = 'all'; kwKey = 'all'; }
   toStudio = false;
 };
 const LIST_TOP = 221;
@@ -128,6 +130,96 @@ function activityChips(root) {
   paint(start);
 }
 
+// ---------- 키워드 알림 칩(11/12 피그마 #썸 2340:21569, #전남친 2340:21792, #남친 2340:22015, 전체 1952:14700과 2100:25022) ----------
+// 칩을 누르면 그 분류 프레임의 목록(묶음 머리와 카드)만 남고 칩 모양이 바뀐다. 전체를 누르면 전체 목록으로 돌아온다. 활동 알림 칩과 같은 방식이다:
+// 머리말과 탭, 요약 줄, 칩 줄은 그대로이고 목록만 180ms 교차 페이드(opacity)하며 새 목록은 맨 위(스크롤 0)에서 시작한다.
+// 분류 프레임의 카드는 전체 목록의 같은 제목 카드와 노드 값이 같아서(REST 비교) 카드를 새로 만들지 않고 보이는 카드만 고른다.
+// 카드에 붙은 동작(59의 오늘 카드를 누르면 방 구경)은 같은 카드라 그대로 따라간다. 고른 칩은 활동 알림 분류와 같이 알림 화면 안에서만 남는다.
+let kwKey = 'all';
+const KW_TOP = 162;
+const kwText = (el) => ((el && el.querySelector(':scope > span:not([aria-hidden])')) || {}).textContent || '';
+const kwNorm = (s) => s.replace(/\s+/g, '');
+
+function keywordChips(root) {
+  const box = root && root.querySelector('[data-figma="Keyword Alert Content"]');
+  const row = box && box.querySelector(':scope > [data-figma="Keyword Chips"]');
+  if (!box || !row || box.dataset.kwTabs) return;
+  box.dataset.kwTabs = '1';
+  const sc = root.querySelector(':scope > [data-scroll]');
+  const content = sc && sc.querySelector(':scope > [data-scroll-content]');
+  const base = { box: box.style.height, content: content ? content.style.height : '' };
+  const rows = [...box.children].filter((c) => /^(Group|Alert) \//.test(c.getAttribute('data-figma') || ''));
+  const keyOf = (c) => (/^Group/.test(c.getAttribute('data-figma')) ? 'g:' + kwNorm(kwText(c.querySelector('p'))) : 't:' + kwNorm(kwText(c.querySelector('[data-figma="Title"]'))));
+  // 59 생성 화면은 줄 배치(display flex)를 인라인으로 단다. 숨겼다 다시 보일 때 그 값으로 되돌린다.
+  const disp = new Map(rows.map((c) => [c, c.style.display]));
+  rows.forEach((c) => { c.dataset.kwKey = keyOf(c); });
+  const chips = [...row.querySelectorAll(':scope > [data-figma^="Chip / "]')];
+  // 칩 글자: 고르지 않은 모양은 생성 화면 값을 그대로 쓰고(전체만 고른 모양), 나머지 모양은 피그마 분류 프레임의 윤곽(kwTabs.js)을 쓴다.
+  const parts = chips.map((el) => [...el.querySelectorAll(':scope > p')].map((p) => ({ p, art: p.querySelector(':scope > span[aria-hidden]') })));
+  const gen = parts.map((ps) => ps.map((x) => (x.art ? x.art.innerHTML : '')));
+  const names = chips.map((el) => (el.getAttribute('data-figma') || '').replace('Chip / ', ''));
+  const paint = (tab) => {
+    chips.forEach((el, i) => {
+      const on = i === tab.on;
+      // 피그마 Chip: 고른 칩 #F8F8F8 바탕에 글자와 숫자 #121415 SemiBold 14(행간 17), 고르지 않은 칩 #222628 바탕에 글자 #F8F8F8 Medium 14, 숫자 #36D2FF Bold 13(행간 16)
+      el.style.background = on ? '#F8F8F8' : '#222628';
+      el.setAttribute('aria-pressed', on ? 'true' : 'false');
+      const nm = names[i];
+      parts[i].forEach((x, k) => {
+        const isAll = nm === '전체';
+        let html = gen[i][k];
+        if (isAll && !on) html = KW_ALL_OFF;
+        if (!isAll && on && KW_CHIP_ON[nm]) html = k === 0 ? KW_CHIP_ON[nm].label : KW_CHIP_ON[nm].count;
+        if (x.art && html) x.art.innerHTML = html;
+        x.p.style.color = on ? '#121415' : k === 0 ? '#F8F8F8' : '#36D2FF';
+        x.p.style.fontWeight = on ? '600' : k === 0 ? '500' : '700';
+        if (k > 0) { x.p.style.fontSize = on ? '14px' : '13px'; x.p.style.lineHeight = on ? '17px' : '16px'; }
+      });
+    });
+    const want = tab.rows ? new Set(tab.rows.map((r) => (r.group ? 'g:' + kwNorm(r.group) : 't:' + kwNorm(r.title)))) : null;
+    rows.forEach((c) => { c.style.display = !want || want.has(c.dataset.kwKey) ? disp.get(c) : 'none'; });
+    box.style.height = tab.key === 'all' ? base.box : tab.h + 'px';
+    if (content) content.style.height = tab.key === 'all' ? base.content : Math.max(844, KW_TOP + tab.h) + 'px';
+    box.setAttribute('data-tab', tab.key);
+    fixSubpixel(row);
+  };
+  let ghost = null;
+  const pick = (key) => {
+    if (key === kwKey) return;
+    const tab = KW_TABS.find((t) => t.key === key);
+    if (!tab) return;
+    kwKey = key;
+    if (ghost) { ghost.remove(); ghost = null; }
+    rows.forEach((c) => c.getAnimations().forEach((a) => a.cancel()));
+    // 교차 페이드: 지금 목록의 사본을 보이는 자리 그대로 위에 두고 옅게 지우며(요약 줄, 칩 줄, 구분 띠는 사본에서 숨김), 새 목록은 맨 위에서 옅게 나타난다.
+    const top = sc ? sc.scrollTop : 0;
+    const g = box.cloneNode(true);
+    g.removeAttribute('data-figma');
+    g.removeAttribute('data-kw-tabs');
+    g.setAttribute('data-noti-ghost', '');
+    g.setAttribute('aria-hidden', 'true');
+    g.querySelectorAll('[data-node]').forEach((e) => e.removeAttribute('data-node'));
+    g.removeAttribute('data-node');
+    [...g.children].forEach((c) => { if (!/^(Group|Alert) \//.test(c.getAttribute('data-figma') || '')) c.style.visibility = 'hidden'; c.removeAttribute('data-figma'); });
+    const gTop = KW_TOP - top;
+    const floor = root.clientHeight || 844;
+    Object.assign(g.style, { top: gTop + 'px', height: Math.max(0, Math.min(box.offsetHeight, floor - gTop)) + 'px', pointerEvents: 'none' });
+    box.insertAdjacentElement('afterend', g);
+    ghost = g;
+    if (sc) sc.scrollTop = 0;
+    paint(tab);
+    const o = { duration: FADE, easing: motion.standard, fill: 'both' };
+    rows.filter((c) => c.style.display !== 'none').forEach((c) => { const a = c.animate([{ opacity: 0 }, { opacity: 1 }], o); a.onfinish = () => a.cancel(); });
+    const b = g.animate([{ opacity: 1 }, { opacity: 0 }], o);
+    const end = () => { g.remove(); if (ghost === g) ghost = null; };
+    b.onfinish = end;
+    window.setTimeout(end, FADE + 80);
+  };
+  chips.forEach((el, i) => pressable(el, () => pick((KW_TABS.find((t) => t.on === i) || KW_TABS[0]).key)));
+  const start = KW_TABS.find((t) => t.key === kwKey) || KW_TABS[0];
+  if (start.key !== 'all') paint(start);
+}
+
 // 스크롤 층의 윗선을 움직이는 묶음의 윗선에 맞춘다. 그 위(머리말, 탭)로 내용이 올라가 겹치지 않는다.
 function clipScroll(root, top) {
   const sc = root && root.querySelector(':scope > [data-scroll]');
@@ -194,8 +286,15 @@ export function NotiActivityScreen() {
 
 export function NotiKeywordScreen() {
   const [ref, root] = useRoot();
-  useLayoutEffect(() => { const r = root(); clipScroll(r, 162); showStrokes(r); wireAlerts(r); return keepOrReset; }, []);
+  useLayoutEffect(() => { const r = root(); clipScroll(r, 162); showStrokes(r); wireAlerts(r); keywordChips(r); return keepOrReset; }, []);
   return <div ref={ref} style={{ display: 'contents' }}><Screen2100_25022 /></div>;
+}
+
+// 키워드 알림(58, 피그마 1952:14700): 생성 화면 그대로에 키워드 칩만 붙인다(카드 누름 동작은 지금처럼 없음).
+export function NotiKeyword58Screen() {
+  const [ref, root] = useRoot();
+  useLayoutEffect(() => { keywordChips(root()); return keepOrReset; }, []);
+  return <div ref={ref} style={{ display: 'contents' }}><NotiKeyword /></div>;
 }
 
 export function NotiSettingsScreen() {

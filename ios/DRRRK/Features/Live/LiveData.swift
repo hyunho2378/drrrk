@@ -51,6 +51,8 @@ struct LiveFeatured: Identifiable, Hashable {
     let time: String
     let viewers: String
     let scene: String
+    /// 곧 끝 방(빨간 시계 배지, 피그마 1943:12396 캐러셀 둘째 장)
+    var urgent: Bool = false
 }
 
 enum LiveSort: String, CaseIterable, Identifiable {
@@ -113,9 +115,14 @@ enum LiveData {
             .init(title: "편입 준비하는 애들아\n나만 포기하고 싶니..", viewers: "2", meta: "첫 대화 상대를 기다려요", metaBlue: true, els: [.empty(256, 62), .chair(278, 46, 48, "D-chairt-66dbe89dae", ring: false)]),
         ],
     ]
+    // 위 가로 카드 다섯 장(피그마 1943:12396 "캐러셀" 2340:22269, 왼쪽부터 Carousel / 1, 4, 3, 2, 5). 윗줄 작은 글(Versus)은 팀이 지웠다.
+    // 둘째부터 다섯째 장면은 명예의 전당과 같은 그림(피그마 그림 해시가 같다)이다. 웹 liveCarousel.js LIVE_CARDS와 같은 값이다.
     static let featured: [LiveFeatured] = [
-        .init(title: "둘이 찍은 사진인데\n지만 보정해서 올린 여우", versus: "이거 백퍼 질투 맞지?", time: "04:30", viewers: "22", scene: "D3-live-scene-1"),
-        .init(title: "남친이 1주년 선물로\n다이소 틴트 사줌", versus: "헤어질까 말까", time: "07:50", viewers: "15", scene: "D3-live-scene-2"),
+        .init(title: "둘이 찍은 사진인데\n지만 보정해서 올린 여우", versus: "", time: "04:30", viewers: "22", scene: "D3-live-scene-1"),
+        .init(title: "남친이 1주년 선물로\n다이소 틴트 사줌", versus: "", time: "02:30", viewers: "12", scene: "C-hall-2", urgent: true),
+        .init(title: "남사친이 자꾸만\n좋아져서 고민이야", versus: "", time: "10:31", viewers: "66", scene: "C-hall-3"),
+        .init(title: "너네는 친구가 남미새면\n어떻게 할거야?", versus: "", time: "06:43", viewers: "13", scene: "C-hall-4"),
+        .init(title: "친친 스토리에 나만 빼고\n등록해둔 친구가 있어", versus: "", time: "04:12", viewers: "62", scene: "C-hall-5"),
     ]
     static let bell = "C-4fdd18ce8a29"
 

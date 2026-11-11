@@ -698,10 +698,12 @@ struct TopicBanner: View {
                     Text("고민").suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.brandPrimary)
                     // 접힌 한 줄도 행간 140%(피그마 1884:11512). 피그마 글 상자는 높이 17, 위 11.5, 위 맞춤이라 19.6 줄 상자의 글자가
                     // 가운데 정렬보다 1.3 아래에 놓인다(웹 roomConcern.js styleBannerLine과 같은 자리).
+                    // 글 폭은 피그마 2340:21460과 같은 261(x 67에서 328, 화살표까지 8)이다. 예전 Spacer는 HStack 간격 8이 한 번 더 붙어
+                    // 글 폭이 253으로 줄어 긴 카드 제목의 말줄임 자리가 웹보다 앞에 왔다. 남는 폭을 글이 차지하게 해 간격을 8 하나로 둔다.
                     Text(model.topicShort).suit(14, .medium, tracking: -0.56)
-                        .foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                        .foregroundStyle(DS.Palette.textPrimary).lineLimit(1).truncationMode(.tail)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .offset(y: (Self.bodyLine - 17) / 2)
-                    Spacer(minLength: 0)
                     Image("icon-chevron-down").renderingMode(.template).resizable()
                         .foregroundStyle(DS.Palette.textPrimary).frame(width: 16, height: 16)
                 }

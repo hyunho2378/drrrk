@@ -406,6 +406,13 @@ export const SCREENS = [
   "name": "DRRRK · 홈 (Dark)",
   "file": "HomeClipOpen",
   "h": 844
+ },
+ {
+  "n": 64,
+  "id": "2340:21259",
+  "name": "혼자 드르륵 · 그리드",
+  "file": "SoloGrid",
+  "h": 844
  }
 ];
 
@@ -440,7 +447,7 @@ const modules = {
   'LiveSchool': () => import('../figma/screens/LiveSchool.jsx'),
   'LiveCareer': () => import('../figma/screens/LiveCareer.jsx'),
   'NotiActivity': () => import('../figma/screens/NotiActivity.jsx'),
-  'NotiKeyword': () => import('../figma/screens/NotiKeyword.jsx'),
+  'NotiKeyword': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiKeyword58Screen })),
   'NotiKeywordFull': () => import('../figma/screens/NotiKeywordFull.jsx'),
   'NotiKeywordSettings': () => import('../figma/screens/NotiKeywordSettings.jsx'),
   'NotiActivity1110': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiActivityScreen })),
@@ -505,6 +512,7 @@ const modules = {
   'Replay': () => import('./ReplayScreen.jsx'),
   'HomeClip': () => import('./HomeClip.jsx'),
   'HomeClipOpen': () => import('./HomeClipOpen.jsx'),
+  'SoloGrid': () => import('./SoloGrid.jsx'),
 };
 
 export async function loadScreen(n) {

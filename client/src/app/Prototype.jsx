@@ -226,6 +226,8 @@ export default function Prototype() {
         const au1 = AUTO[from];
         if (au1) {
           set.add(au1.to);
+          // 빈 홈에서 온 고민 분석(26)은 방을 찾지 못함(45)으로 넘어간다(flow.js AUTO alt). 그 화면도 미리 받는다.
+          if (au1.alt) set.add(au1.alt);
           LINKS.filter((l) => l.from === au1.to).forEach((l) => set.add(l.to));
         }
         [...set].forEach((t) => { if (AUTO[t]) set.add(AUTO[t].to); });

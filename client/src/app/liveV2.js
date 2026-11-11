@@ -133,10 +133,11 @@ export function pickWatch(card) {
   setConcern(photo || !card ? null : { title: card.title, tag: tabOf(card.title) });
   picked = card ? { title: String(card.title).replace(/ \n/g, '\n'), views: String(card.views ?? ''), left: leftOf(card) } : null;
 }
-// 위 가로 카드 두 장 값(피그마 2100:23638 Carousel / 1, 2의 제목, 보는 수, 시계). iOS LiveData.featured와 같다.
+// 위 가로 카드 첫 두 장 값(피그마 1943:12396 캐러셀 Carousel / 1, 4의 제목, 보는 수, 시계). 둘째 장은 곧 끝 방(빨간 시계 02:30)이다.
+// 다섯 장 전체 값은 liveCarousel.js LIVE_CARDS 에 있고, 셋째부터 다섯째 장은 그 파일이 직접 누름을 받는다. iOS LiveData.featured와 같다.
 const FEATURED = [
   { title: PHOTO_TITLE, views: '22', meta: '04:30 남음', st: 'talk' },
-  { title: '남친이 1주년 선물로\n다이소 틴트 사줌', views: '15', meta: '07:50 남음', st: 'talk' },
+  { title: '남친이 1주년 선물로\n다이소 틴트 사줌', views: '12', meta: '02:30 남음', st: 'soon', timer: '02:30' },
 ];
 // 방 구경(37)으로 들어간다. 알림 키워드 카드처럼 라이브 목록 밖에서도 부른다.
 // 예: openWatch(LIVE_LIST[10][0]) 은 사진보정 방 구경, openWatch({ title: '3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?', views: '22', meta: '12:32 남음', st: 'talk' }).
@@ -202,16 +203,7 @@ function cardOf(c) {
 export function patchLiveV2(root, n) {
   if (!LIVE_SCREENS.includes(n) || !root || root.dataset.liveV2) return;
   const list = LIVE_LIST[n] || LIVE_LIST[10];
-  // 위 가로 카드 장면: 팀 피그마 최신 장면(Carousel / 1 1943:12456, / 2 1943:12466)으로 바꾼다.
-  [1, 2].forEach((i) => {
-    const car = root.querySelector('[data-figma="Carousel / ' + i + '"]');
-    if (!car) return;
-    const url = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.webp)';
-    const sc = car.querySelector(':scope > [data-figma="Scene"]');
-    // 연애(49) 생성 화면은 장면 칸 없이 카드 자체 배경에 옛 장면을 깔고 있어서, 그때는 카드 배경을 바꾼다.
-    if (sc) sc.style.backgroundImage = url;
-    else car.style.setProperty('background-image', url, 'important');
-  });
+  // 위 가로 카드 다섯 장의 장면과 글은 liveCarousel.js prepareLiveCarousel 이 이 함수보다 먼저 깐다(피그마 1943:12396 캐러셀).
   const olds = [1, 2, 3].map((i) => root.querySelector('[data-figma="List Card / ' + i + '"]')).filter(Boolean);
   if (!olds.length) return;
   root.dataset.liveV2 = '1';

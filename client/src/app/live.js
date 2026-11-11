@@ -23,6 +23,7 @@ import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
 import { patchCommunity } from './community.js';
 import { prepareHall } from './hallOfFame.js';
+import { prepareLiveCarousel } from './liveCarousel.js';
 import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
@@ -31,10 +32,11 @@ import { patchSolo } from './solo.js';
 import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
 import { patchReportStory } from './reportPatch.js';
-import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.js';
+import { prepReportMotion, attachReportMotion, endFloor, pinEndBar } from './reportMotion.js';
 import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 import { prepareNormalPager, attachNormalPager } from './normalPager.js';
+import { prepareSoloGrid, attachSoloGrid, soloGridRoute } from './soloGrid.js';
 import { attachDictation, endDictation } from './dictation.js';
 import { isClipDone, setClipDone } from './clipHome.js';
 
@@ -42,7 +44,7 @@ export { setText };
 
 // 방마다 묶은 화면. W는 라운지에서 구경하는 방(시계만 흐르고 화면은 넘기지 않는다).
 // 해 뜨는 단계(40)는 함께 드르륵 방(B)에 둔다. 그래서 29에서 40으로 넘어가도 같은 방 시계가 이어진다(11/10 해뜨기 영상).
-export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23], B: [29, 28, 30, 31, 32, 33, 35, 40], C: [46, 43, 41, 42], W: [37] };
+export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23], B: [29, 28, 30, 31, 32, 33, 35, 40], C: [46, 43, 41, 42, 64], W: [37] };
 export const sceneOf = (n) => Object.keys(ROOMS).find((k) => ROOMS[k].includes(n)) || null;
 
 const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
@@ -51,8 +53,9 @@ const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
 export function resolveTo(l) {
   // 네이버 클립에서 드르륵으로 들어가는 길: 스플래시를 띄우고 화면은 바로 바꾼다(스플래시가 덮고 있는 동안 홈이 그려진다).
   // 클립에서 다시 들어오면 처음(클립이 붙은 홈 62)부터 다시 시연한다(clipHome.js).
+  // 클립 리스트(55)의 드르륵 배너는 빈 홈(25, 텍스트필드만 있는 홈)으로 들어간다(탁빛나 11/12 1843:40980). 그때는 함께 방에 앉은 뒤와 같은 빈 홈 상태다.
   if (l.t === 'enter') {
-    setClipDone(false);
+    setClipDone(l.to === 25 || l.to === 24);
     window.dispatchEvent(new Event('drrrk:splash'));
     return Object.assign({}, l, { t: 'none' });
   }
@@ -70,6 +73,14 @@ export function resolveTo(l) {
     setClipDone(true);
   }
   // 방을 찾지 못함(45)에 어디서 왔는지 적어 둔다. 뒤로는 추천 드르륵(27)에서 왔으면 27, 빈 홈에서 왔으면 빈 홈(25)이다.
+  // 고민 분석(26)에 어느 홈에서 왔는지 적어 둔다. 빈 홈(25, 24)에서 왔으면 분석이 끝난 뒤 추천(27) 대신 방을 찾지 못함(45)으로 간다(탁빛나 11/12 1647:25167).
+  // 뒤로는 온 홈으로 간다(26 뒤로는 25로 적혀 있고 함께 방에 앉기 전이면 아래 규칙이 클립 홈 62로 바꾼다). iOS AnalysisView.play와 같다.
+  if (l.to === 26 && l.t !== 'back') { const f = l.from || hashN(); try { sessionStorage.setItem('drrrk-analysis-from', f === 25 || f === 24 ? 'home' : 'clip'); } catch (e) { /* 기본값 clip */ } }
+  if (l.to === 27 && l.t !== 'back' && (l.from || hashN()) === 26) {
+    let o = 'clip';
+    try { o = sessionStorage.getItem('drrrk-analysis-from') || 'clip'; } catch (e) { /* 기본값 clip */ }
+    if (o === 'home') { try { sessionStorage.setItem('drrrk-noroom-from', 'home'); } catch (e) { /* 기본값 home */ } return Object.assign({}, l, { to: 45 }); }
+  }
   if (l.to === 45 && l.t !== 'back') { try { sessionStorage.setItem('drrrk-noroom-from', l.from === 27 ? 'rec' : 'home'); } catch (e) { /* 기본값 home */ } }
   if (l.from === 45 && l.to === 25 && l.t === 'back') {
     let o = 'home';
@@ -88,6 +99,8 @@ export function resolveTo(l) {
   // 키워드 관리(60)는 연 화면(키워드 알림 58 또는 풀버전 59)으로 돌아간다. iOS router.pop과 같다.
   if (l.to === 60) { const f = l.from || hashN(); try { sessionStorage.setItem('drrrk-kw-from', f === 58 ? '58' : '59'); } catch (e) { /* 기본값 59 */ } }
   if ((l.from === 60 || hashN() === 60) && l.t === 'back' && l.to === 59) { let o = '59'; try { o = sessionStorage.getItem('drrrk-kw-from') || '59'; } catch (e) { /* 기본값 59 */ } if (o === '58') return Object.assign({}, l, { to: 58 }); }
+  // 혼자 방 그리드(64): 들어온 현장 화면(46, 41, 43)을 적어 두고 현장 모드 버튼은 그 화면으로 돌아간다(soloGrid.js).
+  { const sg = soloGridRoute(l); if (sg) return sg; }
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
   // 함께 드르륵 방에 앉기 전에는 홈으로 가는 길(탭바, 알림 닫기, 뒤로)이 클립이 붙은 홈(62, 펼침 63)으로 간다.
@@ -278,12 +291,19 @@ function lateInputs(layer, root, n, go, inRoom) {
 }
 
 // ---------- 5) 고민 분석 ----------
-function halfRing(side) {
+// 링 조각: 12시에서 시계 방향으로 a0도부터 a1도까지 도는 두께 5(바깥 반지름 100, 안쪽 95, 피그마 innerRadius 0.95) 호.
+// 겹침 0.8도: 안쪽 반지름 95에서 1.33px로, 뒤 반쪽 칸을 더 연 1px보다 넓다. 반환점에서 앞뒤로 보이는 조각은 0.8도(약 5ms)뿐이다.
+const RING_SEAM_DEG = 0.8;
+function ringArc(a0, a1) {
   const R = 100, r = 95;
-  const d = side === 'left'
-    ? 'M100 0 A100 100 0 0 0 100 200 L100 195 A95 95 0 0 1 100 5 Z'
-    : 'M100 0 A100 100 0 0 1 100 200 L100 195 A95 95 0 0 0 100 5 Z';
-  return '<svg width="200" height="200" viewBox="0 0 200 200" style="display:block"><path d="' + d + '" fill="' + LIVE.ringColor + '"/></svg>' + (R && r ? '' : '');
+  const pt = (rad, a) => { const t = (a * Math.PI) / 180; return (100 + rad * Math.sin(t)).toFixed(3) + ' ' + (100 - rad * Math.cos(t)).toFixed(3); };
+  const big = a1 - a0 > 180 ? 1 : 0;
+  const d = 'M' + pt(R, a0) + ' A' + R + ' ' + R + ' 0 ' + big + ' 1 ' + pt(R, a1) + ' L' + pt(r, a1) + ' A' + r + ' ' + r + ' 0 ' + big + ' 0 ' + pt(r, a0) + ' Z';
+  return '<svg width="200" height="200" viewBox="0 0 200 200" style="display:block;overflow:visible"><path d="' + d + '" fill="' + LIVE.ringColor + '"/></svg>';
+}
+// side 'left': 왼쪽 반(180도에서 360도). side 'right': 오른쪽 반(0도에서 180도)에 앞뒤 끝을 RING_SEAM_DEG만큼 더 그려 앞 반쪽과 겹친다.
+function halfRing(side) {
+  return side === 'left' ? ringArc(180, 360) : ringArc(-RING_SEAM_DEG, 180 + RING_SEAM_DEG);
 }
 // 고민 분석은 보이기 전에 0에서 시작하는 모습(initAnalysis)을 만들어 두고, 화면이 자리를 잡은 뒤(playAnalysis) 차오른다.
 function initAnalysis(root) {
@@ -292,12 +312,14 @@ function initAnalysis(root) {
     ring.dataset.live = 'ring';
     ring.innerHTML = '';
     Object.assign(ring.style, { overflow: 'visible' });
+    // 두 반쪽이 x 100에서 맞닿으면 화면 배율이 정수가 아닐 때 6시와 12시 이음매에 틈(트랙이 비치는 줄)과 숨은 반쪽의 가장자리(하늘색 실선)가 생긴다.
+    // 그래서 반쪽은 제 차례 전에는 opacity 0으로 숨기고, 뒤 반쪽 칸은 오른쪽으로 1px 더 열고 앞 끝을 조금 더 그려 앞 반쪽과 겹치게 한다.
     const mk = (left) => {
       const clip = document.createElement('div');
-      Object.assign(clip.style, { position: 'absolute', top: '0', left: left ? '0' : '100px', width: '100px', height: '200px', overflow: 'hidden' });
+      Object.assign(clip.style, { position: 'absolute', top: '0', left: left ? '0' : '100px', width: left ? '101px' : '100px', height: '200px', overflow: 'hidden' });
       const rot = document.createElement('div');
       rot.innerHTML = halfRing(left ? 'right' : 'left');
-      Object.assign(rot.style, { position: 'absolute', top: '0', left: left ? '0' : '-100px', width: '200px', height: '200px', transformOrigin: '100px 100px', transform: 'rotate(0deg)' });
+      Object.assign(rot.style, { position: 'absolute', top: '0', left: left ? '0' : '-100px', width: '200px', height: '200px', transformOrigin: '100px 100px', transform: 'rotate(0deg)', opacity: '0' });
       clip.appendChild(rot);
       ring.appendChild(clip);
       return rot;
@@ -325,8 +347,11 @@ function playAnalysis(root, ms) {
     ring.dataset.played = '1';
     const [first, second] = ring.__rots;
     const half = ms / 2;
-    first.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, easing: 'linear', fill: 'forwards' });
-    second.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: half, delay: half, easing: 'linear', fill: 'forwards' });
+    // 기다리는 동안은 바탕 opacity 0이 그대로 남는다(fill forwards만, backwards 없음).
+    // 첫 장면(0도)에는 숨은 쪽 가장자리가 6시와 12시에 비치므로 1%(1.8도)까지는 opacity 0에서 시작한다. 회전 빠르기는 그대로 일정하다.
+    first.animate([{ transform: 'rotate(0deg)', opacity: 0 }, { transform: 'rotate(1.8deg)', opacity: 1, offset: 0.01 }, { transform: 'rotate(180deg)', opacity: 1 }], { duration: half, easing: 'linear', fill: 'forwards' });
+    // 뒤 반쪽은 뒤끝 겹침만큼 돌린 자리에서 시작해 12시 왼쪽에 조각이 비치지 않게 한다.
+    second.animate([{ transform: 'rotate(' + RING_SEAM_DEG + 'deg)', opacity: 1 }, { transform: 'rotate(180deg)', opacity: 1 }], { duration: half, delay: half, easing: 'linear', fill: 'forwards' });
   }
   // 세 단계가 끝나면 모두 맨 위 단계와 같은 밝은 체크가 된다. 돌아가는 아이콘 칸은 비우고 체크 그림만 같은 크기로 넣는다(칸 크기와 자리는 그대로).
   const steps = q(root, '[data-figma^="step ·"]');
@@ -415,6 +440,8 @@ function scrollerOf(layer, root, n) {
   if (!LIVE.scrollScreens.includes(n) && !generic) return null;
   const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
   const named = (LIVE.pinNames[n] || []).map((nm) => root.querySelector(':scope > [data-figma="' + nm + '"]')).filter(Boolean);
+  // 종료(1) 아래 버튼 묶음은 창 바닥에 붙여 두고 움직이지 않는다(reportMotion.js pinEndBar, 피그마 세로 제약 BOTTOM).
+  if (n === 1) { const eb = pinEndBar(root, layer); if (eb) named.push(eb); }
   const pins = [...(fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : []), ...named];
   // 종료(1)는 바닥 요소가 없고, 휴대폰에서는 뿌리 칸이 보이는 창 바닥까지 늘어난다(mobileFit.js). 그 바닥까지 움직인다.
   const floor = n === 1 ? endFloor(root) : LIVE.screenH;
@@ -821,6 +848,10 @@ export async function prepare(layer, n, prevN) {
   attachSort(root, n, true);
   // 일반 모드 참여자 칸 두 장 넘기기(normalPager.js): 칸을 넘기는 판으로 옮기고 둘째 장(피그마 "나" 2023:11805) 그림을 보이기 전에 받는다.
   await prepareNormalPager(layer, root, n);
+  // 혼자 방 그리드(64, 피그마 2340:21259, 2340:21344 두 장): 보이기 전에 현장 장면을 빼고 칸 두 장과 점, 채팅 줄을 깔다.
+  await prepareSoloGrid(layer, root, n);
+  // 라이브 위 가로 카드 다섯 장(liveCarousel.js, 피그마 1943:12396 캐러셀): 그림 디코드까지 끝낸 뒤 깔고, 카드 넘기기(attachDrag)가 다섯 장을 세도록 먼저 부른다.
+  await prepareLiveCarousel(root, n);
   // 라이브 목록(liveV2.js)을 먼저 깔아야 화면 스크롤(attachDrag)이 새 카드 목록 끝까지 잰다(11/10 전체 탭 스크롤 수정).
   patchLiveV2(root, n);
   // 커뮤니티 명예의 전당 카우셀 다섯 장(hallOfFame.js): 카드 넘기기(attachDrag)가 다섯 장을 세도록 먼저 깐다.
@@ -843,7 +874,7 @@ export async function prepare(layer, n, prevN) {
   if (n === LIVE.analysisScreen) initAnalysis(root);
   prepareRoomClock(root, n);
   // 방 입장 영상과 해뜨기 영상: 보이기 전에 장면 칸 그림을 영상 첫 장면으로 대체하고 영상 첫 프레임이 준비될 때까지 기다린다(roomEnterVideo.js, sunriseVideo.js).
-  await prepareRoomEnter(root, n, sceneOf(n) === 'B' && room.scene !== 'B');
+  await prepareRoomEnter(root, n, !!sceneOf(n) && room.scene !== sceneOf(n));
   await prepareSunrise(root, n);
   prepareChat(root, n);
   patchCommunity(root, n);
@@ -895,7 +926,8 @@ export function attach(layer, n, go, prevN) {
   if (sc === 'B' || sc === 'W') prefetchSunrise();
   attachSunrise(root, n);
   // 방 입장 영상: 새로 들어온 방이면 한 번 재생하고, 같은 방 안 전환이면 이어 가거나 멈춘다(roomEnterVideo.js). room.scene이 바뀌기 전에 부른다.
-  attachRoomEnter(root, n, sc === 'B' && room.scene !== 'B');
+  attachRoomEnter(root, n, !!sc && room.scene !== sc);
+  attachSoloGrid(layer, root, n);
   if (sc) {
     const kind = timerKind(root);
     if (room.scene !== sc || room.kind !== kind) {

@@ -3,7 +3,8 @@
 // 옛 프레임에 있던 가운데 "AI 드르륵 의자" 이름표와 소리 막대는 새 프레임에 없어 숨긴다.
 // 옛 41, 42의 빨간 시계(곧 끝)는 새 프레임에서 기본 시계(#222628, 하늘색 시간)다.
 const q = (r, s) => [...r.querySelectorAll(s)];
-export const SOLO_SCREENS = [46, 43, 41, 42];
+// 64는 혼자 방 그리드(soloGrid.js)다. 46 생성 화면을 바탕으로 쓰므로 시계 칸과 옛 이름표를 같이 고친다.
+export const SOLO_SCREENS = [46, 43, 41, 42, 64];
 // 방 움직임(room.js)이 나중에 display를 되돌려도 숨김이 유지되게 속성 규칙으로 숨긴다.
 if (typeof document !== 'undefined' && !document.getElementById('solo-hide')) {
   const st = document.createElement('style');
