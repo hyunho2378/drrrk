@@ -287,16 +287,20 @@ export function attachMic(root) {
       if (!mic.stream) {
         try {
           await startMic();
+          window.dispatchEvent(new Event('drrrk:mic'));
           await show('on');
           toast(root, LIVE.micOnText);
         } catch (err) {
           mic.denied = true;
+          window.dispatchEvent(new Event('drrrk:mic'));
           await show('off');
           toast(root, err && err.message === 'unsupported' ? LIVE.micUnsupportedText : LIVE.micDeniedText);
         }
       } else {
         mic.muted = !mic.muted;
         mic.stream.getAudioTracks().forEach((t) => (t.enabled = !mic.muted));
+        // 받아쓰기(dictation.js)가 마이크 켜짐과 꺼짐을 바로 따른다.
+        window.dispatchEvent(new Event('drrrk:mic'));
         await show(mic.muted ? 'off' : 'on');
         toast(root, mic.muted ? LIVE.micMutedText : LIVE.micOnText);
       }

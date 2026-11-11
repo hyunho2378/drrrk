@@ -33,6 +33,7 @@ import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.j
 import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 import { prepareNormalPager, attachNormalPager } from './normalPager.js';
+import { attachDictation } from './dictation.js';
 
 export { setText };
 
@@ -236,9 +237,25 @@ function attachInputs(root, n, go) {
       if (next) window.setTimeout(() => go({ to: next, t: 'fade' }), LIVE.afterSendMs);
     };
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); send(); } });
+    // 받아쓰기(dictation.js)도 이 보내기를 그대로 쓴다.
+    input.__send = send;
     const btn = field.parentElement && field.parentElement.querySelector('[data-figma^="btn_전송"]');
     if (btn) { btn.style.cursor = 'pointer'; btn.addEventListener('click', send); }
   });
+}
+
+// 방 온보딩 덮개가 입력칸을 가린 채 화면이 붙으면 입력칸이 만들어지지 않았다. 덮개가 닫힌 뒤 같은 화면이면 입력칸과 받아쓰기를 붙인다.
+function lateInputs(layer, root, n, go, inRoom) {
+  if (root.__lateInputs || root.querySelector('input.live-input')) return;
+  if (!q(root, '[data-figma="채팅 입력"]').length) return;
+  const until = performance.now() + 120000;
+  root.__lateInputs = window.setInterval(() => {
+    const done = () => { window.clearInterval(root.__lateInputs); root.__lateInputs = 0; };
+    if (current.layer !== layer || !root.isConnected || performance.now() > until) { done(); return; }
+    if (document.querySelector('[data-figma="방 온보딩"]')) return;
+    attachInputs(root, n, go);
+    if (root.querySelector('input.live-input')) { attachDictation(root, inRoom); done(); }
+  }, 400);
 }
 
 // ---------- 5) 고민 분석 ----------
@@ -834,6 +851,8 @@ export function attach(layer, n, go, prevN) {
   attachThrow(root);
   attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachInputs(root, n, go);
+  // 말한 내용 받아쓰기: 함께 드르륵과 혼자 방(방 구경 37 제외) 입력줄에 붙는다(dictation.js).
+  { const dsc = sceneOf(n); attachDictation(root, !!dsc && dsc !== 'W'); lateInputs(layer, root, n, go, !!dsc && dsc !== 'W'); }
   attachTaps(root, n, go, prevN);
   attachSort(root, n, false);
   patchLiveV2(root, n);

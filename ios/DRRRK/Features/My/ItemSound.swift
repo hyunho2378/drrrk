@@ -50,7 +50,8 @@ final class ItemSound {
     private func prepare() -> Bool {
         if ready, engine.isRunning { return true }
         do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+            // 받아쓰기(Dictation.swift)가 녹음 세션을 쓰는 중이면 ambient 로 되돌리지 않는다.
+            if !DictationAudio.recording { try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers]) }
             try AVAudioSession.sharedInstance().setActive(true)
             if !ready {
                 engine.attach(player)

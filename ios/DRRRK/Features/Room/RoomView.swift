@@ -758,6 +758,9 @@ struct RoomInputBar: View {
     @State private var text = ""
     @FocusState private var typing: Bool
     @State private var micOn = true
+    /// 받아쓰기(Dictation.swift)가 이 입력칸에 마지막으로 쓴 글. 입력칸 글이 이것과 다르면 사용자가 직접 친 글이다.
+    @State private var dictText = ""
+    @State private var dictID = UUID()
     var body: some View {
         HStack(spacing: 8) {
             Button {
@@ -803,15 +806,53 @@ struct RoomInputBar: View {
         }
         .padding(8)
         .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.input))
+        // 받아쓰기: 마이크가 켜져 있으면 말한 글이 입력칸에 채워지고 1초 뒤 이 입력줄의 보내기로 내 말풍선이 된다.
+        .onAppear {
+            Dictation.shared.attach(dictID) { sentence in sendDictated(sentence) }
+            Dictation.shared.setMic(on: micOn)
+        }
+        .onDisappear { Dictation.shared.detach(dictID) }
+        .onChange(of: micOn) { _, on in Dictation.shared.setMic(on: on) }
+        .onChange(of: Dictation.shared.partial) { _, p in showDictated(p) }
+        .onChange(of: text) { _, t in
+            guard t != dictText else { return }
+            // 사용자가 직접 쳤다. 칸을 비우면 기다리던 받아쓴 글을 다시 쓴다.
+            dictText = ""
+            if t.isEmpty, !Dictation.shared.partial.isEmpty {
+                showDictated(Dictation.shared.partial)
+                Dictation.shared.rearm()
+            }
+        }
     }
 
-    private func send() {
+    /// 사용자가 직접 친 글이 칸에 있는지.
+    private var userTyping: Bool { !text.isEmpty && dictText.isEmpty }
+
+    private func showDictated(_ p: String) {
+        guard !userTyping else { return }
+        dictText = p
+        text = p
+    }
+
+    private func sendDictated(_ sentence: String) -> Bool {
+        guard !userTyping else { return false }
+        dictText = sentence
+        text = sentence
+        send(focus: false)
+        dictText = ""
+        return true
+    }
+
+    private func send() { send(focus: true) }
+
+    /// 받아쓰기로 보낼 때는 키보드를 올리지 않는다(focus false). 나머지는 키보드 보내기와 같다.
+    private func send(focus: Bool) {
         let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         onSend(t)
         text = ""
-        typing = true
+        if focus { typing = true }
     }
 }
 
