@@ -167,6 +167,9 @@ export async function morph(prev, next, reduced) {
     u.els.forEach((el) => play(el, f.k, f.d, f.e));
   });
   entering.forEach((v) => {
+    // 자기 모션을 위해 보이기 전에 숨겨 둔 요소(inline opacity 0, 예: 종료 1의 해 그림 촤라락 모션)는 건드리지 않는다.
+    // 여기서 0에서 1로 드러내면 전환이 끝날 때 다시 숨었다가 자기 모션으로 다시 나타났다(11/11 검사: 35에서 1로, 해 그림 +50 보임, +267 사라짐, +467 다시 보임).
+    if (v.el.style.opacity === '0') return;
     if (!reduced && v.name === PANEL) { expandPanel(v, play); return; }
     if (!reduced && v.name === PILL) { v.els.forEach((el) => play(el, [{ opacity: 0 }, { opacity: 1 }], 220, motion.standard, 240)); return; }
     const f = frames(kindOf(v), 'in', reduced);

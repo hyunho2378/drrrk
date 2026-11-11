@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07E60C9A61A87945AEA85562 /* CommunityTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8E14CA1AF42BBD9879E5C4 /* CommunityTabs.swift */; };
 		0AA854BF8B8315F2BE279590 /* snack-can.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FEE1755FB237620D0E2AE9A5 /* snack-can.mp3 */; };
 		0CFEDF0125B4CB879D2DCA23 /* SUIT-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 37CF8AE0BD5CC76AEC12E9B2 /* SUIT-ExtraBold.otf */; };
 		1253C405282A608123A76EE6 /* sunrise-photo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */; };
 		1C8D73314E7F0E4B41EDFD33 /* RoomEnterVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */; };
+		1EC80D9D6F4CEA5E995BB4AA /* clip-ssang.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 13DB2AB0E92B4BB09ECD19DE /* clip-ssang.mp4 */; };
 		2086FB2D2C7FC1046CDB9399 /* LiveScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA4C1919ACF949D819C53E1 /* LiveScreens.swift */; };
 		21BC378FC93A374C180C79FE /* RoomClockHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1735AA7C558ED37465659F5F /* RoomClockHandoff.swift */; };
 		23E31936A51E28D4ACEB49C9 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4533C63C25CFFB9BEEE5F247 /* Tokens.swift */; };
@@ -30,6 +32,7 @@
 		5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5D62597EB5736F98D562A0 /* NotiScreens.swift */; };
 		5AE4CBC169CDA200AA9E51DB /* DRRRKApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071502F7C6300EB6A419D22B /* DRRRKApp.swift */; };
 		5D0329EF1758E2B051668BEB /* RoomScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD40CD1CB370E46CDEE60C6 /* RoomScreens.swift */; };
+		5EAED20F123485F94E756958 /* ClipVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11DC606ACC220A20BC8EC27 /* ClipVideo.swift */; };
 		63EC4390B346CD0C760147D7 /* logo-motion.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 79E359FEC2985AFFE94377DB /* logo-motion.mp4 */; };
 		64FD68FDB86E4B51FD5303A4 /* RoomChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05962FBA580675C788F4D5DF /* RoomChat.swift */; };
 		705C4C4474C514AC5599A5A9 /* ChairStudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAD1C8E266114FE833A93C4 /* ChairStudioView.swift */; };
@@ -65,11 +68,13 @@
 		05962FBA580675C788F4D5DF /* RoomChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomChat.swift; sourceTree = "<group>"; };
 		071502F7C6300EB6A419D22B /* DRRRKApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DRRRKApp.swift; sourceTree = "<group>"; };
 		0F31ED16836268E045ED6C57 /* sunrise-ssang.mp4 */ = {isa = PBXFileReference; path = "sunrise-ssang.mp4"; sourceTree = "<group>"; };
+		13DB2AB0E92B4BB09ECD19DE /* clip-ssang.mp4 */ = {isa = PBXFileReference; path = "clip-ssang.mp4"; sourceTree = "<group>"; };
 		14456F248BBE7E155D47906C /* SUIT-Heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Heavy.otf"; sourceTree = "<group>"; };
 		1735AA7C558ED37465659F5F /* RoomClockHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomClockHandoff.swift; sourceTree = "<group>"; };
 		201069A4B4C8636439181ECD /* SoundFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundFiles.swift; sourceTree = "<group>"; };
 		23A4A2BA30C7DB329308DD9B /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
 		28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRegistry.swift; sourceTree = "<group>"; };
+		2E8E14CA1AF42BBD9879E5C4 /* CommunityTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityTabs.swift; sourceTree = "<group>"; };
 		355454814EF792BE3C446D3C /* ChairStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStore.swift; sourceTree = "<group>"; };
 		37CF8AE0BD5CC76AEC12E9B2 /* SUIT-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-ExtraBold.otf"; sourceTree = "<group>"; };
 		395C3228E5E835DBD4E76582 /* RoomVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomVoice.swift; sourceTree = "<group>"; };
@@ -100,6 +105,7 @@
 		A58B17C0F22880FD7E18C587 /* ClipSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipSheets.swift; sourceTree = "<group>"; };
 		AC665468AD22F020707AA567 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		AE12650DE60F318392041F22 /* SUIT-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SUIT-Regular.otf"; sourceTree = "<group>"; };
+		B11DC606ACC220A20BC8EC27 /* ClipVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipVideo.swift; sourceTree = "<group>"; };
 		B3B5FDB33CEBC883BD517974 /* snack-soju.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "snack-soju.mp3"; sourceTree = "<group>"; };
 		B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */ = {isa = PBXFileReference; path = "room-enter-photo.mp4"; sourceTree = "<group>"; };
 		BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipScreens.swift; sourceTree = "<group>"; };
@@ -166,6 +172,7 @@
 				D88CDC61C1AC45D9164E2648 /* ClipScene.swift */,
 				BC0A78D7EE25F1663339AE78 /* ClipScreens.swift */,
 				A58B17C0F22880FD7E18C587 /* ClipSheets.swift */,
+				B11DC606ACC220A20BC8EC27 /* ClipVideo.swift */,
 			);
 			path = Clip;
 			sourceTree = "<group>";
@@ -181,6 +188,7 @@
 		59249A41957494967FDA77FC /* Videos */ = {
 			isa = PBXGroup;
 			children = (
+				13DB2AB0E92B4BB09ECD19DE /* clip-ssang.mp4 */,
 				B8EB92B1FE673A42489787C9 /* room-enter-photo.mp4 */,
 				6C7AD8E785C7DD4B2CC64A55 /* room-enter-ssang.mp4 */,
 				5452DBF1C4D6BCCBA1BB0F3C /* sunrise-photo.mp4 */,
@@ -193,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */,
+				2E8E14CA1AF42BBD9879E5C4 /* CommunityTabs.swift */,
 			);
 			path = Community;
 			sourceTree = "<group>";
@@ -406,6 +415,7 @@
 				E901701EBADC7258D253319F /* SUIT-Regular.otf in Resources */,
 				DC4BC5C049BDE2CF062C7D35 /* SUIT-SemiBold.otf in Resources */,
 				8DEFB64716B3EB82B2678540 /* clip-scenes.json in Resources */,
+				1EC80D9D6F4CEA5E995BB4AA /* clip-ssang.mp4 in Resources */,
 				63EC4390B346CD0C760147D7 /* logo-motion.mp4 in Resources */,
 				FEA54EC24EE2DA9AF4135DBD /* room-enter-photo.mp4 in Resources */,
 				9DE5146244173ADB7ED4F45D /* room-enter-ssang.mp4 in Resources */,
@@ -432,7 +442,9 @@
 				242B7984567E6875D7130D6B /* ClipScene.swift in Sources */,
 				8DFE97107118D796AB06FC10 /* ClipScreens.swift in Sources */,
 				41A44E31079DD018324A741C /* ClipSheets.swift in Sources */,
+				5EAED20F123485F94E756958 /* ClipVideo.swift in Sources */,
 				C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */,
+				07E60C9A61A87945AEA85562 /* CommunityTabs.swift in Sources */,
 				5AE4CBC169CDA200AA9E51DB /* DRRRKApp.swift in Sources */,
 				35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */,
 				D811BC96F15441A069092895 /* ItemCopy.swift in Sources */,

@@ -65,8 +65,14 @@ struct ClipCommentSheet: View {
             Color.black.opacity(open ? 1 : 0).frame(width: 390, height: 844)
                 .contentShape(Rectangle())
                 .onTapGesture { onClose() }
+            // 영상 클립은 카드 자리에서도 같은 플레이어(두 번째 AVPlayerLayer)로 영상이 그대로 이어지고 소리도 그대로 난다.
             Image(state.current.image).resizable().scaledToFill()
                 .frame(width: open ? 169 : 390, height: open ? 299 : 750)
+                .overlay {
+                    if state.current.hasVideo {
+                        ClipVideoLayerView(player: ClipFullPlayer.shared.player)
+                    }
+                }
                 .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: open ? 14 : 0, bottomTrailingRadius: open ? 14 : 0))
                 .offset(x: open ? 110.5 : 0)
                 .opacity(open ? 1 : 0)

@@ -5,7 +5,9 @@ import UIKit
 /// 함께 드르륵 방에 들어올 때 배경에서 한 번 재생하는 입장 영상(11. 10. 피그마 댓글 1807:23214 "영상으로 반영").
 /// 쌍밍아웃은 room-enter-ssang.mp4(피그마 2096:22459, 1807:23214 영상), 사진보정은 room-enter-photo.mp4(피그마 2100:24322, 1979:27708 영상)이다.
 /// 둘 다 640 x 1148, 24fps, 3.08초이고 카메라가 멀리서 테이블 쪽으로 다가온다. 팀이 넣은 소리 트랙이 있어 소리를 켠 채 재생한다(volume).
-/// 영상 마지막 장면은 방 장면 그림과 같은 구도라서, 끝나면 영상이 0.12초 동안 옅어지며 아래의 장면 그림이 그대로 이어진다.
+/// 입장 영상은 장면 그림 위에 얹지 않고 바닥 그림 자체를 바꾼다(11. 11. 사용자 "이미지 자체를 교체해야지 위에 새 화면을 하나 더 얹으면 안 된다"). 방이 보이는 첫 순간부터 바닥 그림은
+/// 영상 첫 장면 그림(poster)이고, 영상은 같은 자리에서 첫 장면부터 이어서 흐른다(AVPlayerLayer가 그릴 준비가 되기 전에는 투명해서 같은 그림이 보인다).
+/// 영상 마지막 장면은 방 장면 그림과 같은 구도라서, 끝나면 바닥 그림을 장면 그림으로 바꾼 뒤 영상이 0.12초 동안 옅어진다.
 /// 방(RoomView)이 처음 나타날 때만 만든다. 일반 모드에 갔다 돌아와도 다시 재생하지 않고, 방을 나갔다가 새로 들어오면(새 RoomView) 다시 재생한다.
 /// 온보딩 덮개가 떠 있는 동안은 첫 장면에 세워 두고 덮개가 닫히면 재생한다. 파일이 없거나 재생이 막히면 영상을 빼서 장면 그림이 그대로 남는다.
 /// 소리 세션은 RoomVoice.enter가 이미 ambient(다른 앱 소리와 섞임)로 맞추므로 여기서는 건드리지 않는다.
@@ -31,14 +33,38 @@ final class RoomEnterPlayer {
         story == .photo ? "room-enter-photo" : "room-enter-ssang"
     }
 
+    /// 영상 첫 장면 그림(Resources/Videos/room-enter-*-first.jpg, 영상과 같은 640 x 1148). 방이 보이는 첫 순간부터 장면 그림 대신 이 그림을 바닥에 깔고,
+    /// 영상이 같은 자리에서 첫 장면부터 이어서 흐르므로 보이는 변화가 없다. 미리 풀어 둔(preparingForDisplay) 그림을 이야기마다 한 번만 만든다.
+    private static var posters: [StoryKind: UIImage] = [:]
+    static func poster(for story: StoryKind) -> UIImage? {
+        if let cached = posters[story] { return cached }
+        guard let url = Bundle.main.url(forResource: fileName(for: story) + "-first", withExtension: "jpg"),
+              let raw = UIImage(contentsOfFile: url.path) else { return nil }
+        let img = raw.preparingForDisplay() ?? raw
+        posters[story] = img
+        return img
+    }
+
+    /// 이 방에서 입장 영상을 틀 수 있는지(줄인 움직임 설정이 꺼져 있고 영상과 첫 장면 그림이 모두 있음). 아니면 처음부터 장면 그림만 보인다.
+    static func canPlay(story: StoryKind) -> Bool {
+        !UIAccessibility.isReduceMotionEnabled
+            && Bundle.main.url(forResource: fileName(for: story), withExtension: "mp4") != nil
+            && poster(for: story) != nil
+    }
+
+    /// 바닥에 깔 첫 장면 그림. 영상을 보이는 동안만 있고, 끝나거나 멈추면 nil이라 같은 구도의 장면 그림으로 대체된다.
+    let poster: UIImage?
+
     init(story: StoryKind) {
-        guard !UIAccessibility.isReduceMotionEnabled,
+        guard Self.canPlay(story: story),
               let url = Bundle.main.url(forResource: Self.fileName(for: story), withExtension: "mp4") else {
             player = nil
+            poster = nil
             visible = false
             finished = true
             return
         }
+        poster = Self.poster(for: story)
         let item = AVPlayerItem(url: url)
         let p = AVPlayer(playerItem: item)
         p.volume = Self.volume
@@ -79,6 +105,7 @@ final class RoomEnterPlayer {
         visible = false
     }
 
+    /// 끝나면 visible이 false가 되어 바닥 그림이 장면 그림으로 바뀌고(RoomView), 그 위에서 마지막 장면에 멈춘 영상이 0.12초 동안 옅어진다.
     private func finish() {
         guard !finished else { return }
         finished = true

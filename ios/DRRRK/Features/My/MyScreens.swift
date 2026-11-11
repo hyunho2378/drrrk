@@ -88,9 +88,19 @@ private struct MyHome: View {
 
     @Environment(Router.self) private var router
     @State private var chairs = ChairStore.shared
-    @State private var overlay: MyOverlay = .none
+    /// 시작 시트와 팝업(편의점, 아이템, 의자 팝업)은 첫 그리기부터 열린 상태다. 예전에는 닫힌 마이를 한 번 그린 뒤 onAppear에서 열어
+    /// 마이 화면이 먼저 보였다가 시트가 나타났다(11. 11. "예전 화면이 떴다가 바뀌는" 현상). onAppear의 같은 값 대입은 다시 돌아올 때의 기존 동작 그대로다.
+    @State private var overlay: MyOverlay
     @State private var item: MyShelfItem?
     @State private var gauge: CGFloat = 0
+
+    init(startOverlay: MyOverlay, startItem: MyShelfItem?, pushed: Bool) {
+        self.startOverlay = startOverlay
+        self.startItem = startItem
+        self.pushed = pushed
+        _overlay = State(initialValue: startOverlay)
+        _item = State(initialValue: startItem)
+    }
 
     var body: some View {
         ZStack(alignment: .top) {

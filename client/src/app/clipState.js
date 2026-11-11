@@ -3,7 +3,7 @@
 
 export const CLIPS = [
   {
-    id: 's0', card: '쌍밍아웃 영상', img: 'vid', back: 'card', title: '베프가 내 비밀을 까발린다 ep.01', tags: '#친구관계 #연애',
+    id: 's0', card: '쌍밍아웃 영상', img: 'vid', back: 'card', video: 'ssang', title: '베프가 내 비밀을 까발린다 ep.01', tags: '#친구관계 #연애',
     creator: '흔한 웹드', av: 'av0', badge: true, likes: 2413, comments: 187, plays: '2.4만', when: '3일 전', bubble: '와 이번꺼 공감 100000%', bubbleAv: 'av2',
   },
   {

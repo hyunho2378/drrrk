@@ -170,7 +170,13 @@ private struct FilterChip: View {
 
 struct NotiActivityView: View {
     @Environment(Router.self) private var router
-    @State private var tab = 0
+    /// 고른 탭(0 활동 알림, 1 키워드 알림). 키워드 알림 길(notiKeyword)로 열면 첫 그리기부터 1이다.
+    /// 예전에는 0으로 그린 뒤 onAppear에서 1로 바꿔 활동 알림 목록이 먼저 보였다가 키워드 목록으로 옅어지며 바뀌었다(11. 11. "예전 화면이 떴다가 바뀌는" 현상).
+    @State private var tab: Int
+
+    init(startTab: Int = 0) {
+        _tab = State(initialValue: startTab)
+    }
     @State private var filter = "전체"
     @State private var keywordFilter = "전체"
     @State private var store = KeywordStore.shared
@@ -190,11 +196,6 @@ struct NotiActivityView: View {
         }
         .background(DS.Palette.bgSurface.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
-        .onAppear {
-            if router.path.last == .notiKeyword {
-                tab = 1
-            }
-        }
     }
 
     private var activity: some View {
@@ -406,7 +407,7 @@ private struct KeywordTimerBadge: View {
 
 struct NotiKeywordView: View {
     var body: some View {
-        NotiActivityView()
+        NotiActivityView(startTab: 1)
     }
 }
 
