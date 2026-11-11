@@ -8,6 +8,8 @@ enum Route: String, Hashable, CaseIterable, Identifiable {
     case clipList, clipPlayer
     // 탭: 홈
     case home, worryInput, analysis, recommend, noRoom
+    /// 시뮬레이터 확인용: 함께 드르륵을 한 판 한 뒤의 빈 홈(clipDone true)을 바로 연다. 화면은 home과 같다.
+    case homeEmpty
     case onboardingTogether, onboardingSolo
     // 방
     case room, roomNormal, roomSolo, roomEnd, roomMorning, roomSummary
@@ -15,7 +17,7 @@ enum Route: String, Hashable, CaseIterable, Identifiable {
     // 탭: 라이브
     case live, liveWatch
     // 탭: 커뮤니티
-    case community, communityDetail
+    case community, communityDetail, replay
     // 탭: 마이
     case my, mySkin, chairStudio, myShelf, myItem
     // 알림
@@ -62,6 +64,9 @@ final class Router {
     var enteredApp = false
     /// 마이 화면에서 아이템 시트나 팝업이 아래 탭을 덮을 때만 true. 이때는 마이 화면이 같은 자리에 자기 탭을 그린다.
     var navLocal = false
+    /// 함께 드르륵 방(room)에 한 번 앉은 뒤면 true. 홈은 true면 빈 홈(1647:23475), false면 클립이 붙은 홈(2296:20815)을 그린다.
+    /// 네이버 클립에서 다시 들어오면 false로 돌아간다(웹 client/src/app/clipHome.js drrrk-clip-done과 같은 규칙, 11/11 23:18 팀 흐름 변경).
+    var clipDone = false
 
     /// 지금 맨 위에 보이는 화면
     var current: Route {
@@ -73,7 +78,7 @@ final class Router {
     /// 화면마다 아래 탭을 보일지. 온보딩은 어둡게 깔린 채로 보인다.
     static func navMode(for r: Route) -> NavMode {
         switch r {
-        case .home, .worryInput, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
+        case .home, .homeEmpty, .worryInput, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
         // 온보딩은 방 위에 겹쳐 뜨므로(2026. 11. 9.) 방과 같이 아래 탭을 보이지 않는다.
         case .onboardingTogether, .onboardingSolo: .none
         default: .none
@@ -117,6 +122,7 @@ final class Router {
     func enterFromClip() {
         showSplash = true
         enteredApp = true
+        clipDone = false
         tab = .home
         path.removeAll()
     }
@@ -125,7 +131,7 @@ final class Router {
     static func tab(for r: Route) -> Tab {
         switch r {
         case .live, .liveWatch: .live
-        case .community, .communityDetail: .community
+        case .community, .communityDetail, .replay: .community
         case .my, .mySkin, .chairStudio, .myShelf, .myItem: .my
         default: .home
         }

@@ -267,7 +267,8 @@ struct NotiActivityView: View {
 
     private func activityRow(_ a: ActivityItem) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            Image(a.icon).resizable().frame(width: 40, height: 40)
+            // 댓글 분류 프레임(2308:19983)의 따봉 줄은 아이콘이 #5C5C5C, 전체(1952:14673)의 같은 줄은 흰색이다(웹 notiTabs.js icon 값과 같다).
+            Image(a.icon == "C-noti-5" ? "C-noti-5-gray" : a.icon).resizable().frame(width: 40, height: 40)
             // 피그마 content(2100:24882): 폭 266, 사이 4. 제목 14 Bold, 시간 12 Regular, 본문 15 Regular, 모두 행간 145% 자간 -2%.
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {

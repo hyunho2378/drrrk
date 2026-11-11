@@ -1,7 +1,7 @@
-import { live as LIVE } from '../tokens.js';
+import { leftAfter } from './roomClock.js';
 // 방 구경 시계를 방 시계로 이어 준다(11/10 팀원 피드백 "라이브 누르기 전 타이머-앉기 눌렀을때 타이머 연동해야함").
 // 라이브 카드의 남은 시간에서 방 구경(37) 시계가 줄고, 앉기를 누르는 순간의 값과 그 시각을 여기 맡긴다.
-// 방(29)에 들어오면 그 값과 시각에서 같은 빠르기(tokens.js live.timeScale)로 이어 줄어든다. 그래서 앉는 순간 두 시계가 같은 값이다.
+// 방(29)에 들어오면 그 값과 시각에서 같은 두 구간 시계(roomClock.js, 01:12 위 실제 24.6초 구간과 아래 5.4초 구간)로 이어 줄어든다. 그래서 앉는 순간 두 시계가 같은 값이다.
 // 한 번 쓰면 비운다. 다른 길(홈 흐름, ?at=29)로 들어온 방은 맡긴 값이 없어 기본 20:00이다.
 let hand = null;
 // 맡긴 값이 이 시간(ms) 안에 방에서 쓰이지 않으면 버린다(앉기를 누르고 화면이 바뀌는 데 걸리는 시간보다 넉넉하다).
@@ -22,7 +22,7 @@ function fresh() {
 // 지금 보여 줄 값(초). 맡긴 값이 없으면 def. 방 화면을 미리 그릴 때(prepare) 쓴다.
 export function handoffNow(def) {
   const h = fresh();
-  return h ? h.left - ((performance.now() - h.at) / 1000) * LIVE.timeScale : def;
+  return h ? leftAfter(h.left, (performance.now() - h.at) / 1000, 'B') : def;
 }
 
 // 방 시계 시작 값과 시작 시각. 맡긴 값이 있으면 그것을 꺼내고 비운다.

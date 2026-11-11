@@ -1,4 +1,4 @@
-// 커뮤니티 글 상세(38) 글과 댓글. 팀 피그마 2100:23295 글자를 그대로 옮겼고, 댓글 글은 1953:12298(11. 10. 의정 수정본) 기준이다(iOS CommunityScreens.swift와 같은 값).
+// 커뮤니티 글 상세(38) 글과 댓글. 팀 피그마 2298:22028(11. 11. 의정 "이 화면으로 반영", 예전 2100:23295) 글자를 그대로 옮겼고, 댓글 글은 1953:12298(11. 10. 의정 수정본) 기준이다(iOS CommunityScreens.swift와 같은 값).
 // 줄바꿈은 피그마에 직접 넣은 줄바꿈만 넣고, 나머지는 칸 폭(본문 342, 댓글 300, 답글 258)에서 저절로 끊긴다.
 // 댓글 의자 그림: 피그마 "의자 프로필" 안 그림(recliner_03, wooden_stool_05, sofa_04, convenience_chair_03, wooden_stool_04, wheeled_chair_04, convenience_chair_04)과
 // 같은 앱 의자 그림(assets/chairs/t-*.webp, 투명 바탕)을 다시 쓴다.
@@ -8,13 +8,14 @@ const CH = BASE + 'assets/chairs/';
 export const SSANG_TITLE = '친구가 썸남 앞에서\n내 쌍밍아웃함';
 
 export const POST = {
-  author: '딱딱한 나무스툴12',
+  author: '푹신한 가죽 소파12',
   time: '· 방금',
   title: '둘이 찍은 사진인데\n지만 보정해서 올린 여우',
   body: '유진이 얼굴만 잡티 하나 없이 보정해서 올렸어. 내 얼굴은 그대로… 이거 나만 서운한 거야?',
-  replay: '대화 다시보기 · 12:32',
-  seats: '의자 3',
-  liveCta: '라이브 보기',
+  // 대화 다시보기 카드(2298:22040): 오른쪽 아래 재생 시간 칩(2298:22043), 참여 의자 줄(2298:22049), CTA(2298:22059)
+  replay: '12:32',
+  seats: '의자 4',
+  liveCta: '라이브 다시보기',
   likes: 48,
   comments: 23,
 };

@@ -369,7 +369,8 @@ struct AppTitleBar: View {
             Button { router.push(.notiActivity) } label: {
                 ZStack(alignment: .topTrailing) {
                     Image(LiveData.bell).resizable().scaledToFill().frame(width: 26, height: 26).clipShape(Circle())
-                    Circle().fill(DS.Palette.danger).frame(width: 8, height: 8).offset(x: 1, y: -2)
+                    // 커뮤니티 목록(1953:19406) 종 배지 1953:19514는 #36D2FF(웹 39와 같다). 이 막대는 커뮤니티에서만 쓴다.
+                    Circle().fill(DS.Palette.brandPrimary).frame(width: 8, height: 8).offset(x: 1, y: -2)
                 }
                 .frame(width: 44, height: 44)
             }
@@ -672,7 +673,7 @@ struct LiveWatchView: View {
     @State private var feedRandom = WatchFeed.Random()
     @State private var feedIndex = 0
     @FocusState private var focused: Bool
-    /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 빠르기(RoomModel.shownSeconds / realSeconds, 20분이 실제 1분 30초)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
+    /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 두 구간 시계(RoomModel.left(after:from:), 01:12 위 실제 24.6초 구간과 아래 5.4초 구간)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
     /// 첫 그리기부터 누른 카드의 남은 시간을 보이도록 nil이면 router.watch 값을 읽는다(예전에는 06:12를 한 번 그린 뒤 onAppear에서 바꿨다).
     @State private var leftValue: Double?
     private var left: Double {
@@ -714,7 +715,7 @@ struct LiveWatchView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { leftValue = Double(router.watch?.left ?? 372) }
-        .onReceive(clock) { _ in leftValue = max(0, left - 0.25 * (RoomModel.shownSeconds / RoomModel.realSeconds)) }
+        .onReceive(clock) { _ in leftValue = max(0, RoomModel.left(after: 0.25, from: left)) }
         // 화면이 보이고 0.7초 뒤 첫 줄, 처음 4줄까지 1.0초에서 1.8초, 그 뒤 2.4초에서 4.2초 사이 간격(시작 값 고정). 화면을 나가면 작업이 취소되어 멈춘다.
         .task { await runFeed() }
     }

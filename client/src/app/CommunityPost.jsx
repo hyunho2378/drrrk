@@ -1,9 +1,10 @@
-// 커뮤니티 글 상세(38). 팀 피그마 "커뮤니티 / 글 상세 (v5 글 중심)" 2100:23295 (390 x 844)와 댓글 모음 2100:23497을 그대로 옮긴 화면(11. 10. 수정사항).
+// 커뮤니티 글 상세(38). 팀 피그마 "커뮤니티 / 글 상세 (v5 글 중심)" 2298:22028(11. 11. 23시 기준, 예전 2100:23295. 바깥 칸 data-node는 community.js 판별용으로 예전 값을 둔다) (390 x 844)와 댓글 모음 2100:23497을 그대로 옮긴 화면(11. 10. 수정사항).
 //  1) 상단 바(2100:23454)는 뒤로가기만 있다. 공유는 글 아래 액션줄에만 있다("공유 하단에도 있어서 없앰" 2100:23637).
 //  2) 액션줄(2100:23321)은 좋아요와 숫자, 공유만 있다. 좋아요 옆 댓글 수는 아래 "댓글 23"과 겹쳐서 뺐다(2100:23633).
 //  3) 댓글 줄마다 작성자 의자 그림(원형 32, 바탕 #33383D, 그림 28.5)을 넣는다(2100:23632). 답글은 왼쪽 42 들여쓴다.
-//  4) 대화 다시보기 카드(2100:23307, 11. 11. 팀 수정본 342 x 176)는 모양만 맞춘다. 라벨은 글만(play-circle 숨김), 가운데 play 버튼(2302:12692),
-//     아래 라이브 보기 바(2302:12695, 참여 의자와 "라이브 보기")가 있다. 누른 뒤 화면은 아직 없어서 play 버튼은 눌림 반응만 준다.
+//  4) 대화 다시보기 카드(11. 11. 23시 팀 수정본 2298:22040, 342 x 176): 왼쪽 위 라벨 대신 오른쪽 아래 "12:32" 재생 시간 칩(2298:22043),
+//     가운데 play 버튼은 피그마에서 비워져 없다(2298:22047), 아래 라이브 보기 바(2298:22048, "+1"과 의자 셋, "의자 4", "라이브 다시보기"). 카드를 누르면 대화 다시보기(61, ReplayScreen.jsx)로 밀어 들어간다.
+//  5) 작성자 줄(2298:22031)은 "의자 프로필" 32 원(바탕 #33383D, sofa_05)과 "푹신한 가죽 소파12"다. 아래 검은 판은 y 708, 높이 136(2298:22208)이다.
 // 내용은 피그마 사진보정 글이다. 목록에서 다른 글(쌍밍아웃 등)을 열면 제목만 그 글 제목으로 바꾸고 나머지는 지금 앱과 같다.
 // 한글 줄바꿈은 피그마처럼 글자 단위로 끊는다(word-break: break-all, 댓글 "기억이 나네/요" 자리가 피그마와 같다).
 // 휴대폰 높이 맞춤(mobileFit.js)이 읽을 수 있게 맨 바깥 칸의 자식은 모두 피그마 좌표의 absolute 칸이다.
@@ -13,12 +14,12 @@ import { toast } from './room.js';
 import { pickedPostTitle } from './community.js';
 import { getSaved, thumb as chairThumb } from './chairs.js';
 import { POST, COMMENTS, SSANG_TITLE } from './communityPostData.js';
+import { REPLAY_ASSETS } from './replayData.js';
 
 const BASE = import.meta.env.BASE_URL || '/';
 const A = BASE + 'assets/community3/';
 const C = { bg: '#121415', card: '#222628', avatarBg: '#33383D', text: '#F8F8F8', body: '#D9DBDE', sub: '#9AA1A6', faint: '#6E767C', brand: '#36D2FF' };
 const SUIT = "'SUIT', system-ui, sans-serif";
-const NOTO = "'Noto Sans KR', 'SUIT', system-ui, sans-serif";
 // 좋아요는 화면을 나갔다 돌아와도 남는다(이전 post.js와 같은 동작).
 const likeState = { on: false };
 
@@ -34,13 +35,6 @@ const icon = {
   thumbSmall: <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}><path d="M13.9823 6.33887C13.7218 6.03871 13.3999 5.79802 13.0383 5.6331C12.6767 5.46817 12.284 5.38287 11.8866 5.38295H9.67089L9.85751 4.24929C9.92355 3.85007 9.84388 3.44041 9.63304 3.09504C9.4222 2.74966 9.09423 2.49159 8.70896 2.36788C8.32369 2.24417 7.90679 2.26307 7.5343 2.42114C7.1618 2.5792 6.85853 2.8659 6.67981 3.22893L5.77666 5.05913V13.7146H11.4977C12.1662 13.7119 12.8115 13.4693 13.3162 13.031C13.8209 12.5926 14.1514 11.9877 14.2478 11.3262L14.6393 8.54899C14.6947 8.15503 14.6647 7.75376 14.5513 7.37242C14.4379 6.99109 14.2439 6.6386 13.9823 6.33887ZM1.33301 8.15996V10.9372C1.3337 11.6735 1.56214 12.3794 1.96824 12.9C2.37434 13.4207 2.92493 13.7135 3.49925 13.7144H3.93249V5.38274H3.49925C2.92493 5.38362 2.37434 5.6765 1.96824 6.19714C1.56214 6.71778 1.3337 7.42367 1.33301 8.15996Z" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" stroke={C.sub} /></svg>,
   play: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}><path d="M16.5 9C16.5 13.1423 13.1423 16.5 9 16.5C4.85775 16.5 1.5 13.1423 1.5 9C1.5 4.85775 4.85775 1.5 9 1.5C13.1423 1.5 16.5 4.85775 16.5 9ZM8.025 6.1875C7.5375 5.8875 7.125 6.135 7.125 6.7125V11.2875C7.125 11.865 7.5375 12.1125 8.025 11.8125L11.6625 9.525C12.15 9.225 12.15 8.775 11.6625 8.475L8.025 6.1875Z" fillRule="evenodd" clipRule="evenodd" fill="#F8F8F8" /></svg>,
   arrow: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ display: 'block' }}><path d="M3 12H21M15 18L21 12L15 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke="#000000" /></svg>,
-  // 피그마 play 버튼(2302:12692) 48 원(흰색 92%)과 삼각형(15.6 x 19, #1F2226, 원 안 20, 14.5 자리)
-  replayPlay: (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style={{ display: 'block' }}>
-      <path d="M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48Z" fill="#FFFFFF" fillOpacity="0.92" />
-      <path transform="translate(20 14.5)" d="M2.00786e-06 1.002L2.00786e-06 18.002C-0.000355988 18.1807 0.0471643 18.3562 0.137621 18.5103C0.228078 18.6644 0.358167 18.7914 0.514357 18.8782C0.670547 18.9649 0.847134 19.0083 1.02575 19.0037C1.20437 18.9991 1.37849 18.9467 1.53 18.852L15.13 10.352C15.2747 10.2623 15.3941 10.1372 15.4769 9.98843C15.5598 9.83968 15.6032 9.67225 15.6032 9.502C15.6032 9.33176 15.5598 9.16433 15.4769 9.01558C15.3941 8.86683 15.2747 8.74169 15.13 8.652L1.53 0.152003C1.37849 0.0573049 1.20437 0.00493242 1.02575 0.000331646C0.847134 -0.00426912 0.670547 0.0390705 0.514357 0.125843C0.358167 0.212615 0.228078 0.339651 0.137621 0.493736C0.0471643 0.647822 -0.000355988 0.823329 2.00786e-06 1.002Z" fill="#1F2226" />
-    </svg>
-  ),
   // 피그마 icon/chevron-right(2302:12698) 16 칸, 선 1.6 둥근 끝, #36D2FF
   chevronSmall: <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}><path d="M6 3.5L10.5 8L6 12.5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" stroke="#36D2FF" /></svg>,
 };
@@ -126,6 +120,9 @@ export default function CommunityPost() {
   const [draft, setDraft] = useState('');
 
   useEffect(() => { likeState.on = liked; }, [liked]);
+  // 다시보기 화면 그림을 미리 받아 둔다(누른 뒤 장면과 의자 그림이 빈 칸으로 먼저 보이지 않게).
+  useEffect(() => { REPLAY_ASSETS.forEach((u) => { const im = new Image(); im.decoding = 'async'; im.src = u; }); }, []);
+  const openReplay = () => window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { from: 38, to: 61, t: 'push', label: '대화 다시보기' } }));
 
   const toggleLike = (e) => {
     e.stopPropagation();
@@ -149,12 +146,12 @@ export default function CommunityPost() {
   const count = POST.likes + (liked ? 1 : 0);
 
   return (
-    <div ref={rootRef} data-figma="커뮤니티 / 글 상세 (v5 글 중심)" data-node="2100:23295" style={{ width: 390, height: 844, background: C.bg, position: 'relative', overflow: 'hidden' }}>
+    <div ref={rootRef} data-figma="커뮤니티 / 글 상세 (v5 글 중심)" data-node="2100:23295" data-figma-v="2298:22028" style={{ width: 390, height: 844, background: C.bg, position: 'relative', overflow: 'hidden' }}>
       <style>{'.cp5-scroll{scrollbar-width:none}.cp5-scroll::-webkit-scrollbar{display:none}'}</style>
       <div data-figma="Scroll" data-node="2100:23296" className="cp5-scroll" style={{ position: 'absolute', left: 0, top: 112, width: 390, height: 732, overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'contain' }}>
         <div data-figma="Post" style={{ display: 'flex', flexDirection: 'column', width: 390, padding: '8px 24px 24px 24px', boxSizing: 'border-box' }}>
-          <div data-figma="Author" style={{ display: 'flex', alignItems: 'center', gap: 8, height: 28 }}>
-            <img alt="" draggable={false} src={A + 'author.webp'} style={{ width: 28, height: 28, display: 'block', flexShrink: 0 }} />
+          <div data-figma="Author" data-node="2298:22031" style={{ display: 'flex', alignItems: 'center', gap: 8, height: 32 }}>
+            <img data-figma="의자 프로필" alt="" draggable={false} src={A + 'author-sofa5.webp'} style={{ width: 32, height: 32, display: 'block', flexShrink: 0 }} />
             <p style={t(13, 700, C.text, { lineHeight: '16px' })}>{POST.author}</p>
             <p style={t(12, 500, C.faint, { lineHeight: '15px' })}>{POST.time}</p>
           </div>
@@ -163,22 +160,23 @@ export default function CommunityPost() {
           <div style={{ height: 12 }} />
           <p style={t(15, 400, C.body, { lineHeight: '24px', whiteSpace: 'pre-wrap', wordBreak: 'break-all', width: 342 })}>{POST.body}</p>
           <div style={{ height: 24 }} />
-          <div data-figma="대화 다시보기" data-node="2100:23307" style={{ position: 'relative', width: 342, height: 176, borderRadius: 16, overflow: 'hidden', background: '#1F2226', flexShrink: 0 }}>
-            {/* 장면: 피그마 fade(2100:23309, 342 x 150)가 scene(2100:23308)을 모두 덮은 모습 그대로다. */}
+          <div data-figma="대화 다시보기" data-node="2298:22040" role="button" tabIndex={0} aria-label="라이브 다시보기" onClick={(e) => { e.stopPropagation(); openReplay(); }} onKeyDown={(e) => { if (e.key === 'Enter') openReplay(); }} {...pressProps()} style={{ position: 'relative', width: 342, height: 176, borderRadius: 16, overflow: 'hidden', background: '#1F2226', flexShrink: 0, cursor: 'pointer' }}>
+            {/* 장면: 피그마 fade(2298:22042, 342 x 150)가 scene(2298:22041)을 모두 덮은 모습 그대로다(예전 카드와 같은 그림). */}
             <img alt="" draggable={false} src={A + 'replay-bg.webp'} style={{ position: 'absolute', left: 0, top: 0, width: 342, height: 150, display: 'block' }} />
-            <div data-figma="다시보기 라벨" data-node="2100:23310" style={{ position: 'absolute', left: 12, top: 12, height: 25, boxSizing: 'border-box', display: 'flex', alignItems: 'center', padding: '4px 10px', borderRadius: 999, background: 'rgba(0,0,0,0.55)' }}>
-              <p style={{ margin: 0, fontFamily: NOTO, fontSize: 12, fontWeight: 500, lineHeight: '17px', color: '#FFFFFF', whiteSpace: 'pre' }}>{POST.replay}</p>
+            <div data-figma="재생 시간" data-node="2298:22043" style={{ position: 'absolute', left: 283, top: 97, width: 45, height: 25, boxSizing: 'border-box', display: 'flex', alignItems: 'center', padding: '4px 8px', borderRadius: 999, background: 'rgba(0,0,0,0.55)' }}>
+              <p style={{ margin: 0, fontFamily: SUIT, fontSize: 12, fontWeight: 500, lineHeight: '17px', color: '#FFFFFF', whiteSpace: 'pre' }}>{POST.replay}</p>
             </div>
-            <div data-figma="play 버튼" data-node="2302:12692" aria-hidden="true" {...pressProps()} style={{ position: 'absolute', left: 147, top: 42, width: 48, height: 48, borderRadius: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.35)' }}>
-              {icon.replayPlay}
-            </div>
-            <div data-figma="라이브 보기 바" data-node="2302:12695" style={{ position: 'absolute', left: 0, top: 132, width: 342, height: 44, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px 0 12px', background: C.card }}>
-              <div data-figma="참여 의자" data-node="2100:23313" style={{ display: 'flex', alignItems: 'center', gap: 8, height: 26 }}>
-                <img alt="" draggable={false} src={A + 'replay-avatars.webp'} style={{ width: 62, height: 26, display: 'block' }} />
-                <p style={{ margin: 0, fontFamily: NOTO, fontSize: 12, fontWeight: 500, lineHeight: '16.8px', color: C.text, whiteSpace: 'pre' }}>{POST.seats}</p>
+            {/* play 버튼(2298:22047)은 11. 11. 23시 피그마에서 안쪽 그림이 지워지고 채움이 꺼져 보이지 않는다. 그래서 그리지 않는다. */}
+            <div data-figma="라이브 보기 바" data-node="2298:22048" style={{ position: 'absolute', left: 0, top: 132, width: 342, height: 44, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px 0 12px', background: C.card }}>
+              <div data-figma="참여 의자" data-node="2298:22049" style={{ display: 'flex', alignItems: 'center', gap: 8, height: 32 }}>
+                {/* "+1" 원과 의자 프로필 셋(2298:22051, 97 x 32). 내보낸 그림은 양쪽 테두리 1씩 더 넓어(99) 왼쪽으로 1 당긴다. */}
+                <div style={{ position: 'relative', width: 97, height: 32, flexShrink: 0 }}>
+                  <img alt="" draggable={false} src={A + 'replay-seats4.webp'} style={{ position: 'absolute', left: -1, top: 0, width: 99, height: 32, display: 'block' }} />
+                </div>
+                <p style={{ margin: 0, fontFamily: SUIT, fontSize: 12, fontWeight: 500, lineHeight: '16.8px', color: C.text, whiteSpace: 'pre' }}>{POST.seats}</p>
               </div>
-              <div data-figma="라이브 보기 CTA" data-node="2302:12696" style={{ display: 'flex', alignItems: 'center', gap: 2, height: 16 }}>
-                <p style={{ margin: 0, fontFamily: NOTO, fontSize: 13, fontWeight: 700, lineHeight: '15.6px', color: C.brand, whiteSpace: 'pre' }}>{POST.liveCta}</p>
+              <div data-figma="라이브 보기 CTA" data-node="2298:22059" style={{ display: 'flex', alignItems: 'center', gap: 2, height: 16 }}>
+                <p style={{ margin: 0, fontFamily: SUIT, fontSize: 13, fontWeight: 700, lineHeight: '16.2px', color: C.brand, whiteSpace: 'pre' }}>{POST.liveCta}</p>
                 {icon.chevronSmall}
               </div>
             </div>
@@ -210,7 +208,7 @@ export default function CommunityPost() {
       <div data-figma="Top Bar" data-node="2100:23454" style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 112, background: C.bg }}>
         <div data-figma="chevron-left" style={{ position: 'absolute', left: 24, top: 79, width: 24, height: 24 }}>{icon.chevron}</div>
       </div>
-      <div data-figma="Rectangle 1954141374" style={{ position: 'absolute', left: -1, top: 632, width: 392, height: 212, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, #000000 73.24%)' }} />
+      <div data-figma="Rectangle 1954141374" data-node="2298:22208" style={{ position: 'absolute', left: -1, top: 708, width: 392, height: 136, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, #000000 73.24%)' }} />
       <div data-figma="input" data-node="2100:23469" style={{ position: 'absolute', left: 24, top: 754, width: 342, height: 66, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 8px 8px 20px', borderRadius: 32, background: C.card }}>
         <div data-figma="댓글 입력칸" style={{ position: 'relative', width: 256, height: 48, display: 'flex', alignItems: 'center', paddingRight: 16, boxSizing: 'border-box', flexShrink: 0 }} onClick={() => inputRef.current && inputRef.current.focus()}>
           <p aria-hidden="true" style={t(14, 400, C.sub, { lineHeight: '19.6px', letterSpacing: '-0.56px', opacity: draft ? 0 : 1, pointerEvents: 'none' })}>댓글 달기</p>

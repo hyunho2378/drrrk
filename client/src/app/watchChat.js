@@ -10,6 +10,47 @@ import { getStory } from './story.js';
 export const WATCH_CHAT = { firstMs: 700, fastCount: 4, fastMinMs: 1000, fastMaxMs: 1800, minMs: 2400, maxMs: 4200, seed: 1110, maxRows: 5, moveMs: 220, rise: 8, fadeOver: 32 };
 const EASE = 'cubic-bezier(0.2, 0, 0, 1)';
 
+// 내 댓글 말풍선(피그마 1943:12890): 하늘색 #36D2FF, 모서리 14, 안쪽 여백 12와 7, 글자 13 굵기 500 행간 18.2, 검정. 칸 오른쪽 끝에 붙는다.
+// 피그마 말풍선은 글 길이에 맞춰 늘어나는 모양이라, 긴 글은 칸 폭 342 안에서 줄을 바꾼다(글 폭은 여백 12씩을 뺀 318까지).
+export const MINE = { boxW: 342, padX: 12 };
+export function styleMine(node) {
+  const bub = node && node.querySelector('[data-figma="bubble"]');
+  const p = node && node.querySelector('p[data-outline]');
+  if (bub) Object.assign(bub.style, { width: 'auto', maxWidth: MINE.boxW + 'px' });
+  if (p) Object.assign(p.style, { width: 'auto', maxWidth: MINE.boxW - MINE.padX * 2 + 'px', whiteSpace: 'pre-wrap', wordBreak: 'keep-all', overflowWrap: 'anywhere', height: 'auto' });
+}
+
+// 입력칸 보내기 연결(live.js attachInputs가 모든 입력줄에 쓴다).
+// 엔터: 한글을 조합하는 도중에 엔터를 누르면 조합이 끝난 직후 한 번 보낸다(예전에는 엔터를 두 번 눌러야 보내졌다). 빈 글은 send가 거른다.
+// 보내기 버튼: 누르는 동안 scale 0.97, opacity 0.85(90ms), 떼면 120ms로 돌아오고, 눌러도 입력칸 초점이 빠지지 않아 이어서 칠 수 있다(홈 입력줄과 같다).
+const PRESS_IN = 'transform 90ms ' + EASE + ', opacity 90ms ' + EASE;
+const PRESS_OUT = 'transform 120ms ' + EASE + ', opacity 120ms ' + EASE;
+export function wireSend(input, btn, send) {
+  let afterIme = false;
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    if (e.isComposing) { afterIme = true; return; }
+    e.preventDefault();
+    afterIme = false;
+    send();
+  });
+  input.addEventListener('compositionend', () => {
+    if (!afterIme) return;
+    afterIme = false;
+    window.setTimeout(send, 0);
+  });
+  if (!btn) return;
+  btn.style.cursor = 'pointer';
+  btn.style.touchAction = 'manipulation';
+  const up = () => { btn.style.transition = PRESS_OUT; btn.style.transform = ''; btn.style.opacity = ''; };
+  btn.addEventListener('pointerdown', () => { btn.style.transition = PRESS_IN; btn.style.transform = 'scale(0.97)'; btn.style.opacity = '0.85'; });
+  btn.addEventListener('pointerup', up);
+  btn.addEventListener('pointercancel', up);
+  btn.addEventListener('pointerleave', up);
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', () => { up(); send(); });
+}
+
 // 글 후보는 앱에 이미 있는 글만 쓴다. 이야기별 방 채팅 줄(iOS RoomModel.ssang, photo의 opening과 talk 중 다른 의자 줄, 웹 방 화면 글과 같다),
 // 커뮤니티 글 상세 댓글(communityPostData.js COMMENTS, iOS CommunityData.comments), 방 구경 댓글 두 줄(피그마 1943:12838) 순서로 돈다.
 const SSANG_LINES = [

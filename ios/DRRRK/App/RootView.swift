@@ -33,6 +33,10 @@ struct RootView: View {
         switch r {
         case .clipList: return
         case .clipPlayer: router.path = [.clipPlayer]
+        case .homeEmpty:
+            router.enteredApp = true
+            router.clipDone = true
+            router.tab = .home
         case .miniProfile, .report, .block:
             // 방 위에 겹쳐 뜨는 창은 방을 깔고 연다.
             router.enteredApp = true

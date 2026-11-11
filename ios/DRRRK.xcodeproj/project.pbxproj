@@ -42,6 +42,7 @@
 		73753224B39AA2E216C7852F /* room-enter-photo-first.jpg in Resources */ = {isa = PBXBuildFile; fileRef = BF099331A1A9A1780A9FCB80 /* room-enter-photo-first.jpg */; };
 		7A78EB1BF73C0ABF4DA8FE38 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C8A91E1BC0B6EBCFA76A45 /* Story.swift */; };
 		7D2DE5D8D1BCB1AE1F668A00 /* snack-dried.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 818122680277DB88A74433B1 /* snack-dried.mp3 */; };
+		7E98BA8084F37FD4DE2BFADA /* ReplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA58DBD43F8FD4983DA03A4 /* ReplayView.swift */; };
 		80FD4EDF4E7657CE2BE60C78 /* ChairStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355454814EF792BE3C446D3C /* ChairStore.swift */; };
 		8501F6C0AD82CEBBC1D99ADE /* voice-naman-yemin.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9D390999B1CC4FB625BD4D1F /* voice-naman-yemin.mp3 */; };
 		856CF2631A345DE00B0E82B2 /* MyScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4862DF05D28CBDBD44A4E3 /* MyScreens.swift */; };
@@ -79,6 +80,7 @@
 		201069A4B4C8636439181ECD /* SoundFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundFiles.swift; sourceTree = "<group>"; };
 		23A4A2BA30C7DB329308DD9B /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
 		28610E7A13EFD6F5A14546AE /* ScreenRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRegistry.swift; sourceTree = "<group>"; };
+		2AA58DBD43F8FD4983DA03A4 /* ReplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplayView.swift; sourceTree = "<group>"; };
 		2BDE53C31D67E13AC844CFD6 /* sunrise-photo-first.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "sunrise-photo-first.jpg"; sourceTree = "<group>"; };
 		2E8E14CA1AF42BBD9879E5C4 /* CommunityTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityTabs.swift; sourceTree = "<group>"; };
 		355454814EF792BE3C446D3C /* ChairStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChairStore.swift; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 			children = (
 				705DE4AE91328E3A6EE291B2 /* CommunityScreens.swift */,
 				2E8E14CA1AF42BBD9879E5C4 /* CommunityTabs.swift */,
+				2AA58DBD43F8FD4983DA03A4 /* ReplayView.swift */,
 			);
 			path = Community;
 			sourceTree = "<group>";
@@ -476,6 +479,7 @@
 				5759DCC037A3A5725B9AA4DF /* NotiScreens.swift in Sources */,
 				C6D7A5027D4F744DA817E82D /* OnboardingKit.swift in Sources */,
 				48F0D0EA9E7B55B9CDE3592F /* OnboardingVisuals.swift in Sources */,
+				7E98BA8084F37FD4DE2BFADA /* ReplayView.swift in Sources */,
 				3AA9D92D641C4E6CE0012504 /* ReportMotion.swift in Sources */,
 				64FD68FDB86E4B51FD5303A4 /* RoomChat.swift in Sources */,
 				21BC378FC93A374C180C79FE /* RoomClockHandoff.swift in Sources */,

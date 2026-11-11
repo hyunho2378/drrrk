@@ -4,12 +4,38 @@ import SwiftUI
 /// 현장 모드 방의 상태. 팀 피그마 "주전부리 · 퀵슬롯 (기본)"(1979:27515)과 웹 프로토타입 동작을 따른다.
 @Observable
 final class RoomModel {
-    // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어들고, 실제로는 1분 30초(90초)에 끝난다(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로", 웹 tokens.js realRoomSeconds와 같은 값).
-    // 방 시계, 방 구경 시계(LiveWatchView), 혼자 방 시계가 모두 이 두 값의 비(1초에 13.33초)로 줄어든다.
+    // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어든다. 시계 값과 실제 초 사이 변환은 아래 realOf, leftAt, left(after:from:together:) 한 곳에서 한다(웹 client/src/app/roomClock.js와 같은 값).
+    // 함께 드르륵 방과 방 구경(LiveWatchView): 해뜨기 영상까지 합쳐 실제 30초(11/11 사용자 전달 "함께 드르륵 실제 체감 시간 30초로").
+    //   20:00에서 01:12까지 실제 24.6초(1초에 45.85초씩), 01:12에서 00:00까지 실제 5.4초(1초에 13.33초씩, 해뜨기 영상 5.17초가 잘리지 않는다).
+    // 혼자 드르륵 방: 예전처럼 20분이 실제 90초(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로"). 온보딩 뒤 10초짜리 AI 대화와 안내 창이 이어지므로 30초로 줄이지 않는다.
     static let shownSeconds: Double = 20 * 60
     static let realSeconds: Double = 90
     /// 화면 시계가 01:12에 닿으면 해 뜨기 1분 전 장면(피그마 1979:27780)으로 바뀌고 해뜨기 영상이 재생된다(SunriseVideo.swift). 01:12에서 0까지 실제 5.4초.
     static let lastMinuteShown: Double = 72
+    /// 함께 방 이야기 구간(20:00에서 01:12) 실제 초와 해뜨기 구간(01:12에서 00:00) 실제 초. 웹 tokens.js live.clock과 같다.
+    static let storyRealSeconds: Double = 24.6
+    static let sunriseRealSeconds: Double = 5.4
+    static let storyScale = (shownSeconds - lastMinuteShown) / storyRealSeconds
+    static let sunriseScale = lastMinuteShown / sunriseRealSeconds
+
+    /// 시계 값 left가 20:00에서 몇 실제 초 뒤의 값인지.
+    static func realOf(_ left: Double, together: Bool = true) -> Double {
+        guard together else { return (shownSeconds - left) / (shownSeconds / realSeconds) }
+        if left >= lastMinuteShown { return (shownSeconds - left) / storyScale }
+        return storyRealSeconds + (lastMinuteShown - left) / sunriseScale
+    }
+
+    /// 20:00에서 실제 real초 뒤의 시계 값.
+    static func leftAt(_ real: Double, together: Bool = true) -> Double {
+        guard together else { return shownSeconds - real * (shownSeconds / realSeconds) }
+        if real <= storyRealSeconds { return shownSeconds - real * storyScale }
+        return lastMinuteShown - (real - storyRealSeconds) * sunriseScale
+    }
+
+    /// 시계 값 left에서 실제 sec초가 지난 뒤의 값.
+    static func left(after sec: Double, from left: Double, together: Bool = true) -> Double {
+        leftAt(realOf(left, together: together) + sec, together: together)
+    }
 
     struct Snack: Identifiable, Hashable {
         let id: String
@@ -222,6 +248,12 @@ final class RoomModel {
     }
 
     var startedAt = Date()
+    /// 방 온보딩 덮개가 떠 있는 동안 시계를 멈춘 시각(함께 방 실제 30초, 11/11 시연 요청). nil이면 흐른다. 웹 live.js tick과 같다.
+    var pausedAt: Date?
+    func pauseClock() { if pausedAt == nil { pausedAt = Date() } }
+    func resumeClock() { if let p = pausedAt { startedAt = startedAt.addingTimeInterval(Date().timeIntervalSince(p)); pausedAt = nil } }
+    /// 함께 드르륵 방이면 true(두 구간 30초 시계), 혼자 방(solo)이면 false(90초 한 구간).
+    var together = true
     /// 시계 시작 값(초). 홈 흐름은 20:00, 방 구경에서 앉아 들어오면 앉는 순간의 방 구경 시계 값(RoomClockHandoff).
     var startLeft: Double = RoomModel.shownSeconds
     /// 방에 들어온 시각. 단계 전환(해 뜨기 1분 전, 끝)은 이 시각에서 RoomClockHandoff.graceSeconds가 지나야 걸린다.
@@ -300,6 +332,7 @@ final class RoomModel {
     /// 혼자 드르륵 방(피그마 1647:25199, 1647:25052, 1647:24874). 고민 글과 AI가 읽은 맥락이 다르다.
     static func solo() -> RoomModel {
         let m = RoomModel()
+        m.together = false
         m.topicShort = "오늘 친구랑 인생네컷을 찍었는데, 글쎄 친구가…"
         m.topicBody = "오늘 친구랑 인생네컷을 찍었는데, 글쎄 친구가 인스타 게시글에 자기 얼굴만 보정을 해서 올렸더라고.. 다들 엄청 이쁘다고 비교된다는 식으로 댓글 달리는데 너무 속상해..."
         m.topicTags = ["#친구관계", "#외모고민"]
@@ -322,8 +355,8 @@ final class RoomModel {
     static let tableLand = photo.tableLand
 
     func remaining(at date: Date) -> Double {
-        let real = date.timeIntervalSince(startedAt)
-        return max(0, startLeft - real * (Self.shownSeconds / Self.realSeconds))
+        let real = min(date, pausedAt ?? date).timeIntervalSince(startedAt)
+        return max(0, Self.left(after: real, from: startLeft, together: together))
     }
 
     func clockText(at date: Date) -> String {
