@@ -3,6 +3,7 @@ import { currentMode } from './sort.js';
 import { setText } from './dom.js';
 import { motion, live as LIVE } from '../tokens.js';
 import { setStory, setConcern } from './story.js';
+import { watchScriptOf } from './watchScripts.js';
 // 라이브 목록 카드 v2. 팀 피그마 "라이브 · 리스트 시안 v2"(1972:22375)와 "라이브 리스트 카드 · 상태 정의"(1972:22488) 값을 그대로 옮겼다.
 // 카드(342 x 112, #222628, 모서리 16)는 그대로 두고, 오른쪽 장면 썸네일과 타이머, 말하는 사람 수를 지운 뒤
 // 아래 줄(보는 사람 수, 점, 남은 시간)과 오른쪽 아래 의자 얼굴 묶음을 상태별로 그린다. iOS LiveRoomCard와 같은 값이다.
@@ -281,6 +282,9 @@ function patchWatchTitle(root) {
   if (title) { setText(title, p.title); Object.assign(title.style, { whiteSpace: 'pre', width: 'auto' }); }
   const view = root.querySelector('[data-figma="보는 중"] p');
   if (view) { setText(view, p.views); Object.assign(view.style, { width: 'auto', whiteSpace: 'nowrap' }); }
+  // 대화 중 의자 이름표 세 개(리클라이너, 나무스툴, 가죽소파 순서)를 카드 글(watchScripts.js) 이름으로 바꾼다. 그림은 그대로다.
+  const sc = watchScriptOf(p.title);
+  if (sc) Object.keys(WATCH_SEAT).forEach((seat, i) => setText(root.querySelector('[data-figma="Seat / ' + seat + '"] p'), sc.seats[i]));
 }
 // 방 구경 장면: 생성 화면은 옛 장면(길거리)과 바닥 이름표 4개를 그대로 담고 있다. 팀 피그마 1943:12838은 새 장면(편의점 앞 밤)이고 이름표가 없다(11/09 QA).
 const OLD_FLOOR = ['부드러운 리클라이너21', '아기자기 나무스툴12', '새로 산 가죽소파19', '새벽2시 편의점 의자', 'Group 2147229021'];

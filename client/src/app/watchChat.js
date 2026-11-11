@@ -1,6 +1,6 @@
 import { setText } from './dom.js';
-import { COMMENTS } from './communityPostData.js';
 import { getStory } from './story.js';
+import { watchScriptOf } from './watchScripts.js';
 // 방 구경(37, 피그마 1943:12838) 채팅이 라이브 방송처럼 계속 올라온다(11/10 팀원 피드백 "라이브-눌러서 라방 보듯이 할라면 계속 새 메시지가 올라오는 것 처럼 해야할듯").
 // 채팅 칸(댓글 (라이브 채팅), 342 x 150)과 안내줄, 입력칸은 피그마 그대로 두고, 칸 안에 새 줄을 아래에 붙인다.
 // 화면이 처음 뜰 때 채팅 칸은 비어 있다(11. 10. 팀 요청 "처음에 시작했을 때 댓글 아무 것도 없다가 하나씩 생겨나는 느낌으로").
@@ -71,12 +71,32 @@ const WATCH_LINES = [
   ['구경하는 스툴3', '가죽소파님 목소리 너무 차분해서 더 슬픔'],
   ['폭신한 방석20', '그 친구 원래 그런 스타일이야?'],
 ];
-// 사진보정 카드는 photo 줄을 먼저, 그 밖의 카드는 ssang 줄을 먼저 쓴다. 이어서 다른 이야기 줄, 커뮤니티 댓글, 방 구경 댓글 순서다.
+// 사진보정 글 상세 댓글 일곱 줄(11. 12. 03시 기준 communityPostData.js COMMENTS 값). 커뮤니티 글마다 댓글이 따로 생겨도
+// 첫 카드(사진보정) 방 구경 채팅은 지금 그대로 두라는 지시(11. 12. 03:13)라 여기 그대로 붙잡아 둔다.
+const POST_LINES = [
+  ['푹신푹신 리클라이너17', '내가 봤을 때는 백퍼 글쓴이 질투하는듯\n웃으면서 나도 보정 좀 해주지~라고 댓글 달아봐'],
+  ['딱딱한 나무스툴12', '근데 사이 틀어질지도.. 괜히 어사되면 어캄'],
+  ['새벽2시 소파', '나도 똑같은 일 있었는데 물어보니까 진짜 걍 생각없이 올린거였음'],
+  ['퇴근길 편의점 의자', '그건 선 넘었다 ㅋㅋ'],
+  ['주말 아침 나무스툴', '근데 그걸 까먹을 수가 있나?'],
+  ['비 오는 날 바퀴달린의자', '쫀득하게 자기만 보정하면 어떡해ㅠㅠ 속상했겠다...'],
+  ['길거리 편의점 의자', '너도 그런거 하나 올려봐ㅋㅋㅋ 역지사지가 되어야함'],
+];
+// 카드 제목별 글(watchScripts.js)이 있으면 그 카드 채팅 여덟 줄과 댓글 세 줄을 돈다(11. 12. 03:13 사용자 지시 "다 다르게").
+// 표에 없는 제목(첫 카드 사진보정, 알림 키워드 카드 등)은 예전 규칙: 사진보정 카드는 photo 줄을 먼저, 그 밖의 카드는 ssang 줄을 먼저 쓰고
+// 이어서 다른 이야기 줄, 사진보정 글 댓글, 방 구경 댓글 순서다.
 // 순서대로 돌기 때문에 같은 줄이 연달아 나오지 않는다(맨 끝 줄과 맨 앞 줄도 다르다).
-export function feedLines(story) {
+export function feedLines(story, title) {
+  const sc = title ? watchScriptOf(title) : null;
+  if (sc) return [...sc.chat, ...sc.comments];
   const first = story === 'photo' ? PHOTO_LINES : SSANG_LINES;
   const second = story === 'photo' ? SSANG_LINES : PHOTO_LINES;
-  return [...first, ...second, ...COMMENTS.map((c) => [c.name, c.text]), ...WATCH_LINES];
+  return [...first, ...second, ...POST_LINES, ...WATCH_LINES];
+}
+// 방 구경 화면에 보이는 제목(liveV2.js patchWatchTitle 이 누른 카드 제목으로 바꾼 글)을 읽는다.
+export function watchTitleOf(root) {
+  const t = root && [...root.querySelectorAll('p[data-figma]')].find((e) => e.getAttribute('data-figma').indexOf('둘이 찍은 사진인데') === 0);
+  return t ? t.textContent : '';
 }
 // 같은 시작 값이면 같은 수열(32비트 선형 합동). iOS WatchFeed.next와 같은 식이다.
 export function makeRandom(seed) {
@@ -113,7 +133,7 @@ export function startWatchChat(root, n) {
   base.querySelectorAll('[data-node]').forEach((e) => e.removeAttribute('data-node'));
   // 칸 높이와 자리는 피그마 그대로 두고, 줄을 아래부터 쌓아 넘친 줄이 칸 위쪽으로 잘려 나가게 한다(내 댓글 보내기와 같은 방식).
   Object.assign(box.style, { justifyContent: 'flex-end', overflow: 'hidden' });
-  const lines = feedLines(getStory());
+  const lines = feedLines(getStory(), watchTitleOf(root));
   const rnd = makeRandom(WATCH_CHAT.seed);
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let idx = 0;

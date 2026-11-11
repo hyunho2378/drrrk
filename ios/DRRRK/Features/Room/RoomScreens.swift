@@ -786,7 +786,8 @@ struct RoomSoloView: View {
     @State private var entry: RoomEnterPlayer?
     /// 그리드(피그마 2340:21259, 2340:21344). 머리 오른쪽 버튼으로 열고 닫는다. 같은 방 안이라 시계와 채팅, 주전부리 상태가 이어진다.
     @State private var grid = false
-    /// 해 뜨는 단계(피그마 2351:34553, 웹 66). 시계가 01:12에 닿으면 시계가 빨개지고 퀵슬롯이 접히고 바닥이 해뜨기 영상으로 바뀐다.
+    /// 해 뜨는 단계(피그마 2351:34553, 웹 66). 시계가 01:12에 닿으면 시계가 빨개지고 바닥이 해뜨기 영상으로 바뀐다.
+    /// 퀵슬롯은 펼침 상태를 그대로 이어 간다(함께 방 RoomView와 같다. 웹 quickSlot.js prepareQuickSlot, 사용자 11/12 03:35 "화면 전환 때 튀지 않게").
     @State private var lastMinute = false
     /// 혼자 방 해뜨기 영상(SunriseVideo.swift, sunrise-solo.mp4). 방이 나타날 때 만들어 미리 받고, 해 뜨는 단계가 시작되면 한 번 재생한다.
     @State private var sunrise: SunrisePlayer?
@@ -1036,7 +1037,6 @@ struct RoomSoloView: View {
                     lastMinute = true
                     grid = false
                     found = false
-                    model.dockOpen = false
                 }
                 entry?.stop()
                 sunrise?.start()
@@ -1911,7 +1911,8 @@ private struct ReportScreen: View {
                 .frame(height: 112 - 62)
                 .background(DS.Palette.bgSurface.ignoresSafeArea(edges: .top))
                 .allowsHitTesting(false)
-            backButton.padding(.top, 79 - 62).padding(.leading, 24)
+            // 누르는 칸은 44 x 44(그림 24 둘레 10씩)라 그림 자리는 그대로 (24, 79)다.
+            backButton.padding(.top, 79 - 62 - 10).padding(.leading, 24 - 10)
         }
     }
 
@@ -1935,14 +1936,18 @@ private struct ReportScreen: View {
             // 닫기(close 2337:15792, 24 안에 12 x 12 선 2, #F8F8F8). 피그마에 연결이 없어 "올리지 않고 홈으로"와 같이 홈으로 간다(웹 flow.js 65 닫기와 같다).
             Button { router.select(.home) } label: {
                 Image("C-close").renderingMode(.template).resizable().frame(width: 24, height: 24)
-                    .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
+                    .foregroundStyle(DS.Palette.textPrimary)
+                    .frame(width: 44, height: 44).contentShape(Rectangle())
             }
             .buttonStyle(PressStyle())
             .accessibilityLabel("닫기")
         } else {
-            Button { router.pop() } label: {
+            // 종료(1), 아침(2), 오늘 나눈 대화(3)의 뒤로는 "올리지 않고 홈으로"와 같은 곳(홈)으로 간다(사용자 11/12 03:40, 웹 flow.js 1, 2, 3 뒤로).
+            // 예전에는 router.pop()이라 방 화면으로 되돌아갔다.
+            Button { router.select(.home) } label: {
                 Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
-                    .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
+                    .foregroundStyle(DS.Palette.textPrimary)
+                    .frame(width: 44, height: 44).contentShape(Rectangle())
             }
             .buttonStyle(PressStyle())
             .accessibilityLabel("뒤로")

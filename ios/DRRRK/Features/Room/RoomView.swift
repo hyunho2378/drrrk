@@ -321,9 +321,7 @@ struct RoomView: View {
 
     /// 칸을 끌지 않고 누르기만 하면 웹과 같은 안내를 띄운다(웹 tokens.js live.throwHintText, throwEmptyText).
     private func tapSlot(_ snack: RoomModel.Snack) {
-        if snack.count == 0 {
-            RoomToastCenter.shared.show("남은 주전부리가 없어요")
-        } else if !model.isCooling(snack.id) {
+        if !model.isCooling(snack.id) {
             RoomToastCenter.shared.show("가운데 테이블로 끌어서 던져요")
         }
     }
@@ -336,7 +334,7 @@ struct RoomView: View {
     private func throwGesture(_ snack: RoomModel.Snack, _ map: SceneMap) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .named("room"))
             .updating($drag) { v, state, _ in
-                // 개수가 0이거나 그 칸이 쉬는 중이면 끌리지 않는다(다른 칸은 그대로 끌린다).
+                // 그 칸이 쉬는 중이면 끌리지 않는다(다른 칸은 그대로 끌린다). 개수 제한은 없다.
                 guard model.canThrow(snack) else { return }
                 if state == nil {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -507,10 +505,9 @@ struct DockHandle: View {
 }
 
 /// 퀵슬롯 한 칸(피그마 "slot" 44 x 44, 검정 45%, 흰 12% 1px 테두리, 모서리 12, 그림 32).
-/// 혼자 방(1647:24874)에서는 남은 개수 배지와, 막 던진 칸의 하늘색 2px 테두리와 쿨타임 덮개가 붙는다.
+/// 막 던진 칸에 하늘색 2px 테두리와 쿨타임 덮개가 붙는다. 남은 개수 배지는 함께 방과 혼자 방 모두 없다(사용자 11/12 03:25).
 struct SnackSlot: View {
     let snack: RoomModel.Snack
-    var showCount = false
     var selected = false
     /// 남은 쿨타임 비율(1에서 0으로 줄어든다)
     var cooldown: Double = 0
@@ -533,19 +530,6 @@ struct SnackSlot: View {
                 RoundedRectangle(cornerRadius: DS.Radius.chip)
                     .strokeBorder(selected ? DS.Palette.brandPrimary : .white.opacity(0.12), lineWidth: selected ? 2 : 1)
             )
-            .overlay(alignment: .topLeading) {
-                if showCount {
-                    Text("\(snack.count)").suit(12, .bold, lineHeight: 16).foregroundStyle(DS.Palette.textPrimary)
-                        .monospacedDigit()
-                        .contentTransition(.numericText(countsDown: true))
-                        .padding(.horizontal, 5)
-                        .frame(minWidth: 20, minHeight: 18)
-                        .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.white.opacity(0.2), lineWidth: 1))
-                        .offset(x: 28, y: 30)
-                }
-            }
-            .opacity(snack.count > 0 ? 1 : 0.4)
     }
 }
 
@@ -1026,9 +1010,10 @@ struct SystemLine: View {
     }
 }
 
-/// 혼자 방 퀵슬롯(피그마 1647:25199 접힘, 1647:24874 펼침). 펼치면 칸마다 남은 개수가 붙고,
+/// 혼자 방 퀵슬롯(피그마 1647:25199 접힘, 1647:24874 펼침). 함께 방 퀵슬롯과 같이 개수 배지와 개수 제한이 없다(사용자 11/12 03:25).
+/// 접힌 알약을 누르면 같은 화면 안에서 제자리에 펼쳐지고 접기 핸들을 누르면 접힌다(함께 방 dock과 같은 model.dockOpen, 같은 곡선).
 /// 칸을 누르면 그 주전부리가 장면 속 테이블로 떨어진 뒤 3초(RoomModel.throwCooldownSeconds) 동안 하늘색 테두리와 어두운 덮개가 줄어든다.
-/// 쉬는 상태는 모델(칸별 coolingUntil)에 있어 퀵슬롯을 접었다 펴도 이어지고, 끝나는 시각이 지나면 개수가 남은 칸은 반드시 다시 눌린다. 쉬는 동안 그 칸만 막힌다.
+/// 쉬는 상태는 모델(칸별 coolingUntil)에 있어 퀵슬롯을 접었다 펴도 이어지고, 끝나는 시각이 지나면 반드시 다시 눌린다. 쉬는 동안 그 칸만 막힌다.
 struct SoloQuickSlot: View {
     @Bindable var model: RoomModel
     let onThrow: (RoomModel.Snack) -> Void
@@ -1054,12 +1039,12 @@ struct SoloQuickSlot: View {
                         ForEach(model.snacks) { snack in
                             let mine = model.isCooling(snack.id, at: ctx.date)
                             Button { tap(snack) } label: {
-                                SnackSlot(snack: snack, showCount: true, selected: mine, cooldown: mine ? model.cooldownLeft(snack.id, at: ctx.date) : 0)
+                                SnackSlot(snack: snack, selected: mine, cooldown: mine ? model.cooldownLeft(snack.id, at: ctx.date) : 0)
                             }
                             .buttonStyle(RoomPressStyle())
-                            .disabled(snack.count == 0 || mine)
+                            .disabled(mine)
                             .matchedGeometryEffect(id: snack.id, in: ns, isSource: model.dockOpen)
-                            .accessibilityLabel("\(snack.name) \(snack.count)개")
+                            .accessibilityLabel(snack.name)
                         }
                     }
                 }

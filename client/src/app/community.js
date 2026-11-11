@@ -37,6 +37,13 @@ const BEST = '#36D2FF';
 // 목록(39)에서 마지막으로 누른 카드 제목. 상세(38, CommunityPost.jsx) 제목에 넣는다.
 let pickedTitle = null;
 export const pickedPostTitle = () => pickedTitle;
+// 누른 카드의 따봉 수와 댓글 수(글 상세 숫자를 목록 카드와 같게 한다). 같은 제목도 탭마다 숫자가 달라서 제목과 따로 기억한다.
+let pickedStats = null;
+export const pickedPostStats = () => pickedStats;
+function statsIn(card) {
+  const nums = [...card.querySelectorAll('[data-figma="stats"] > p')].map((p) => parseInt(p.textContent.replace(/\D/g, ''), 10));
+  return nums.length >= 2 && nums.every((v) => v >= 0) ? { likes: nums[0], comments: nums[1] } : null;
+}
 
 function setImg(el, file) {
   const url = A + file;
@@ -74,7 +81,7 @@ function watchCards(root) {
     if (!root.isConnected) { window.removeEventListener('pointerdown', onDown, true); return; }
     const stack = document.elementsFromPoint(e.clientX, e.clientY);
     const card = stack.map((el) => el.closest && el.closest('[data-figma^="List Card /"], [data-figma^="Carousel /"]')).find((c) => c && root.contains(c));
-    if (card) pickedTitle = titleIn(card);
+    if (card) { pickedTitle = titleIn(card); pickedStats = statsIn(card); }
   };
   window.addEventListener('pointerdown', onDown, true);
 }
@@ -174,6 +181,14 @@ export function patchCommunity(root, n) {
   });
   if (n === 39) {
     watchCards(root);
+    // "지난 밤 이야기"(1953:19511)는 생성 화면에 Noto Sans KR 윤곽으로 남아 있었다. 사용자 결정(2026. 11. 12. 03:00 "다 SUIT 으로 통일")대로
+    // 최종 탭 프레임 2340:30370 의 글자 값(SUIT Bold 18, 행간 25.2, #F8F8F8, 자리 24, 360)으로 실제 글자를 그린다. 자리는 생성 화면 칸 그대로다.
+    const lastNight = root.querySelector('p[data-node="1953:19511"]');
+    if (lastNight && !lastNight.dataset.suit) {
+      lastNight.dataset.suit = '1';
+      lastNight.querySelectorAll(':scope > span[aria-hidden]').forEach((o) => (o.style.display = 'none'));
+      Object.assign(lastNight.style, { fontFamily: "'SUIT', system-ui, sans-serif", fontWeight: '700', fontSize: '18px', lineHeight: '25.2px', width: 'auto', webkitTextFillColor: 'currentColor' });
+    }
     // 좋아요와 댓글 사이 간격(의정 11. 10. 댓글 "좋아요/댓글 사이 간격 수정"): 피그마 1953:19406 stats(2223:13623 등)는
     // 따봉 16, 숫자, 댓글 아이콘 16, 숫자를 간격 4로만 잇는다. 생성 화면에 남은 4px 빈 칸(Frame)을 빼서 댓글 아이콘을 숫자 끝 + 4 자리로 당긴다.
     root.querySelectorAll('[data-figma="stats"] > [data-figma="Frame"]').forEach((el) => { el.style.display = 'none'; });

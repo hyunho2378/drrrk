@@ -750,7 +750,7 @@ struct LiveWatchView: View {
         feed = WatchFeed.initial
         feedRandom = WatchFeed.Random()
         feedIndex = 0
-        let lines = WatchFeed.lines(Story.current)
+        let lines = WatchFeed.lines(Story.current, title: router.watch?.title)
         try? await Task.sleep(for: .seconds(WatchFeed.firstDelay))
         while !Task.isCancelled {
             let l = lines[feedIndex % lines.count]
@@ -771,13 +771,15 @@ struct LiveWatchView: View {
                 Text("대화 중 \(WatchData.seats.count)").suit(14, .bold, lineHeight: 21).foregroundStyle(DS.Palette.textPrimary)
             }
             HStack(alignment: .top, spacing: 14) {
-                ForEach(WatchData.seats) { seat in
+                // 이름표는 카드 글(WatchScripts) 이름, 그림은 피그마 자리 그림 그대로(웹 liveV2.js patchWatchTitle과 같다).
+                let names = WatchData.seatNames(router.watch?.title)
+                ForEach(Array(WatchData.seats.enumerated()), id: \.element.id) { i, seat in
                     VStack(spacing: 6) {
                         // 피그마처럼 흰 원 바탕에 의자를 꽉 채운다. 그림은 투명판이라 원 가장자리가 깨끗하다.
                         Image(seat.image).resizable().scaledToFill().frame(width: 54, height: 54)
                             .background(Color.white)
                             .clipShape(Circle())
-                        Text(seat.name).suit(11, .medium, lineHeight: 13).foregroundStyle(DS.Palette.textSecondary)
+                        Text(i < names.count ? names[i] : seat.name).suit(11, .medium, lineHeight: 13).foregroundStyle(DS.Palette.textSecondary)
                             .lineLimit(1).frame(width: 58)
                     }
                     .frame(width: 58)

@@ -214,7 +214,7 @@ export const live = {
   // 아침(2)과 오늘 나눈 대화(3)의 고정 버튼 막대 위 바탕색 띠 높이.
   reportBand: 24,
   // MY 화면들(엉따 온도 막대가 차는 화면)과 아이템 상세, 미리 그려 둘 화면
-  myScreens: [1, 2, 36, 53, 54],
+  myScreens: [1, 2, 36, 54],
   itemScreen: 54,
   warmDonors: [31, 43, 28],
   // 주전부리 던지기(끌어서 놓기)

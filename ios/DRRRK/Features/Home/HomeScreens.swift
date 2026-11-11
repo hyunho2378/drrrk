@@ -112,6 +112,9 @@ struct HomeView: View {
     @FocusState private var focused: Bool
     /// 고민 분석으로 넘어가는 중(완료 키와 화살표가 겹쳐 두 번 넘어가지 않게 막는다)
     @State private var sending = false
+    /// 첨부 삭제(X) 모션 단계: 썸네일이 사라지는 중(140ms), 카드 바탕이 입력칸 자리로 내려앉는 중(220ms). 웹 HomeScene removeClip과 같다.
+    @State private var clipRemoving = false
+    @State private var clipSettling = false
 
     private static var screen: CGSize {
         UIScreen.main.bounds.size
@@ -123,8 +126,9 @@ struct HomeView: View {
     }
 
     /// 클립이 붙은 홈(피그마 2296:20815 접힘, 2296:20794 펼침). 함께 드르륵 방에 앉기 전에는 이 홈, 앉은 뒤에는 빈 홈(1647:23475, 1647:23436)이다(Router.clipDone).
+    /// 첨부 삭제(X)를 누르면 router.clipDone이 바로 true가 되어 엔터는 혼자 드르륵 흐름(26 다음 45)으로 간다. 모션이 끝날 때까지만 카드를 그린다.
     private var clip: Bool {
-        !router.clipDone
+        !router.clipDone || clipRemoving
     }
 
     /// 입력칸 자리(피그마 좌표). 접힘 2045:11658(24, 655), 펼침 1671:45255(20, 446)는 키보드(541) 위 29에 붙는다.
@@ -132,7 +136,7 @@ struct HomeView: View {
     private var inputOrigin: CGPoint {
         guard open else { return CGPoint(x: 24, y: 655) }
         let top = keyboardTop ?? (Self.screen.height - lastKeyboardHeight)
-        return CGPoint(x: clip ? 24 : 20, y: top / Self.scale - 29 - 66)
+        return CGPoint(x: clip && !clipSettling ? 24 : 20, y: top / Self.scale - 29 - 66)
     }
 
     private var motion: Animation? {
@@ -168,7 +172,7 @@ struct HomeView: View {
                 // 피그마 "input / 숏츠 첨부"(2332:10890, 2296:21025): 입력칸 위 142에서 시작하는 342 x 208 카드. 입력칸과 같이 올라간다.
                 if clip {
                     clipCard
-                        .at(24, inputOrigin.y - 142)
+                        .at(inputOrigin.x, inputOrigin.y - 142)
                         .animation(motion, value: open)
                         .animation(motion, value: keyboardTop)
                 }
@@ -216,15 +220,17 @@ struct HomeView: View {
             focused = false
             open = false
             router.navLocal = false
+            clipRemoving = false
+            clipSettling = false
         }
     }
 
     // 피그마 input 2045:11658, 1671:45255: 342 x 66, #222628, 반경 32, 글 왼쪽 21, 버튼 둘레 9, 글과 버튼 사이 8.
-    // 안내 글 SUIT 16, 자간 -4%, #9AA1A6(접힘 Regular, 펼침 Bold). 전송 버튼 48 x 48 #36D2FF, 검정 화살표 18 x 12.
+    // 안내 글 SUIT 16, 자간 -4%, #9AA1A6, 홈 네 상태(25, 24, 62, 63) 모두 Bold(사용자 결정 2026. 11. 12. 03:00, 최종 2340:24090, 2340:24158, 2340:24111). 전송 버튼 48 x 48 #36D2FF, 검정 화살표 18 x 12.
     private var input: some View {
         HStack(spacing: 8) {
             TextField("", text: $text, prompt: Text("편하게 고민을 꺼내보아요")
-                .font(.custom((open || clip ? SUITWeight.bold : SUITWeight.regular).rawValue, fixedSize: 16))
+                .font(.custom(SUITWeight.bold.rawValue, fixedSize: 16))
                 .tracking(-0.64)
                 .foregroundStyle(DS.Palette.textSecondary))
                 .suit(16, .regular, tracking: -0.64)
@@ -256,33 +262,47 @@ struct HomeView: View {
 
     // 피그마 2332:10890 카드(342 x 208, 반경 28, #222628) 안 위 12, 왼 12에 숏츠 2332:10892(92 x 124, 반경 14).
     // 숏츠 그림 2332:10893은 92 x 177로 위로 18 올라가 잘린다. 첨부 삭제 2332:10894는 숏츠 안 (62, 6) 24 x 24, 반경 12, #14171A 80%, 닫기 16(선 1.33).
-    // 첨부 삭제는 피그마에 연결이 없어 누르는 자리로 만들지 않았다(웹 HomeScene과 같다). 카드를 누르면 입력칸을 누른 것과 같다.
+    // 카드를 누르면 입력칸을 누른 것과 같다. 첨부 삭제(X)를 누르면 클립 콘텐츠를 지우고 빈 홈(접힘 25, 펼침 24)으로 바뀐다(사용자 지시 2026. 11. 12. 03:45).
+    // 모션: 썸네일 opacity 1에서 0, scale 0.96(140ms), 이어서 카드 바탕이 translateY 142로 입력칸 자리에 내려앉으며 옅어진다(220ms, 표준 곡선). 입력칸은 같은 뷰라 쓰던 글이 남는다.
     private var clipCard: some View {
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 28).fill(DS.Palette.bgElevated)
+                .offset(y: clipSettling ? 142 : 0)
+                .opacity(clipSettling ? 0 : 1)
             ZStack(alignment: .topLeading) {
                 Color.white
                 Image("L-home-clip-thumb").resizable()
                     .frame(width: 92, height: 177)
                     .offset(y: -18)
-                ZStack {
-                    Circle().fill(Color(red: 0.08, green: 0.09, blue: 0.10).opacity(0.8))
-                    Path { p in
-                        p.move(to: CGPoint(x: 4, y: 4)); p.addLine(to: CGPoint(x: 12, y: 12))
-                        p.move(to: CGPoint(x: 12, y: 4)); p.addLine(to: CGPoint(x: 4, y: 12))
+                // 보이는 X는 24 x 24(숏츠 안 62, 6), 누르는 자리는 40 x 34로 넓힌다(웹과 같다).
+                Button(action: removeClip) {
+                    ZStack {
+                        Circle().fill(Color(red: 0.08, green: 0.09, blue: 0.10).opacity(0.8))
+                        Path { p in
+                            p.move(to: CGPoint(x: 4, y: 4)); p.addLine(to: CGPoint(x: 12, y: 12))
+                            p.move(to: CGPoint(x: 12, y: 4)); p.addLine(to: CGPoint(x: 4, y: 12))
+                        }
+                        .stroke(.white, style: StrokeStyle(lineWidth: 1.33333, lineCap: .round, lineJoin: .round))
+                        .frame(width: 16, height: 16)
                     }
-                    .stroke(.white, style: StrokeStyle(lineWidth: 1.33333, lineCap: .round, lineJoin: .round))
-                    .frame(width: 16, height: 16)
+                    .frame(width: 24, height: 24)
+                    .frame(width: 40, height: 34)
                 }
-                .frame(width: 24, height: 24)
-                .offset(x: 62, y: 6)
+                .buttonStyle(PressStyle())
+                .offset(x: 54, y: 1)
+                .accessibilityLabel("첨부 삭제")
             }
             .frame(width: 92, height: 124, alignment: .topLeading)
             .clipShape(RoundedRectangle(cornerRadius: 14))
+            .opacity(clipRemoving ? 0 : 1)
+            .scaleEffect(clipRemoving ? 0.96 : 1)
             .offset(x: 12, y: 12)
+            .accessibilityElement(children: .contain)
             .accessibilityLabel("첨부한 숏츠 쌍밍아웃 빌런썰 EP.1")
         }
         .frame(width: 342, height: 208, alignment: .topLeading)
+        .clipShape(RoundedRectangle(cornerRadius: 28))
+        .allowsHitTesting(!clipRemoving)
         .contentShape(RoundedRectangle(cornerRadius: 28))
         .onTapGesture { focused = true }
     }
@@ -303,6 +323,30 @@ struct HomeView: View {
     private func close() {
         focused = false
         open = false
+    }
+
+    /// 첨부 삭제(X): 클립 상태를 빈 홈으로 바꾸고(router.clipDone true) 썸네일, 카드 바탕 순서로 지운다. 클립에서 다시 들어오면(56 에이전트 버튼) 다시 클립 홈이다.
+    private func removeClip() {
+        guard !router.clipDone, !clipRemoving else { return }
+        if reduceMotion {
+            router.clipDone = true
+            return
+        }
+        withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.14)) {
+            clipRemoving = true
+            router.clipDone = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
+            withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.22)) { clipSettling = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                var t = Transaction()
+                t.disablesAnimations = true
+                withTransaction(t) {
+                    clipRemoving = false
+                    clipSettling = false
+                }
+            }
+        }
     }
 
     private func send() {

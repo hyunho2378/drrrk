@@ -4,12 +4,13 @@
 //  2) 베스트 댓글 따봉(2): 누르면 수가 하나 오르고 다시 누르면 내려간다.
 //  3) 신고 사유(7): 고른 줄만 켜진다. 상세 입력칸에 글을 쓸 수 있고 글자 수가 바뀐다. 신고하기 뒤 방(9)에서 접수 알림을 띄운다.
 //  4) 체크박스(7 차단도 함께, 8 신고도 함께, 60 알림 옵션 2개): 누를 때마다 켜지고 꺼진다.
-//  5) 칩과 탭(53, 57, 58, 59, 39, 47): 고른 칩이나 탭만 선택색이 된다. 화면 밖으로 넘치는 칩 줄은 옆으로 밀어 볼 수 있다. 59의 추가 칩은 키워드 관리(60)로 간다.
+//  5) 칩과 탭(57, 58, 59, 39, 47): 고른 칩이나 탭만 선택색이 된다. 화면 밖으로 넘치는 칩 줄은 옆으로 밀어 볼 수 있다. 59의 추가 칩은 키워드 관리(60)로 간다.
 //  6) 키워드 관리(60): 입력칸에 쓰고 등록하면 키워드 줄이 늘고, 줄의 X를 누르면 빠진다. 최근 본 키워드 칩을 누르면 내 키워드로 들어간다. 제목의 개수도 바뀐다.
 import { motion } from '../tokens.js';
 import { q, relRect, setText } from './dom.js';
 import { cloneOf, warm } from './donor.js';
 import { toast } from './room.js';
+import { dragScroll } from './rowDrag.js';
 
 const SKY = '#36D2FF';
 const PRESS_IN = 'transform 90ms ' + motion.standard + ', opacity 90ms ' + motion.standard;
@@ -98,10 +99,12 @@ function tabGroup(root, tabs, line) {
   });
 }
 
-// 화면 폭을 넘는 칩 줄은 옆으로 밀어 본다(스크롤바는 숨긴다).
+// 화면 폭을 넘는 칩 줄은 옆으로 밀어 본다(스크롤바는 숨긴다). 오른쪽 끝 여백은 왼쪽 시작 여백과 같은 24다.
+// 손가락과 마우스 끌기, 트랙패드 가로 스크롤 모두 줄만 옆으로 민다. 6px 넘게 끌면 칩 누름이 취소된다(rowDrag.js, 2026. 11. 12. 03:45 사용자 지시).
 function scrollRow(row) {
   if (!row || row.dataset.row) return;
   row.dataset.row = '1';
+  dragScroll(row);
   Object.assign(row.style, { overflowX: 'auto', overflowY: 'hidden', width: '390px', scrollbarWidth: 'none', touchAction: 'pan-x', overscrollBehaviorX: 'contain' });
   row.style.paddingRight = '24px';
   row.style.boxSizing = 'border-box';
@@ -414,7 +417,6 @@ export function attachTaps(root, n, go, prevN) {
     keywords(root, go);
   }
   if (n === 27) roomPick(root);
-  if (n === 53) chipGroup(q(root, '[data-figma^="chip · "]'));
   if ([57, 58, 59].includes(n)) {
     const row = root.querySelector('[data-figma="Keyword Chips"]');
     if (row) {

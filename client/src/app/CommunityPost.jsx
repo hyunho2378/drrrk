@@ -5,7 +5,8 @@
 //  4) 대화 다시보기 카드(11. 11. 23시 팀 수정본 2298:22040, 342 x 176): 왼쪽 위 라벨 대신 오른쪽 아래 "12:32" 재생 시간 칩(2298:22043),
 //     가운데 play 버튼은 피그마에서 비워져 없다(2298:22047), 아래 라이브 보기 바(2298:22048, "+1"과 의자 셋, "의자 4", "라이브 다시보기"). 카드를 누르면 대화 다시보기(61, ReplayScreen.jsx)로 밀어 들어간다.
 //  5) 작성자 줄(2298:22031)은 "의자 프로필" 32 원(바탕 #33383D, sofa_05)과 "푹신한 가죽 소파12"다. 아래 검은 판은 y 708, 높이 136(2298:22208)이다.
-// 내용은 피그마 사진보정 글이다. 목록에서 다른 글(쌍밍아웃 등)을 열면 제목만 그 글 제목으로 바꾸고 나머지는 지금 앱과 같다.
+// 내용은 피그마 사진보정 글이다. 목록에서 다른 글을 열면(11. 12. 03:13 사용자 지시 "상세페이지 죄다 다르게") 그 제목의 글(postScripts.js)로
+//  작성자와 의자 그림, 시간, 본문, 댓글 일곱 개를 바꾸고, 따봉 수와 "댓글 N"은 누른 목록 카드 숫자(community.js pickedPostStats)를 쓴다. 표에 없는 제목은 사진보정 원문이다.
 // 한글 줄바꿈은 피그마처럼 글자 단위로 끊는다(word-break: break-all, 댓글 "기억이 나네/요" 자리가 피그마와 같다).
 // 11. 12. 최종 2340:28134 대조: 본문 첫 줄이 피그마는 "내 얼굴은 그"에서 끊기는데 앱은 "그대"까지 들어갔다(앱 줄 폭 341.8, 칸 342). 칸을 341.5로 줄여 같은 자리에서 끊는다.
 //  입력창 안 "댓글 달기"는 x 45, 보내기 버튼은 x 309다(피그마 2340:28315, 앞뒤 안쪽 여백 21과 9). 앞은 44, 308이었다.
@@ -13,9 +14,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, live as LIVE } from '../tokens.js';
 import { toast } from './room.js';
-import { pickedPostTitle } from './community.js';
+import { pickedPostTitle, pickedPostStats } from './community.js';
 import { getSaved, thumb as chairThumb } from './chairs.js';
-import { POST, COMMENTS, SSANG_TITLE } from './communityPostData.js';
+import { POST, COMMENTS } from './communityPostData.js';
+import { scriptFor } from './postScripts.js';
 import { REPLAY_ASSETS } from './replayData.js';
 
 const BASE = import.meta.env.BASE_URL || '/';
@@ -104,19 +106,21 @@ function share(root, title) {
   copy();
 }
 
-function titleFor(picked) {
-  if (!picked) return POST.title;
+// 누른 카드 제목으로 글 내용을 고른다. 사진보정 글이거나 표에 없는 제목이면 피그마 원문(communityPostData.js)이다.
+function postFor(picked) {
   const flat = (s) => s.replace(/\s+/g, '');
-  if (flat(picked) === flat(POST.title)) return POST.title;
-  if (flat(picked) === flat(SSANG_TITLE)) return SSANG_TITLE;
-  return picked;
+  const sc = picked && flat(picked) !== flat(POST.title) ? scriptFor(picked) : null;
+  const st = sc ? pickedPostStats() : null;
+  if (!sc) return { title: picked && flat(picked) !== flat(POST.title) ? picked : POST.title, author: POST.author, authorAvatar: null, time: POST.time, body: POST.body, likes: POST.likes, comments: POST.comments, list: COMMENTS };
+  return { title: sc.title, author: sc.author, authorAvatar: sc.authorAvatar, time: '· ' + sc.time, body: sc.body, likes: st ? st.likes : POST.likes, comments: st ? st.comments : POST.comments, list: sc.comments };
 }
 
 export default function CommunityPost() {
   const rootRef = useRef(null);
   const thumbRef = useRef(null);
   const inputRef = useRef(null);
-  const [title] = useState(() => titleFor(pickedPostTitle()));
+  const [view] = useState(() => postFor(pickedPostTitle()));
+  const title = view.title;
   const [liked, setLiked] = useState(likeState.on);
   const [mine, setMine] = useState([]);
   const [draft, setDraft] = useState('');
@@ -145,7 +149,7 @@ export default function CommunityPost() {
   };
 
   const likeColor = liked ? C.brand : C.sub;
-  const count = POST.likes + (liked ? 1 : 0);
+  const count = view.likes + (liked ? 1 : 0);
 
   return (
     <div ref={rootRef} data-figma="커뮤니티 / 글 상세 (v5 글 중심)" data-node="2100:23295" data-figma-v="2298:22028" style={{ width: 390, height: 844, background: C.bg, position: 'relative', overflow: 'hidden' }}>
@@ -153,14 +157,14 @@ export default function CommunityPost() {
       <div data-figma="Scroll" data-node="2100:23296" className="cp5-scroll" style={{ position: 'absolute', left: 0, top: 112, width: 390, height: 732, overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'contain' }}>
         <div data-figma="Post" style={{ display: 'flex', flexDirection: 'column', width: 390, padding: '8px 24px 24px 24px', boxSizing: 'border-box' }}>
           <div data-figma="Author" data-node="2298:22031" style={{ display: 'flex', alignItems: 'center', gap: 8, height: 32 }}>
-            <img data-figma="의자 프로필" alt="" draggable={false} src={A + 'author-sofa5.webp'} style={{ width: 32, height: 32, display: 'block', flexShrink: 0 }} />
-            <p style={t(13, 700, C.text, { lineHeight: '16px' })}>{POST.author}</p>
-            <p style={t(12, 500, C.faint, { lineHeight: '15px' })}>{POST.time}</p>
+            {view.authorAvatar ? <ChairAvatar src={view.authorAvatar} /> : <img data-figma="의자 프로필" alt="" draggable={false} src={A + 'author-sofa5.webp'} style={{ width: 32, height: 32, display: 'block', flexShrink: 0 }} />}
+            <p style={t(13, 700, C.text, { lineHeight: '16px' })}>{view.author}</p>
+            <p style={t(12, 500, C.faint, { lineHeight: '15px' })}>{view.time}</p>
           </div>
           <div style={{ height: 16 }} />
           <p style={t(20, 700, C.text, { lineHeight: '28px' })}>{title}</p>
           <div style={{ height: 12 }} />
-          <p style={t(15, 400, C.body, { lineHeight: '24px', whiteSpace: 'pre-wrap', wordBreak: 'break-all', width: 341.5 })}>{POST.body}</p>
+          <p style={t(15, 400, C.body, { lineHeight: '24px', whiteSpace: 'pre-wrap', wordBreak: 'break-all', width: 341.5 })}>{view.body}</p>
           <div style={{ height: 24 }} />
           <div data-figma="대화 다시보기" data-node="2298:22040" role="button" tabIndex={0} aria-label="라이브 다시보기" onClick={(e) => { e.stopPropagation(); openReplay(); }} onKeyDown={(e) => { if (e.key === 'Enter') openReplay(); }} {...pressProps()} style={{ position: 'relative', width: 342, height: 176, borderRadius: 16, overflow: 'hidden', background: '#1F2226', flexShrink: 0, cursor: 'pointer' }}>
             {/* 장면: 피그마 fade(2298:22042, 342 x 150)가 scene(2298:22041)을 모두 덮은 모습 그대로다(예전 카드와 같은 그림). */}
@@ -198,10 +202,10 @@ export default function CommunityPost() {
         </div>
         <div data-figma="Divider" style={{ width: 390, height: 8, background: C.card }} />
         <div data-figma="Comments" style={{ display: 'flex', flexDirection: 'column', padding: '16px 24px 120px 24px', boxSizing: 'border-box', width: 390 }}>
-          <p style={t(16, 700, C.text, { lineHeight: '20px' })}>{'댓글 ' + (POST.comments + mine.length)}</p>
+          <p style={t(16, 700, C.text, { lineHeight: '20px' })}>{'댓글 ' + (view.comments + mine.length)}</p>
           <div style={{ display: 'flex', flexDirection: 'column', width: 342 }}>
             {mine.map((c) => <Fresh key={c.id}><CommentItem c={c} width={342} /></Fresh>)}
-            {COMMENTS.map((c) => (c.reply ? (
+            {view.list.map((c) => (c.reply ? (
               <div key={c.id} data-figma="Reply" style={{ display: 'flex', paddingLeft: 42, width: 342, boxSizing: 'border-box' }}><CommentItem c={c} width={300} /></div>
             ) : <CommentItem key={c.id} c={c} width={342} />))}
           </div>
