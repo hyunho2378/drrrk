@@ -13,6 +13,11 @@ struct ChairStudioView: View {
     private let primary = DS.Palette.brandPrimary
     private let subtle = DS.Palette.brandSubtle
     private let elevated = DS.Palette.bgElevated
+    /// 큰 그림과 이름이 바뀌는 곡선: 120ms 표준 곡선(웹 ChairStudio.jsx cs-hero-in, cs-text와 같다). 칸 눌림은 PressStyle 90ms.
+    static let swap = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.12)
+
+    /// 화면이 만들어지는 순간 다섯 종류의 모든 그림을 미리 디코드하기 시작한다(웹 live.js prepare의 warmStudio와 같다).
+    init() { ChairStore.shared.warmStudio() }
 
     var body: some View {
         let k = store.draftK
@@ -48,19 +53,16 @@ struct ChairStudioView: View {
                 .frame(width: 73, alignment: .trailing)
                 .offset(x: 293, y: 79)
 
-            // 큰 의자 그림. 바뀔 때 새 그림이 옅게 커지며 들어온다.
+            // 큰 의자 그림. 미리 디코드한 380px 그림을 누른 프레임에 바로 바꾸고 120ms 교차 페이드한다(opacity만, 웹 ChairStudio.jsx와 같다).
             ZStack {
                 // 잠긴 의자는 큰 그림을 30%로 둔다(최종 피그마 2340:24031 그림 채우기 불투명도 0.3, 웹 ChairStudio.jsx와 같다).
-                Image(ChairStore.big(k, c)).resizable().scaledToFit()
+                store.image(ChairStore.hero(k, c)).resizable().scaledToFit()
                     .opacity(locked ? 0.3 : 1)
-                    .id(ChairStore.big(k, c))
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .scale(scale: 0.95)).combined(with: .offset(y: 8)),
-                        removal: .opacity
-                    ))
+                    .id(ChairStore.hero(k, c))
+                    .transition(.opacity)
             }
             .frame(width: 190, height: 190)
-            .animation(DS.Motion.decel(0.34), value: ChairStore.big(k, c))
+            .animation(Self.swap, value: ChairStore.hero(k, c))
             .offset(x: 100, y: 151)
 
             if locked {
@@ -70,7 +72,7 @@ struct ChairStudioView: View {
                     .frame(width: 56, height: 56)
                     .background(.black.opacity(0.6), in: Circle())
                     .offset(x: 167, y: 221)
-                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .transition(.opacity)
             }
 
             VStack(spacing: 8) {
@@ -82,7 +84,7 @@ struct ChairStudioView: View {
                     .frame(height: 18)
             }
             .id("\(k)-\(c)")
-            .transition(.opacity.combined(with: .offset(y: 4)))
+            .transition(.opacity)
             .frame(width: 390)
             .offset(y: 349)
 
@@ -94,11 +96,11 @@ struct ChairStudioView: View {
                 ForEach(ChairStore.kinds.indices, id: \.self) { i in
                     let on = i == k
                     Button {
-                        withAnimation(DS.Motion.decel(0.34)) { store.pickKind(i) }
+                        withAnimation(Self.swap) { store.pickKind(i) }
                         UISelectionFeedbackGenerator().selectionChanged()
                     } label: {
                         ZStack {
-                            Image(ChairStore.thumb(i, 0)).resizable().scaledToFit()
+                            store.image(ChairStore.tile(i, 0)).resizable().scaledToFit()
                                 .frame(width: 46, height: 46)
                                 .opacity(ChairStore.isLocked(i) ? 0.3 : 1)
                             if ChairStore.isLocked(i) {
@@ -130,11 +132,11 @@ struct ChairStudioView: View {
                             let on = j == c
                             Button {
                                 guard !locked else { return }
-                                withAnimation(DS.Motion.decel(0.34)) { store.pickColor(j) }
+                                withAnimation(Self.swap) { store.pickColor(j) }
                                 UISelectionFeedbackGenerator().selectionChanged()
                             } label: {
                                 ZStack(alignment: .topLeading) {
-                                    Image(ChairStore.thumb(k, j)).resizable().scaledToFit()
+                                    store.image(ChairStore.tile(k, j)).resizable().scaledToFit()
                                         .frame(width: 76, height: 76)
                                         .opacity(locked ? 0.23 : 1)
                                         .offset(x: 16, y: 8)

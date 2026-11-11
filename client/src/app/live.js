@@ -24,7 +24,7 @@ import { applySync } from './sync.js';
 import { patchCommunity } from './community.js';
 import { prepareHall } from './hallOfFame.js';
 import { prepareLiveCarousel } from './liveCarousel.js';
-import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
+import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio, warmStudio } from './chairs.js';
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
@@ -879,6 +879,9 @@ export async function prepare(layer, n, prevN) {
   patchWatchSeats(root, n);
   prepareWatchChat(root, n);
   if ([19, 36, 54].includes(n)) patchMyChair(root);
+  // 의자 꾸미기(20) 그림 미리 받기(chairs.js warmStudio): 마이(36), 스킨 팝업(19), 활동 알림(57)에서 미리 시작하고, 20은 다 받을 때까지(최대 600ms) 기다린 뒤 보인다.
+  if ([19, 36, 57].includes(n)) warmStudio();
+  if (n === 20) await Promise.race([warmStudio(), new Promise((r) => setTimeout(r, 600))]);
   attachPost(root);
   patchPill(root, n);
   patchReport(root, n);

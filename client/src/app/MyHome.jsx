@@ -178,11 +178,13 @@ function ItemSheet({ slot }) {
 // 화면 함수(MyItem)를 이 파일에서 내보내면 화면 목록이 36번에도 MyItem을 골라 마이가 늘 시트가 열린 채로 떴다(11/09). 그래서 MyItem은 MyItem.jsx에 둔다.
 export const pickedItem = () => pickedSlot();
 
-// 엉따 막대가 39도를 넘는 순간 의자 획득 장면(19)으로 넘어간다. 다른 화면에서 들어와 막대가 차오를 때만, 같은 세션에서 한 번만.
+// 엉따 막대가 39도를 넘는 순간 의자 획득 장면(19)으로 넘어간다. 다른 화면에서 들어와 막대가 차오를 때마다 뜬다.
+// 예전에는 같은 세션에서 한 번만 떠서 두 번째로 마이에 들어오면 뜨지 않았다(11/12 팀원 "마이페이지에서 온도 달성 캐릭터 잠금해제 창이 안 떠요").
+// 마이 안쪽 화면(36, 54, 19, 20) 사이를 오갈 때는 막대가 다시 차오르지 않으므로(fillGauge) 다시 뜨지 않는다.
 // 19의 "나중에 할게요"는 마이로 돌아오고(19는 마이 안의 화면이라 막대가 다시 차오르지 않는다), "지금 앉아보기"는 의자 꾸미기(20)로 간다.
 function useChairGet(fillRef, on) {
   useEffect(() => {
-    if (!on || chairGetSeen()) return undefined;
+    if (!on) return undefined;
     let raf = 0;
     let done = false;
     let gapTimer = 0;
@@ -193,7 +195,6 @@ function useChairGet(fillRef, on) {
       window.clearTimeout(timer);
       // 막대가 다 차오른 뒤 잠깐 마이를 보여 주고 획득 장면이 뜨도록 텐을 둔다(11/10 팀원 피드백). 그사이 다른 화면으로 가면 뜨지 않는다.
       gapTimer = window.setTimeout(() => {
-        if (chairGetSeen()) return;
         markChairGetSeen();
         go(19, 'none');
       }, CHAIR_GET.popGapMs);

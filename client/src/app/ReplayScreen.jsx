@@ -7,6 +7,8 @@
 // 10초 버튼은 시간을 10초 옮기고, 배속 칩은 1.0x, 1.5x, 2.0x 순서로 돌며 흐르는 빠르기를 바꾼다. 12:32에 닿으면 멈춘다.
 // 댓글 말풍선은 피그마에 순서 단서가 없어 처음부터 프레임 그대로 보인다.
 // 제목과 댓글 두 줄은 글 상세에서 연 글을 따른다(11. 12. 03:13 사용자 지시). 목록에서 누른 제목이 postScripts.js 표에 있으면 그 글 제목과 댓글이고, 없으면 사진보정 원문(replayData.js)이다. 장면과 의자 그림, 시간은 그대로다.
+// 끌어 옮기기(11. 12. 04:46 사용자 지시): 재생 바 위아래 30 칸 어디든 누르면 그 자리로 바로 옮기고, 누른 채 좌우로 끌면 손잡이와 진행 막대, 시간 글이 손가락을 따라 바뀐다.
+// 끄는 동안 흐름은 멈추고 손잡이는 scale 1.3(120ms 표준 곡선)으로 커진다. 놓으면 원래 상태(재생 중이면 이어 재생, 일시정지면 그대로)로 돌아가고, 끝까지 끌어 놓으면 12:32 끝 처리대로 멈춘다.
 // 휴대폰 높이 맞춤(mobileFit.js)이 읽을 수 있게 맨 바깥 칸의 자식은 모두 피그마 좌표의 absolute 칸이다.
 import { useEffect, useRef, useState } from 'react';
 import { motion } from '../tokens.js';
@@ -91,6 +93,10 @@ export default function ReplayScreen() {
   const thumbRef = useRef(null);
   // 10초 옮김 미끄러짐: 옮기기 직전 보이던 위치와 새 위치의 차이(초)를 180ms 동안 0으로 줄인다.
   const glide = useRef({ gap: 0, t0: 0 });
+  // 끄는 중인지와 끌기를 받는 칸(위아래 30), 손잡이 안쪽 원(눌림 반응 scale을 따로 건다).
+  const dragRef = useRef(null);
+  const hitRef = useRef(null);
+  const knobRef = useRef(null);
   const [sec, setSec] = useState(REPLAY.start);
   const [playing, setPlaying] = useState(true);
   const [rateI, setRateI] = useState(0);
@@ -121,7 +127,9 @@ export default function ReplayScreen() {
     const tick = (now) => {
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
-      if (playRef.current && !document.hidden && shown()) {
+      if (dragRef.current) {
+        // 끄는 동안은 흐르지 않는다(위치는 포인터가 정한다).
+      } else if (playRef.current && !document.hidden && shown()) {
         pos.current = Math.min(REPLAY.total, pos.current + dt * rateRef.current);
         if (pos.current >= REPLAY.total) { playRef.current = false; setPlaying(false); }
         paint(now);
@@ -150,6 +158,45 @@ export default function ReplayScreen() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     glide.current = { gap: reduce ? 0 : before - pos.current, t0: now };
     paint(now);
+  };
+  // 포인터 x를 0에서 12:32 사이 위치로 바꾼다. 화면 배율(mobileFit, 1440 틀)과 상관없이 트랙의 실제 화면 폭으로 나눈다.
+  const posAt = (clientX) => {
+    const r = hitRef.current.getBoundingClientRect();
+    const k = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    return k * REPLAY.total;
+  };
+  const knob = (on) => {
+    const el = knobRef.current;
+    if (!el) return;
+    el.style.transition = 'transform 120ms ' + motion.standard;
+    el.style.transform = on ? 'scale(1.3)' : 'scale(1)';
+  };
+  const scrubDown = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.stopPropagation();
+    e.preventDefault();
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) { /* 포인터가 이미 떨어졌다 */ }
+    dragRef.current = { id: e.pointerId };
+    glide.current = { gap: 0, t0: 0 };
+    pos.current = posAt(e.clientX);
+    knob(true);
+    paint();
+  };
+  const scrubMove = (e) => {
+    const d = dragRef.current;
+    if (!d || d.id !== e.pointerId) return;
+    pos.current = posAt(e.clientX);
+    paint();
+  };
+  const scrubUp = (e) => {
+    const d = dragRef.current;
+    if (!d || d.id !== e.pointerId) return;
+    if (e.type === 'pointerup') pos.current = posAt(e.clientX);
+    dragRef.current = null;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) { /* 이미 풀렸다 */ }
+    knob(false);
+    // 재생 중이었고 끝(12:32)에 놓았으면 다음 그리기에서 끝 처리(멈춤)가 돈다. 일시정지였으면 그 자리에 멈춰 있다.
+    paint();
   };
   const cycleRate = () => {
     const next = (rateI + 1) % REPLAY.rates.length;
@@ -213,7 +260,13 @@ export default function ReplayScreen() {
         <div data-figma="track" style={{ position: 'absolute', left: 0, top: 5, width: BAR_W, height: 4, borderRadius: 2, background: C.chip, overflow: 'hidden' }}>
           <div ref={barRef} data-figma="progress" style={{ position: 'absolute', left: 0, top: 0, width: BAR_W, height: 4, borderRadius: 2, background: C.brand, willChange: 'transform', transform: 'translateX(' + (REPLAY.start / REPLAY.total - 1) * BAR_W + 'px)' }} />
         </div>
-        <div ref={thumbRef} data-figma="thumb" style={{ position: 'absolute', left: 0, top: 0, width: 14, height: 14, borderRadius: 7, background: C.text, willChange: 'transform', transform: 'translateX(' + (REPLAY.start / REPLAY.total * BAR_W - 7) + 'px)' }} />
+        <div ref={thumbRef} data-figma="thumb" style={{ position: 'absolute', left: 0, top: 0, width: 14, height: 14, willChange: 'transform', transform: 'translateX(' + (REPLAY.start / REPLAY.total * BAR_W - 7) + 'px)' }}>
+          <div ref={knobRef} style={{ width: 14, height: 14, borderRadius: 7, background: C.text, transform: 'scale(1)' }} />
+        </div>
+        {/* 끌기를 받는 칸: 바 폭 그대로, 위아래로 8씩 넓혀 높이 30(손잡이 위에 덮여 손잡이를 눌러도 같다). */}
+        <div ref={hitRef} data-figma="재생 바 끌기 칸" role="slider" aria-label="재생 위치" aria-valuemin={0} aria-valuemax={REPLAY.total} aria-valuenow={sec} tabIndex={-1}
+          onPointerDown={scrubDown} onPointerMove={scrubMove} onPointerUp={scrubUp} onPointerCancel={scrubUp} onLostPointerCapture={scrubUp} onClick={(e) => e.stopPropagation()}
+          style={{ position: 'absolute', left: 0, top: -8, width: BAR_W, height: 30, cursor: 'pointer', touchAction: 'none' }} />
       </div>
 
       <div data-figma="플레이어 컨트롤" data-node="2322:12362" style={{ position: 'absolute', left: 24, top: 754, width: 342, height: 66, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px 8px 20px', borderRadius: 32, background: C.card }}>

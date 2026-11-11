@@ -149,10 +149,11 @@ private struct MyHome: View {
             if gauge < 1 {
                 withAnimation(DS.Motion.decel(1.0).delay(0.2)) { gauge = 1 }
                 // 다른 화면에서 들어와 막대가 차오를 때만, 39도를 넘는 순간 의자 획득 장면으로 넘어간다.
-                if startOverlay == .none, startItem == nil, !MyChairGet.seen {
+                // 들어올 때마다 뜬다(11/12 팀원 요청). 마이 안에서 시트나 팝업을 닫거나 의자 꾸미기에서 돌아오면 gauge 가 이미 1 이라 다시 뜨지 않는다.
+                if startOverlay == .none, startItem == nil {
                     Task { @MainActor in
                         try? await Task.sleep(for: .seconds(MyChairGet.crossSeconds + MyChairGet.popGapSeconds))
-                        guard !MyChairGet.seen, overlay == .none, item == nil else { return }
+                        guard overlay == .none, item == nil else { return }
                         MyChairGet.seen = true
                         withAnimation(DS.Motion.decel(0.35)) { overlay = .skin }
                     }

@@ -61,6 +61,8 @@ struct ReplayView: View {
     @State private var rateIndex = 0
     /// 앱이 앞에 있는지. 반복문 안에서 scenePhase를 바로 읽으면 화면이 처음 만들어질 때 값(켜지는 중 inactive)에 묶여 시간이 멈췄다(11/11 시뮬레이터 확인).
     @State private var active = true
+    /// 재생 바를 끄는 중인지(11. 12. 04:46 사용자 지시). 끄는 동안은 흐르지 않고 위치는 손가락이 정한다. 웹 ReplayScreen.jsx dragRef와 같다.
+    @State private var scrubbing = false
 
     private let barWidth: CGFloat = 342
 
@@ -214,10 +216,39 @@ struct ReplayView: View {
                     }
                     .clipShape(Capsule())
                 Circle().fill(DS.Palette.textPrimary).frame(width: 14, height: 14)
+                    // 끄는 동안 손잡이를 1.3배로 키운다(120ms 표준 곡선, 웹과 같다).
+                    .scaleEffect(scrubbing ? 1.3 : 1)
+                    .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.12), value: scrubbing)
                     .offset(x: p * barWidth - 7)
             }
             .frame(width: barWidth, height: 14, alignment: .leading)
         }
+        // 끌기를 받는 칸: 바 폭 그대로 위아래 8씩 넓혀 높이 30(자리는 그대로, 손잡이를 눌러도 같다).
+        // 누르면 그 자리로 바로 옮기고, 끄는 동안 손잡이와 진행 막대, 시간 글이 손가락을 따라 바뀐다. 0과 12:32를 넘지 않는다.
+        // 놓으면 원래 상태로(재생 중이면 이어 재생, 일시정지면 그대로). 재생 중 끝에 놓으면 waitForEnd가 끝 처리(멈춤)를 한다.
+        .padding(.vertical, 8)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                .onChanged { v in
+                    if !scrubbing {
+                        reanchor()
+                        glideGap = 0
+                        scrubbing = true
+                    }
+                    anchorPos = min(ReplayData.total, max(0, Double(v.location.x / barWidth) * ReplayData.total))
+                    anchorDate = Date()
+                }
+                .onEnded { v in
+                    anchorPos = min(ReplayData.total, max(0, Double(v.location.x / barWidth) * ReplayData.total))
+                    anchorDate = Date()
+                    scrubbing = false
+                }
+        )
+        .padding(.vertical, -8)
+        .accessibilityElement()
+        .accessibilityLabel("재생 위치")
+        .accessibilityValue(ReplayData.mmss(anchorPos))
     }
 
     // MARK: 플레이어 컨트롤 2322:12362: 342 x 66, #222628, 모서리 32, 안쪽 여백 8 14 8 20, 양 끝 정렬
@@ -281,7 +312,7 @@ struct ReplayView: View {
     // MARK: 동작
 
     /// 흐르는 중인지(재생 중이고 앱이 앞에 있을 때).
-    private var running: Bool { playing && active }
+    private var running: Bool { playing && active && !scrubbing }
 
     /// 기준 위치에서 지금 위치를 계산한다(끝 12:32에서 멈춤).
     private func livePos(_ date: Date) -> Double {
