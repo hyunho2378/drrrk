@@ -66,6 +66,12 @@ enum SUITWeight: String {
     case heavy = "SUIT-Heavy"
 }
 
+/// 자간 -4% 통일(팀 요청 2026. 11. 12., 피그마 "자간줄여" 섹션 글 2128개가 모두 -4%). 웹 index.css 전역 규칙과 같은 값.
+enum SUITTracking {
+    static let ratio: CGFloat = -0.04
+    static func of(_ size: CGFloat) -> CGFloat { ratio * size }
+}
+
 struct SUITText: ViewModifier {
     let size: CGFloat
     let weight: SUITWeight
@@ -73,9 +79,10 @@ struct SUITText: ViewModifier {
     let lineHeight: CGFloat?
 
     func body(content: Content) -> some View {
+        // 호출하는 곳에서 넘긴 tracking 값과 관계없이 모든 글자를 글자 크기 x -0.04 로 그린다.
         content
             .font(.custom(weight.rawValue, fixedSize: size))
-            .tracking(tracking)
+            .tracking(SUITTracking.of(size))
             .lineSpacing(lineHeight.map { max(0, $0 - size * 1.25) } ?? 0)
     }
 }

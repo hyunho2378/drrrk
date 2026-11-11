@@ -12,7 +12,7 @@ export const SCREENS = [
   "n": 2,
   "id": "1647:26876",
   "name": "DRRRK / 아침",
-  "file": "Screen1647_26876",
+  "file": "MorningReport",
   "h": 844
  },
  {
@@ -406,6 +406,27 @@ export const SCREENS = [
   "name": "DRRRK · 홈 (Dark)",
   "file": "HomeClipOpen",
   "h": 844
+ },
+ {
+  "n": 64,
+  "id": "2340:21259",
+  "name": "혼자 드르륵 · 그리드",
+  "file": "SoloGrid",
+  "h": 844
+ },
+ {
+  "n": 65,
+  "id": "2337:15695",
+  "name": "종료",
+  "file": "SoloReport",
+  "h": 844
+ },
+ {
+  "n": 66,
+  "id": "2351:34553",
+  "name": "DRRRK · 드르륵 · 현장 모드",
+  "file": "SoloSunrise",
+  "h": 844
  }
 ];
 
@@ -440,7 +461,7 @@ const modules = {
   'LiveSchool': () => import('../figma/screens/LiveSchool.jsx'),
   'LiveCareer': () => import('../figma/screens/LiveCareer.jsx'),
   'NotiActivity': () => import('../figma/screens/NotiActivity.jsx'),
-  'NotiKeyword': () => import('../figma/screens/NotiKeyword.jsx'),
+  'NotiKeyword': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiKeyword58Screen })),
   'NotiKeywordFull': () => import('../figma/screens/NotiKeywordFull.jsx'),
   'NotiKeywordSettings': () => import('../figma/screens/NotiKeywordSettings.jsx'),
   'NotiActivity1110': () => import('./NotiScreens.jsx').then((m) => ({ default: m.NotiActivityScreen })),
@@ -505,6 +526,11 @@ const modules = {
   'Replay': () => import('./ReplayScreen.jsx'),
   'HomeClip': () => import('./HomeClip.jsx'),
   'HomeClipOpen': () => import('./HomeClipOpen.jsx'),
+  'SoloGrid': () => import('./SoloGrid.jsx'),
+  'SoloReport': () => import('./SoloReport.jsx'),
+  // 아침(2): 최종 2340:23266, 2369:4202는 종료 리포트 위쪽과 같은 짜임이라 종료 생성 화면을 그대로 그린다(MorningReport.jsx).
+  'MorningReport': () => import('./MorningReport.jsx'),
+  'SoloSunrise': () => import('./SoloSunrise.jsx'),
 };
 
 export async function loadScreen(n) {

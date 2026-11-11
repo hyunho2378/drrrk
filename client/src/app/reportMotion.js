@@ -7,6 +7,13 @@
 // 움직임은 opacity와 translate(transform 속성의 한 갈래)만 쓴다. 화면 스크롤(live.js scrollerOf)이 덩어리에 transform을 쓰므로 겹치지 않게 translate로 움직인다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect } from './dom.js';
+import { SOLO_REPORT, SOLO_REPORT_H } from './soloReport.js';
+
+// 아래 버튼 묶음이 창 바닥에 붙는 종료 화면: 함께 방 종료(1, 1708 프레임)와 혼자 드르륵 종료 리포트(65, 1092 프레임, soloReport.js)
+// 아침(2)도 최종 2340:23266, 2369:4202에서 종료 리포트 위쪽과 같은 짜임(종료 생성 화면, MorningReport.jsx)이라 같은 고정 묶음과 스크롤을 쓴다.
+// 아침은 엉따 막대만 차고 덩어리 펼침은 하지 않는다(의정 1647:26876 막대 댓글, 펼침 댓글은 종료 1647:26726에만).
+export const isEndScreen = (n) => n === 1 || n === 2 || n === SOLO_REPORT;
+const rises = (n) => isEndScreen(n) && n !== 2;
 
 const R = LIVE.reportMotion;
 const EMPTY = 'inset(0 100% 0 0 round 99px)';
@@ -26,6 +33,29 @@ export function endFloor(root) {
   if (root.dataset.fit && h && h !== 1708) { root.style.setProperty('--end-h', h + 'px'); return h; }
   return LIVE.screenH;
 }
+// 종료(1) 아래 버튼 묶음(피그마 2023:30766, 1804:13238 "Frame 2147249293", 342 x 78, 세로 제약 BOTTOM)은 스크롤해도 창 바닥에 붙어 따라온다(탁빛나 11/12 "하단바 따라오게").
+// 피그마 1708 프레임에서 묶음 아래 여백은 40(1590 + 78 = 1668)이다. 창 바닥에서 같은 여백을 두고, 묶음 위의 누르는 자리(커뮤니티에 고민 올리기, 올리지 않고 홈으로)도 같은 만큼 올린다.
+// 피그마에 묶음 뒤 배경(판, 그라데이션)은 없다. 묶음 윗선 아래로 내려간 내용은 스크롤 칸(live.js scrollerOf)이 잘라 버튼과 겹치지 않는다.
+// 두 번 불러도 같은 결과다(처음 자리를 data-y0에 적어 둔다).
+export function pinEndBar(root, layer) {
+  const bar = root.querySelector(':scope > [data-figma="Frame 2147249293"]');
+  if (!bar) return null;
+  if (!bar.dataset.y0) bar.dataset.y0 = String(parseFloat(bar.style.top) || relRect(root, bar).y);
+  const y0 = +bar.dataset.y0;
+  const H = root.dataset.soloReport ? SOLO_REPORT_H : END_H;
+  const shift = y0 - (endFloor(root) - (H - y0));
+  bar.style.top = y0 - shift + 'px';
+  bar.style.zIndex = '3';
+  if (layer) q(layer, '[data-hotspot]').forEach((b) => {
+    if (!b.dataset.y0) b.dataset.y0 = b.style.top;
+    const t = parseFloat(b.dataset.y0);
+    if (!(t >= y0 - 0.5)) return;
+    b.style.top = t - shift + 'px';
+    b.dataset.fitPinned = '1';
+  });
+  return bar;
+}
+const END_H = 1708;
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const bars = (root) => q(root, '[data-figma="엉따온도 Card"] [data-figma="Track"] > [data-figma="Bar"]');
@@ -70,12 +100,12 @@ function viewBottom(root) {
 
 // 화면이 보이기 전(prepare): 막대를 비우고, 종료의 줄을 숨겨 둔다.
 export function prepReportMotion(root, n) {
-  if ((n !== 1 && n !== 2) || root.dataset.reportMotion) return;
+  if ((!isEndScreen(n) && n !== 2) || root.dataset.reportMotion) return;
   root.dataset.reportMotion = 'prep';
-  if (n === 1) endFloor(root);
+  if (isEndScreen(n)) endFloor(root);
   if (reduced()) return;
   bars(root).forEach((b) => (b.style.clipPath = EMPTY));
-  if (n === 1) blocksOf(root).forEach((bk) => bk.rows.forEach((r) => Object.assign(r.style, { opacity: '0', translate: '0 ' + R.dy + 'px' })));
+  if (rises(n)) blocksOf(root).forEach((bk) => bk.rows.forEach((r) => Object.assign(r.style, { opacity: '0', translate: '0 ' + R.dy + 'px' })));
 }
 
 function fill(bar, delay) {
@@ -90,12 +120,12 @@ function rise(row, delay) {
 
 // 화면이 자리를 잡은 뒤(attach): 매 프레임 보이는 자리를 재서 막대와 덩어리를 한 번씩만 시작한다.
 export function attachReportMotion(root, n) {
-  if ((n !== 1 && n !== 2) || root.dataset.reportMotion !== 'prep') return;
+  if ((!isEndScreen(n) && n !== 2) || root.dataset.reportMotion !== 'prep') return;
   root.dataset.reportMotion = 'on';
   if (reduced()) return;
   const t0 = performance.now();
   let gauges = bars(root);
-  let blocks = n === 1 ? blocksOf(root) : [];
+  let blocks = rises(n) ? blocksOf(root) : [];
   let nextAt = 0;
   const loop = () => {
     if (!root.isConnected) return;

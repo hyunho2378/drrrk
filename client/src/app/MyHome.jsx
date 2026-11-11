@@ -24,7 +24,8 @@ const ITEMS = [
   { key: 'drrra', name: '드르라', img: 's-drrra' },
   { key: 'squid', name: '오징어', img: 's-squid' },
   { key: 'monster', name: '몬스타', img: 's-monster', locked: true },
-  { key: 'soju', name: '마지막처럼', img: 's-soju', locked: true },
+  // 최종 피그마(2340:30187): 잠긴 마지막처럼은 같은 그림에 노출 -1, 채도 -1 거름을 건다(몬스타 그림 s-monster는 노출 -1이 이미 구워져 있다).
+  { key: 'soju', name: '마지막처럼', img: 's-soju', locked: true, dim: 'grayscale(1) brightness(0.18)' },
 ];
 
 const CSS = `
@@ -35,6 +36,10 @@ const CSS = `
 .mh-hero{transition:transform 120ms cubic-bezier(.2,0,0,1),opacity 120ms cubic-bezier(.2,0,0,1)}
 .mh-hero:active{transform:scale(.97);opacity:.85;transition-duration:90ms}
 .mh-nav [data-figma="name=my, state=selected"]{position:absolute!important;left:312px!important;top:12px!important;margin:0!important}
+.mh-nav [data-figma="name=home, state=default"]{left:20px!important;top:12px!important}
+.mh-nav [data-figma="tab/라이브"]{left:120px!important;top:12px!important}
+.mh-nav [data-figma="tab/커뮤니티"]{left:216px!important;top:12px!important}
+.mh-nav p[data-figma="MY"]{font-weight:700!important}
 `;
 
 // 마이 안의 화면(나의 편의점 53, 아이템 상세 54, 스킨 팝업 19, 의자 꾸미기 20)에서 돌아오면 엉따 막대를 다시 채우지 않는다.
@@ -48,7 +53,7 @@ function go(to, t = 'fade') {
 function Title({ text }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: 20 }}>
-      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.28px', color: '#F8F8F8', lineHeight: '20px' }}>{text}</span>
+      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.04em', color: '#F8F8F8', lineHeight: '20px' }}>{text}</span>
       <img alt="" src={A + 'info.png'} style={{ width: 13, height: 13 }} />
     </div>
   );
@@ -70,7 +75,7 @@ function ItemSheet({ slot }) {
   const key = sheetKey(slot);
   const locked = key === 'locked';
   const copy = locked ? LOCKED_COPY : ITEM_COPY[key];
-  const chips = locked ? LOCKED_COPY.chips : itemChips();
+  const chips = locked ? LOCKED_COPY.chips : itemChips(key);
   const H = locked ? 397 : 393;
   const [y0, setY0] = useState(null);
   const [dy, setDy] = useState(0);
@@ -158,7 +163,7 @@ function ItemSheet({ slot }) {
               <img alt="" draggable={false} src={copy.img} style={{ width: 112, height: 112, objectFit: 'contain' }} />
             </button>}
         <span data-figma="item name" style={{ marginTop: 16, height: 28, fontSize: 20, fontWeight: 700, lineHeight: '28px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>{copy.name}</span>
-        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: locked || key === 'byeollo' ? 0 : '-0.56px', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
+        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: '-0.04em', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
         <span data-figma="정보 칩" style={{ marginTop: 16, display: 'flex', gap: 8 }}>
           {chips.map((c, i) => (
             <span key={i} data-figma={i === 0 ? 'chip 쿨타임' : 'chip 라이브 전용'} style={{ padding: '5px 10px', borderRadius: 8, background: 'rgba(255,255,255,.08)', fontSize: locked ? 14 : 12, fontWeight: locked ? 400 : 500, lineHeight: locked ? '21px' : '17px', color: '#CCD1D6', whiteSpace: 'nowrap' }}>{c}</span>
@@ -230,7 +235,8 @@ export default function MyHome({ item, still }) {
     if (!root) return;
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     for (let n = w.nextNode(); n; n = w.nextNode()) if (n.nodeValue.trim() === 'MY') n.nodeValue = '마이';
-    // 글자 위에 덮인 피그마 윤곽(MY 모양)을 지우고 실제 글자 "마이"를 보이게 한다. 굵기는 다른 탭 글자와 같게 둔다.
+    // 글자 위에 덮인 피그마 윤곽(MY 모양)을 지우고 실제 글자 "마이"를 보이게 한다.
+    // 최종 피그마(2340:30101, 2340:23706): 고른 탭 "마이"는 SUIT 700 #36D2FF, 네 탭은 x 20, 120, 216, 312 와 y 12(아래 탭 안)에 둔다(위 CSS).
     root.querySelectorAll('p[data-figma="MY"][data-outline]').forEach((p) => {
       p.querySelectorAll('span[aria-hidden="true"]').forEach((s) => s.remove());
       p.style.webkitTextFillColor = 'currentColor';
@@ -261,12 +267,12 @@ export default function MyHome({ item, still }) {
       <div style={{ position: 'absolute', left: 24, top: 356, width: 342 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', height: 36 }}>
           <Title text="엉따 온도" />
-          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.52px', lineHeight: '36px', color: '#FF9A4D' }}>39.2°</span>
+          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: '36px', color: '#FF9A4D' }}>39.2°</span>
         </div>
         {/* 오늘 오른 온도 칩(팀 피그마 1980:28595): 화면 기준 237, 361. 칩 49 x 25, 모서리 11, #36D2FF, 안쪽 여백 9와 4,
             글자 SUIT Bold 11, 행간 150%, 자간 -4%, 검정. 오른쪽 꼬리(1980:28598)는 285, 369의 9.5 x 9 삼각형이다. */}
         <span aria-label="오늘 0.5도 올랐어요" data-figma="+ 0.5°" style={{ position: 'absolute', left: 213, top: 5, width: 58, height: 25, pointerEvents: 'none' }}>
-          <span style={{ position: 'absolute', left: 0, top: 0, width: 49, height: 25, borderRadius: 11, background: '#36D2FF', boxSizing: 'border-box', padding: '4px 9px', fontSize: 11, fontWeight: 700, lineHeight: '16.5px', letterSpacing: '-0.44px', color: '#000', whiteSpace: 'nowrap' }}>+ 0.5°</span>
+          <span style={{ position: 'absolute', left: 0, top: 0, width: 49, height: 25, borderRadius: 11, background: '#36D2FF', boxSizing: 'border-box', padding: '4px 9px', fontSize: 11, fontWeight: 700, lineHeight: '16.5px', letterSpacing: '-0.04em', color: '#000', whiteSpace: 'nowrap' }}>+ 0.5°</span>
           <svg aria-hidden width="58" height="25" viewBox="0 0 58 25" style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
             <path d="M55.5921 11.5962L48 8V17L55.5921 13.4037C56.3547 13.0425 56.3547 11.9574 55.5921 11.5962Z" fill="#36D2FF" />
           </svg>
@@ -301,7 +307,7 @@ export default function MyHome({ item, still }) {
             onClick={() => { playItem(it.locked ? 'locked' : it.key); pickItem(it.locked ? '???' : it.name, 36, i); go(54, 'none'); }}
             style={{ position: 'absolute', left: (i % 4) * step, top: Math.floor(i / 4) * 105, width: 76, height: 93, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <span style={{ position: 'relative', width: 72, height: 72, display: 'grid', placeItems: 'center' }}>
-              <img alt="" src={A + it.img + '.png'} style={{ width: 68, height: 68, objectFit: 'contain', opacity: it.locked ? 0.35 : 1 }} />
+              <img alt="" src={A + it.img + '.png'} style={{ width: 68, height: 68, objectFit: 'contain', opacity: it.locked ? 0.35 : 1, filter: it.dim || 'none' }} />
               {it.locked && <img alt="" src={A + 'lock.png'} style={{ position: 'absolute', width: 24, height: 24 }} />}
             </span>
             <span style={{ fontSize: 12, fontWeight: 500, lineHeight: '17px', color: it.locked ? '#666B73' : '#D9DEE3', whiteSpace: 'nowrap' }}>{it.locked ? '???' : it.name}</span>

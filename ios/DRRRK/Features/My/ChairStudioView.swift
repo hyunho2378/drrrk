@@ -50,9 +50,9 @@ struct ChairStudioView: View {
 
             // 큰 의자 그림. 바뀔 때 새 그림이 옅게 커지며 들어온다.
             ZStack {
+                // 잠긴 의자는 큰 그림을 30%로 둔다(최종 피그마 2340:24031 그림 채우기 불투명도 0.3, 웹 ChairStudio.jsx와 같다).
                 Image(ChairStore.big(k, c)).resizable().scaledToFit()
-                    .brightness(locked ? -0.5 : 0)
-                    .saturation(locked ? 0.6 : 1)
+                    .opacity(locked ? 0.3 : 1)
                     .id(ChairStore.big(k, c))
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .scale(scale: 0.95)).combined(with: .offset(y: 8)),

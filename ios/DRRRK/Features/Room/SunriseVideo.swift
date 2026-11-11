@@ -42,9 +42,16 @@ final class SunrisePlayer {
         startedAt != nil && !failed && poster != nil
     }
 
-    init(story: StoryKind) {
-        guard let url = Bundle.main.url(forResource: Self.fileName(for: story), withExtension: "mp4"),
-              let posterURL = Bundle.main.url(forResource: Self.fileName(for: story) + "-first", withExtension: "jpg"),
+    /// 혼자 드르륵 방 해 뜨는 단계(피그마 2351:34553, 탁빛나 11/12 "아침해 뜨는거 반영 필요")의 영상 이름. 640 x 1148, 24fps, 5.07초. 웹 tokens.js live.sunriseVideo.solo와 같다.
+    static let soloName = "sunrise-solo"
+
+    convenience init(story: StoryKind) {
+        self.init(named: Self.fileName(for: story))
+    }
+
+    init(named name: String) {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "mp4"),
+              let posterURL = Bundle.main.url(forResource: name + "-first", withExtension: "jpg"),
               let raw = UIImage(contentsOfFile: posterURL.path) else {
             player = nil
             poster = nil
@@ -94,6 +101,12 @@ final class SunrisePlayer {
     /// 방을 나가면 멈춘다.
     func stop() {
         player?.pause()
+    }
+
+    /// 멈춘 자리부터 이어 튼다(혼자 방 그리드를 닫을 때). 이미 끝났으면 마지막 장면에 그대로 둔다.
+    func resume() {
+        guard let player, startedAt != nil, endedAt == nil, !failed else { return }
+        player.play()
     }
 
     /// 첫 장면이 그려졌을 때(AVPlayerLayer.isReadyForDisplay) 부른다.

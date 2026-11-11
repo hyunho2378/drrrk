@@ -1,14 +1,13 @@
 import Foundation
 
-// 아이템 상세 시트 글(팀 피그마 "Section 1" 2116:28581, 시트 9장 390 x 393).
-// 피그마 시트의 설명 글은 팀원이 임의로 써 둔 글이라(11. 10. 메모 "아이템 설명글 라이팅 수정 필요") 여기서 새로 썼다.
-// 줄마다 사실 하나: 첫 줄은 어떤 간식인지, 둘째 줄은 라이브 방에서 던졌을 때 테이블에 올라가는 쓰임이다.
-// 칩 두 개는 피그마 프레임 이름("chip 쿨타임 30초", "chip 라이브 전용")대로 기능 칩으로 쓴다.
+// 아이템 상세 시트 글(최종 드르륵 페이지 "토스트 팝업" 섹션 2340:30205, 시트 9장 390 x 393, 2340:30206 ~ 2340:30350).
+// 11. 12. 팀이 시트마다 설명 두 줄과 칩 두 개를 새로 썼다. 글은 피그마 글자 그대로다(마지막처럼 둘째 줄 앞 칸 띄움 포함).
 // 웹 client/src/app/itemCopy.js와 글자가 같아야 한다.
 
 struct ItemCopy {
     let name: String
     let lines: [String]
+    var chips: [String] = []
 
     var text: String { lines.joined(separator: "\n") }
 }
@@ -18,21 +17,21 @@ enum ItemCopyData {
     static let throwCooldownSeconds = 3
 
     static let byKey: [String: ItemCopy] = [
-        "shrimp": ItemCopy(name: "새우깡", lines: ["새우 맛이 나는 짭짤하고 바삭한 과자예요.", "라이브 방에서 던지면 테이블 위에 올라가요."]),
-        "soju": ItemCopy(name: "마지막처럼", lines: ["초록 병에 담긴 부드러운 맛의 소주예요.", "라이브 방에서 던지면 테이블에 병이 놓여요."]),
-        "peanut": ItemCopy(name: "오징어땅콩", lines: ["땅콩을 오징어 맛 과자로 감싼 스낵이에요.", "던지면 봉지째 라이브 방 테이블에 올라가요."]),
-        "nogari": ItemCopy(name: "노가리", lines: ["어린 명태를 말려 구운 쫄깃한 안주예요.", "라이브 방에서 던지면 테이블에 한 접시 놓여요."]),
-        "drrra": ItemCopy(name: "드르라", lines: ["톡 쏘는 탄산이 시원한 초록 캔 맥주예요.", "라이브 방에서 던지면 테이블에 캔이 올라가요."]),
-        "squid": ItemCopy(name: "오징어", lines: ["통째로 말려 찢어 먹는 오징어 안주예요.", "라이브 방에서 던지면 테이블에 봉지가 놓여요."]),
-        "monster": ItemCopy(name: "몬스타", lines: ["잠을 깨워 주는 카페인 에너지 음료예요.", "라이브 방에서 던지면 테이블에 캔이 놓여요."]),
-        "byeollo": ItemCopy(name: "별로", lines: ["투명한 병에 담긴 깔끔한 맛의 소주예요.", "라이브 방에서 던지면 테이블에 병이 올라가요."]),
+        "shrimp": ItemCopy(name: "새우깡", lines: ["바삭, 하나만 먹으려다 어느새 봉지 바닥.", "자꾸 손이 가는 소리에 이야기도 술술 풀린다."], chips: ["바삭한수다", "손이가요손이가"]),
+        "soju": ItemCopy(name: "마지막처럼", lines: ["한 잔 한 잔, 내일은 없다.", " 마음속에 담아둔 이야기도 편하게 꺼내보자."], chips: ["솔직한수다", "한잔해"]),
+        "peanut": ItemCopy(name: "오징어땅콩", lines: ["고소한 땅콩과 짭짤한 오징어를 한입에.", "봉지를 돌려 나누다 보면 어색함도 사라진다."], chips: ["고소한수다", "고소짭짤"]),
+        "nogari": ItemCopy(name: "노가리", lines: ["질겅질겅 씹는 동안 말문도 천천히 풀린다.", "짭조름한 한 점이 새벽 대화를 오래 붙잡아준다."], chips: ["느긋한수다", "씹고뜯고"]),
+        "drrra": ItemCopy(name: "드르라", lines: ["톡 쏘는 첫 모금에 대화도 산뜻하게 시작된다.", "잔을 기울이며 오늘의 이야기를 천천히 이어가자."], chips: ["상쾌한수다", "캬"]),
+        "squid": ItemCopy(name: "오징어", lines: ["몸통부터 다리까지 하나씩 뜯어 먹듯,", "복잡한 이야기도 차근차근 풀어보자."], chips: ["쫄깃한수다", "찢어먹자"]),
+        "monster": ItemCopy(name: "몬스타", lines: ["톡 쏘는 한 모금에 잠은 달아나고 기운은 번쩍.", "길어진 밤, 대화는 아직 끝나지 않았다."], chips: ["활기찬수다", "잠이번쩍"]),
+        "byeollo": ItemCopy(name: "별로", lines: ["목 넘김은 부드럽게, 기분은 말랑하게.", "천천히 한 잔 기울이며 오늘의 이야기를 나눠보자."], chips: ["부드러운수다", "꼴꼴꼴"]),
     ]
 
     /// 미획득 시트(2116:28586)는 피그마 그대로: 이름 ???, 설명 ??????(두 줄), 칩 ??? 두 개, 자물쇠.
     static let locked = ItemCopy(name: "???", lines: ["??????", "??????"])
     static let lockedChips = ["???", "???"]
 
-    static var chips: [String] { ["쿨타임 \(throwCooldownSeconds)초", "라이브 전용"] }
+    static func chips(for key: String) -> [String] { copy(for: key).chips }
 
     static func copy(for key: String) -> ItemCopy {
         byKey[key] ?? byKey["shrimp"]!

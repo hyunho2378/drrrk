@@ -50,7 +50,7 @@ export function MiniProfileScreen({ startRecommended = false, Base = Gen }) {
       <Base />
       {rec && (
         <div className="mp-in" style={{ position: 'absolute', left: 0, right: 0, top: 566 - 62 - 12 - 54, display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 6 }}>
-          <div style={{ background: '#30363A', color: '#F8F8F8', fontSize: 12, fontWeight: 500, letterSpacing: '-0.48px', lineHeight: '17px', textAlign: 'center', padding: '10px 16px', borderRadius: 12, whiteSpace: 'pre' }}>
+          <div style={{ background: '#30363A', color: '#F8F8F8', fontSize: 12, fontWeight: 500, letterSpacing: '-0.04em', lineHeight: '17px', textAlign: 'center', padding: '10px 16px', borderRadius: 12, whiteSpace: 'pre' }}>
             {'딱딱한 나무 스툴12님의 엉따 지수가 0.1°\n올라갔어요'}
           </div>
         </div>
@@ -58,12 +58,12 @@ export function MiniProfileScreen({ startRecommended = false, Base = Gen }) {
       <div className="mp-sheet" style={{ position: 'absolute', left: 0, top: 566, width: 390, height: 278, background: '#121415', borderRadius: '24px 24px 0 0', zIndex: 5 }}>
         <img alt="" draggable={false} src={STOOL} style={{ position: 'absolute', left: 129, top: -62, width: 132, height: 132, objectFit: 'contain', filter: 'drop-shadow(0 10px 9px rgba(0,0,0,.45))', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', left: 0, right: 0, top: 74, height: 27, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.38px', lineHeight: '27px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>딱딱한 나무 스툴12</span>
+          <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: '27px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>딱딱한 나무 스툴12</span>
           <Wave />
         </div>
         <div style={{ position: 'absolute', left: 24, top: 121, width: 51 }}>
           <div style={{ fontSize: 13, fontWeight: 500, lineHeight: '18px', color: '#9AA1A6', whiteSpace: 'nowrap' }}>엉따 지수</div>
-          <div style={{ marginTop: 2, fontSize: 22, fontWeight: 700, letterSpacing: '-0.44px', lineHeight: '31px', color: '#FF9A4D', whiteSpace: 'nowrap' }}>41.5°</div>
+          <div style={{ marginTop: 2, fontSize: 22, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: '31px', color: '#FF9A4D', whiteSpace: 'nowrap' }}>41.5°</div>
         </div>
         <div aria-label="대표 업적 오징어땅콩, 새우깡, 드르라" style={{ position: 'absolute', left: 218, top: 125, display: 'flex', gap: 8 }}>
           {SNACKS.map(([n, src]) => (
@@ -82,7 +82,7 @@ export function MiniProfileScreen({ startRecommended = false, Base = Gen }) {
         {menu && (
           <div className="mp-in" style={{ position: 'absolute', right: 11, top: 50, padding: '4px 0', borderRadius: 12, background: '#222628', boxShadow: '0 6px 12px rgba(0,0,0,.4)', zIndex: 7 }}>
             {[['신고하기', 7, 'push'], ['차단하기', 8, 'fade']].map(([t, to, tr]) => (
-              <button key={t} className="mp-btn" onClick={() => go(to, tr)} style={{ display: 'block', width: 152, height: 40, padding: '0 16px', textAlign: 'left', fontSize: 14, fontWeight: 500, letterSpacing: '-0.28px', color: '#F8F8F8' }}>{t}</button>
+              <button key={t} className="mp-btn" onClick={() => go(to, tr)} style={{ display: 'block', width: 152, height: 40, padding: '0 16px', textAlign: 'left', fontSize: 14, fontWeight: 500, letterSpacing: '-0.04em', color: '#F8F8F8' }}>{t}</button>
             ))}
           </div>
         )}

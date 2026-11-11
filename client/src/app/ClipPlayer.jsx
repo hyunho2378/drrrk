@@ -538,7 +538,7 @@ export function ClipPlayer(props) {
       {st.sheet === 'more' ? <MoreSheet open={st.sheetOpen} onClose={closeSheet} onAction={act} stats={{ like: fmt(likeCount(c)), comment: fmt(commentsOf(c)) }} liked={isLiked(c.id)} saved={isSaved(c.id)} loop={clip.loop} /> : null}
       <ClipAgent delay={1600} />
       {toast ? (
-        <div key={toast.id} role="status" style={{ position: 'absolute', left: '50%', top: 692, zIndex: 70, maxWidth: 330, padding: '10px 16px', borderRadius: 14, background: 'rgba(44,44,46,0.96)', color: '#F2F2F7', fontFamily: FONT, fontSize: 13.5, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.27px', whiteSpace: 'pre', pointerEvents: 'none', animation: 'cpToast 240ms cubic-bezier(0.05,0.7,0.1,1) both', boxShadow: '0 6px 16px rgba(0,0,0,0.4)' }}>{toast.text}</div>
+        <div key={toast.id} role="status" style={{ position: 'absolute', left: '50%', top: 692, zIndex: 70, maxWidth: 330, padding: '10px 16px', borderRadius: 14, background: 'rgba(44,44,46,0.96)', color: '#F2F2F7', fontFamily: FONT, fontSize: 13.5, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.04em', whiteSpace: 'pre', pointerEvents: 'none', animation: 'cpToast 240ms cubic-bezier(0.05,0.7,0.1,1) both', boxShadow: '0 6px 16px rgba(0,0,0,0.4)' }}>{toast.text}</div>
       ) : null}
     </div>
   );

@@ -18,7 +18,7 @@ export function toast(root, text) {
   const t = document.createElement('div');
   t.setAttribute('role', 'status');
   t.textContent = text;
-  Object.assign(t.style, { position: 'absolute', left: '24px', width: '342px', top: y - 62 + 'px', zIndex: '40', boxSizing: 'border-box', padding: '12px 16px', borderRadius: '12px', background: '#222628', color: '#F8F8F8', fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '14px', fontWeight: '600', lineHeight: '20px', textAlign: 'center', letterSpacing: '-0.02em', pointerEvents: 'none', boxShadow: '0 6px 16px 0 rgba(0,0,0,0.32)' });
+  Object.assign(t.style, { position: 'absolute', left: '24px', width: '342px', top: y - 62 + 'px', zIndex: '40', boxSizing: 'border-box', padding: '12px 16px', borderRadius: '12px', background: '#222628', color: '#F8F8F8', fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '14px', fontWeight: '600', lineHeight: '20px', textAlign: 'center', letterSpacing: '-0.04em', pointerEvents: 'none', boxShadow: '0 6px 16px 0 rgba(0,0,0,0.32)' });
   root.appendChild(t);
   t.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
   window.setTimeout(() => {
@@ -524,7 +524,7 @@ export function attachSpeakers(root) {
     const paint = (i) => labels.forEach((p, k) => {
       const on = k === i;
       p.dataset.speaking = on ? '1' : '';
-      Object.assign(p.style, { transition: 'color 200ms ' + motion.standard, textShadow: on ? '0 0 4px rgba(0, 0, 0, 0.25)' : '0 0 4px rgba(0, 0, 0, 0.5)', webkitTextFillColor: 'currentColor', color: on ? '#F8F8F8' : 'rgba(248, 248, 248, 0.5)', fontWeight: on ? '700' : '500', fontSize: on ? '12px' : '11px', lineHeight: on ? '15px' : '14px', letterSpacing: on ? '-0.48px' : '-0.44px', height: on ? '15px' : '14px', width: 'auto', whiteSpace: 'pre' });
+      Object.assign(p.style, { transition: 'color 200ms ' + motion.standard, textShadow: on ? '0 0 4px rgba(0, 0, 0, 0.25)' : '0 0 4px rgba(0, 0, 0, 0.5)', webkitTextFillColor: 'currentColor', color: on ? '#F8F8F8' : 'rgba(248, 248, 248, 0.5)', fontWeight: on ? '700' : '500', fontSize: on ? '12px' : '11px', lineHeight: on ? '15px' : '14px', letterSpacing: '-0.04em', height: on ? '15px' : '14px', width: 'auto', whiteSpace: 'pre' });
     });
     // 기준 자리: 피그마에서 초록 점과 파동이 붙어 있는 이름표. 점은 이름표 왼쪽, 파동은 이름표 가운데 위에 같은 간격으로 붙는다.
     const d0 = relRect(root, dot), w0 = relRect(root, wave);

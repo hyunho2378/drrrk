@@ -9,20 +9,28 @@
 //   영상 첫 프레임을 기한 안에 준비하지 못하거나 파일을 못 받으면 영상 층을 만들지 않고 가까운 정지 사진이 처음부터 보인다.
 // 새로 들어온 방(live.js room.scene이 B가 아니던 때)에서만 재생한다. 같은 방 안의 화면 전환(퀵슬롯 펼침, 올림)에서는 영상을 새 화면으로 옮겨 이어 간다.
 // 방 온보딩 덮개가 떠 있는 동안은 첫 장면에 세워 두고, 덮개가 닫히면 재생한다(roomChat.js와 같은 기준).
+// 혼자 드르륵 방 첫 화면(46, 피그마 1647:25199 "영상", 11. 12. 팀 댓글 "영상 반영")도 같은 방식으로 room-enter-solo.mp4(640 x 1148, 30fps, 3.0초)를 한 번 재생한다.
+//   혼자 방에 새로 들어올 때(live.js room.scene이 C가 아니던 때)만 재생하고, 끝나면 41, 42, 43과 같은 현장 장면(영상 마지막 장면과 회색 평균 차이 1.4/255)으로 대체한다.
+//   재생 중에 그리드(64)로 갔다 46으로 돌아오면 멈춘 자리부터 이어 재생하고, 이미 끝났으면 현장 장면이 처음부터 보인다.
 // 브라우저가 소리 재생을 막으면 소리 없이 재생한다. 해 뜨는 단계(40)와 해 뜬 순간(35)에서는 재생하지 않는다. iOS RoomEnterVideo.swift와 같은 동작이다.
 import { live as LIVE } from '../tokens.js';
 import { roomStory } from './roomConcern.js';
 import { assetUrl, decodeImage, frameReady, setSceneImage, urlIn } from './videoReplace.js';
 
 // 입장 영상을 까는 방 화면(접힘 29, 펼침 28, 올림 30, 31). 같은 방 안에서 이 화면끼리 옮기면 재생 중인 영상을 새 화면으로 옮겨 이어 간다.
-const ENTRY_SCREENS = [28, 29, 30, 31];
+const ENTRY_SCREENS = [28, 29, 30, 31, 46];
+// 혼자 드르륵 방 첫 화면(46). 혼자 방 안의 다른 화면(41, 42, 43, 그리드 64)에는 영상을 옮기지 않는다.
+const SOLO_SCREEN = 46;
 // 방으로 이어지는 화면(라이브 목록과 탭, 고민 분석, 추천, 방 구경, 혼자 방의 함께 앉기). 여기서 영상과 첫 장면 그림을 미리 받아 둔다.
-const AHEAD_SCREENS = [10, 26, 27, 37, 42, 47, 48, 49, 50, 51, 52];
+// 혼자 방으로 이어지는 화면(방을 찾지 못함 45, 혼자 드르륵 온보딩 16, 17, 추천 27, 그리드 64)도 넣는다.
+const AHEAD_SCREENS = [10, 16, 17, 26, 27, 37, 42, 45, 47, 48, 49, 50, 51, 52, 64];
 
 const cache = {};
 const log = [];
 let cur = null;
 let covTimer = 0;
+// 혼자 방 영상을 재생하는 중에 다른 화면(그리드 64)으로 나가면 멈춘 자리를 적어 둔다. 46으로 돌아오면 이어 재생한다.
+let parked = null;
 // 확인용 기록(개발 서버에서 window.__roomEnter로 읽는다).
 if (typeof window !== 'undefined') window.__roomEnter = { log, el: () => cur && cur.video, state: () => cur && { phase: cur.phase, key: cur.key } };
 const note = (ev, extra) => {
@@ -32,7 +40,7 @@ const note = (ev, extra) => {
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const covered = () => !!document.querySelector('[data-figma="방 온보딩"]');
-const keyNow = () => (roomStory() === 'photo' ? 'photo' : 'ssang');
+const keyNow = (n) => (n === SOLO_SCREEN ? 'solo' : roomStory() === 'photo' ? 'photo' : 'ssang');
 const posterOf = (key) => assetUrl(LIVE.roomEnterPoster[key]);
 
 function videoFor(key) {
@@ -55,7 +63,10 @@ function videoFor(key) {
 // 방으로 이어지는 화면에서 부른다. 두 이야기 영상(합쳐 약 0.8MB)과 첫 장면 그림을 미리 받아 둔다.
 export function prefetchRoomEnter(n) {
   if (!AHEAD_SCREENS.includes(n) && !ENTRY_SCREENS.includes(n)) return;
-  try { ['ssang', 'photo'].forEach((k) => { videoFor(k); decodeImage(posterOf(k)); }); } catch (e) { void e; }
+  try {
+    ['ssang', 'photo', 'solo'].forEach((k) => { videoFor(k); decodeImage(posterOf(k)); });
+    decodeImage(assetUrl(LIVE.roomEnterAfter.solo));
+  } catch (e) { void e; }
 }
 
 // 장면 그림 칸(scene.js swapScene이 바꾼 "image 1208091463").
@@ -100,6 +111,7 @@ function leave(why) {
   try { my.video.pause(); } catch (e) { void e; }
   my.video.onended = null;
   my.video.onerror = null;
+  if (my.key === 'solo' && !my.video.ended) parked = my;
   note('leave', { why, currentTime: +my.video.currentTime.toFixed(3) });
 }
 
@@ -109,13 +121,16 @@ export async function prepareRoomEnter(root, n, fresh) {
   if (!root || !ENTRY_SCREENS.includes(n)) return;
   const scene = sceneOf(root);
   if (!scene) return;
+  if (!fresh && n === SOLO_SCREEN) { await soloAgain(root, scene); return; }
   if (!fresh) { carry(root, n, scene); return; }
   stop('new room');
+  parked = null;
+  // 혼자 방은 영상이 끝난 뒤 현장 장면으로 대체한다. 영상을 못 틀 때(줄인 움직임, 파일 없음)는 생성 화면 정지 사진(멀리 본 장면)이 그대로 보인다.
   if (reduced()) return;
-  const key = keyNow();
+  const key = keyNow(n);
   const video = videoFor(key);
   const poster = posterOf(key);
-  const still = urlIn(scene.style.backgroundImage);
+  const still = (LIVE.roomEnterAfter[key] && assetUrl(LIVE.roomEnterAfter[key])) || urlIn(scene.style.backgroundImage);
   const my = { root, video, key, scene, still, poster, phase: 'wait' };
   cur = my;
   try { video.pause(); } catch (e) { void e; }
@@ -132,6 +147,31 @@ export async function prepareRoomEnter(root, n, fresh) {
   place(video, scene);
   my.phase = 'ready';
   note('prepare', { n, key, readyState: video.readyState, currentTime: video.currentTime, waited: Math.round(performance.now() - t0) });
+}
+
+// 혼자 방 안에서 46으로 돌아올 때(그리드 64에서 현장 모드로). 영상이 도중에 멈췄으면 같은 영상 요소를 새 화면 장면 칸에 옮겨 멈춘 장면 그대로 보이고
+// attach에서 이어 재생한다. 영상이 이미 끝났으면 장면 칸을 현장 장면(영상 마지막 장면과 같은 구도)으로 대체한다. 둘 다 보이기 전에 끝낸다.
+async function soloAgain(root, scene) {
+  const after = assetUrl(LIVE.roomEnterAfter.solo);
+  const my = parked;
+  parked = null;
+  if (my && !my.video.ended && !my.video.error && my.video.readyState >= 2 && !reduced()) {
+    await decodeImage(after);
+    if (!root.isConnected) return;
+    // 영상 아래 바닥 그림은 지금 장면과 가장 가까운 첫 장면 그림이다(영상이 끝나면 현장 장면으로 대체).
+    setSceneImage(scene, my.poster);
+    my.root = root;
+    my.scene = scene;
+    my.still = after;
+    my.phase = 'ready';
+    cur = my;
+    place(my.video, scene);
+    note('resume', { currentTime: +my.video.currentTime.toFixed(3) });
+    return;
+  }
+  await decodeImage(after);
+  if (root.isConnected) setSceneImage(scene, after);
+  note('after', { why: my ? 'ended' : 'none' });
 }
 
 // 같은 방 안에서 장면이 있는 다른 화면으로 옮길 때 영상을 새 화면으로 옮긴다(처음부터 다시 재생하지 않는다).

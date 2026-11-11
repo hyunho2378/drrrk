@@ -21,6 +21,7 @@ enum ScreenRegistry {
         case .roomEnd: RoomEndView()
         case .roomMorning: RoomMorningView()
         case .roomSummary: RoomSummaryView()
+        case .roomSoloEnd: RoomSoloEndView()
         case .miniProfile: MiniProfileView()
         case .report: ReportView()
         case .block: BlockView()

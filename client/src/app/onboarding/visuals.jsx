@@ -123,10 +123,12 @@ export function V2() {
   );
 }
 
-// 함께 드르륵 3: 주전부리. 퀵슬롯 칸을 누르면 그 주전부리가 포물선으로 테이블에 올라앉고 6초 뒤 사라진다.
-const SNACK = { 새우깡: 'bed9931029c69814ae2f6dd44ebd80d71fa2505e', 소주: '191be13a520213686ad5b874a05f08d497379aa1', 오징어땅콩: 'c37719d2006c751888fb31e7273db993645ce2b4', 노가리: '0f95cc55d0fc315a02c2b11f5841c19d8657ef4d' };
-const SLOTS = [{ n: '새우깡', y: 20, on: true }, { n: '소주', y: 64 }, { n: '오징어땅콩', y: 108 }];
-const LAND = [{ x: 86, y: 62, r: 8 }, { x: 56, y: 66, r: -10 }, { x: 112, y: 64, r: 14 }, { x: 72, y: 58, r: -4 }];
+// 함께 드르륵 3: 주전부리(11/12 최종 2340:25795 "주전부리 (접힌 슬롯)"). 퀵슬롯 칸을 누르면 그 주전부리가 포물선으로 테이블에 올라앉고 6초 뒤 사라진다.
+// 테이블(14, 68, 128 x 42), 테이블 위 새우깡과 오징어땅콩, 소주, 날아가는 DRRRA, 접힌 퀵슬롯(162, 30, 59 x 115, 원 칸 39.2 세 개가 25.2 간격으로 겹침)은 최종 프레임 relativeTransform 값 그대로다.
+const SNACK = { 새우깡: 'bed9931029c69814ae2f6dd44ebd80d71fa2505e', 소주: '191be13a520213686ad5b874a05f08d497379aa1', 오징어땅콩: 'c37719d2006c751888fb31e7273db993645ce2b4', DRRRA: '727dbbd65b191a39ca09aa59e033d814a1b3db7f' };
+const SLOTS = [{ n: '새우깡', y: 12.6 }, { n: 'DRRRA', y: 37.8 }, { n: '소주', y: 63 }];
+const QS = { x: 162, y: 30, sx: 9.8, d: 39.2 };
+const LAND = [{ x: 80, y: 62, r: 8 }, { x: 50, y: 66, r: -10 }, { x: 106, y: 64, r: 14 }, { x: 66, y: 58, r: -4 }];
 const src = (n) => IMG + SNACK[n] + '.webp';
 export function V3() {
   const [toss, setToss] = useState([]);
@@ -134,35 +136,32 @@ export function V3() {
   const throwIt = (s) => {
     const land = LAND[seq.current % LAND.length];
     seq.current += 1;
-    const cx = 178 + 1 + 19;
-    const cy = 12 + s.y + 19;
+    const cx = QS.x + QS.sx + QS.d / 2;
+    const cy = QS.y + s.y + QS.d / 2;
     setToss((l) => [...l, { id: seq.current, n: s.n, ...land, sx: cx - land.x, sy: cy - land.y }]);
   };
   return (
     <Panel t={60} shadow={false}>
       <div data-figma="테이블" style={{ ...abs(0, 0, 230, 200), ...an('obRise', 200, 400) }}>
-        <div style={{ ...abs(22, 148, 124, 16), borderRadius: '50%', background: 'rgba(18, 20, 21, 0.14)', filter: 'blur(3px)' }} />
-        <div style={{ ...abs(54, 140, 60, 12), borderRadius: '50%', background: 'linear-gradient(180deg, #D9DDE0 0%, #B4BBC0 100%)' }} />
-        <div style={{ ...abs(77, 93, 14, 52), borderRadius: 3, background: 'linear-gradient(90deg, #B4BBC0 0%, #E6E9EB 45%, #AEB5BA 100%)' }} />
-        <div style={{ ...abs(10, 75, 148, 42), borderRadius: '50%', background: 'linear-gradient(180deg, #C9CED2 0%, #A9B0B5 100%)' }} />
-        <div style={{ ...abs(10, 68, 148, 42), borderRadius: '50%', background: 'linear-gradient(180deg, #FFFFFF 0%, #E4E7EA 100%)' }} />
+        <div style={{ ...abs(16, 148, 124, 16), borderRadius: '50%', background: 'rgba(18, 20, 21, 0.14)', filter: 'blur(3px)' }} />
+        <div style={{ ...abs(48, 140, 60, 12), borderRadius: '50%', background: 'linear-gradient(180deg, #D9DDE0 0%, #B4BBC0 100%)' }} />
+        <div style={{ ...abs(71, 93, 14, 52), borderRadius: 3, background: 'linear-gradient(90deg, #B4BBC0 0%, #E6E9EB 45%, #AEB5BA 100%)' }} />
+        <div style={{ ...abs(14, 75, 128, 42), borderRadius: '50%', background: 'linear-gradient(180deg, #C9CED2 0%, #A9B0B5 100%)' }} />
+        <div style={{ ...abs(14, 68, 128, 42), borderRadius: '50%', background: 'linear-gradient(180deg, #FFFFFF 0%, #E4E7EA 100%)' }} />
         <div style={{ ...abs(28, 73, 88, 12), borderRadius: '50%', background: 'rgba(255, 255, 255, 0.7)', filter: 'blur(2px)' }} />
       </div>
-      <div style={{ ...abs(0, 0, 0, 0), ...an('obDrop', 440, 320) }}><RotImg x={34} y={44} w={34} h={38} rot={14} src={src('노가리')} /></div>
-      <div style={{ ...abs(0, 0, 0, 0), ...an('obDrop', 500, 320) }}><RotImg x={70} y={38} w={32} h={36} rot={-6} src={src('오징어땅콩')} /></div>
-      <div style={{ ...abs(0, 0, 0, 0), ...an('obDrop', 560, 320) }}><RotImg x={104} y={32} w={22} h={46} rot={-16} src={src('소주')} /></div>
-      {/* 자동 시연: 새우깡 칸에서 날아가는 새우깡(피그마 "날아가는 새우깡" 자리에서 멈춘다) */}
-      <div style={{ ...abs(0, 0, 0, 0), '--sx': '66px', '--sy': '-9px', ...an('obArc', 820, 700, 'cubic-bezier(0.3, 0, 0.5, 1)') }}>
-        <RotImg x={126.2} y={41} w={26} h={30} rot={-24} src={src('새우깡')} shadow="drop-shadow(0 4px 4px rgba(18, 20, 20, 0.18))" />
+      <div style={{ ...abs(0, 0, 0, 0), ...an('obDrop', 440, 320) }}><RotImg x={30} y={48.65} w={35.84} h={40.05} rot={14} src={src('새우깡')} /></div>
+      <div style={{ ...abs(0, 0, 0, 0), ...an('obDrop', 500, 320) }}><RotImg x={67.95} y={42.32} w={33.73} h={37.95} rot={-6} src={src('오징어땅콩')} /></div>
+      <div style={{ ...abs(0, 0, 0, 0), ...an('obDrop', 560, 320) }}><RotImg x={103.78} y={36} w={23.19} h={48.49} rot={-16} src={src('소주')} /></div>
+      {/* 자동 시연: DRRRA 칸(가운데 칸 중심 191.4, 87.4)에서 날아가는 DRRRA(피그마 "날아가는 DRRRA" 자리, 중심 129.6, 38.1에서 멈춘다) */}
+      <div style={{ ...abs(0, 0, 0, 0), '--sx': '62px', '--sy': '49px', ...an('obArc', 820, 700, 'cubic-bezier(0.3, 0, 0.5, 1)') }}>
+        <RotImg x={126.02} y={19} w={22} h={32} rot={-24} src={src('DRRRA')} shadow="drop-shadow(0 4px 4px rgba(18, 20, 20, 0.18))" />
       </div>
-      <div data-figma="주전부리 퀵슬롯 (펼침)" style={abs(178, 12, 40, 146)}>
-        <div style={{ ...abs(0, 0, 40, 14), borderRadius: 8, background: DARK, ...an('obDrop', 300, 260) }}>
-          <div style={{ ...abs(13, 6, 14, 3), borderRadius: 2, background: 'rgba(248, 248, 248, 0.6)' }} />
-        </div>
+      <div data-figma="퀵슬롯 (접힘)" style={{ ...abs(QS.x, QS.y, 59, 115), borderRadius: 28, background: 'rgba(18, 20, 21, 0.55)', ...an('obDrop', 300, 260) }}>
         {SLOTS.map((s, k) => (
-          <div key={s.n} style={{ ...abs(1, s.y, 38, 38), ...an('obDrop', 350 + k * 50, 300) }}>
-            <div className="obp" onClick={() => throwIt(s)} onTouchStart={noop} style={{ position: 'relative', width: 38, height: 38, borderRadius: 12, background: DARK, boxShadow: s.on ? 'inset 0 0 0 2px ' + SKY : 'none' }}>
-              <img src={src(s.n)} alt="" draggable={false} style={{ ...abs(6, 6, 26, 26), objectFit: 'contain' }} />
+          <div key={s.n} data-figma={'slot / ' + s.n} style={{ ...abs(QS.sx, s.y, QS.d, QS.d), ...an('obDrop', 350 + k * 50, 300) }}>
+            <div className="obp" onClick={() => throwIt(s)} onTouchStart={noop} style={{ position: 'relative', width: QS.d, height: QS.d, borderRadius: QS.d / 2, background: DARK, boxShadow: 'inset 0 0 0 2.8px #000000' }}>
+              <img src={src(s.n)} alt="" draggable={false} style={{ ...abs(5.6, 5.6, 28, 28), objectFit: 'contain' }} />
             </div>
           </div>
         ))}
@@ -207,11 +206,11 @@ function V4Run({ onReplay }) {
   return (
     <>
       <Panel t={60}>
-        <div data-figma="Timer Pill" style={{ ...abs(44, 18, 142, 32), ...an('obRise', 220, 300) }}>
+        <div data-figma="Timer Pill" style={{ ...abs(44, 18, 137, 32), ...an('obRise', 220, 300) }}>
           <div className="obp" onClick={onReplay} onTouchStart={noop} style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, background: DARK, overflow: 'hidden' }}>
             <div style={{ ...abs(12, 9, 14, 14), animation: phase === 'run' ? `obBreath 800ms ${ST} infinite` : 'none' }}><Svg name="timer" w={14} h={14} /></div>
             <Txt x={32} y={8.5} w={56} h={15} size={12} weight={500} color={WHITE}>해 뜨기까지</Txt>
-            <Txt x={94} y={8.5} w={34} h={15} size={12} weight={700} color={SKY} style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <Txt x={91} y={8.5} w={34} h={15} size={12} weight={700} color={SKY} style={{ fontVariantNumeric: 'tabular-nums' }}>
               <span key={phase === 'done' ? 'reset' : 'count'} style={{ display: 'inline-block', ...(phase === 'done' && !reduced ? an('obLabelUp', 0, 260) : null) }}>{fmt(sec)}</span>
             </Txt>
           </div>
@@ -222,7 +221,7 @@ function V4Run({ onReplay }) {
         <Skel x={110} y={172} w={104} h={24} r={12} t={500} op={0.2} />
       </Panel>
       {sunUp && (
-        <div data-figma="해가 떴어요 칩" style={{ ...abs(20, 150, 110, 34), ...an('obRise', 0, 400) }}>
+        <div data-figma="해가 떴어요 칩" style={{ ...abs(20, 150, 108, 34), ...an('obRise', 0, 400) }}>
           <div className="obp" onClick={onReplay} onTouchStart={noop} style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 99, background: WHITE, boxShadow: SHADOW }}>
             <div style={{ ...abs(12, 8, 18, 18), ...an('obSun', 120, 500) }}><Icon name="sun-1620-23094" color="#FFB800" style={{ width: 18, height: 18 }} /></div>
             <Txt x={36} y={9} w={60} h={16} size={13} weight={700} color={DARK}>해가 떴어요</Txt>
@@ -259,9 +258,10 @@ function V5Run({ onReplay }) {
     <Panel t={60}>
       <div data-figma="엉따 온도 카드" style={{ ...abs(16, 14, 198, 76), ...an('obRise', 200, 300) }}>
         <div className="obp" onClick={onReplay} onTouchStart={noop} style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 14, background: 'rgba(18, 20, 21, 0.05)' }}>
-          <Txt x={8} y={9} w={102} {...T} color={DARK}>오늘 대화로 엉따 온도가</Txt>
-          <Txt x={8} y={24} w={65} {...T} color={DARK}>
-            <span style={{ display: 'inline-block', color: SKY, transformOrigin: '50% 70%', ...an('obBounce', 1700, 300, ST) }}>1.1°C</span>{' 올랐어요'}
+          {/* 11/12 최종 2340:25775 문구 1, 문구 2("1.1°C"만 SUIT ExtraBold 800 하늘색) */}
+          <Txt x={8} y={9} w={87} {...T} color={DARK}>오늘 대화에서 의자가</Txt>
+          <Txt x={8} y={24} w={96} {...T} color={DARK}>
+            <span style={{ display: 'inline-block', color: SKY, fontWeight: 800, transformOrigin: '50% 70%', ...an('obBounce', 1700, 300, ST) }}>1.1°C</span>{' 더 뜨끈해졌어요'}
           </Txt>
           <Txt x={14} y={46} w={37} h={14} size={10} weight={500} ls={-0.2} color="#6E767C">엉따 온도</Txt>
           <Txt x={152} y={43} w={32} h={18} size={13} weight={700} ls={-0.26} color={SKY} style={{ fontVariantNumeric: 'tabular-nums' }}>{v.toFixed(1) + '°'}</Txt>

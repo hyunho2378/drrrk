@@ -314,8 +314,11 @@ private struct MyHome: View {
                 } label: {
                     VStack(spacing: 4) {
                         ZStack {
+                            // 최종 피그마(2340:30182 몬스타, 2340:30187 마지막처럼): 잠긴 칸 그림은 노출 -1(약 18% 밝기), 마지막처럼은 채도 -1을 더해 35%로 둔다(웹 MyHome.jsx와 같다).
                             Image(it.asset).resizable().scaledToFit()
                                 .frame(width: 68, height: 68)
+                                .saturation(locked && it.id == "soju" ? 0 : 1)
+                                .colorMultiply(locked ? Color(white: 0.18) : .white)
                                 .opacity(locked ? 0.35 : 1)
                             if locked {
                                 Image("D-icon-lock").renderingMode(.template).resizable()
@@ -582,7 +585,7 @@ private struct MyItemSheet: View {
 
     private var isLocked: Bool { item.id == MyShelfData.locked.id }
     private var copy: ItemCopy { isLocked ? ItemCopyData.locked : ItemCopyData.copy(for: item.id) }
-    private var chips: [String] { isLocked ? ItemCopyData.lockedChips : ItemCopyData.chips }
+    private var chips: [String] { isLocked ? ItemCopyData.lockedChips : ItemCopyData.chips(for: item.id) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -662,7 +665,7 @@ private struct MySkinModal: View {
                 }
                 VStack(spacing: 6) {
                     Text("새로운 디자인").suit(12, .bold, lineHeight: 18).foregroundStyle(DS.Palette.brandPrimary)
-                        .frame(width: 92, height: 28)
+                        .frame(width: 89, height: 28)
                         .background(.black.opacity(0.45), in: Capsule())
                         .overlay(Capsule().strokeBorder(DS.Palette.brandPrimary.opacity(0.7), lineWidth: 1))
                     Text("푹신한 가죽 소파").suit(28, .bold, lineHeight: 38).foregroundStyle(DS.Palette.textPrimary)

@@ -312,8 +312,8 @@ struct HomeView: View {
         // 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(App/Story.swift).
         Story.current = .ssang
         Story.concern = nil
-        // 클립이 붙은 홈은 고민 분석(26)으로, 빈 홈은 방을 찾지 못함(45)으로 바로 간다(11/11 23:18 팀 흐름 변경, 웹 HomeScene send와 같다).
-        router.push(clip ? .analysis : .noRoom)
+        // 두 홈 모두 고민 분석(26, 드르륵 읽는 중)으로 간다. 분석이 끝나면 클립이 붙은 홈은 추천(27), 빈 홈은 방을 찾지 못함(45)이다(탁빛나 11/12 1647:25167, 웹 live.js resolveTo와 같다).
+        router.push(.analysis)
     }
 }
 
@@ -346,8 +346,10 @@ struct AnalysisView: View {
             // 피그마 1647:23520, 1647:23521 링 200 x 200, 안쪽 반지름 95%(두께 5). 선 가운데 지름 195.
             ZStack {
                 Circle().stroke(DS.Palette.bgElevated, lineWidth: 5)
+                // 한 줄짜리 호(trim)라 웹처럼 두 반쪽 이음매가 없다. 끝은 피그마 1647:23521 채움 모양처럼 평평하게(.butt) 둬다.
+                // 둥글게 두면 호 시작이 12시 왼쪽으로 2.5만큼 튀어나와 웹, 피그마와 달라진다.
                 Circle().trim(from: 0, to: progress)
-                    .stroke(DS.Palette.brandPrimary, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                    .stroke(DS.Palette.brandPrimary, style: StrokeStyle(lineWidth: 5, lineCap: .butt))
                     .rotationEffect(.degrees(-90))
             }
             .frame(width: 195, height: 195)
@@ -401,7 +403,8 @@ struct AnalysisView: View {
         if router.path.last == .analysis {
             router.path.removeLast()
         }
-        router.push(.recommend)
+        // 빈 홈(clipDone true)에서 왔으면 방을 찾지 못함(45)으로 간다. 뒤로는 빈 홈이다.
+        router.push(router.clipDone ? .noRoom : .recommend)
     }
 }
 
@@ -458,7 +461,8 @@ struct RecommendView: View {
             }
             .buttonStyle(PressStyle())
             .at(24, 726)
-            Button { router.push(.noRoom) } label: {
+            // 혼자 드르륵 앉기는 방을 찾지 못함(45)을 거치지 않고 바로 혼자 드르륵(46)으로 간다(탁빛나 11/12 1671:45285).
+            Button { router.push(.roomSolo) } label: {
                 Text("혼자 드르륵 앉기").suit(14, .bold, tracking: -0.56).foregroundStyle(DS.Palette.textSecondary)
                     .frame(width: 342, height: 44).contentShape(Rectangle())
             }
@@ -598,7 +602,7 @@ enum OnboardingPages {
         .init(visual: .together2, title: "말하기 부담되면\n이모지로 반응해요", sub: "+ 버튼을 눌러 이모지를 날려요"),
         .init(visual: .together3, title: "주전부리를 던지면\n가운데 테이블에 올라가요", sub: "오른쪽 퀵슬롯에서 주전부리를 눌러 던져요"),
         .init(visual: .together4, title: "대화는 20분 뒤\n저장되지 않고 사라져요", sub: "해 뜨기 타이머가 끝나면 대화방이 종료돼요"),
-        .init(visual: .together5, title: "대화가 끝나면\n리포트가 도착해요", sub: "공감과 추천을 받으면 엉따 온도가 올라가요"),
+        .init(visual: .together5, title: "대화가 끝나면\n리포트가 도착해요", sub: "추천을 받으면 엉따 온도가 올라가요"),
     ]
 
     /// 팀 피그마 1647:22976, 1647:23028 문구

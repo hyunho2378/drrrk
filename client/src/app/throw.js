@@ -77,14 +77,19 @@ export function attachThrow(root) {
     c.setAttribute('data-cool', '');
     c.setAttribute('aria-hidden', 'true');
     Object.assign(c.style, { position: 'absolute', left: '0', top: '0', width: W + 'px', height: W + 'px', borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none', zIndex: '2' });
+    // 두 반쪽이 가운데 세로줄에서 맞닿으면 화면 배율이 정수가 아닐 때 밝은 틈 줄이 생긴다(고민 분석 원과 같은 원인, live.js initAnalysis).
+    // 그래서 반원은 불투명 검정으로 그리고 60%는 두 반원을 담은 묶음에 한 번만 주며, 왼쪽 칸과 그 안 반원을 가운데로 1px 더 격쳐 틈을 없앤다(겹친 자리도 진하지 않다).
+    const shade = document.createElement('div');
+    Object.assign(shade.style, { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', opacity: '0.6' });
+    c.appendChild(shade);
     const half = (side) => {
-      // side 'R': 오른쪽 반만 보이는 칸 안에 왼쪽 반원을 둔다. side 'L': 왼쪽 반만 보이는 칸 안에 오른쪽 반원을 둔다.
+      // side 'R': 오른쪽 반만 보이는 칸 안에 왼쪽 반원을 둔다. side 'L': 왼쪽 반만 보이는 칸 안에 오른쪽 반원을 둔다(곷은 변 쪽으로 1px 더).
       const clip = document.createElement('div');
-      Object.assign(clip.style, { position: 'absolute', top: off + 'px', width: D / 2 + 'px', height: D + 'px', overflow: 'hidden', left: side === 'R' ? W / 2 + 'px' : off + 'px' });
+      Object.assign(clip.style, { position: 'absolute', top: off + 'px', width: (side === 'R' ? D / 2 : D / 2 + 1) + 'px', height: D + 'px', overflow: 'hidden', left: side === 'R' ? W / 2 + 'px' : off + 'px' });
       const disc = document.createElement('div');
-      Object.assign(disc.style, { position: 'absolute', top: '0', width: D / 2 + 'px', height: D + 'px', background: 'rgba(0,0,0,0.6)', left: side === 'R' ? -D / 2 + 'px' : D / 2 + 'px', borderRadius: side === 'R' ? D / 2 + 'px 0 0 ' + D / 2 + 'px' : '0 ' + D / 2 + 'px ' + D / 2 + 'px 0', transformOrigin: side === 'R' ? '100% 50%' : '0% 50%' });
+      Object.assign(disc.style, { position: 'absolute', top: '0', width: (side === 'R' ? D / 2 : D / 2 + 1) + 'px', height: D + 'px', background: '#000', left: side === 'R' ? -D / 2 + 'px' : D / 2 - 1 + 'px', borderRadius: side === 'R' ? D / 2 + 'px 0 0 ' + D / 2 + 'px' : '0 ' + D / 2 + 'px ' + D / 2 + 'px 0', transformOrigin: side === 'R' ? '100% 50%' : '1px 50%' });
       clip.appendChild(disc);
-      c.appendChild(clip);
+      shade.appendChild(clip);
       return disc;
     };
     const right = half('R'), left = half('L');
@@ -96,7 +101,8 @@ export function attachThrow(root) {
     const cs = cools[nameOf(slot)];
     const at = Math.min(ms, Math.max(0, Date.now() - (cs ? cs.start : Date.now())));
     const opt = { duration: ms, easing: 'linear', fill: 'both' };
-    const l = left.animate([{ transform: 'rotate(180deg)' }, { transform: 'rotate(0deg)', offset: 0.5 }, { transform: 'rotate(0deg)' }], opt);
+    // 왼쪽 반원은 제 몰을 다 돌면(절반) 숨긴다. 더 그린 1px 띠가 빈 왼쪽 칸에 남지 않게 한다.
+    const l = left.animate([{ transform: 'rotate(180deg)', opacity: 1 }, { transform: 'rotate(0deg)', opacity: 1, offset: 0.5 }, { transform: 'rotate(0deg)', opacity: 0, offset: 0.5 }, { transform: 'rotate(0deg)', opacity: 0 }], opt);
     const r = right.animate([{ transform: 'rotate(180deg)' }, { transform: 'rotate(180deg)', offset: 0.5 }, { transform: 'rotate(0deg)' }], opt);
     l.currentTime = at;
     r.currentTime = at;

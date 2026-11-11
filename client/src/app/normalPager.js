@@ -43,7 +43,7 @@ function pageTwo() {
     t.appendChild(disc);
     // 이름 칸은 칸 가운데(피그마 60.5, 283, 93 x 20).
     const name = el('div', { position: 'absolute', left: '82.5px', top: '103px', height: '20px', transform: 'translateX(-50%)', padding: '3px 8px', boxSizing: 'border-box', borderRadius: '8px', background: '#000', display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' });
-    const p = el('p', { margin: '0', fontFamily: "'SUIT', system-ui, sans-serif", fontWeight: '700', fontSize: '11px', lineHeight: '14px', letterSpacing: '-0.44px', color: '#F8F8F8' }, '편의점 의자11 ');
+    const p = el('p', { margin: '0', fontFamily: "'SUIT', system-ui, sans-serif", fontWeight: '700', fontSize: '11px', lineHeight: '14px', letterSpacing: '-0.04em', color: '#F8F8F8' }, '편의점 의자11 ');
     p.appendChild(el('span', { color: '#36D2FF' }, '(나)'));
     name.appendChild(p);
     t.appendChild(name);

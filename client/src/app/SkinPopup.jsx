@@ -50,7 +50,7 @@ export default function SkinPopup() {
           <img key={i} alt="" src={BASE + 'D2-sparkle-' + (i + 1) + '.svg'} style={{ position: 'absolute', left: x, top: y, width: s, height: s }} />
         ))}
         <div style={{ position: 'absolute', left: 0, top: 450, width: 390, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 92, height: 28, borderRadius: 14, background: 'rgba(0,0,0,.45)', boxShadow: 'inset 0 0 0 1px rgba(54,210,255,.7)', color: '#36D2FF', fontSize: 12, fontWeight: 700, lineHeight: '28px', textAlign: 'center' }}>새로운 디자인</span>
+          <span style={{ width: 89, height: 28, borderRadius: 14, background: 'rgba(0,0,0,.45)', boxShadow: 'inset 0 0 0 1px rgba(54,210,255,.7)', color: '#36D2FF', fontSize: 12, fontWeight: 700, lineHeight: '28px', textAlign: 'center' }}>새로운 디자인</span>
           <span style={{ height: 38, fontSize: 28, fontWeight: 700, lineHeight: '38px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>푹신한 가죽 소파</span>
         </div>
         <div style={{ position: 'absolute', left: 75, top: 542, width: 240, height: 50 }}>
@@ -64,8 +64,8 @@ export default function SkinPopup() {
         <div style={{ position: 'absolute', left: 0, top: 600, width: 390, textAlign: 'center', fontSize: 13, fontWeight: 500, lineHeight: '18px', color: '#9AA1A6' }}>엉따 온도 39°에 도달해서 열렸어요</div>
       </div>
       <div style={{ position: 'absolute', left: 0, top: 668, width: 390, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, opacity: shown ? 1 : 0, ...fade(350) }}>
-        <button className="sk-btn" onClick={sit} style={{ width: 278, height: 46, borderRadius: 28, background: '#36D2FF', color: '#000', fontSize: 16, fontWeight: 700, letterSpacing: '-0.64px' }}>지금 앉아보기</button>
-        <button className="sk-btn" onClick={later} style={{ height: 34, padding: '0 20px', marginTop: -8, color: '#6E767C', fontSize: 13, fontWeight: 500, letterSpacing: '-0.52px' }}>나중에 할게요</button>
+        <button className="sk-btn" onClick={sit} style={{ width: 278, height: 46, borderRadius: 28, background: '#36D2FF', color: '#000', fontSize: 16, fontWeight: 700, letterSpacing: '-0.04em' }}>지금 앉아보기</button>
+        <button className="sk-btn" onClick={later} style={{ height: 34, padding: '0 20px', marginTop: -8, color: '#6E767C', fontSize: 13, fontWeight: 500, letterSpacing: '-0.04em' }}>나중에 할게요</button>
       </div>
     </div>
   );

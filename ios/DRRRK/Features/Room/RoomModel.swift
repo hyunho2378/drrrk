@@ -7,7 +7,8 @@ final class RoomModel {
     // 해 뜨기 시계: 화면에는 20:00에서 00:00까지 줄어든다. 시계 값과 실제 초 사이 변환은 아래 realOf, leftAt, left(after:from:together:) 한 곳에서 한다(웹 client/src/app/roomClock.js와 같은 값).
     // 함께 드르륵 방과 방 구경(LiveWatchView): 해뜨기 영상까지 합쳐 실제 30초(11/11 사용자 전달 "함께 드르륵 실제 체감 시간 30초로").
     //   20:00에서 01:12까지 실제 24.6초(1초에 45.85초씩), 01:12에서 00:00까지 실제 5.4초(1초에 13.33초씩, 해뜨기 영상 5.17초가 잘리지 않는다).
-    // 혼자 드르륵 방: 예전처럼 20분이 실제 90초(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로"). 온보딩 뒤 10초짜리 AI 대화와 안내 창이 이어지므로 30초로 줄이지 않는다.
+    // 혼자 드르륵 방: 모두 합쳐 실제 90초(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로")를 함께 방처럼 두 구간으로 나눈다(탁빛나 11/12 2351:34553 "아침해 뜨는거 반영 필요").
+    //   20:00에서 01:12까지 실제 84.6초, 01:12에서 00:00까지 실제 5.4초(혼자 방 해뜨기 영상 sunrise-solo.mp4 5.07초). 웹 tokens.js live.soloClock과 같다.
     static let shownSeconds: Double = 20 * 60
     static let realSeconds: Double = 90
     /// 화면 시계가 01:12에 닿으면 해 뜨기 1분 전 장면(피그마 1979:27780)으로 바뀌고 해뜨기 영상이 재생된다(SunriseVideo.swift). 01:12에서 0까지 실제 5.4초.
@@ -17,19 +18,24 @@ final class RoomModel {
     static let sunriseRealSeconds: Double = 5.4
     static let storyScale = (shownSeconds - lastMinuteShown) / storyRealSeconds
     static let sunriseScale = lastMinuteShown / sunriseRealSeconds
+    /// 혼자 방 이야기 구간 실제 초(90 - 5.4). 해뜨기 구간은 함께 방과 같은 sunriseRealSeconds, sunriseScale이다.
+    static let soloStoryRealSeconds: Double = realSeconds - sunriseRealSeconds
+    static let soloStoryScale = (shownSeconds - lastMinuteShown) / soloStoryRealSeconds
 
     /// 시계 값 left가 20:00에서 몇 실제 초 뒤의 값인지.
     static func realOf(_ left: Double, together: Bool = true) -> Double {
-        guard together else { return (shownSeconds - left) / (shownSeconds / realSeconds) }
-        if left >= lastMinuteShown { return (shownSeconds - left) / storyScale }
-        return storyRealSeconds + (lastMinuteShown - left) / sunriseScale
+        let story = together ? storyRealSeconds : soloStoryRealSeconds
+        let scale = together ? storyScale : soloStoryScale
+        if left >= lastMinuteShown { return (shownSeconds - left) / scale }
+        return story + (lastMinuteShown - left) / sunriseScale
     }
 
     /// 20:00에서 실제 real초 뒤의 시계 값.
     static func leftAt(_ real: Double, together: Bool = true) -> Double {
-        guard together else { return shownSeconds - real * (shownSeconds / realSeconds) }
-        if real <= storyRealSeconds { return shownSeconds - real * storyScale }
-        return lastMinuteShown - (real - storyRealSeconds) * sunriseScale
+        let story = together ? storyRealSeconds : soloStoryRealSeconds
+        let scale = together ? storyScale : soloStoryScale
+        if real <= story { return shownSeconds - real * scale }
+        return lastMinuteShown - (real - story) * sunriseScale
     }
 
     /// 시계 값 left에서 실제 sec초가 지난 뒤의 값.
@@ -252,7 +258,7 @@ final class RoomModel {
     var pausedAt: Date?
     func pauseClock() { if pausedAt == nil { pausedAt = Date() } }
     func resumeClock() { if let p = pausedAt { startedAt = startedAt.addingTimeInterval(Date().timeIntervalSince(p)); pausedAt = nil } }
-    /// 함께 드르륵 방이면 true(두 구간 30초 시계), 혼자 방(solo)이면 false(90초 한 구간).
+    /// 함께 드르륵 방이면 true(두 구간 30초 시계), 혼자 방(solo)이면 false(두 구간 90초 시계, 84.6초와 5.4초).
     var together = true
     /// 시계 시작 값(초). 홈 흐름은 20:00, 방 구경에서 앉아 들어오면 앉는 순간의 방 구경 시계 값(RoomClockHandoff).
     var startLeft: Double = RoomModel.shownSeconds

@@ -121,8 +121,8 @@ export function attachSort(root, n, first) {
       row.dataset.figma = k;
       row.setAttribute('role', 'button');
       row.setAttribute('aria-label', k + ', ' + DESC[k]);
-      row.appendChild(mk('div', { position: 'absolute', left: '0px', top: '14px', fontSize: '15px', fontWeight: '700', letterSpacing: '-0.3px', lineHeight: '22px', color: on ? ON_COLOR : OFF_COLOR, whiteSpace: 'nowrap' }, k));
-      row.appendChild(mk('div', { position: 'absolute', left: '0px', top: '38px', fontSize: '12px', fontWeight: '400', letterSpacing: '-0.24px', lineHeight: '17px', color: '#6E767C', whiteSpace: 'nowrap' }, DESC[k]));
+      row.appendChild(mk('div', { position: 'absolute', left: '0px', top: '14px', fontSize: '15px', fontWeight: '700', letterSpacing: '-0.04em', lineHeight: '22px', color: on ? ON_COLOR : OFF_COLOR, whiteSpace: 'nowrap' }, k));
+      row.appendChild(mk('div', { position: 'absolute', left: '0px', top: '38px', fontSize: '12px', fontWeight: '400', letterSpacing: '-0.04em', lineHeight: '17px', color: '#6E767C', whiteSpace: 'nowrap' }, DESC[k]));
       if (on) row.appendChild(mk('div', { position: 'absolute', left: '322px', top: '25px', width: '20px', height: '20px' }, CHECK));
       row.addEventListener('click', (e) => {
         e.stopPropagation();

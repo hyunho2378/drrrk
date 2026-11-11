@@ -88,7 +88,7 @@ function cluster(state, smalls, big, more, talkFlag) {
   const list = state === 'alone' ? [] : smalls;
   let x = bigX - 22 * list.length;
   if (more) {
-    const m = el('div', { position: 'absolute', left: x - 19 + 'px', top: smallY + 3 + 'px', width: '26px', height: '26px', borderRadius: '50%', background: '#33383D', boxShadow: '0 0 0 2px #222628', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '6px', boxSizing: 'border-box', fontFamily: "'Noto Sans KR', " + FONT, fontSize: '9.72px', fontWeight: '700', lineHeight: '14px', letterSpacing: '-0.2px', color: '#D9DEE3', whiteSpace: 'nowrap' }, '+' + more);
+    const m = el('div', { position: 'absolute', left: x - 19 + 'px', top: smallY + 3 + 'px', width: '26px', height: '26px', borderRadius: '50%', background: '#33383D', boxShadow: '0 0 0 2px #222628', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '6px', boxSizing: 'border-box', fontFamily: "'Noto Sans KR', " + FONT, fontSize: '9.72px', fontWeight: '700', lineHeight: '14px', letterSpacing: '-0.04em', color: '#D9DEE3', whiteSpace: 'nowrap' }, '+' + more);
     g.appendChild(m);
   }
   list.forEach((f) => { g.appendChild(face(f, x, smallY, false, false)); x += 22; });
@@ -105,14 +105,14 @@ function metaRow(state, views, left) {
   const m = el('div', { position: 'absolute', left: '16px', top: '76px', height: '23px', display: 'flex', alignItems: 'center', gap: '6px', fontFamily: FONT, whiteSpace: 'nowrap' });
   const eye = el('div', { display: 'flex', alignItems: 'center', gap: '4px' });
   eye.appendChild(el('span', { display: 'block', width: '16px', height: '16px' }, EYE));
-  eye.appendChild(el('span', { fontSize: '12px', fontWeight: '700', color: '#6E767C', letterSpacing: '-0.48px' }, views));
+  eye.appendChild(el('span', { fontSize: '12px', fontWeight: '700', color: '#6E767C', letterSpacing: '-0.04em' }, views));
   m.appendChild(eye);
   // 곧 끝 카드(빨간 시계 배지 카드)도 보는 수 옆에 남은 시간을 쓴다(11/11 의정 댓글 1943:12022 핀 (88,699) "여기도 남은 시간 뜨게").
   // 시간은 배지와 같은 값(카드 timer, 없으면 03:00)이고 글 모양은 말하는 중 카드의 "12:32 남음"과 같다(12 Medium #9AA1A6, 점 3, 간격 6).
   m.appendChild(el('span', { display: 'block', width: '3px', height: '3px', borderRadius: '50%', background: '#9AA1A6' }));
   const blue = state === 'alone' || state === 'fresh';
   const txt = state === 'alone' ? '첫 대화 상대를 기다려요' : state === 'fresh' ? '방금 열림' : left + ' 남음';
-  const t = el('span', { fontSize: '12px', fontWeight: '500', color: blue ? '#36D2FF' : '#9AA1A6', letterSpacing: '-0.48px' }, txt);
+  const t = el('span', { fontSize: '12px', fontWeight: '500', color: blue ? '#36D2FF' : '#9AA1A6', letterSpacing: '-0.04em' }, txt);
   m.appendChild(t);
   return { m, time: blue ? null : t };
 }
@@ -133,10 +133,11 @@ export function pickWatch(card) {
   setConcern(photo || !card ? null : { title: card.title, tag: tabOf(card.title) });
   picked = card ? { title: String(card.title).replace(/ \n/g, '\n'), views: String(card.views ?? ''), left: leftOf(card) } : null;
 }
-// 위 가로 카드 두 장 값(피그마 2100:23638 Carousel / 1, 2의 제목, 보는 수, 시계). iOS LiveData.featured와 같다.
+// 위 가로 카드 첫 두 장 값(피그마 1943:12396 캐러셀 Carousel / 1, 4의 제목, 보는 수, 시계). 둘째 장은 곧 끝 방(빨간 시계 02:30)이다.
+// 다섯 장 전체 값은 liveCarousel.js LIVE_CARDS 에 있고, 셋째부터 다섯째 장은 그 파일이 직접 누름을 받는다. iOS LiveData.featured와 같다.
 const FEATURED = [
   { title: PHOTO_TITLE, views: '22', meta: '04:30 남음', st: 'talk' },
-  { title: '남친이 1주년 선물로\n다이소 틴트 사줌', views: '15', meta: '07:50 남음', st: 'talk' },
+  { title: '남친이 1주년 선물로\n다이소 틴트 사줌', views: '12', meta: '02:30 남음', st: 'soon', timer: '02:30' },
 ];
 // 방 구경(37)으로 들어간다. 알림 키워드 카드처럼 라이브 목록 밖에서도 부른다.
 // 예: openWatch(LIVE_LIST[10][0]) 은 사진보정 방 구경, openWatch({ title: '3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?', views: '22', meta: '12:32 남음', st: 'talk' }).
@@ -181,14 +182,14 @@ function cardOf(c) {
   const card = el('button', { position: 'relative', display: 'block', width: '342px', height: '112px', flex: '0 0 auto', borderRadius: '16px', background: '#222628', border: '0', padding: '0', margin: '0', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', fontFamily: FONT });
   card.className = 'lv2-card';
   card.setAttribute('aria-label', c.title.replace(/\n/g, ' '));
-  const t = el('div', { position: 'absolute', left: '16px', top: '16px', width: '196px', fontSize: '16px', fontWeight: '700', lineHeight: '22px', letterSpacing: '-0.64px', color: '#F8F8F8', whiteSpace: 'pre' }, c.title.replace(/ \n/g, '\n'));
+  const t = el('div', { position: 'absolute', left: '16px', top: '16px', width: '196px', fontSize: '16px', fontWeight: '700', lineHeight: '22px', letterSpacing: '-0.04em', color: '#F8F8F8', whiteSpace: 'pre' }, c.title.replace(/ \n/g, '\n'));
   card.appendChild(t);
   const { m } = metaRow(c.st, c.views, c.st === 'soon' ? (c.timer || '03:00') : c.meta.replace(' 남음', ''));
   card.appendChild(m);
   const smalls = c.small.map((h) => h);
   card.appendChild(cluster(c.st, smalls, c.big, c.more ? c.more.replace('+', '') : 0, c.talk));
   if (c.st === 'soon') {
-    const pill = el('div', { position: 'absolute', left: '269px', top: '16px', height: '20px', padding: '0 7px 0 6px', borderRadius: '999px', background: '#FF4D6A', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: '700', color: '#000', letterSpacing: '-0.44px' });
+    const pill = el('div', { position: 'absolute', left: '269px', top: '16px', height: '20px', padding: '0 7px 0 6px', borderRadius: '999px', background: '#FF4D6A', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: '700', color: '#000', letterSpacing: '-0.04em' });
     pill.appendChild(el('span', { display: 'block', width: '13px', height: '13px' }, TIMER));
     pill.appendChild(el('span', null, c.timer || '03:00'));
     card.appendChild(pill);
@@ -202,16 +203,7 @@ function cardOf(c) {
 export function patchLiveV2(root, n) {
   if (!LIVE_SCREENS.includes(n) || !root || root.dataset.liveV2) return;
   const list = LIVE_LIST[n] || LIVE_LIST[10];
-  // 위 가로 카드 장면: 팀 피그마 최신 장면(Carousel / 1 1943:12456, / 2 1943:12466)으로 바꾼다.
-  [1, 2].forEach((i) => {
-    const car = root.querySelector('[data-figma="Carousel / ' + i + '"]');
-    if (!car) return;
-    const url = 'url(' + (import.meta.env.BASE_URL || '/') + 'assets/live2/scene-' + i + '.webp)';
-    const sc = car.querySelector(':scope > [data-figma="Scene"]');
-    // 연애(49) 생성 화면은 장면 칸 없이 카드 자체 배경에 옛 장면을 깔고 있어서, 그때는 카드 배경을 바꾼다.
-    if (sc) sc.style.backgroundImage = url;
-    else car.style.setProperty('background-image', url, 'important');
-  });
+  // 위 가로 카드 다섯 장의 장면과 글은 liveCarousel.js prepareLiveCarousel 이 이 함수보다 먼저 깐다(피그마 1943:12396 캐러셀).
   const olds = [1, 2, 3].map((i) => root.querySelector('[data-figma="List Card / ' + i + '"]')).filter(Boolean);
   if (!olds.length) return;
   root.dataset.liveV2 = '1';
@@ -277,6 +269,7 @@ function soonText(state, left) {
 // 방 구경(37, 피그마 1943:12838) "대화 중 3" 줄. 생성 화면은 흰 바탕이 붙은 원본 그림을 납작하게 구운 그림이라 원 바깥에 흰 테가 보였다.
 // 투명판 그림으로 바꾸고 원 바탕을 #222628로 칠한다(iOS LiveWatchView와 같은 값: 원 54, 그림은 원 안에 꽉 채워 둥글게 자름).
 const WATCH = { '리클라이너21': C.convBlue, '나무스툴12': C.stoolOak, '가죽소파19': C.sofaBrown };
+const WATCH_SEAT = { '리클라이너21': '3ab7dfb2602df8c0d82aa5a0372d6fea572af0c1', '나무스툴12': '6977f0a432c84a681ba24727c6cf90be17ca73b3', '가죽소파19': '24a5f181f6780ce4f26219b8a54ffece8c11c38c' };
 function patchWatchTitle(root) {
   if (root.dataset.watchTitle) return;
   root.dataset.watchTitle = '1';
@@ -308,9 +301,11 @@ export function patchWatchSeats(root, n) {
   root.dataset.watchSeats = '1';
   imgs.forEach((img) => {
     const seat = img.parentElement && img.parentElement.dataset.figma ? img.parentElement.dataset.figma.replace('Seat / ', '') : '';
-    const file = WATCH[seat];
+    // 최종 드르륵 방 구경 2340:26264(11/12): 자리 아바타(2340:26281, 26284, 26287, 54 원, 모서리 27)는 흰 바탕 의자 그림 채우기(FIT)다.
+    // 그림은 피그마 채우기 그대로(assets/images, 37번 미리 받기 목록 screenAssets.js에 이미 있음).
+    const file = WATCH_SEAT[seat];
     if (!file) return;
-    img.src = BASE + file + '.png';
+    img.src = (import.meta.env.BASE_URL || '/') + 'assets/images/' + file + '.webp';
     Object.assign(img.style, { background: '#222628', borderRadius: '50%', objectFit: 'cover', boxSizing: 'border-box' });
   });
 }

@@ -13,6 +13,8 @@ enum Route: String, Hashable, CaseIterable, Identifiable {
     case onboardingTogether, onboardingSolo
     // 방
     case room, roomNormal, roomSolo, roomEnd, roomMorning, roomSummary
+    /// 혼자 드르륵 종료 리포트(피그마 2337:15695, 웹 65). 혼자 방 시계가 0이 되면 들어온다.
+    case roomSoloEnd
     case miniProfile, report, block
     // 탭: 라이브
     case live, liveWatch
@@ -119,10 +121,11 @@ final class Router {
     }
 
     /// 네이버 클립에서 드르륵 에이전트를 누르면 스플래시를 띄우고 홈으로 들어간다.
-    func enterFromClip() {
+    /// empty가 true면(클립 리스트의 드르륵 배너) 텍스트필드만 있는 빈 홈으로 들어간다(탁빛나 11/12 1843:40980, 웹 live.js resolveTo enter와 같다).
+    func enterFromClip(empty: Bool = false) {
         showSplash = true
         enteredApp = true
-        clipDone = false
+        clipDone = empty
         tab = .home
         path.removeAll()
     }

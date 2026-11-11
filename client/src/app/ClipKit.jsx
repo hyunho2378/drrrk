@@ -49,7 +49,7 @@ const shadowFilter = (sh) => (sh ? 'drop-shadow(' + sh[0] + 'px ' + sh[1] + 'px 
 const lineH = (it) => it.lh || Math.round(it.size * 1.4);
 const textBase = (size, wt, c, a, lh) => ({
   fontFamily: FONT, fontSize: size, fontWeight: wt, color: rgba(c || '#FFFFFF', a == null ? 1 : a),
-  lineHeight: lh + 'px', letterSpacing: '-0.02em', whiteSpace: 'pre', margin: 0,
+  lineHeight: lh + 'px', letterSpacing: '-0.04em', whiteSpace: 'pre', margin: 0,
 });
 
 function Fill({ img }) {

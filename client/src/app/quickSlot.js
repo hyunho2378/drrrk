@@ -7,7 +7,8 @@ import { relRect, scaleOf } from './dom.js';
 
 const PANEL = '[data-figma="주전부리 퀵슬롯"]';
 const PILL = '[data-figma="퀵슬롯 · 접힘"]';
-const ROOMS = [28, 29, 30, 31, 40];
+// 66은 혼자 방 해 뜨는 단계(피그마 2351:34553). 접힌 알약과 숨겨 둔 41 목록(solo.js prepareSoloSunrise)을 짝으로 쓴다.
+const ROOMS = [28, 29, 30, 31, 40, 66];
 const CLOSED_H = 86;
 const HEAD_H = 34;
 const EASE = 'cubic-bezier(0.2, 0, 0, 1)';
@@ -117,7 +118,7 @@ export function attachQuickSlot(root, n, fix) {
   const pill = root.querySelector(PILL);
   const panel = root.querySelector(PANEL);
   if (!pill && !panel) return;
-  const st = { pill, panel, open: !!panel, busy: false, fix: fix ? (el) => fix(el) : null };
+  const st = { pill, panel, open: !!panel && panel.style.visibility !== 'hidden', busy: false, fix: fix ? (el) => fix(el) : null };
   root.__qs = st;
   bindPill(root, st);
   bindPanel(root, st);

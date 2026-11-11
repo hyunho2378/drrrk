@@ -148,15 +148,15 @@ function InfoBlock({ clip, following, onFollow }) {
         <img src={pic(c.av)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
       <div style={{ position: 'absolute', left: 62, top: 0, height: 32, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.3px', color: '#F6F6F6' }}>{c.creator}</span>
+        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.04em', color: '#F6F6F6' }}>{c.creator}</span>
         {c.badge ? <svg width="13" height="13" viewBox="0 0 14 14" style={{ display: 'block' }}><circle cx="7" cy="7" r="6.5" fill="#F9A825" /><path d="M4 7.2l2 2L10 5" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}
         <span className="ck-press" role="button" tabIndex={0} aria-pressed={!!following} onClick={(e) => { e.stopPropagation(); if (onFollow) onFollow(); }}
-          style={{ marginLeft: 6, height: 26, padding: '0 9px', display: 'flex', alignItems: 'center', border: '1px solid #343436', borderRadius: 8, fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.27px', color: '#EFEFEF', background: following ? '#141414' : 'transparent', cursor: 'pointer' }}>{following ? '팔로잉' : '팔로우'}</span>
+          style={{ marginLeft: 6, height: 26, padding: '0 9px', display: 'flex', alignItems: 'center', border: '1px solid #343436', borderRadius: 8, fontSize: 13.5, fontWeight: 500, letterSpacing: '-0.04em', color: '#EFEFEF', background: following ? '#141414' : 'transparent', cursor: 'pointer' }}>{following ? '팔로잉' : '팔로우'}</span>
       </div>
-      <p style={{ position: 'absolute', left: 20, top: 43, margin: 0, fontSize: 16.5, lineHeight: '22px', letterSpacing: '-0.33px', color: '#F5F5F5', whiteSpace: 'pre' }}>{c.title}</p>
-      <p style={{ position: 'absolute', left: 20, top: 62, margin: 0, fontSize: 16.5, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.33px', color: '#F5F5F5', whiteSpace: 'pre' }}>{c.tags}</p>
-      <p style={{ position: 'absolute', left: 20, top: 90, margin: 0, fontSize: 15, lineHeight: '20px', letterSpacing: '-0.3px', color: SUB, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'pre' }}>{'재생수 ' + c.plays}<i style={{ width: 3.5, height: 3.5, borderRadius: '50%', background: SUB, display: 'block' }} />{c.when}</p>
-      {c.id === 's0' ? <div style={{ position: 'absolute', left: 20, top: 127, width: 52, height: 29, borderRadius: 8, border: '1px solid #343436', background: ROW, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, letterSpacing: '-0.28px', color: '#EDEDED' }}>AI 활용</div> : null}
+      <p style={{ position: 'absolute', left: 20, top: 43, margin: 0, fontSize: 16.5, lineHeight: '22px', letterSpacing: '-0.04em', color: '#F5F5F5', whiteSpace: 'pre' }}>{c.title}</p>
+      <p style={{ position: 'absolute', left: 20, top: 62, margin: 0, fontSize: 16.5, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.04em', color: '#F5F5F5', whiteSpace: 'pre' }}>{c.tags}</p>
+      <p style={{ position: 'absolute', left: 20, top: 90, margin: 0, fontSize: 15, lineHeight: '20px', letterSpacing: '-0.04em', color: SUB, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'pre' }}>{'재생수 ' + c.plays}<i style={{ width: 3.5, height: 3.5, borderRadius: '50%', background: SUB, display: 'block' }} />{c.when}</p>
+      {c.id === 's0' ? <div style={{ position: 'absolute', left: 20, top: 127, width: 52, height: 29, borderRadius: 8, border: '1px solid #343436', background: ROW, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, letterSpacing: '-0.04em', color: '#EDEDED' }}>AI 활용</div> : null}
       <div style={{ position: 'absolute', left: 0, top: 181, width: 390, height: 1, background: '#292929' }} />
     </div>
   );
@@ -201,7 +201,7 @@ function ReplyBox({ open, name, onSend, onCancel, scroller }) {
       <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: ROW }} />
       <input ref={input} value={v} onChange={(e) => setV(e.target.value)} enterKeyHint="send" aria-label={name + '님에게 답글'}
         onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } if (e.key === 'Escape') onCancel(); }}
-        style={{ position: 'absolute', left: 14, top: 0, width: 'calc(100% - 58px)', height: 40, border: 0, outline: 'none', background: 'transparent', color: TXT, fontFamily: FONT, fontSize: 14.5, letterSpacing: '-0.29px', padding: 0 }} />
+        style={{ position: 'absolute', left: 14, top: 0, width: 'calc(100% - 58px)', height: 40, border: 0, outline: 'none', background: 'transparent', color: TXT, fontFamily: FONT, fontSize: 14.5, letterSpacing: '-0.04em', padding: 0 }} />
       <button type="button" aria-label="답글 보내기" onClick={(e) => { e.stopPropagation(); send(); }} className="cp-btn" style={{ right: 5, top: 5, width: 30, height: 30, borderRadius: '50%', background: body ? '#36D2FF' : '#3A3A3A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <SendIcon on={!!body} size={16} />
       </button>
@@ -246,7 +246,7 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
     if (liked.has(c.id)) { liked.delete(c.id); c.likes -= 1; } else { liked.add(c.id); c.likes += 1; }
     bump();
   };
-  const opt = (on) => ({ border: 0, background: 'transparent', padding: 0, margin: 0, cursor: 'pointer', fontFamily: FONT, fontSize: 15, lineHeight: '22px', letterSpacing: '-0.3px', fontWeight: 500, color: on ? '#F8F8F8' : SUB2, outline: 'none', WebkitTapHighlightColor: 'transparent', display: 'flex', alignItems: 'center', gap: 7.5, transition: 'color 160ms' });
+  const opt = (on) => ({ border: 0, background: 'transparent', padding: 0, margin: 0, cursor: 'pointer', fontFamily: FONT, fontSize: 15, lineHeight: '22px', letterSpacing: '-0.04em', fontWeight: 500, color: on ? '#F8F8F8' : SUB2, outline: 'none', WebkitTapHighlightColor: 'transparent', display: 'flex', alignItems: 'center', gap: 7.5, transition: 'color 160ms' });
   const dot = (on) => ({ width: 5, height: 5, borderRadius: '50%', background: on ? '#F8F8F8' : SUB2, display: 'block' });
   const LikeBtn = ({ c, top, small }) => (
     <button type="button" aria-label="공감" aria-pressed={liked.has(c.id)} onClick={() => toggle(c)} className="cp-btn" style={{ right: 14, top, width: 44, height: small ? 46 : 54, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.3 }}>
@@ -259,7 +259,7 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
       <CardBackdrop open={open} onClose={onClose} img={clip ? clip.back : 'card'} mirror={mirror} />
       <Sheet open={open} top={310} onClose={onClose}>
         {!info ? (<>
-        <p style={{ position: 'absolute', left: 20, top: 38, margin: 0, fontSize: 17, fontWeight: 500, lineHeight: '24px', letterSpacing: '-0.34px', color: '#F9F9F9' }}>{'댓글 ' + commentCount(clip).toLocaleString('en-US')}</p>
+        <p style={{ position: 'absolute', left: 20, top: 38, margin: 0, fontSize: 17, fontWeight: 500, lineHeight: '24px', letterSpacing: '-0.04em', color: '#F9F9F9' }}>{'댓글 ' + commentCount(clip).toLocaleString('en-US')}</p>
         <div style={{ position: 'absolute', right: 21, top: 38, display: 'flex', gap: 12.5 }}>
           <button type="button" onClick={() => setSort('like')} style={opt(sort === 'like')} aria-pressed={sort === 'like'}><i style={dot(sort === 'like')} />순공감순</button>
           <button type="button" onClick={() => setSort('new')} style={opt(sort === 'new')} aria-pressed={sort === 'new'}><i style={dot(sort === 'new')} />최신순</button>
@@ -269,10 +269,10 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
           {info ? <InfoBlock clip={clip} following={following} onFollow={onFollow} /> : (<>
           <div style={{ margin: '25px 0 0 15px', width: 359, height: 67, position: 'relative' }}>
             <div style={{ position: 'absolute', inset: 0, borderRadius: 6, background: '#36D2FF' }} />
-            <p style={{ position: 'absolute', left: 16, top: 10, margin: 0, fontSize: 15.5, fontWeight: 800, lineHeight: '22px', letterSpacing: '-0.31px', color: '#000000', whiteSpace: 'pre', textShadow: '-2px 0 #fff, 2px 0 #fff, 0 -2px #fff, 0 2px #fff, -1.4px -1.4px #fff, 1.4px 1.4px #fff, -1.4px 1.4px #fff, 1.4px -1.4px #fff' }}>드르륵 칵, 잼컨 썰 여기 다 있네</p>
+            <p style={{ position: 'absolute', left: 16, top: 10, margin: 0, fontSize: 15.5, fontWeight: 800, lineHeight: '22px', letterSpacing: '-0.04em', color: '#000000', whiteSpace: 'pre', textShadow: '-2px 0 #fff, 2px 0 #fff, 0 -2px #fff, 0 2px #fff, -1.4px -1.4px #fff, 1.4px 1.4px #fff, -1.4px 1.4px #fff, 1.4px -1.4px #fff' }}>드르륵 칵, 잼컨 썰 여기 다 있네</p>
             <div style={{ position: 'absolute', left: 16, top: 36, height: 19, padding: '0 9px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 4, borderRadius: 5, background: '#222628', overflow: 'hidden' }}>
               <span style={{ width: 29.2, height: 11, lineHeight: 0, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: LOGO }} />
-              <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: '16px', letterSpacing: '-0.23px', color: '#E7E0FA', whiteSpace: 'pre' }}>지금 다운받기</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: '16px', letterSpacing: '-0.04em', color: '#E7E0FA', whiteSpace: 'pre' }}>지금 다운받기</span>
               <span style={{ width: 7, height: 11, lineHeight: 0, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: CHEV }} />
             </div>
             <img src={pic('cmt-drrra')} alt="" draggable={false} style={{ position: 'absolute', left: 216, top: -18, width: 55.3, height: 55.3, display: 'block' }} />
@@ -282,7 +282,7 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
           </div>
           <div style={{ margin: '16px 20px 0', height: 42, borderRadius: 8, background: ROW, position: 'relative' }}>
             <svg width="20" height="17" viewBox="0 0 20 17" style={{ position: 'absolute', left: 14, top: 12 }} fill="none"><path d="M3 11.5C3 7.4 6.2 4.6 10 4.6C13.8 4.6 17 7.4 17 11.5V12.5H3Z" fill={GREEN} /><circle cx="7.2" cy="9.6" r="1.4" fill={ROW} /><circle cx="12.8" cy="9.6" r="1.4" fill={ROW} /><path d="M10 4.6V2.2" stroke={GREEN} strokeWidth="1.5" strokeLinecap="round" /><circle cx="10" cy="1.9" r="1.2" fill={GREEN} /></svg>
-            <p style={{ position: 'absolute', left: 39, top: 10, margin: 0, fontSize: 15, fontWeight: 500, lineHeight: '20px', letterSpacing: '-0.3px', color: '#E9E9E9', whiteSpace: 'pre' }}><span style={{ color: GREEN }}>클린봇</span>이 악성댓글을 감지합니다.</p>
+            <p style={{ position: 'absolute', left: 39, top: 10, margin: 0, fontSize: 15, fontWeight: 500, lineHeight: '20px', letterSpacing: '-0.04em', color: '#E9E9E9', whiteSpace: 'pre' }}><span style={{ color: GREEN }}>클린봇</span>이 악성댓글을 감지합니다.</p>
             <p style={{ position: 'absolute', right: 13, top: 10, margin: 0, fontSize: 14, fontWeight: 500, lineHeight: '20px', color: '#A2A2A2', display: 'flex', alignItems: 'center', gap: 4 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#A2A2A2"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.6 7.6 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.5 7.5 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.2 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" /></svg>설정
             </p>
@@ -293,10 +293,10 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
               <div style={{ display: 'flex', gap: 11 }}>
                 <Avatar c={c} />
                 <div style={{ flex: 1, minWidth: 0, paddingRight: 52 }}>
-                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, lineHeight: '20px', letterSpacing: '-0.3px', color: '#F6F6F6' }}>{c.name}</p>
-                  <p style={{ margin: '3px 0 0', fontSize: 15, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.3px', color: BODY, wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>{c.text}</p>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, lineHeight: '20px', letterSpacing: '-0.04em', color: '#F6F6F6' }}>{c.name}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 15, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.04em', color: BODY, wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>{c.text}</p>
                   <p style={{ margin: '1px 0 0', fontSize: 13, lineHeight: '17px', color: SUB }}>{c.when}</p>
-                  <button type="button" className="cp-row" aria-expanded={replyTo === c.id} onClick={(e) => { e.stopPropagation(); setReplyTo((r) => (r === c.id ? null : c.id)); }} style={{ display: 'block', height: 34, padding: 0, fontSize: 14, color: '#EBEBEB', fontWeight: 400, letterSpacing: '-0.28px' }}>답글 쓰기</button>
+                  <button type="button" className="cp-row" aria-expanded={replyTo === c.id} onClick={(e) => { e.stopPropagation(); setReplyTo((r) => (r === c.id ? null : c.id)); }} style={{ display: 'block', height: 34, padding: 0, fontSize: 14, color: '#EBEBEB', fontWeight: 400, letterSpacing: '-0.04em' }}>답글 쓰기</button>
                 </div>
               </div>
               <div style={{ paddingLeft: 43 }}>
@@ -305,8 +305,8 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
                   <div key={r.id} className={fresh === r.id ? 'cp-new' : undefined} style={{ position: 'relative', display: 'flex', gap: 9, margin: '4px 0 6px' }}>
                     <Avatar c={r} size={24} />
                     <div style={{ flex: 1, minWidth: 0, paddingRight: 52 }}>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, lineHeight: '19px', letterSpacing: '-0.28px', color: '#F6F6F6' }}>{r.name}</p>
-                      <p style={{ margin: '2px 0 0', fontSize: 14.5, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.29px', color: BODY, wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>{r.text}</p>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, lineHeight: '19px', letterSpacing: '-0.04em', color: '#F6F6F6' }}>{r.name}</p>
+                      <p style={{ margin: '2px 0 0', fontSize: 14.5, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.04em', color: BODY, wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>{r.text}</p>
                       <p style={{ margin: '1px 0 0', fontSize: 12.5, lineHeight: '17px', color: SUB }}>{r.when}</p>
                     </div>
                     <LikeBtn c={r} top={-4} small />
@@ -327,7 +327,7 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
           </div>
           <div style={{ position: 'absolute', left: 70, top: 11, width: 263, height: 45, borderRadius: 22.5, border: '1px solid #343436', boxSizing: 'border-box' }}>
             <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }} placeholder="힘이 되는 말 한마디 남겨보세요." enterKeyHint="send"
-              style={{ position: 'absolute', left: 14, top: 0, width: 200, height: 43, border: 0, outline: 'none', background: 'transparent', color: TXT, fontFamily: FONT, fontSize: 15, letterSpacing: '-0.3px', padding: 0 }} />
+              style={{ position: 'absolute', left: 14, top: 0, width: 200, height: 43, border: 0, outline: 'none', background: 'transparent', color: TXT, fontFamily: FONT, fontSize: 15, letterSpacing: '-0.04em', padding: 0 }} />
             <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8E8E8E" strokeWidth="1.8" strokeLinecap="round" style={{ position: 'absolute', left: 233, top: 11.5 }}><circle cx="12" cy="12" r="10" /><circle cx="8.6" cy="9.8" r="0.9" fill="#8E8E8E" stroke="none" /><circle cx="15.4" cy="9.8" r="0.9" fill="#8E8E8E" stroke="none" /><path d="M7.5 14.2c1 2 2.8 3 4.5 3s3.5-1 4.5-3" /></svg>
           </div>
           <button type="button" aria-label="보내기" onClick={send} className="cp-btn" style={{ left: 340, top: 19, width: 38, height: 38, borderRadius: '50%', background: draft.trim() ? '#36D2FF' : ROW, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 160ms, transform 110ms' }}>
@@ -358,11 +358,11 @@ function Row({ icon, label, tail, color, top, onClick }) {
     <button type="button" className="cp-row" onClick={onClick} style={{ position: 'absolute', left: 0, top, width: 390, height: 42, display: 'block', textAlign: 'left', color: color || TXT }}>
       <span style={{ position: 'absolute', left: 20, top: 10, lineHeight: 0, width: 22 }}><Svg size={22} stroke={TXT} sw={1.5}>{ICONS[icon]}</Svg></span>
       <span style={{ position: 'absolute', left: 54, top: 10, display: 'flex', alignItems: 'center', gap: 7, whiteSpace: 'pre' }}>
-        <span style={{ fontSize: 15.5, fontWeight: 600, lineHeight: '22px', letterSpacing: '-0.31px' }}>{label}</span>
+        <span style={{ fontSize: 15.5, fontWeight: 600, lineHeight: '22px', letterSpacing: '-0.04em' }}>{label}</span>
         {tail ? (
           <>
             <i style={{ width: 3.5, height: 3.5, borderRadius: '50%', background: SUB, display: 'block' }} />
-            <span style={{ fontSize: 14.5, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.3px', color: '#AEAEAE' }}>{tail}</span>
+            <span style={{ fontSize: 14.5, fontWeight: 400, lineHeight: '22px', letterSpacing: '-0.04em', color: '#AEAEAE' }}>{tail}</span>
           </>
         ) : null}
       </span>
@@ -375,7 +375,7 @@ export function MoreSheet({ open, onClose, stats, liked: isLiked, saved, onActio
       <span style={{ position: 'absolute', left: 0, top: 11, width: w, display: 'flex', justifyContent: 'center', lineHeight: 0 }}>
         {icon === 'heart' ? <Heart on={on} size={22} off={TXT} /> : <Svg size={22} stroke={on ? TXT : TXT} fill={icon === 'keep' && on ? TXT : 'none'} sw={1.6}>{ICONS[icon]}</Svg>}
       </span>
-      <span style={{ position: 'absolute', left: 0, top: 39, width: w, textAlign: 'center', fontSize: 14.5, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.3px', color: '#F2F2F2' }}>{text}</span>
+      <span style={{ position: 'absolute', left: 0, top: 39, width: w, textAlign: 'center', fontSize: 14.5, fontWeight: 400, lineHeight: '20px', letterSpacing: '-0.04em', color: '#F2F2F2' }}>{text}</span>
     </button>
   );
   return (

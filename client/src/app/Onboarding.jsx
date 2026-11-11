@@ -18,7 +18,7 @@ export const TOGETHER = [
   { img: 'ob-2.png', title: '말하기 부담되면\n이모지로 반응해요', sub: '+ 버튼을 눌러 이모지를 날려요' },
   { img: 'ob-3.png', title: '주전부리를 던지면\n가운데 테이블에 올라가요', sub: '오른쪽 퀵슬롯에서 주전부리를 눌러 던져요' },
   { img: 'ob-4.png', title: '대화는 20분 뒤\n저장되지 않고 사라져요', sub: '해 뜨기 타이머가 끝나면 대화방이 종료돼요' },
-  { img: 'ob-5.png', title: '대화가 끝나면\n리포트가 도착해요', sub: '공감과 추천을 받으면 엉따 온도가 올라가요' },
+  { img: 'ob-5.png', title: '대화가 끝나면\n리포트가 도착해요', sub: '추천을 받으면 엉따 온도가 올라가요' },
 ];
 export const SOLO = [
   { img: 'solo-1.png', title: '매칭될 사람이 없으면\nAI와 먼저 대화해요', sub: '기다리지 않고 바로 고민을 털어놓아요' },
@@ -71,8 +71,8 @@ function PageText({ page, mode, dir, delay }) {
 function TextBody({ page, title, subStyle }) {
   return (
     <div style={{ height: 91, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 24, boxSizing: 'border-box' }}>
-      <div style={{ fontFamily: FONT, fontSize: 16, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.64px', color: '#121415', textAlign: 'center', whiteSpace: 'pre', wordBreak: 'keep-all' }}>{title || page.title}</div>
-      <div style={{ fontFamily: FONT, marginTop: 8, fontSize: 12, fontWeight: 400, lineHeight: '15px', letterSpacing: '-0.48px', color: '#6E767C', textAlign: 'center', whiteSpace: 'pre', wordBreak: 'keep-all', ...subStyle }}>{page.sub}</div>
+      <div style={{ fontFamily: FONT, fontSize: 16, fontWeight: 700, lineHeight: '22px', letterSpacing: '-0.04em', color: '#121415', textAlign: 'center', whiteSpace: 'pre', wordBreak: 'keep-all' }}>{title || page.title}</div>
+      <div style={{ fontFamily: FONT, marginTop: 8, fontSize: 12, fontWeight: 400, lineHeight: '15px', letterSpacing: '-0.04em', color: '#6E767C', textAlign: 'center', whiteSpace: 'pre', wordBreak: 'keep-all', ...subStyle }}>{page.sub}</div>
     </div>
   );
 }
@@ -154,13 +154,13 @@ function Deck({ pages, visuals, onFinish }) {
           {layers.map((L) => <PageText key={'t' + L.id} page={pages[L.idx]} mode={L.out ? 'out' : 'in'} dir={st.dir} delay={moved ? 100 : 160} />)}
         </div>
         <div style={{ position: 'relative', height: 68 }}>
-          <button className="ob-btn" onClick={onFinish} onTouchStart={noop} style={{ position: 'absolute', left: 4, top: 20, height: 44, padding: '0 20px', fontSize: 12, fontWeight: 500, letterSpacing: '-0.48px', color: '#6E767C', opacity: last ? 0 : 1, pointerEvents: last ? 'none' : 'auto', transition: `opacity 200ms ${EASE}` }}>건너뛰기</button>
+          <button className="ob-btn" onClick={onFinish} onTouchStart={noop} style={{ position: 'absolute', left: 4, top: 20, height: 44, padding: '0 20px', fontSize: 12, fontWeight: 500, letterSpacing: '-0.04em', color: '#6E767C', opacity: last ? 0 : 1, pointerEvents: last ? 'none' : 'auto', transition: `opacity 200ms ${EASE}` }}>건너뛰기</button>
           <div style={{ position: 'absolute', left: 0, right: 0, top: 39, display: 'flex', justifyContent: 'center', gap: 6 }}>
             {pages.map((_, k) => (
               <span key={k} style={{ width: k === i ? 16 : 6, height: 6, borderRadius: 3, background: k === i ? '#36D2FF' : 'rgba(154,161,166,.4)', transition: `width 300ms ${EASE}, background-color 300ms ${EASE}` }} />
             ))}
           </div>
-          <button className="ob-btn" onClick={next} onTouchStart={noop} style={{ position: 'absolute', right: 4, top: 20, height: 44, padding: '0 26px', fontSize: 12, fontWeight: 700, letterSpacing: '-0.48px', color: '#36D2FF', overflow: 'hidden' }}>
+          <button className="ob-btn" onClick={next} onTouchStart={noop} style={{ position: 'absolute', right: 4, top: 20, height: 44, padding: '0 26px', fontSize: 12, fontWeight: 700, letterSpacing: '-0.04em', color: '#36D2FF', overflow: 'hidden' }}>
             <span key={last ? 'start' : 'next'} style={{ display: 'inline-block', ...(moved ? an(last ? 'obLabelUp' : 'obLabelDown', 0, 220, EASE) : null) }}>{last ? '시작하기' : '다음'}</span>
           </button>
         </div>

@@ -1,6 +1,9 @@
 // 대화 다시보기(재방송, 61). 팀 피그마 2322:12283 "대화 다시보기 (재방송)"(390 x 844, 2026. 11. 11. 의정 "라이브다시보기 화면 추가")를 그대로 옮긴 화면.
 // 글 상세(38)의 대화 다시보기 카드를 누르면 밀어 들어오고(push), 왼쪽 위 뒤로(flow.js 61 -> 38 back)를 누르면 글 상세로 돌아간다.
-// 동작: 06:12에서 재생 중으로 시작해 실제 1초에 1초씩 흐른다. 가운데 버튼은 일시정지와 재생을 오간다(재생 모양은 피그마 play 버튼 2302:12692의 삼각형).
+// 2026. 11. 12. 팀이 "자간줄여" 섹션에 두 상태를 나눠 그렸다: 재생 중 2340:30920(btn_일시정지, 두 막대), 일시정지 2351:34663(btn_재생, 원에 둥근 삼각형 구멍). 두 프레임은 버튼만 다르다.
+// 동작: 06:12에서 재생 중(2340:30920)으로 시작해 실제 1초에 1초씩 흐른다. 가운데 버튼을 누르면 일시정지(2351:34663)와 재생을 오간다.
+// 애니메이션(팀 댓글 "애니메이션", 2351:34663 진행 바와 컨트롤 줄): 진행 바와 손잡이는 매 화면 그리기(requestAnimationFrame)마다 translateX로 흐르고, 10초 옮김은 180ms 표준 곡선으로 미끄러진다.
+// 두 버튼 아이콘은 겹쳐 두고 opacity와 scale(0.9에서 1)을 180ms 표준 곡선으로 바꿔 교차한다. 피그마에 프로토타입 연결과 스마트 애니메이트 값은 없다.
 // 10초 버튼은 시간을 10초 옮기고, 배속 칩은 1.0x, 1.5x, 2.0x 순서로 돌며 흐르는 빠르기를 바꾼다. 12:32에 닿으면 멈춘다.
 // 댓글 말풍선은 피그마에 순서 단서가 없어 처음부터 프레임 그대로 보인다.
 // 휴대폰 높이 맞춤(mobileFit.js)이 읽을 수 있게 맨 바깥 칸의 자식은 모두 피그마 좌표의 absolute 칸이다.
@@ -32,8 +35,8 @@ const icon = {
   fwd10: <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" style={{ display: 'block' }}><path d="M24.5 14C24.5 16.0767 23.8842 18.1068 22.7304 19.8335C21.5767 21.5602 19.9368 22.906 18.0182 23.7007C16.0996 24.4955 13.9884 24.7034 11.9516 24.2982C9.91476 23.8931 8.04383 22.8931 6.57538 21.4246C5.10693 19.9562 4.1069 18.0852 3.70176 16.0484C3.29661 14.0116 3.50455 11.9004 4.29927 9.98182C5.09399 8.0632 6.4398 6.42332 8.16652 5.26957C9.89323 4.11581 11.9233 3.5 14 3.5C16.94 3.5 19.7517 4.66667 21.8633 6.69667L24.5 9.33333" strokeWidth="1.98333" strokeLinecap="round" strokeLinejoin="round" stroke="#F8F8F8" /><path d="M24.5 3.5V9.33333H18.6666" strokeWidth="1.98333" strokeLinecap="round" strokeLinejoin="round" stroke="#F8F8F8" /></svg>,
   // btn_일시정지 2322:12371
   pause: <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style={{ display: 'block' }}><path d="M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48Z" fill="#36D2FF" /><path d="M20.5 15H18.5C17.6716 15 17 15.6716 17 16.5V31.5C17 32.3284 17.6716 33 18.5 33H20.5C21.3284 33 22 32.3284 22 31.5V16.5C22 15.6716 21.3284 15 20.5 15Z" fill="#121415" /><path d="M29.5 15H27.5C26.6716 15 26 15.6716 26 16.5V31.5C26 32.3284 26.6716 33 27.5 33H29.5C30.3284 33 31 32.3284 31 31.5V16.5C31 15.6716 30.3284 15 29.5 15Z" fill="#121415" /></svg>,
-  // 재생: 같은 원(#36D2FF)에 피그마 play 버튼(2302:12692)의 삼각형(15.6 x 19, 원 안 20, 14.5 자리)을 #121415로 둔다.
-  play: <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style={{ display: 'block' }}><path d="M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48Z" fill="#36D2FF" /><path transform="translate(20 14.5)" d="M2.00786e-06 1.002L2.00786e-06 18.002C-0.000355988 18.1807 0.0471643 18.3562 0.137621 18.5103C0.228078 18.6644 0.358167 18.7914 0.514357 18.8782C0.670547 18.9649 0.847134 19.0083 1.02575 19.0037C1.20437 18.9991 1.37849 18.9467 1.53 18.852L15.13 10.352C15.2747 10.2623 15.3941 10.1372 15.4769 9.98843C15.5598 9.83968 15.6032 9.67225 15.6032 9.502C15.6032 9.33176 15.5598 9.16433 15.4769 9.01558C15.3941 8.86683 15.2747 8.74169 15.13 8.652L1.53 0.152003C1.37849 0.0573049 1.20437 0.00493242 1.02575 0.000331646C0.847134 -0.00426912 0.670547 0.0390705 0.514357 0.125843C0.358167 0.212615 0.228078 0.339651 0.137621 0.493736C0.0471643 0.647822 -0.000355988 0.823329 2.00786e-06 1.002Z" fill="#121415" /></svg>,
+  // btn_재생 2351:34663 안 shape: 원(#36D2FF)에서 둥근 삼각형을 빼낸 한 모양(EVENODD). 삼각형 자리는 비어 아래 컨트롤 판(#222628)이 보인다.
+  play: <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style={{ display: 'block' }}><path fillRule="evenodd" clipRule="evenodd" d="M48 24C48 37.2552 37.2552 48 24 48C10.7448 48 0 37.2552 0 24C0 10.7448 10.7448 0 24 0C37.2552 0 48 10.7448 48 24ZM20.88 15C19.32 14.04 18 14.832 18 16.68L18 31.32C18 33.168 19.32 33.96 20.88 33L32.52 25.68C34.08 24.72 34.08 23.28 32.52 22.32L20.88 15Z" fill="#36D2FF" /></svg>,
 };
 
 // 누름 반응: 누르면 scale 0.97과 opacity 0.85(90ms), 떼면 120ms. 표준 곡선.
@@ -52,6 +55,21 @@ function pressProps() {
   };
 }
 
+// 표준 곡선 cubic-bezier(0.2, 0, 0, 1)을 자바스크립트로 푼다(10초 옮김 미끄러짐에 쓴다).
+const ease = (() => {
+  const x1 = 0.2, y1 = 0, x2 = 0, y2 = 1;
+  const bz = (t, a, b) => 3 * a * t * (1 - t) * (1 - t) + 3 * b * t * t * (1 - t) + t * t * t;
+  return (x) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    let lo = 0, hi = 1, t = x;
+    for (let i = 0; i < 24; i++) { t = (lo + hi) / 2; if (bz(t, x1, x2) < x) lo = t; else hi = t; }
+    return bz(t, y1, y2);
+  };
+})();
+const SEEK_MS = 180;
+const ICON_T = 'opacity 180ms ' + motion.standard + ', transform 180ms ' + motion.standard;
+
 function Btn({ label, onPress, style, children, figma }) {
   return (
     <div role="button" tabIndex={0} aria-label={label} data-figma={figma} onClick={(e) => { e.stopPropagation(); onPress(); }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPress(); } }} {...pressProps()} style={{ cursor: 'pointer', flexShrink: 0, ...style }}>
@@ -67,14 +85,25 @@ export default function ReplayScreen() {
   const playRef = useRef(true);
   const barRef = useRef(null);
   const thumbRef = useRef(null);
+  // 10초 옮김 미끄러짐: 옮기기 직전 보이던 위치와 새 위치의 차이(초)를 180ms 동안 0으로 줄인다.
+  const glide = useRef({ gap: 0, t0: 0 });
   const [sec, setSec] = useState(REPLAY.start);
   const [playing, setPlaying] = useState(true);
   const [rateI, setRateI] = useState(0);
 
   // 진행 바와 손잡이는 transform만 바꾼다(그리기마다 React를 다시 돌리지 않는다).
-  const paint = () => {
-    const p = Math.min(1, Math.max(0, pos.current / REPLAY.total));
-    if (barRef.current) barRef.current.style.transform = 'scaleX(' + p + ')';
+  const gapNow = (now) => {
+    const g = glide.current;
+    if (!g.gap) return 0;
+    const k = (now - g.t0) / SEEK_MS;
+    if (k >= 1) { g.gap = 0; return 0; }
+    return g.gap * (1 - ease(k));
+  };
+  const paint = (now = performance.now()) => {
+    const shownSec = Math.min(REPLAY.total, Math.max(0, pos.current + gapNow(now)));
+    const p = shownSec / REPLAY.total;
+    // 진행 바는 트랙 폭(342) 그대로 두고 둥근 트랙 칸 안에서 왼쪽으로 밀어 낸다(scaleX처럼 끝 둥근 모서리가 찌그러지지 않는다).
+    if (barRef.current) barRef.current.style.transform = 'translateX(' + ((p - 1) * BAR_W) + 'px)';
     if (thumbRef.current) thumbRef.current.style.transform = 'translateX(' + (p * BAR_W - 7) + 'px)';
     const s = Math.floor(pos.current);
     setSec((v) => (v === s ? v : s));
@@ -91,7 +120,9 @@ export default function ReplayScreen() {
       if (playRef.current && !document.hidden && shown()) {
         pos.current = Math.min(REPLAY.total, pos.current + dt * rateRef.current);
         if (pos.current >= REPLAY.total) { playRef.current = false; setPlaying(false); }
-        paint();
+        paint(now);
+      } else if (glide.current.gap) {
+        paint(now);
       }
       raf = requestAnimationFrame(tick);
     };
@@ -109,8 +140,12 @@ export default function ReplayScreen() {
     paint();
   };
   const seek = (d) => {
+    const now = performance.now();
+    const before = pos.current + gapNow(now);
     pos.current = Math.min(REPLAY.total, Math.max(0, pos.current + d));
-    paint();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    glide.current = { gap: reduce ? 0 : before - pos.current, t0: now };
+    paint(now);
   };
   const cycleRate = () => {
     const next = (rateI + 1) % REPLAY.rates.length;
@@ -131,7 +166,7 @@ export default function ReplayScreen() {
       </div>
       <div data-figma="보는 중" data-node="2322:12328" style={{ position: 'absolute', left: 313, top: 78, height: 27, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px 5px 9px', borderRadius: 999, background: 'rgba(0,0,0,0.7)' }}>
         {icon.view}
-        <p style={t(12, 700, C.text, { lineHeight: '17.4px', letterSpacing: '-0.24px' })}>{REPLAY.viewers}</p>
+        <p style={t(12, 700, C.text, { lineHeight: '17.4px', letterSpacing: '-0.04em' })}>{REPLAY.viewers}</p>
       </div>
 
       <div data-figma="고민" data-node="2322:12288" style={{ position: 'absolute', left: 24, top: 321, width: 342, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -145,8 +180,8 @@ export default function ReplayScreen() {
             {REPLAY.seats.map((s) => (
               <div key={s.name} data-figma={'Seat / ' + s.name} style={{ width: 58, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                 <div data-figma="avatar" style={{ position: 'relative', width: 54, height: 54 }}>
-                  {/* 말하는 자리는 바깥 테두리 2가 그림에 들어 있어 58 칸을 2만큼 바깥으로 둔다. */}
-                  <img alt="" draggable={false} src={s.img} style={s.on ? { position: 'absolute', left: -2, top: -2, width: 58, height: 58, display: 'block' } : { position: 'absolute', left: 0, top: 0, width: 54, height: 54, display: 'block' }} />
+                  {/* 말하는 자리의 하늘색 테두리(안쪽 2)는 그림 안에 들어 있다. 세 자리 모두 54 칸 그대로다. */}
+                  <img alt="" draggable={false} src={s.img} style={{ position: 'absolute', left: 0, top: 0, width: 54, height: 54, display: 'block' }} />
                 </div>
                 <p style={t(11, 500, s.on ? C.text : C.sub, { lineHeight: '13.728px', width: 58, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' })}>{s.name}</p>
               </div>
@@ -162,18 +197,19 @@ export default function ReplayScreen() {
       <div data-figma="댓글 (라이브 채팅)" data-node="2322:12315" style={{ position: 'absolute', left: 24, top: 540, width: 342, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
         {REPLAY.comments.map((c) => (
           <div key={c.name} data-figma={'댓글 ' + c.name} style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-start' }}>
-            <p style={t(11, 500, C.faint, { lineHeight: '15.4px', letterSpacing: '-0.22px', height: 15 })}>{c.name}</p>
+            <p style={t(11, 500, C.faint, { lineHeight: '15.4px', letterSpacing: '-0.04em', height: 15 })}>{c.name}</p>
             <div data-figma="bubble" style={{ display: 'flex', alignItems: 'center', height: 32, boxSizing: 'border-box', padding: '7px 12px', borderRadius: 14, background: C.card }}>
-              <p style={t(13, 500, C.text, { lineHeight: '18.2px', letterSpacing: '-0.26px' })}>{c.text}</p>
+              <p style={t(13, 500, C.text, { lineHeight: '18.2px', letterSpacing: '-0.04em' })}>{c.text}</p>
             </div>
           </div>
         ))}
       </div>
 
       <div data-figma="재생 바" data-node="2322:12358" style={{ position: 'absolute', left: 24, top: 716, width: BAR_W, height: 14 }}>
-        <div data-figma="track" style={{ position: 'absolute', left: 0, top: 5, width: BAR_W, height: 4, borderRadius: 2, background: C.chip }} />
-        <div ref={barRef} data-figma="progress" style={{ position: 'absolute', left: 0, top: 5, width: BAR_W, height: 4, borderRadius: 2, background: C.brand, transformOrigin: '0 50%', transform: 'scaleX(' + REPLAY.start / REPLAY.total + ')' }} />
-        <div ref={thumbRef} data-figma="thumb" style={{ position: 'absolute', left: 0, top: 0, width: 14, height: 14, borderRadius: 7, background: C.text, transform: 'translateX(' + (REPLAY.start / REPLAY.total * BAR_W - 7) + 'px)' }} />
+        <div data-figma="track" style={{ position: 'absolute', left: 0, top: 5, width: BAR_W, height: 4, borderRadius: 2, background: C.chip, overflow: 'hidden' }}>
+          <div ref={barRef} data-figma="progress" style={{ position: 'absolute', left: 0, top: 0, width: BAR_W, height: 4, borderRadius: 2, background: C.brand, willChange: 'transform', transform: 'translateX(' + (REPLAY.start / REPLAY.total - 1) * BAR_W + 'px)' }} />
+        </div>
+        <div ref={thumbRef} data-figma="thumb" style={{ position: 'absolute', left: 0, top: 0, width: 14, height: 14, borderRadius: 7, background: C.text, willChange: 'transform', transform: 'translateX(' + (REPLAY.start / REPLAY.total * BAR_W - 7) + 'px)' }} />
       </div>
 
       <div data-figma="플레이어 컨트롤" data-node="2322:12362" style={{ position: 'absolute', left: 24, top: 754, width: 342, height: 66, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px 8px 20px', borderRadius: 32, background: C.card }}>
@@ -185,8 +221,10 @@ export default function ReplayScreen() {
             <div style={{ position: 'absolute', left: 2, top: 2 }}>{icon.back10}</div>
             <p style={t(8, 700, C.text, { position: 'absolute', left: 11, top: 12, lineHeight: '10px' })}>10</p>
           </Btn>
-          <Btn label={playing ? '일시정지' : '재생'} figma="btn_일시정지" onPress={toggle} style={{ width: 48, height: 48, borderRadius: 24 }}>
-            {playing ? icon.pause : icon.play}
+          <Btn label={playing ? '일시정지' : '재생'} figma={playing ? 'btn_일시정지' : 'btn_재생'} onPress={toggle} style={{ position: 'relative', width: 48, height: 48, borderRadius: 24 }}>
+            {/* 두 아이콘을 겹쳐 두고 보이는 쪽만 opacity 1, scale 1. 숨는 쪽은 opacity 0, scale 0.9. */}
+            <div data-figma="btn_일시정지 아이콘" style={{ position: 'absolute', left: 0, top: 0, transition: ICON_T, opacity: playing ? 1 : 0, transform: playing ? 'scale(1)' : 'scale(0.9)' }}>{icon.pause}</div>
+            <div data-figma="btn_재생 아이콘" style={{ position: 'absolute', left: 0, top: 0, transition: ICON_T, opacity: playing ? 0 : 1, transform: playing ? 'scale(0.9)' : 'scale(1)' }}>{icon.play}</div>
           </Btn>
           <Btn label="10초 앞으로" figma="10초 앞으로" onPress={() => seek(10)} style={{ position: 'relative', width: 32, height: 32 }}>
             <div style={{ position: 'absolute', left: 2, top: 2 }}>{icon.fwd10}</div>

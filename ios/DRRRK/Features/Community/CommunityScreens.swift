@@ -23,9 +23,6 @@ struct CommunityView: View {
     @State private var showSort = false
     @State private var loveDots = LoveDotStore.shared
 
-    private var featured: [LiveFeatured] {
-        zip(CommunityData.featuredTitles, CommunityData.scenes).map { .init(title: $0, versus: "", time: "", viewers: "", scene: $1) }
-    }
 
     /// 고른 카테고리 탭의 카드(CommunityTabs.swift). 전체는 기존 목록이다.
     private var posts: [CommunityPost] {
@@ -48,13 +45,15 @@ struct CommunityView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 22)
-                    FeaturedCarousel(items: featured, page: $page) {
-                        CommunityData.openedTitle = featured[min(page, featured.count - 1)].title
+                    // 11. 12. 새 섹션 2340:28014 캐러셀(2366:34754): 지난 밤 이야기 카드와 같은 작은 글 카드 다섯 장(342 x 112, 사이 12).
+                    // 제목 아래 6에서 시작하고(y 158), 점은 카드 아래 12(y 282), 탭 줄은 점 아래 20(y 308)이다. 어느 카드를 눌러도 그 글 상세로 간다(웹과 같다).
+                    HallCarousel(items: CommunityData.hallCards, page: $page) { post in
+                        CommunityData.openedTitle = post.title
                         router.push(.communityDetail)
                     }
-                        .padding(.top, 18)
-                    PageDots(count: featured.count, index: page).frame(maxWidth: .infinity).padding(.top, 12)
-                    CategoryTabs(selected: $category, showDot: !loveDots.communityLoveSeen).padding(.top, 18)
+                        .padding(.top, 6)
+                    PageDots(count: CommunityData.hallCards.count, index: page).frame(maxWidth: .infinity).padding(.top, 12)
+                    CategoryTabs(selected: $category, showDot: !loveDots.communityLoveSeen).padding(.top, 20)
                         .onChange(of: category, initial: true) { _, new in
                             if new == "연애" { loveDots.markCommunity() }
                             CommunityTabState.selected = new
@@ -99,6 +98,41 @@ struct CommunityView: View {
                 .presentationBackground(DS.Palette.bgElevated)
         }
     }
+}
+
+/// 명예의 전당 카드 줄. 카드 한 장씩 맞춰 멈추고(viewAligned), 보이는 카드 번호를 점에 알린다.
+private struct HallCarousel: View {
+    let items: [CommunityPost]
+    @Binding var page: Int
+    let onTap: (CommunityPost) -> Void
+    var body: some View {
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 12) {
+                ForEach(Array(items.enumerated()), id: \.element.id) { i, post in
+                    Button { onTap(post) } label: { PostCard(post: post).frame(width: 342) }
+                        .buttonStyle(PressStyle())
+                        .id(i)
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .contentMargins(.horizontal, 24, for: .scrollContent)
+        .scrollTargetBehavior(.viewAligned)
+        .scrollIndicators(.hidden)
+        .scrollPosition(id: Binding(get: { page }, set: { page = $0 ?? 0 }))
+        .frame(height: 112)
+    }
+}
+
+extension CommunityData {
+    /// 명예의 전당 다섯 장(피그마 2366:34754 왼쪽부터 List Card / 1, 2, 4, 5, 6). 그림은 목록 카드와 같은 그림을 다시 쓴다.
+    static let hallCards: [CommunityPost] = [
+        .init(title: "친구가 썸남 앞에서\n내 쌍밍아웃함", likes: 128, comments: 52, thumb: "F-community-thumb-1"),
+        .init(title: "부모님은 공무원 하라는데\n나는 그림이 좋다", likes: 97, comments: 61, thumb: "F-community-thumb-1864c9-t2"),
+        .init(title: "조별과제 혼자 다 했는데\n이름은 다섯 명", likes: 118, comments: 56, thumb: "F-community-thumb-5b7485"),
+        .init(title: "전남친이 내 친구랑\n사귄다는 소식 들음", likes: 156, comments: 63, thumb: "F-community-thumb-6b25e7"),
+        .init(title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", likes: 31, comments: 17, thumb: "F-community-thumb-2"),
+    ]
 }
 
 private struct PostCard: View {
@@ -348,8 +382,9 @@ struct CommunityDetailView: View {
 
     private var inputBar: some View {
         HStack(spacing: 8) {
+            // 피그마 2340:28315(11. 12. 최종): "댓글 달기" 14 Regular, x 45. 보내기 버튼 x 309(오른쪽 안쪽 여백 9). 웹 CommunityPost.jsx와 같은 값.
             TextField("", text: $draft, prompt: Text("댓글 달기").foregroundStyle(DS.Palette.textSecondary))
-                .suit(14, .medium, tracking: -0.56)
+                .suit(14, .regular, tracking: -0.56)
                 .foregroundStyle(DS.Palette.textPrimary)
                 .focused($typing)
                 .submitLabel(.send)
@@ -362,7 +397,7 @@ struct CommunityDetailView: View {
             .buttonStyle(PressStyle())
             .accessibilityLabel("댓글 보내기")
         }
-        .padding(.vertical, 8).padding(.trailing, 8).padding(.leading, 8)
+        .padding(.vertical, 8).padding(.trailing, 9).padding(.leading, 8)
         .frame(height: 66)
         .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: 32))
         .padding(.horizontal, 24)
