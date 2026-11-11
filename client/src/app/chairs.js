@@ -171,6 +171,39 @@ export function commitDraft() {
 // 큰 자리는 피그마 원본 PNG, 작은 자리는 같은 그림을 256px로 줄인 PNG다.
 export const big = (k, c) => BASE + 'assets/chairs/v2/' + KINDS[k].files[c] + '.png';
 export const thumb = (k, c) => BASE + 'assets/chairs/v2/t-' + KINDS[k].files[c] + '.png';
+// 의자 꾸미기(20) 전용 그림(11. 12. 04:46 사용자 지시 "누르면 큰 그림이 늦게 바뀐다"): 큰 그림은 표시 190의 2배인 380px WebP(투명, 품질 0.92, 한 장 약 17KB),
+// 작은 칸은 76 칸의 2배인 152px WebP다. 원본 1024px PNG(한 장 약 710KB, 29장 20.6MB)는 다른 화면이 그대로 쓴다.
+export const hero = (k, c) => BASE + 'assets/chairs/v2/h-' + KINDS[k].files[c] + '.webp';
+export const tile = (k, c) => BASE + 'assets/chairs/v2/s-' + KINDS[k].files[c] + '.webp';
+// 다섯 종류의 모든 스타일 큰 그림과 작은 그림을 미리 받아 디코드해 둔다. 한 번 디코드한 그림은 Image 객체를 붙잡아 두어 눌렀을 때 같은 프레임에 바로 그린다.
+// 지금 보는 의자부터 받는다. 돌려주는 약속은 전부 끝나면 풀린다(그림 하나가 실패해도 풀린다).
+const warmed = new Map();
+export const isWarm = (u) => warmed.get(u) === true;
+const warmOne = (u) => {
+  if (warmed.has(u)) return warmed.get(u) === true ? Promise.resolve() : warmed.get(u).p;
+  const im = new Image();
+  im.decoding = 'async';
+  const p = new Promise((res) => {
+    const done = () => { warmed.set(u, true); keep.push(im); res(); };
+    im.onload = () => (im.decode ? im.decode().then(done, done) : done());
+    im.onerror = () => { warmed.delete(u); res(); };
+  });
+  warmed.set(u, { p });
+  im.src = u;
+  return p;
+};
+const keep = [];
+let warmAll = null;
+export function warmStudio() {
+  if (warmAll) return warmAll;
+  const order = [];
+  const d = draft;
+  KINDS.forEach((k, i) => order.push(tile(i, 0)));
+  KINDS[d.k].colors.forEach((_, c) => { order.push(hero(d.k, c)); order.push(tile(d.k, c)); });
+  KINDS.forEach((k, i) => k.colors.forEach((_, c) => { order.push(hero(i, c)); order.push(tile(i, c)); }));
+  warmAll = Promise.all([...new Set(order)].map(warmOne));
+  return warmAll;
+}
 // 화면 그림 주소(./assets/images/...) 안의 파일 이름 자리에 넣는 값: 한 단계 올라가서 chairs/v2 폴더로 간다.
 const rel = (k, c, large) => '../chairs/v2/' + (large ? '' : 't-') + KINDS[k].files[c] + '.png';
 export const mineRel = (large) => rel(saved.k, saved.c, large);

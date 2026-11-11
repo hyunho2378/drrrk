@@ -52,6 +52,32 @@ final class ChairStore {
         return f.count == 8 ? "D2-chair-" + f : "D-chairt-" + f
     }
 
+    /// 의자 꾸미기 전용 그림(11. 12. 04:46 사용자 지시 "누르면 큰 그림이 늦게 바뀐다", 웹 chairs.js hero, tile과 같다).
+    /// 큰 그림은 표시 190의 2배인 380px(D3-chairh-), 작은 칸은 76 칸의 2배인 152px(D3-chairs-)다. 원본 1024px는 다른 화면이 그대로 쓴다.
+    static func hero(_ k: Int, _ c: Int) -> String { "D3-chairh-" + kinds[k].files[c] }
+    static func tile(_ k: Int, _ c: Int) -> String { "D3-chairs-" + kinds[k].files[c] }
+
+    /// 다섯 종류의 모든 스타일 큰 그림과 작은 그림을 미리 디코드해 둔다(preparingForDisplay). 누르면 디코드된 그림을 같은 프레임에 그린다.
+    @ObservationIgnored private(set) var prepared: [String: UIImage] = [:]
+    @ObservationIgnored private var warming = false
+    func warmStudio() {
+        guard !warming else { return }
+        warming = true
+        var names: [String] = []
+        for k in Self.kinds.indices { for c in Self.kinds[k].colors.indices { names.append(Self.hero(k, c)); names.append(Self.tile(k, c)) } }
+        Task.detached(priority: .userInitiated) {
+            var out: [String: UIImage] = [:]
+            for n in names { if let im = UIImage(named: n) { out[n] = im.preparingForDisplay() ?? im } }
+            let done = out
+            await MainActor.run { ChairStore.shared.prepared.merge(done) { a, _ in a } }
+        }
+    }
+    /// 미리 디코드한 그림이 있으면 그것을, 없으면 자산 이름으로 그린다.
+    func image(_ name: String) -> Image {
+        if let im = prepared[name] { return Image(uiImage: im) }
+        return Image(name)
+    }
+
     private static let key = "drrrk.chair.v1"
 
     private(set) var savedK = 0
