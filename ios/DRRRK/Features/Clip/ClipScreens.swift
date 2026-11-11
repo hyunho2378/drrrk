@@ -688,7 +688,7 @@ struct ClipPlayerView: View {
     @ViewBuilder
     private func video(_ c: ClipInfo, current: Bool) -> some View {
         if c.hasVideo {
-            // 진짜 영상(피그마 "영상 / 쌍밍아웃" 390 x 750, 채움 FILL). 아래 피그마 그림이 첫 장면이 뜨기 전 자리를 채운다. 옆 칸에서는 그림만 보인다.
+            // 진짜 영상(피그마 "영상 / 쌍밍아웃" 390 x 750, 채움 FILL). 아래 그림 G-clip-vid는 영상 첫 장면(11. 11. 영상에서 뽑아 교체)이라 영상이 뜨기 전과 뒤가 같은 장면이다. 옆 칸에서는 그림만 보인다.
             ZStack(alignment: .topLeading) {
                 Image(c.image).resizable().scaledToFill().frame(width: 390, height: 750).clipped()
                 if current {

@@ -57,15 +57,26 @@ struct RoomView: View {
         GeometryReader { geo in
             let map = SceneMap(size: geo.size)
             ZStack(alignment: .topLeading) {
-                // 이야기별 장면: 쌍밍아웃은 room-scene(2096:22172), 사진보정은 E-room-scene-new(2100:24130과 같은 그림)
-                Image(model.content.scene)
+                // 바닥 그림 하나(11. 11. "이미지 자체를 교체"). 입장 영상을 틀 동안은 영상 첫 장면 그림, 그 밖에는 이야기별 장면
+                // (쌍밍아웃 room-scene 2096:22172, 사진보정 E-room-scene-new 2100:24130과 같은 그림)이다. 방이 보이는 첫 순간부터 이 자리에 맞는 그림이 있다.
+                // 입장 영상이 끝나면 영상 아래에서 바로 장면 그림으로 바뀌고(같은 구도), 그 위에서 영상이 0.12초 동안 옅어진다.
+                backdrop
                     .resizable()
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
-                    .opacity(sunrise?.shown == true ? 0 : 1)
 
-                // 방 입장 영상: 장면 그림 바로 위. 끝나면 0.12초 동안 옅어지며 같은 구도의 장면 그림으로 이어진다.
+                // 해 뜨는 단계: 바닥 그림이 밤 장면에서 해뜨기 영상 첫 장면 그림(같은 구도)으로 0.12초 동안 바뀐다. 영상은 같은 자리에서 첫 장면부터 이어서 흐른다.
+                if let sunrise, sunrise.active, let poster = sunrise.poster {
+                    Image(uiImage: poster)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .clipped()
+                        .transition(.opacity)
+                }
+
+                // 방 입장 영상: 바닥의 첫 장면 그림과 같은 자리. 끝나면 바닥이 같은 구도의 장면 그림으로 바뀌고 영상이 0.12초 동안 옅어진다.
                 if let entry, entry.player != nil, entry.visible {
                     RoomEnterVideoView(entry: entry)
                         .frame(width: geo.size.width, height: geo.size.height)
@@ -73,11 +84,11 @@ struct RoomView: View {
                         .transition(.opacity)
                 }
 
-                // 해뜨기 영상: 장면 그림 바로 위, 이름표와 채팅 아래. 첫 장면이 그려지기 전에는 보이지 않는다.
+                // 해뜨기 영상: 바닥의 첫 장면 그림과 같은 자리, 이름표와 채팅 아래. 해 뜨는 단계 전에는 보이지 않는다.
                 if let sunrise, sunrise.player != nil {
                     SunriseVideoView(sunrise: sunrise)
                         .frame(width: geo.size.width, height: geo.size.height)
-                        .opacity(sunrise.shown ? 1 : 0)
+                        .opacity(sunrise.active ? 1 : 0)
                         .allowsHitTesting(false)
                 }
 
@@ -161,6 +172,19 @@ struct RoomView: View {
             if over { UISelectionFeedbackGenerator().selectionChanged() }
         }
         .toolbar(.hidden, for: .navigationBar)
+    }
+
+    // MARK: 바닥 그림
+
+    /// 지금 바닥에 깔 그림. entry가 아직 없는 첫 그리기(onAppear 전)에도 입장 영상을 틀 방이면 영상 첫 장면 그림이다.
+    /// 입장 영상이 끝나거나 멈추면(일반 모드로 감, 해 뜨는 단계, 재생 실패) 장면 그림이다.
+    private var backdrop: Image {
+        if let entry {
+            if entry.visible, let img = entry.poster { return Image(uiImage: img) }
+            return Image(model.content.scene)
+        }
+        if RoomEnterPlayer.canPlay(story: model.story), let img = RoomEnterPlayer.poster(for: model.story) { return Image(uiImage: img) }
+        return Image(model.content.scene)
     }
 
     // MARK: 장면 위에 얹는 것

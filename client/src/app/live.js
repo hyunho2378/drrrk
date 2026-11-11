@@ -30,7 +30,7 @@ import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
 import { patchReportStory } from './reportPatch.js';
 import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.js';
-import { prefetchSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
+import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 
 export { setText };
@@ -596,6 +596,9 @@ export function swapAssets(el, n) {
     if (!m) return;
     let v = m[1].replace(/["']/g, '');
     if (/^(https?:|data:|\/)/.test(v)) return;
+    // 패치가 이미 정한 inline 그림(새 장면, 썸네일)과 한 번 옮긴 그림은 다시 쓰지 않는다. 다시 쓰면 생성 화면의 기본 그림으로 되돌아간다(11/11).
+    if (e.dataset.swapBg || (e.style.backgroundImage && e.style.backgroundImage !== 'none')) return;
+    e.dataset.swapBg = '1';
     v = v.replace(/^\.\//, '');
     for (const k of keys) if (v.indexOf(k) >= 0) v = v.split(k).join(map[k]);
     e.style.backgroundImage = 'url("' + base + v + '")';
@@ -795,8 +798,9 @@ export async function prepare(layer, n, prevN) {
   await patchSkinPopup(root, n);
   if (n === LIVE.analysisScreen) initAnalysis(root);
   prepareRoomClock(root, n);
-  // 방 입장 영상: 새로 들어오는 함께 드르륵 방(B)이면 장면 그림 위에 첫 장면을 깔아 둔다(roomEnterVideo.js).
-  prepareRoomEnter(root, n, sceneOf(n) === 'B' && room.scene !== 'B');
+  // 방 입장 영상과 해뜨기 영상: 보이기 전에 장면 칸 그림을 영상 첫 장면으로 대체하고 영상 첫 프레임이 준비될 때까지 기다린다(roomEnterVideo.js, sunriseVideo.js).
+  await prepareRoomEnter(root, n, sceneOf(n) === 'B' && room.scene !== 'B');
+  await prepareSunrise(root, n);
   prepareChat(root, n);
   patchCommunity(root, n);
 }

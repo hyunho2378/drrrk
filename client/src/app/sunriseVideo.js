@@ -1,10 +1,14 @@
 // 해 뜨는 단계(40 "DRRRK · 드르륵 · 해뜨기")의 배경 영상. 11/10 팀 요청 "함께드르륵 해뜰 때 영상으로 나오면 좋겠다"와 피그마 댓글(1647:24788 "해뜨기 영상으로 넣기").
 // 쌍밍아웃은 sunrise-ssang.mp4(피그마 1647:24788 영상), 사진보정은 sunrise-photo.mp4(피그마 1979:27780, 2100:24394 영상)이다. 둘 다 무음 24fps 5.17초.
-// 방에 들어오면 영상 요소를 미리 만들어 받아 두고(preload auto), 40이 뜨면 그 요소를 장면 그림 바로 위(상태바와 채팅 아래)에 넣어 처음부터 한 번 재생한다.
-// 첫 장면이 그려지는 순간 영상은 옅게 나타나고 장면 그림은 옅어진다(tokens.js live.sunriseFadeMs). 끝나면 마지막 장면에서 멈춘다(반복 없음).
-// 재생이 막히거나 파일을 못 받으면 영상을 빼고 장면 그림을 그대로 둔다. 다른 화면으로 가면 멈추고 뺀다. iOS SunriseVideo.swift와 같은 동작이다.
+// 11. 11. 사용자 지시("이미지 자체를 교체해야지 위에 새 화면을 하나 더 얹으면 안 된다")에 따라 덧씌움을 대체로 바꿨다.
+//   보이기 전(live.js prepare): 40의 장면 칸 그림을 영상 첫 장면 jpg(영상 첫 프레임 그대로, tokens.js live.sunrisePoster)로 바꾸고,
+//   같은 jpg 를 poster 로 가진 video 를 그 자리에 두고, 영상 첫 프레임이 준비될 때까지(최대 live.videoReadyMaxMs) 기다린 뒤에 화면이 보인다.
+//   보인 뒤(live.js attach) 처음부터 한 번 재생한다. 첫 장면이 같은 그림이라 정지 사진에서 영상으로 바뀌는 순간이 없다. 끝나면 마지막 장면에서 멈춘다(반복 없음).
+//   첫 프레임을 기한 안에 못 받거나 재생이 막히면 영상 층을 만들지 않고(또는 빼고) 장면 칸에 방 사진이 보인다.
+// 다른 화면으로 가면 멈추되, 나가는 화면이 전환 동안 보이므로 영상은 빼지 않고 마지막 장면을 그대로 둔다. iOS SunriseVideo.swift와 같은 동작이다.
 import { live as LIVE } from '../tokens.js';
 import { roomStory } from './roomConcern.js';
+import { assetUrl, decodeImage, frameReady, setSceneImage, urlIn } from './videoReplace.js';
 
 const SCREEN = 40;
 const cache = {};
@@ -15,7 +19,11 @@ if (typeof window !== 'undefined') window.__sunrise = { log, el: () => active &&
 let active = null;
 
 const storyKey = () => (roomStory() === 'photo' ? 'photo' : 'ssang');
-const urlOf = (key) => new URL('assets/' + LIVE.sunriseVideo[key], document.baseURI).href;
+const posterOf = (key) => assetUrl(LIVE.sunrisePoster[key]);
+const note = (ev, extra) => {
+  log.push(Object.assign({ ev, t: Math.round(performance.now()) }, extra || {}));
+  if (log.length > 120) log.shift();
+};
 
 function videoFor(key) {
   if (cache[key]) return cache[key];
@@ -29,7 +37,9 @@ function videoFor(key) {
   v.setAttribute('playsinline', '');
   v.setAttribute('aria-hidden', 'true');
   v.setAttribute('data-figma', 'sunrise video');
-  v.src = urlOf(key);
+  // poster 는 영상 첫 프레임 그대로라서 재생 전과 재생 첫 프레임이 같은 그림이다.
+  v.poster = posterOf(key);
+  v.src = assetUrl(LIVE.sunriseVideo[key]);
   v.load();
   cache[key] = v;
   return v;
@@ -38,74 +48,95 @@ function videoFor(key) {
 // 영상이 아직 돌고 있거나 끝난 뒤 마지막 장면에 머무는 중이면 true. 종료(1)로 넘어가는 단계는 이 값이 false가 될 때까지 기다린다(live.js tick).
 // 방 구경에서 이어받은 시계가 이미 01:12 아래여서 영상이 늦게 시작해도 끝까지 보이고 마지막 장면이 live.sunHoldMs 동안 남는다.
 export function sunriseHolding(now = performance.now()) {
-  if (!active || active.failed) return false;
+  if (!active || active.failed || !active.startAt) return false;
   // 받기가 멈춰 끝나지 않는 영상은 영상 길이(5.17초)와 머무는 시간을 더한 만큼만 기다린다.
   if (!active.endedAt) return now - active.startAt < 5170 + LIVE.sunHoldMs;
   return now - active.endedAt < LIVE.sunHoldMs;
 }
 
-// 방에 들어올 때 부른다. 지금 이야기의 영상을 받아 둔다.
+// 방에 들어올 때 부른다. 지금 이야기의 영상과 첫 장면 그림을 받아 둔다.
 export function prefetchSunrise() {
-  try { videoFor(storyKey()); } catch (e) { void e; }
+  try { const k = storyKey(); videoFor(k); decodeImage(posterOf(k)); } catch (e) { void e; }
 }
 
-function stop() {
+// 장면 그림 칸(scene.js swapScene이 바꾼 "image 1208091463").
+const sceneIn = (root) => [...root.children].slice(0, 4).find((c) => /^image /.test(c.dataset.figma || ''));
+
+// 영상을 빼고 장면 칸을 방 사진으로 돌린다(재생 실패).
+function drop(why) {
   if (!active) return;
-  const { video, scene } = active;
+  const my = active;
   active = null;
+  try { my.video.pause(); } catch (e) { void e; }
+  my.video.onended = null;
+  my.video.onerror = null;
+  if (my.scene && my.still) setSceneImage(my.scene, my.still);
+  if (my.video.parentNode) my.video.parentNode.removeChild(my.video);
+  note('fallback', { why: String(why) });
+}
+
+// 다른 화면으로 갈 때. 나가는 화면이 아직 보이는 동안 영상을 빼면 그 자리에 첫 장면(밤)이 비치므로 멈추기만 한다.
+function leave() {
+  if (!active) return;
+  const my = active;
+  active = null;
+  try { my.video.pause(); } catch (e) { void e; }
+  my.video.onended = null;
+  my.video.onerror = null;
+  note('leave', { currentTime: +my.video.currentTime.toFixed(3) });
+}
+
+// 화면을 준비할 때(live.js prepare, 보이기 전). 40이면 장면 칸 그림을 영상 첫 장면으로 대체하고 영상 첫 프레임이 준비될 때까지 기다린다.
+export async function prepareSunrise(root, n) {
+  if (n !== SCREEN || !root) return;
+  const scene = sceneIn(root);
+  if (!scene) return;
+  leave();
+  const key = storyKey();
+  const video = videoFor(key);
+  const poster = posterOf(key);
+  const still = urlIn(scene.style.backgroundImage || getComputedStyle(scene).backgroundImage);
+  // community.js 가 40 장면 칸을 다른 그림으로 바꾸지 않게 표시를 먼저 단다.
+  scene.dataset.swapped40 = '1';
+  const my = { root, video, scene, key, still, phase: 'wait' };
+  active = my;
   try { video.pause(); } catch (e) { void e; }
-  video.onended = null;
-  video.onerror = null;
-  if (video.parentNode) video.parentNode.removeChild(video);
-  if (scene && scene.isConnected) scene.style.opacity = '';
-  log.push({ ev: 'stop', t: performance.now() });
+  const t0 = performance.now();
+  const [okImg, okVid] = await Promise.all([decodeImage(poster), frameReady(video, LIVE.videoReadyMaxMs)]);
+  if (active !== my) return;
+  if (!okImg || !okVid || !root.isConnected) {
+    active = null;
+    note('fallback', { why: !okImg ? 'poster' : !okVid ? 'video' : 'left', readyState: video.readyState, waited: Math.round(performance.now() - t0) });
+    return;
+  }
+  setSceneImage(scene, poster);
+  scene.style.opacity = '';
+  Object.assign(video.style, {
+    position: 'absolute', left: '0px', top: '0px', width: '390px', height: '844px',
+    objectFit: 'cover', objectPosition: 'center', opacity: '1', transform: 'translateZ(0)', pointerEvents: 'none',
+  });
+  video.getAnimations().forEach((a) => a.cancel());
+  // 영상은 장면 칸 안에 넣는다. 앞 화면에서 넘어오는 전환(morph.js)이 장면 칸과 영상을 한 덩어리로 다뤄 영상만 따로 옅어졌다 나타나지 않는다.
+  if (video.parentNode !== scene) scene.appendChild(video);
+  my.phase = 'ready';
+  note('prepare', { key, readyState: video.readyState, currentTime: video.currentTime, waited: Math.round(performance.now() - t0) });
 }
 
 // 화면이 붙을 때마다 부른다(live.js attach). 40이면 재생하고, 다른 화면이면 멈춘다.
 export function attachSunrise(root, n) {
-  if (n !== SCREEN) { stop(); return; }
-  if (!root) return;
-  if (active && active.root === root) return;
-  stop();
-  // 장면 그림 칸(scene.js swapScene이 바꾼 "image 1208091463").
-  const scene = [...root.children].slice(0, 4).find((c) => /^image /.test(c.dataset.figma || '')) || root.firstElementChild;
-  if (!scene) return;
-  const key = storyKey();
-  const video = videoFor(key);
-  Object.assign(video.style, {
-    position: 'absolute', left: '0px', top: '0px', width: '390px', height: '844px',
-    objectFit: 'cover', objectPosition: 'center', opacity: '0', transform: 'translateZ(0)',
-    pointerEvents: 'none', zIndex: getComputedStyle(scene).zIndex === 'auto' ? '' : getComputedStyle(scene).zIndex,
-  });
-  scene.after(video);
-  active = { root, video, scene, key, startAt: performance.now() };
+  if (n !== SCREEN) { leave(); return; }
+  if (!root || !active || active.root !== root || active.phase !== 'ready') return;
   const my = active;
-  const fallback = (why) => {
-    if (active !== my) return;
-    log.push({ ev: 'fallback', why: String(why), t: performance.now() });
-    stop();
-  };
-  let shown = false;
-  const reveal = () => {
-    if (shown || active !== my) return;
-    shown = true;
-    const ms = LIVE.sunriseFadeMs;
-    log.push({ ev: 'first-frame', t: performance.now(), currentTime: video.currentTime });
-    video.style.opacity = '1';
-    video.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms, easing: 'linear' });
-    scene.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: 'linear', fill: 'forwards' }).onfinish = () => {
-      if (active === my) scene.style.opacity = '0';
-    };
-  };
-  video.onerror = () => fallback('error');
+  const { video } = my;
+  my.phase = 'playing';
+  my.startAt = performance.now();
+  video.onerror = () => drop('error');
   video.onended = () => {
     if (active === my) my.endedAt = performance.now();
-    log.push({ ev: 'ended', t: performance.now(), currentTime: video.currentTime });
+    note('ended', { currentTime: video.currentTime });
   };
-  try { video.currentTime = 0; } catch (e) { void e; }
-  log.push({ ev: 'start', key, t: performance.now(), readyState: video.readyState });
-  if (typeof video.requestVideoFrameCallback === 'function') video.requestVideoFrameCallback(() => reveal());
-  else video.addEventListener('playing', reveal, { once: true });
+  note('start', { key: my.key, readyState: video.readyState, currentTime: video.currentTime });
+  if (typeof video.requestVideoFrameCallback === 'function') video.requestVideoFrameCallback((now, meta) => note('first-frame', { mediaTime: +meta.mediaTime.toFixed(3) }));
   const p = video.play();
-  if (p && p.catch) p.catch((e) => fallback(e && e.name));
+  if (p && p.catch) p.catch((e) => { if (active === my) drop(e && e.name); });
 }

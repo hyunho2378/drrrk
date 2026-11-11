@@ -18,8 +18,52 @@ import { SCREEN_ASSETS } from './screenAssets.js';
 // 휴대폰에서 칸의 보이는 높이: 한 화면짜리는 창 높이, 긴 화면은 상태바 줄만 뺀 높이(아래로 스크롤).
 const visH = (l, vp) => (!vp.mobile ? l.h : l.h <= 845 ? vp.view : l.h - MOB.crop);
 
+// 층 안의 그림(img, 배경 그림, 영상 poster)을 모두 훑어 아직 받아 디코드되지 않은 것을 기다린다(최대 ms). 실패해도 끝난다.
+// prepare 안의 패치가 바꾼 새 그림까지 보이기 전에 준비되게 한다(11/11 "예전 그림이 떴다가 바뀌는" 현상).
+const decodeCache = new Set();
+function waitImages(el, ms) {
+  const jobs = [];
+  const seen = new Set();
+  const want = (u) => {
+    if (!u || /\.mp4($|\?)/.test(u) || /^data:/.test(u) || seen.has(u)) return;
+    seen.add(u);
+    if (decodeCache.has(u)) return;
+    jobs.push(new Promise((res) => {
+      const i = new Image();
+      const ok = () => { decodeCache.add(u); res(); };
+      i.onload = () => (i.decode ? i.decode().then(ok, ok) : ok());
+      i.onerror = res;
+      i.src = u;
+    }));
+  };
+  el.querySelectorAll('img').forEach((im) => {
+    if (!im.getAttribute('src')) return;
+    if (im.complete && im.naturalWidth > 0) {
+      if (im.decode) jobs.push(im.decode().catch(() => {}));
+    } else {
+      jobs.push(new Promise((res) => {
+        const done = () => (im.decode ? im.decode().then(res, res) : res());
+        im.addEventListener('load', done, { once: true });
+        im.addEventListener('error', res, { once: true });
+      }));
+    }
+  });
+  el.querySelectorAll('video[poster]').forEach((v) => want(v.poster));
+  el.querySelectorAll('*').forEach((e) => {
+    const bg = e.style.backgroundImage || (e.className && String(e.className).indexOf('url(') >= 0 ? getComputedStyle(e).backgroundImage : '');
+    if (!bg || bg.indexOf('url(') < 0) return;
+    (bg.match(/url\(([^)]+)\)/g) || []).forEach((m) => want(new URL(m.slice(4, -1).replace(/["']/g, ''), document.baseURI).href));
+  });
+  if (!jobs.length) return Promise.resolve();
+  return Promise.race([Promise.all(jobs), new Promise((r) => setTimeout(r, ms))]);
+}
+
 function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) {
   const ref = useRef(null);
+  // onReady는 화면 번호가 바뀔 때마다 새 함수가 된다. 의존성에 넣으면 이미 보이는 층에서 준비 단계(swapAssets, prepare)가 다시 돌아
+  // 패치가 바꾼 새 그림을 생성 화면의 기본 그림으로 되돌렸다(11/11 라이브 10 장면 그림 되돌림). ref로 읽어 층마다 한 번만 돈다.
+  const readyRef = useRef(onReady);
+  readyRef.current = onReady;
   const Comp = layer.Comp;
   // 상태바는 맨 위 시스템 상태바 하나만 쓴다. 화면 안의 상태바는 숨긴다.
   useLayoutEffect(() => {
@@ -61,14 +105,17 @@ function Layer({ layer, hidden, active, onReady, onPress, setNode, vp, prevN }) 
       // 보이기 전에 첫 모습을 만든다(글자 바꾸기, 고민 분석 0, 채팅 숨김, 시계, 막대). 오류가 나도 화면은 보이게 한다.
       .then(() => (alive ? prepare(el, layer.n, prevN).catch(() => {}) : null))
       .then(() => { if (alive) { try { carryRoom(el, layer.n); } catch (e) { /* 이어 붙이기 실패해도 화면은 보인다 */ } } })
+      // prepare가 새로 정한 그림(장면, 썸네일, 아바타, 퀵슬롯 아이콘 등)까지 받아 디코드한 뒤에 보인다(최대 1.5초).
+      .then(() => (alive ? waitImages(el, 1500) : null))
       .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
       .then(() => {
-        if (alive) onReady(layer.key);
+        if (alive) readyRef.current(layer.key);
       });
     return () => {
       alive = false;
     };
-  }, [layer.key, onReady]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layer.key]);
   return (
     <div
       ref={ref}
@@ -325,7 +372,8 @@ export default function Prototype() {
           <Layer
             key={l.key}
             layer={l}
-            hidden={!l.ready && layers.length > 1}
+            // 첫 화면도 준비(그림 바꾸기와 prepare)가 끝나기 전에는 보이지 않는다. 생성 화면의 기본 그림이 한 프레임이라도 먼저 보이면 안 된다.
+            hidden={!l.ready}
             active={!!top && l.key === top.key && l.ready}
             onReady={onReady}
             onPress={go}

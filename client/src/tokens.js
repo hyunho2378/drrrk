@@ -80,10 +80,16 @@ export const live = {
   // 해 뜨는 단계 배경 영상(sunriseVideo.js). 이야기마다 하나. 첫 장면이 그려지면 장면 그림이 이 시간(ms) 동안 옅어진다.
   sunriseVideo: { ssang: 'sunrise/sunrise-ssang.mp4', photo: 'sunrise/sunrise-photo.mp4' },
   sunriseFadeMs: 120,
+  // 해뜨기 영상 첫 장면(영상 첫 프레임 그대로 뽑은 jpg). 40이 보이기 전에 장면 칸 그림을 이 그림으로 바꾸고 video poster로도 준다(덧씌움 대신 대체).
+  sunrisePoster: { ssang: 'sunrise/sunrise-ssang-first.jpg', photo: 'sunrise/sunrise-photo-first.jpg' },
   // 함께 드르륵 방 입장 영상(roomEnterVideo.js, 피그마 댓글 1807:23214 "영상으로 반영"). 3.08초 한 번 재생하고, 끝나면 이 시간(ms) 동안 옅어지며 방 사진으로 이어진다.
   // 영상 소리 음량(0에서 1). 0이면 소리를 끈다. iOS RoomEnterPlayer.volume과 같다.
   roomEnterVideo: { ssang: 'roomenter/room-enter-ssang.mp4', photo: 'roomenter/room-enter-photo.mp4' },
   roomEnterFadeMs: 120,
+  // 입장 영상 첫 장면(영상 첫 프레임 그대로 뽑은 jpg). 방이 보이기 전에 장면 칸 그림을 이 그림으로 바꾸고 video poster로도 준다.
+  roomEnterPoster: { ssang: 'roomenter/room-enter-ssang-first.jpg', photo: 'roomenter/room-enter-photo-first.jpg' },
+  // 영상 첫 프레임이 준비될 때까지 화면을 보이지 않고 기다리는 최대 시간(ms). 넘으면 영상 없이 방 사진으로 보인다.
+  videoReadyMaxMs: 1500,
   roomEnterVolume: 0.6,
   // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
   // A 옛 방(9): 01:12에 해 뜨는 단계(40), 0에 종료(1).

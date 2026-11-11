@@ -6,7 +6,8 @@ import UIKit
 /// 11/10 팀 요청 "함께드르륵 해뜰 때 영상으로 나오면 좋겠다"와 피그마 댓글(1647:24788 "해뜨기 영상으로 넣기").
 /// 쌍밍아웃은 sunrise-ssang.mp4, 사진보정은 sunrise-photo.mp4(Resources/Videos, 무음 24fps 5.17초).
 /// 방에 들어오면 플레이어를 만들어 미리 받아 두고, 해 뜨는 단계가 시작되면 처음부터 한 번 재생한다. 끝나면 마지막 장면에서 멈춘다(반복 없음, 끝난 뒤 되감지 않음).
-/// 첫 장면이 그려지면 영상이 0.12초 동안 옅게 나타나고 장면 그림은 옅어진다. 파일이 없거나 재생이 막히면 영상을 보이지 않고 장면 그림이 그대로 남는다.
+/// 해 뜨는 단계가 시작되는 순간 바닥 그림 자체를 밤 장면 그림에서 영상 첫 장면 그림(sunrise-*-first.jpg, 같은 구도)으로 0.12초 동안 바꾸고(11. 11. 사용자 "이미지 자체를 교체"),
+/// 영상은 같은 자리에서 첫 장면부터 이어서 흐른다(AVPlayerLayer는 그릴 준비가 되기 전에는 투명해서 같은 그림이 보인다). 파일이 없거나 재생이 막히면 영상을 보이지 않고 장면 그림이 그대로 남는다.
 /// 웹 client/src/app/sunriseVideo.js와 같은 동작이다.
 @Observable
 @MainActor
@@ -33,12 +34,24 @@ final class SunrisePlayer {
         story == .photo ? "sunrise-photo" : "sunrise-ssang"
     }
 
+    /// 영상 첫 장면 그림. 방에 들어올 때 미리 풀어 둔다(preparingForDisplay). 없으면 영상을 쓰지 않는다.
+    let poster: UIImage?
+
+    /// 해 뜨는 단계가 시작되어 바닥 그림이 영상 첫 장면 그림으로 바뀐 상태인지. 막히면 false로 돌아가 장면 그림이 남는다.
+    var active: Bool {
+        startedAt != nil && !failed && poster != nil
+    }
+
     init(story: StoryKind) {
-        guard let url = Bundle.main.url(forResource: Self.fileName(for: story), withExtension: "mp4") else {
+        guard let url = Bundle.main.url(forResource: Self.fileName(for: story), withExtension: "mp4"),
+              let posterURL = Bundle.main.url(forResource: Self.fileName(for: story) + "-first", withExtension: "jpg"),
+              let raw = UIImage(contentsOfFile: posterURL.path) else {
             player = nil
+            poster = nil
             failed = true
             return
         }
+        poster = raw.preparingForDisplay() ?? raw
         let item = AVPlayerItem(url: url)
         let p = AVPlayer(playerItem: item)
         p.isMuted = true
@@ -67,7 +80,8 @@ final class SunrisePlayer {
     /// 해 뜨는 단계가 시작될 때 부른다. 처음부터 재생한다.
     func start() {
         guard let player, !failed, startedAt == nil else { return }
-        startedAt = .now
+        // 바닥 그림이 밤 장면에서 영상 첫 장면 그림으로 0.12초 동안 바뀐다(RoomView). 영상 층은 이때부터 보이지만 첫 장면이 그림과 같다.
+        withAnimation(.linear(duration: Self.fadeSeconds)) { startedAt = .now }
         // 재생 시간이 0보다 커지면(첫 장면이 그려지고 영상이 흐르기 시작하면) 영상을 보이게 한다. 웹 requestVideoFrameCallback과 같은 자리다.
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 24), queue: .main) { [weak self] time in
             guard time.seconds > 0 else { return }

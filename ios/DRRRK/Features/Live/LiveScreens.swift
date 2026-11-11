@@ -673,7 +673,11 @@ struct LiveWatchView: View {
     @State private var feedIndex = 0
     @FocusState private var focused: Bool
     /// 방 시계(초). 누른 카드의 남은 시간에서 시작하고, 방 시계와 같은 빠르기(RoomModel.shownSeconds / realSeconds, 20분이 실제 1분 30초)로 줄어든다. 위 가로 카드로 들어오면 피그마 값 06:12.
-    @State private var left: Double = 372
+    /// 첫 그리기부터 누른 카드의 남은 시간을 보이도록 nil이면 router.watch 값을 읽는다(예전에는 06:12를 한 번 그린 뒤 onAppear에서 바꿨다).
+    @State private var leftValue: Double?
+    private var left: Double {
+        leftValue ?? Double(router.watch?.left ?? 372)
+    }
     private let clock = Timer.publish(every: 0.25, on: .main, in: .common).autoconnect()
     private var watchClock: String {
         let v = max(0, Int(left.rounded(.up)))
@@ -709,8 +713,8 @@ struct LiveWatchView: View {
                 .ignoresSafeArea(.container, edges: .bottom)
         }
         .toolbar(.hidden, for: .navigationBar)
-        .onAppear { left = Double(router.watch?.left ?? 372) }
-        .onReceive(clock) { _ in left = max(0, left - 0.25 * (RoomModel.shownSeconds / RoomModel.realSeconds)) }
+        .onAppear { leftValue = Double(router.watch?.left ?? 372) }
+        .onReceive(clock) { _ in leftValue = max(0, left - 0.25 * (RoomModel.shownSeconds / RoomModel.realSeconds)) }
         // 화면이 보이고 0.7초 뒤 첫 줄, 처음 4줄까지 1.0초에서 1.8초, 그 뒤 2.4초에서 4.2초 사이 간격(시작 값 고정). 화면을 나가면 작업이 취소되어 멈춘다.
         .task { await runFeed() }
     }

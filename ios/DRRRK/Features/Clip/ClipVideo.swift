@@ -182,10 +182,12 @@ final class ClipFullPlayer {
         playing = false
     }
 
-    /// 다른 클립으로 넘어가거나 화면을 떠날 때. 멈추고 소리를 끈다.
+    /// 다른 클립으로 넘어가거나 화면을 떠날 때. 멈추고 소리를 끄고 0초로 돌려 둔다.
+    /// 다시 들어올 때 새 AVPlayerLayer가 멈춘 자리(예: 5초 장면)를 한 번 그렸다가 0초로 뛰지 않고, 아래 첫 장면 그림(G-clip-vid)과 같은 장면부터 그리게 한다.
     func stop() {
         player?.pause()
         player?.isMuted = true
+        player?.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
         playing = false
         bubbleShown = false
     }
