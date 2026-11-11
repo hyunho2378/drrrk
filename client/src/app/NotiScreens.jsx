@@ -57,7 +57,7 @@ function makeRow(tpl, it) {
   if (dot && !it.dot) dot.remove();
   setGlyphs(row.querySelector('[data-figma="content"] > p'), it.body);
   setGlyphs(row.querySelector('[data-figma="더보기 버튼"] > p'), it.more);
-  // 아이콘 색이 생성 화면 줄과 다른 분류 프레임(댓글 2308:19983의 따봉 줄은 #5C5C5C, 전체 1952:14673의 같은 줄은 흰색)은 그 값을 쓴다.
+  // 따봉 줄 아이콘은 댓글 프레임 2308:19983 값(#5C5C5C)으로 전체 목록까지 통일한다(11/11 사용자 확인: 팀이 댓글 프레임만 고친 상태).
   if (it.icon) { const ic = row.querySelector('[data-figma="icon"] [data-icon]'); if (ic) ic.style.color = it.icon; }
   // 의자 꾸미기 알림을 누르면 의자 꾸미기(20)로 간다. iOS도 같은 알림에서 의자 꾸미기를 연다(ChairStudioView, 뒤로 가면 알림으로).
   if (it.tpl === '2100:24938') {
