@@ -10,13 +10,15 @@ import { setText } from './dom.js';
 import { sceneUrl } from './scene.js';
 import { toast } from './room.js';
 import { patchRest } from './patchRest.js';
+import { attachCommunityTabs } from './communityTabs.js';
 
 const A = (import.meta.env.BASE_URL || '/') + 'assets/community2/';
 const IMG = {
   // 27 추천 드르륵 썸네일(의정 11. 10. "썸네일 교체" 두 건): 카드 1 위쪽 그림 1671:45350, 카드 2 자리에 겹친 카드 3 그림 1804:22161.
   // 피그마 원본 그림(d45f7fd30c, 88dcc68f9d)을 같은 자르기(STRETCH, 세로 0.2916/0.3313에서 정사각)로 240 x 240 자른 파일이다.
   27: { '1671:45350': 'n1671-45350.webp', '1804:22161': 'n1804-22161.webp' },
-  39: { '1953:19492': 'n1953-19492.webp', '1953:20014': 'n1953-20014.png', '1953:20025': 'n1953-20025.png' },
+  // 39 카드 3 썸네일(1953:20025)은 옛 160 x 100 그림이 80 x 80에 눌려 보였다. 피그마 1953:19406 카드 3(2223:13640, 1864c99693 STRETCH)과 같은 자르기로 바꿨다(11. 11. 커뮤니티 탭 작업).
+  39: { '1953:19492': 'n1953-19492.webp', '1953:20014': 'n1953-20014.png', '1953:20025': '../community3/thumb-1864c9-t3.webp' },
   38: { '1953:12312': 'n1953-12312.webp', '1953:12313': 'n1953-12313.webp', '1953:20643': 'n-1980-28321-1953-20583.png' },
   7: { '1647:22120': 'n1647-22120.png', '1647:22149': 'n1647-22149.png', '1647:22151': 'n1647-22151.png', '1647:22155': 'n1647-22155.png' },
   2: { '1647:27007': 'n1951-20746.png' },
@@ -175,6 +177,8 @@ export function patchCommunity(root, n) {
     // 좋아요와 댓글 사이 간격(의정 11. 10. 댓글 "좋아요/댓글 사이 간격 수정"): 피그마 1953:19406 stats(2223:13623 등)는
     // 따봉 16, 숫자, 댓글 아이콘 16, 숫자를 간격 4로만 잇는다. 생성 화면에 남은 4px 빈 칸(Frame)을 빼서 댓글 아이콘을 숫자 끝 + 4 자리로 당긴다.
     root.querySelectorAll('[data-figma="stats"] > [data-figma="Frame"]').forEach((el) => { el.style.display = 'none'; });
+    // 카테고리 탭을 누르면 그 탭 프레임의 카드 내용으로 바뀐다(communityTabs.js, 피그마 2272:13452).
+    attachCommunityTabs(root);
   }
   if (n === 38) {
     commentAvatars(root);

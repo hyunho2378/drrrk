@@ -72,11 +72,40 @@ const Avatar = ({ c, size = 32 }) => (
 );
 
 // 댓글 시트가 올라올 때: 영상이 위쪽 카드(110.5, 0, 169 x 299)로 줄어들고 바탕은 검정이 된다.
-function CardBackdrop({ open, onClose, img = 'card' }) {
+// 영상 클립(mirror가 있을 때)은 카드 자리에서도 영상이 그대로 재생된다. 소리는 뒤의 원래 영상이 계속 내고,
+// 카드 안 영상은 무음으로 원래 영상의 시간과 재생 상태를 매 프레임 따라간다(0.25초 넘게 벌어지면 맞춘다).
+function MirrorVideo({ mirror, img }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    let raf = 0;
+    const step = () => {
+      const m = ref.current;
+      const v = mirror.current;
+      if (m && v) {
+        if (m.src !== v.currentSrc && v.currentSrc) m.src = v.currentSrc;
+        if (m.readyState >= 1 && Math.abs(m.currentTime - v.currentTime) > 0.25) m.currentTime = v.currentTime;
+        if (v.paused && !m.paused) m.pause();
+        else if (!v.paused && m.paused) m.play().catch(() => {});
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => { cancelAnimationFrame(raf); const m = ref.current; if (m) { m.pause(); m.removeAttribute('src'); m.load(); } };
+  }, [mirror]);
+  const poster = mirror.current ? mirror.current.poster : undefined;
+  return (
+    <>
+      <img src={pic(img)} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+      <video ref={ref} data-figma="카드 영상" muted playsInline preload="auto" poster={poster} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+    </>
+  );
+}
+
+function CardBackdrop({ open, onClose, img = 'card', mirror }) {
   return (
     <div onClick={(e) => { e.stopPropagation(); onClose(); }} style={{ position: 'absolute', inset: 0, zIndex: 60, background: open ? '#000' : 'rgba(0,0,0,0)', transition: 'background-color 320ms cubic-bezier(.2,0,0,1)' }}>
       <div style={{ position: 'absolute', left: open ? 110.5 : 0, top: 0, width: open ? 169 : 390, height: open ? 299 : 750, borderRadius: open ? '0 0 14px 14px' : 0, overflow: 'hidden', transition: 'all 380ms ' + EASE, opacity: open ? 1 : 0 }}>
-        <img src={pic(img)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        {mirror ? <MirrorVideo mirror={mirror} img={img} /> : <img src={pic(img)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
       </div>
     </div>
   );
@@ -181,7 +210,7 @@ function ReplyBox({ open, name, onSend, onCancel, scroller }) {
 }
 
 // ---------- 댓글 시트(원본 12번) ----------
-export function CommentSheet({ open, onClose, onCount, say, info, clip, following, onFollow }) {
+export function CommentSheet({ open, onClose, onCount, say, info, clip, following, onFollow, mirror }) {
   const id = clip ? clip.id : 's0';
   const [sort, setSort] = useState('like');
   const [, force] = useState(0);
@@ -227,7 +256,7 @@ export function CommentSheet({ open, onClose, onCount, say, info, clip, followin
   );
   return (
     <>
-      <CardBackdrop open={open} onClose={onClose} img={clip ? clip.back : 'card'} />
+      <CardBackdrop open={open} onClose={onClose} img={clip ? clip.back : 'card'} mirror={mirror} />
       <Sheet open={open} top={310} onClose={onClose}>
         {!info ? (<>
         <p style={{ position: 'absolute', left: 20, top: 38, margin: 0, fontSize: 17, fontWeight: 500, lineHeight: '24px', letterSpacing: '-0.34px', color: '#F9F9F9' }}>{'댓글 ' + commentCount(clip).toLocaleString('en-US')}</p>

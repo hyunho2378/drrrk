@@ -7,6 +7,7 @@ import { Item, Hit } from './ClipKit.jsx';
 import { LIST } from './ClipScenes.js';
 import { ClipAgent } from './ClipAgent.jsx';
 import { CLIPS, SUBS, clip, saveClip, clipPick, isFollow, isSaved, onClip } from './clipState.js';
+import { videoOf, previewAt, reducedMotion } from './clipVideo.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
 const EASE = 'cubic-bezier(0.2, 0, 0, 1)';
@@ -82,6 +83,50 @@ const CSS = `
 @media (prefers-reduced-motion:reduce){.cl-in,.cl-out{animation-duration:1ms}.cl-ul{transition:none}}
 `;
 
+// 썸네일 영상(탁빛나 1843:40980 핀 "쇼츠 미리보기처럼 무음으로 반복재생"): 영상 전체(8초)를 무음으로 반복한다. 끝은 첫 장면으로 디졸브되어 있어 끊기지 않는다.
+// 첨 장면이 뜨기 전에는 poster(없으면 아래 깔린 피그마 썸네일 사진)가 보인다. 줄인 움직임 설정이면 poster만 보인다.
+// 화면이 숨거나(탭 전환) 피드 밖으로 스크롤되면 멈추고, 돌아오면 멈춘 자리부터 이어서 돈다.
+function ThumbVideo({ c, w, h, r }) {
+  const src = videoOf(c);
+  const ref = useRef(null);
+  const still = reducedMotion();
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return undefined;
+    v.muted = true;
+    v.defaultMuted = true;
+    let seen = true;
+    const want = () => seen && document.visibilityState === 'visible';
+    const run = () => { if (want()) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause(); };
+    const meta = () => { if (previewAt.t > 0 && previewAt.t < (v.duration || 8)) v.currentTime = previewAt.t; run(); };
+    if (v.readyState >= 1) meta(); else v.addEventListener('loadedmetadata', meta, { once: true });
+    const keep = () => { previewAt.t = v.currentTime; };
+    v.addEventListener('timeupdate', keep);
+    document.addEventListener('visibilitychange', run);
+    let io = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver((es) => { seen = es[es.length - 1].isIntersecting; run(); });
+      io.observe(v);
+    }
+    return () => {
+      previewAt.t = v.currentTime;
+      v.removeEventListener('loadedmetadata', meta);
+      v.removeEventListener('timeupdate', keep);
+      document.removeEventListener('visibilitychange', run);
+      if (io) io.disconnect();
+      v.pause();
+    };
+  }, []);
+  const box = { position: 'absolute', left: 0, top: 0, width: w, height: h, borderRadius: r, overflow: 'hidden', pointerEvents: 'none' };
+  if (still) return <div data-figma="썸네일 영상" style={box}><img src={src.poster} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></div>;
+  return (
+    <div data-figma="썸네일 영상" style={box}>
+      <video ref={ref} src={src.preview} poster={src.poster} muted autoPlay loop playsInline preload="auto" disablePictureInPicture
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 50%', display: 'block' }} />
+    </div>
+  );
+}
+
 function Feed({ tab, cls }) {
   const { cards } = layout(tab);
   const open = (c) => {
@@ -94,7 +139,9 @@ function Feed({ tab, cls }) {
     <div className={cls} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: '100%' }}>
       {cards.map(({ c, at }) => (
         <Hit key={c.banner ? 'banner' : c.clip} name={c.banner ? '배너 카드' : '카드 / ' + CLIPS[c.clip].card} box={c.box} at={at} items={c.items}
-          label={c.banner ? '드르륵 칵 일단 앉아' : CLIPS[c.clip].title} onTap={() => open(c)} />
+          label={c.banner ? '드르륵 칵 일단 앉아' : CLIPS[c.clip].title} onTap={() => open(c)}>
+          {!c.banner && videoOf(CLIPS[c.clip]) ? <ThumbVideo c={CLIPS[c.clip]} w={c.items[0].w} h={c.items[0].h} r={c.items[0].r} /> : null}
+        </Hit>
       ))}
       {tab === 'mine' && !cards.length ? (
         <p style={{ position: 'absolute', left: 0, top: 418, width: 390, margin: 0, textAlign: 'center', fontFamily: FONT, fontSize: 15, fontWeight: 500, lineHeight: '21px', letterSpacing: '-0.3px', color: '#9AA1A6' }}>저장한 클립이 없어요</p>

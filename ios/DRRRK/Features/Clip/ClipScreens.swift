@@ -237,6 +237,8 @@ private struct ClipProgressBar: View {
 
 struct ClipListView: View {
     @Environment(Router.self) private var router
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var listVisible = false
     @State private var st = ClipState.shared
     /// 아래 탭에서 잠깐 눌려 선택된 칸(220ms 뒤 클립으로 돌아온다)
     @State private var flashTab: String?
@@ -253,6 +255,19 @@ struct ClipListView: View {
             ClipAgentButton()
         }
         .toolbar(.hidden, for: .navigationBar)
+        // 썸네일 미리보기는 리스트가 보일 때만 돈다. 화면이 사라지거나 앱이 뒤로 가면 멈추고, 돌아오면 이어서 돈다.
+        .onAppear {
+            listVisible = true
+            ClipVideoFiles.prefetch()
+            ClipPreviewPlayer.shared.play()
+        }
+        .onDisappear {
+            listVisible = false
+            ClipPreviewPlayer.shared.pause()
+        }
+        .onChange(of: scenePhase) {
+            if scenePhase == .active, listVisible { ClipPreviewPlayer.shared.play() } else { ClipPreviewPlayer.shared.pause() }
+        }
     }
 
     private func openClip(_ c: ClipInfo) {
@@ -465,6 +480,14 @@ private struct ClipFeed: View {
         let items = ClipData.file.list.filter { names.contains($0.n) }
         return ZStack(alignment: .topLeading) {
             ClipItemsLayer(items: items).offset(x: -p.box.minX, y: -p.box.minY).allowsHitTesting(false)
+            // 영상 클립 썸네일(피그마 1843:40992, 183.4 x 326, 모서리 12): 무음 미리보기가 그림 위에서 반복된다. 아래 아바타와 이름 줄은 그대로 보인다.
+            if p.clip?.hasVideo == true, let thumb = items.first(where: { $0.n == "썸네일 / 쌍밍아웃 영상" }), let preview = ClipPreviewPlayer.shared.player {
+                ClipVideoLayerView(player: preview)
+                    .frame(width: CGFloat(thumb.w ?? 183.4), height: CGFloat(thumb.h ?? 326))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .offset(x: CGFloat(thumb.x ?? 7.6) - p.box.minX, y: CGFloat(thumb.y ?? 109) - p.box.minY)
+                    .allowsHitTesting(false)
+            }
         }
         .frame(width: p.box.width, height: p.box.height, alignment: .topLeading)
         .clipPressable {
@@ -488,6 +511,13 @@ struct ClipPlayerView: View {
     @Environment(\.accessibilityReduceMotion) private var reduce
     @State private var st = ClipState.shared
     @State private var clock = ClipClock()
+    /// 영상 클립(쌍밍아웃)의 진짜 영상. 영상이 없는 클립은 clock(가짜 시간)을 쓴다.
+    @State private var full = ClipFullPlayer.shared
+    @Environment(\.scenePhase) private var scenePhase
+    /// 영상 댓글 말풍선의 보임(opacity)과 올라옴(28px 아래에서 0). 숨길 때는 먼저 옅어진 뒤 아래로 돌아간다.
+    @State private var bubbleOpacity: Double = 0
+    @State private var bubbleLifted = false
+    @State private var resumeOnActive = false
     @State private var popped = false
     @State private var sheet: ClipSheetKind?
     @State private var sheetOpen = false
@@ -511,12 +541,24 @@ struct ClipPlayerView: View {
             pages(bare: bare)
             ClipItemsLayer(items: ClipPlayerScene.chromeItems(bare: bare)).allowsHitTesting(false)
             if !bare {
-                ClipProgressBar(clock: clock)
+                if st.current.hasVideo {
+                    ClipVideoProgressBar(full: full)
+                } else {
+                    ClipProgressBar(clock: clock)
+                }
             }
-            ClipHit(label: "소리", box: CGRect(x: 340, y: 53, width: 46, height: 44), radius: 22, items: st.mute ? ClipPlayerScene.soundOff : ClipPlayerScene.soundOn) {
+            // 소리 아이콘: 영상 클립에서는 영상 소리를 켜고 끈다. 끈 상태는 같은 아이콘 위의 대각선 한 줄(피그마에 끈 변형 없음).
+            ClipHit(label: st.mute ? "소리 켜기" : "소리 끄기", box: CGRect(x: 340, y: 53, width: 46, height: 44), radius: 22, items: ClipPlayerScene.soundOn) {
                 withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { st.mute.toggle() }
+                if st.current.hasVideo { full.setMuted(st.mute) }
             }
-            ClipHit(label: "뒤로", box: CGRect(x: 0, y: 56, width: 64, height: 44), radius: 0, items: ClipPlayerScene.fixedBack) { router.pop() }
+            if st.mute {
+                ClipMuteSlash()
+            }
+            ClipHit(label: "뒤로", box: CGRect(x: 0, y: 56, width: 64, height: 44), radius: 0, items: ClipPlayerScene.fixedBack) {
+                full.stop()
+                router.pop()
+            }
             if !bare {
                 ClipHit(label: "댓글 입력", box: CGRect(x: 15, y: 759, width: 359, height: 47), radius: 24, items: ClipPlayerScene.fixedInput) { open(.comments) }
             }
@@ -550,15 +592,50 @@ struct ClipPlayerView: View {
         .onAppear {
             clock.loop = st.loop
             clock.base = st.progress[st.current.id] ?? 0
-            clock.play()
+            full.setLoop(st.loop)
+            // 리스트에서 카드를 누르고 들어오면 소리 켠 채 0초부터 재생한다(미리보기가 돌던 자리와 상관없음).
+            st.mute = false
+            if st.current.hasVideo {
+                full.start(muted: st.mute)
+            } else {
+                clock.play()
+            }
         }
         .onDisappear {
             st.progress[st.current.id] = clock.time()
             clock.pause()
+            full.stop()
         }
         .onChange(of: st.loop) {
             clock.rebase()
             clock.loop = st.loop
+            full.setLoop(st.loop)
+        }
+        // 앱이 뒤로 가거나 다른 앱으로 바뀌면 일시정지하고, 돌아오면 재생 중이던 영상만 이어서 재생한다.
+        .onChange(of: scenePhase) {
+            guard st.current.hasVideo else { return }
+            if scenePhase == .active {
+                if resumeOnActive { full.resume() }
+                resumeOnActive = false
+            } else if full.playing {
+                resumeOnActive = true
+                full.pause()
+            }
+        }
+        // 댓글 말풍선 플로팅: 재생 1.2초 뒤 아래에서 28px 올라오며 옅게 나타나고(0.42초), 반복으로 0초에 돌아가면 0.12초 안에 사라진다.
+        .onChange(of: full.bubbleShown) {
+            if full.bubbleShown {
+                withAnimation(.timingCurve(0.2, 0, 0, 1, duration: ClipVideoFiles.bubbleIn)) {
+                    bubbleOpacity = 1
+                    bubbleLifted = true
+                }
+            } else {
+                withAnimation(.timingCurve(0.2, 0, 0, 1, duration: ClipVideoFiles.bubbleOut)) { bubbleOpacity = 0 }
+                Task {
+                    try? await Task.sleep(for: .seconds(ClipVideoFiles.bubbleOut))
+                    if !full.bubbleShown { bubbleLifted = false }
+                }
+            }
         }
         .task {
             try? await Task.sleep(for: .seconds(1.0))
@@ -587,9 +664,10 @@ struct ClipPlayerView: View {
     private func page(_ c: ClipInfo, current: Bool, bare: Bool) -> some View {
         let scene = ClipPlayerScene.page(c, st: st)
         ZStack(alignment: .topLeading) {
-            video(c)
+            video(c, current: current)
             if !bare {
-                ClipItemsLayer(items: current ? scene.items.filter { !ClipPlayerScene.ownedByHit($0.n) } : scene.items)
+                // 영상 클립의 말풍선은 지금 칸에서만 플로팅으로 그리고, 옆 칸으로 밀려 있을 때는 그리지 않는다.
+                ClipItemsLayer(items: current ? scene.items.filter { !ClipPlayerScene.ownedByHit($0.n) } : scene.items.filter { !(c.hasVideo && ClipPlayerScene.bubble.contains($0.n)) })
                     .allowsHitTesting(false)
                 if !current, let row = scene.row {
                     creatorRow(row, c, interactive: false)
@@ -608,8 +686,18 @@ struct ClipPlayerView: View {
 
     /// 영상 그림. 세로 영상은 화면을 채우고, 가로 영상(혼술바)은 폭에 맞춰 가운데에 둔다.
     @ViewBuilder
-    private func video(_ c: ClipInfo) -> some View {
-        if c.wide {
+    private func video(_ c: ClipInfo, current: Bool) -> some View {
+        if c.hasVideo {
+            // 진짜 영상(피그마 "영상 / 쌍밍아웃" 390 x 750, 채움 FILL). 아래 피그마 그림이 첫 장면이 뜨기 전 자리를 채운다. 옆 칸에서는 그림만 보인다.
+            ZStack(alignment: .topLeading) {
+                Image(c.image).resizable().scaledToFill().frame(width: 390, height: 750).clipped()
+                if current {
+                    ClipVideoLayerView(player: full.player).frame(width: 390, height: 750)
+                }
+            }
+            .frame(width: 390, height: 750)
+            .clipped()
+        } else if c.wide {
             Color.black.frame(width: 390, height: 750)
                 .overlay { Image(c.image).resizable().scaledToFit().frame(width: 390) }
         } else {
@@ -641,7 +729,7 @@ struct ClipPlayerView: View {
                 }
             })
             .simultaneousGesture(SpatialTapGesture().onEnded { v in tap(at: v.location) })
-            .accessibilityLabel(clock.playing ? "일시정지" : "재생")
+            .accessibilityLabel((st.current.hasVideo ? full.playing : clock.playing) ? "일시정지" : "재생")
             .accessibilityAddTraits(.isButton)
     }
 
@@ -652,6 +740,8 @@ struct ClipPlayerView: View {
     private func go(_ d: Int) {
         st.progress[st.current.id] = clock.time()
         single?.cancel()
+        // 다른 클립으로 넘어가면 영상은 멈추고 소리가 꺼진다. 영상 클립으로 다시 오면 0초부터 재생한다.
+        full.stop()
         let next = st.pick + d
         let anim: Animation = reduce ? .easeInOut(duration: 0.2) : .timingCurve(0.2, 0, 0, 1, duration: 0.3)
         withAnimation(anim) {
@@ -659,7 +749,12 @@ struct ClipPlayerView: View {
             drag = 0
         }
         clock.base = st.progress[ClipInfo.all[next].id] ?? 0
-        clock.play()
+        if ClipInfo.all[next].hasVideo {
+            clock.pause()
+            full.start(muted: st.mute)
+        } else {
+            clock.play()
+        }
     }
 
     private func tap(at p: CGPoint) {
@@ -692,12 +787,15 @@ struct ClipPlayerView: View {
     }
 
     private func togglePlay() {
-        if clock.playing {
-            clock.pause()
+        let nowPlaying: Bool
+        if st.current.hasVideo {
+            if full.playing { full.pause() } else { full.resume() }
+            nowPlaying = full.playing
         } else {
-            clock.play()
+            if clock.playing { clock.pause() } else { clock.play() }
+            nowPlaying = clock.playing
         }
-        let f = Flash(playing: clock.playing)
+        let f = Flash(playing: nowPlaying)
         withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { flash = f }
         Task {
             try? await Task.sleep(for: .milliseconds(600))
@@ -722,7 +820,15 @@ struct ClipPlayerView: View {
             say(st.save ? "저장했어요" : "저장을 취소했어요")
         }
         ClipHit(label: "더보기", box: CGRect(x: 336, y: 696, width: 48, height: 32), radius: 16, items: named(ClipPlayerScene.more)) { open(.more) }
-        ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble)) { open(.comments) }
+        if c.hasVideo {
+            // 탁빛나 1843:40911 핀 (101,603): 처음에는 비어 있다가 1.2초 뒤 위로 올라온다. 줄인 움직임 설정이면 옅게만 나타난다.
+            ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble)) { open(.comments) }
+                .opacity(bubbleOpacity)
+                .offset(y: (bubbleLifted || reduce) ? 0 : ClipVideoFiles.bubbleRise)
+                .allowsHitTesting(bubbleOpacity > 0.5)
+        } else {
+            ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble)) { open(.comments) }
+        }
         ClipHit(label: "캡션 더보기", box: CGRect(x: 12, y: 664, width: 318, height: 28), radius: 8, items: named(ClipPlayerScene.caption)) { open(.info) }
         if let row = scene.row {
             creatorRow(row, c, interactive: true)
@@ -865,6 +971,9 @@ struct ClipAgentButton: View {
     var body: some View {
         Button {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            // 드르륵으로 넘어가면 클립 영상과 소리를 바로 멈춘다.
+            ClipFullPlayer.shared.stop()
+            ClipPreviewPlayer.shared.pause()
             withAnimation(.easeOut(duration: 0.3)) { router.enterFromClip() }
         } label: {
             Image("G-clip-agent").resizable().scaledToFill()

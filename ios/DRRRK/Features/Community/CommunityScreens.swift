@@ -22,11 +22,13 @@ struct CommunityView: View {
         zip(CommunityData.featuredTitles, CommunityData.scenes).map { .init(title: $0, versus: "", time: "", viewers: "", scene: $1) }
     }
 
+    /// 고른 카테고리 탭의 카드(CommunityTabs.swift). 전체는 기존 목록이다.
     private var posts: [CommunityPost] {
+        let base = CommunityData.posts(for: category)
         switch sort {
-        case .popular: CommunityData.posts.sorted { $0.likes > $1.likes }
-        case .latest: CommunityData.posts.reversed()
-        case .match: CommunityData.posts
+        case .popular: return base.sorted { $0.likes > $1.likes }
+        case .latest: return base.reversed()
+        case .match: return base
         }
     }
 
@@ -50,6 +52,7 @@ struct CommunityView: View {
                     CategoryTabs(selected: $category, showDot: !loveDots.communityLoveSeen).padding(.top, 18)
                         .onChange(of: category, initial: true) { _, new in
                             if new == "연애" { loveDots.markCommunity() }
+                            CommunityTabState.selected = new
                         }
                     HStack {
                         Text("지난 밤 이야기").suit(18, .bold, tracking: -0.72).foregroundStyle(DS.Palette.textPrimary)
@@ -58,19 +61,25 @@ struct CommunityView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
-                    VStack(spacing: 12) {
-                        ForEach(posts) { post in
-                            Button {
-                                CommunityData.openedTitle = post.title
-                                router.push(.communityDetail)
-                            } label: { PostCard(post: post) }
-                                .buttonStyle(PressStyle())
+                    // 탭을 바꾸면 앞 목록과 새 목록이 같은 자리에 겹쳐 180ms 동안 얕어지고 짙어진다(투명도만). 탭 줄과 머리는 제자리에 있다.
+                    ZStack(alignment: .top) {
+                        VStack(spacing: 12) {
+                            ForEach(posts) { post in
+                                Button {
+                                    CommunityData.openedTitle = post.title
+                                    router.push(.communityDetail)
+                                } label: { PostCard(post: post) }
+                                    .buttonStyle(PressStyle())
+                            }
                         }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 15)
+                        .padding(.bottom, 24)
+                        .animation(DS.Motion.emphasizedDecel, value: sort)
+                        .id(category)
+                        .transition(.opacity)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 15)
-                    .padding(.bottom, 24)
-                    .animation(DS.Motion.emphasizedDecel, value: sort)
+                    .animation(CommunityTabState.fade, value: category)
                 }
             }
             .scrollIndicators(.hidden)
