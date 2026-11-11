@@ -331,13 +331,6 @@ export const SCREENS = [
   "h": 844
  },
  {
-  "n": 53,
-  "id": "1790:10756",
-  "name": "MY · 나의 편의점 (시트 펼침)",
-  "file": "MY2",
-  "h": 844
- },
- {
   "n": 54,
   "id": "1790:10988",
   "name": "MY · 나의 편의점 (아이템 상세)",
@@ -519,7 +512,6 @@ const modules = {
   'DRRRK56': () => import('../figma/screens/DRRRK56.jsx'),
   'DRRRK57': () => import('../figma/screens/DRRRK57.jsx'),
   'DRRRK58': () => import('../figma/screens/DRRRK58.jsx'),
-  'MY2': () => import('../figma/screens/MY2.jsx'),
   'MY3': () => import('../figma/screens/MY3.jsx'),
   'ClipList': () => import('./ClipList.jsx'),
   'ClipPlayer': () => import('./ClipPlayer.jsx'),
@@ -532,6 +524,9 @@ const modules = {
   'MorningReport': () => import('./MorningReport.jsx'),
   'SoloSunrise': () => import('./SoloSunrise.jsx'),
 };
+
+// 지운 화면 번호가 주소(?at=, #/s/)로 들어오면 갈 화면. 나의 편의점 시트 펼침(53, 피그마 1790:10756)은 사용자 11/12 03:30 지시로 지웠고 마이(36)로 보낸다.
+export const MOVED = { 53: 36 };
 
 export async function loadScreen(n) {
   const s = SCREEN_BY_N[n];

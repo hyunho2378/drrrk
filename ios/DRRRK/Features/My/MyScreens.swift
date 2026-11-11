@@ -2,7 +2,7 @@ import Observation
 import SwiftUI
 
 // 마이 묶음. 마이 리디자인(팀 피그마 1980:28455, 1972:22735에 "+ 0.5°" 칩이 더해진 판, 히어로와 엉따 밴드, 업적 편의점 격자), 스킨 획득 팝업(1972:22149),
-// 나의 편의점 시트(1790:10756), 아이템 상세(1790:10988).
+// 아이템 상세(1790:10988). 나의 편의점 시트(1790:10756)는 사용자 11/12 03:30 지시로 지웠다.
 // 좌표와 값은 피그마 390 x 844 기준이다. 시트와 팝업은 마이 화면 위에 같은 화면 안에서 올라온다(화면 이동 없음).
 
 struct MyShelfItem: Identifiable, Hashable {
@@ -46,7 +46,7 @@ enum MyChairGet {
 }
 
 enum MyOverlay: Equatable {
-    case none, shelf, skin
+    case none, skin
 }
 
 // MARK: - 라우트 화면
@@ -64,12 +64,6 @@ struct MyView: View {
 struct MySkinView: View {
     var body: some View {
         MyView(startOverlay: .skin, pushed: true)
-    }
-}
-
-struct MyShelfView: View {
-    var body: some View {
-        MyView(startOverlay: .shelf, pushed: true)
     }
 }
 
@@ -111,11 +105,6 @@ private struct MyHome: View {
                     .frame(width: 390, height: 740, alignment: .topLeading)
                     .frame(maxWidth: .infinity, alignment: .top)
                 Spacer(minLength: 0)
-            }
-
-            // 나의 편의점 시트: 아래 탭은 시트 위에 그대로 보인다(피그마 53).
-            MySheet(isPresented: overlay == .shelf, top: 96, dim: 0.6, background: .black, onClose: closeOverlay) {
-                MyShelfSheet { open($0) }
             }
 
             // 평소에는 앱 전체 아래 탭이 보이고, 아이템 시트나 팝업이 열릴 때만 여기서 같은 자리에 그려 시트 아래에 깐다.
@@ -273,28 +262,14 @@ private struct MyHome: View {
         .overlay(alignment: .topLeading) { WarmGainChip().offset(x: 213, y: 5) }
     }
 
-    /// 업적 편의점 머리줄(24, 498): 제목과 "전체 8"
+    /// 업적 편의점 머리줄(24, 498): 제목과 "전체 8". "전체 8"은 나의 편의점 시트(피그마 53)로 가던 링크였는데 그 시트를 지워(사용자 11/12 03:30)
+    /// 누름 동작과 화살표를 빼고 개수 글만 둔다. 아래 격자가 8칸 전부를 보여 주고 칸을 누르면 아이템 상세 시트가 열린다(웹 MyHome.jsx와 같다).
     private var shelfHeader: some View {
         HStack {
             MyCardTitle("업적 편의점")
             Spacer()
-            Button {
-                withAnimation(DS.Motion.emphasizedDecel) { overlay = .shelf }
-            } label: {
-                HStack(spacing: 2) {
-                    Text("전체 8").suit(13, .medium, lineHeight: 18).foregroundStyle(DS.Palette.textSecondary)
-                    Image("D-icon-chevron-right").renderingMode(.template).resizable()
-                        .foregroundStyle(DS.Palette.textSecondary)
-                        .frame(width: 14, height: 14).padding(1)
-                }
+            Text("전체 8").suit(13, .medium, lineHeight: 18).foregroundStyle(DS.Palette.textSecondary)
                 .frame(height: 20)
-                .padding(.vertical, 12)
-                .padding(.leading, 12)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(PressStyle())
-            .padding(.vertical, -12)
-            .accessibilityLabel("나의 편의점 전체 8종 보기")
         }
         .frame(width: 342, height: 20)
     }
@@ -389,81 +364,6 @@ private struct MyCardTitle: View {
     }
 }
 
-/// 선반 한 줄: 아이템(82 x 80), 판자(8), 이름(23).
-private struct MyShelfRow: View {
-    let items: [MyShelfItem]
-    let pad: CGFloat
-    let counts: Bool
-    var empties = 0
-    var fullWidth: CGFloat?
-    let onTap: (MyShelfItem) -> Void
-
-    /// 판자는 줄 전체 폭이다. 가로로 넘기는 칸 안에서는 폭을 정해 주지 않으면 판자가 줄어든다.
-    private var rowWidth: CGFloat {
-        fullWidth ?? (pad * 2 + 82 * CGFloat(items.count + empties))
-    }
-
-    var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                ForEach(Array(items.enumerated()), id: \.offset) { _, it in
-                    Button { onTap(it) } label: {
-                        ZStack(alignment: .topLeading) {
-                            Image(it.asset).resizable().scaledToFit()
-                                .frame(width: 76, height: 76)
-                                .offset(x: 3, y: 4)
-                            if counts {
-                                Text("\(it.count)").suit(12, .bold).foregroundStyle(DS.Palette.textPrimary)
-                                    .frame(minWidth: 10).padding(.horizontal, 5)
-                                    .frame(height: 18)
-                                    .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 8))
-                                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.white.opacity(0.2), lineWidth: 1))
-                                    .offset(x: 60, y: 60)
-                            }
-                            if it.isNew {
-                                Circle().fill(DS.Palette.brandPrimary).frame(width: 6, height: 6)
-                                    .offset(x: 68, y: 4)
-                            }
-                        }
-                        .frame(width: 82, height: 80, alignment: .topLeading)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(ChairPressStyle())
-                    .accessibilityLabel("\(it.name), 보유 \(it.count)개")
-                }
-                ForEach(0 ..< empties, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(.white.opacity(0.15), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-                        .frame(width: 60, height: 60)
-                        .padding(.horizontal, 11).padding(.top, 18).padding(.bottom, 2)
-                        .accessibilityHidden(true)
-                }
-            }
-            .padding(.horizontal, pad)
-            .frame(width: rowWidth, alignment: .leading)
-
-            LinearGradient(colors: [Color(hex: 0x4A4F57), Color(hex: 0x292B30)], startPoint: .top, endPoint: .bottom)
-                .frame(width: rowWidth, height: 8)
-                .shadow(color: .black.opacity(0.6), radius: 5, x: 0, y: 6)
-                .zIndex(1)
-
-            HStack(spacing: 0) {
-                ForEach(Array(items.enumerated()), id: \.offset) { _, it in
-                    Text(it.name).suit(12, .medium).foregroundStyle(Color(hex: 0xD9DEE3))
-                        .lineLimit(1).frame(width: 82, height: 17)
-                }
-                ForEach(0 ..< empties, id: \.self) { _ in
-                    Text("?").suit(12, .medium).foregroundStyle(Color(hex: 0x595E66)).frame(width: 82, height: 17)
-                }
-            }
-            .padding(.horizontal, pad)
-            .padding(.top, 6)
-            .frame(width: rowWidth, alignment: .leading)
-        }
-        .frame(height: 111, alignment: .top)
-    }
-}
-
 /// 아래에서 올라오는 시트. 끌어내리거나 바깥을 누르면 닫힌다.
 private struct MySheet<Content: View>: View {
     let isPresented: Bool
@@ -516,63 +416,6 @@ private struct MySheet<Content: View>: View {
         }
         .ignoresSafeArea()
         .allowsHitTesting(isPresented)
-    }
-}
-
-/// 나의 편의점 전체(피그마 53). 위 필터를 누르면 그 묶음만 선반에 다시 놓인다.
-private struct MyShelfSheet: View {
-    let onTap: (MyShelfItem) -> Void
-    @State private var filter = "전체"
-
-    var body: some View {
-        let shown = filter == "전체" ? MyShelfData.all : MyShelfData.all.filter { $0.group == filter }
-        let rows = stride(from: 0, to: shown.count, by: 4).map { Array(shown[$0 ..< min($0 + 4, shown.count)]) }
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("나의 편의점").suit(18, .bold, tracking: -0.36).foregroundStyle(DS.Palette.textPrimary)
-                    Spacer()
-                    Text("8종 · 19개").suit(13, .medium).foregroundStyle(DS.Palette.textSecondary)
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-
-                HStack(spacing: 8) {
-                    ForEach(MyShelfData.filters, id: \.self) { f in
-                        let on = f == filter
-                        Button {
-                            withAnimation(DS.Motion.decel(0.34)) { filter = f }
-                            UISelectionFeedbackGenerator().selectionChanged()
-                        } label: {
-                            Text(f).suit(13, on ? .bold : .medium)
-                                .foregroundStyle(on ? DS.Palette.bgSurface : Color(hex: 0xCCD1D6))
-                                .padding(.horizontal, 14).frame(height: 30)
-                                .background(on ? DS.Palette.brandPrimary : .white.opacity(0.08), in: Capsule())
-                        }
-                        .buttonStyle(ChairPressStyle())
-                        .accessibilityAddTraits(on ? .isSelected : [])
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 13)
-
-                VStack(spacing: 20) {
-                    ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
-                        MyShelfRow(items: row, pad: 31, counts: true, empties: 4 - row.count, fullWidth: 390, onTap: onTap)
-                    }
-                    MyShelfRow(items: [], pad: 31, counts: false, empties: 4, fullWidth: 390, onTap: onTap)
-                }
-                .padding(.top, 22)
-                .id(filter)
-                .transition(.opacity)
-
-                Text("라이브에서 드르륵하면 새 주전부리가 들어와요").suit(12, .regular)
-                    .foregroundStyle(DS.Palette.textSecondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 24)
-                    .padding(.bottom, 120)
-            }
-        }
     }
 }
 

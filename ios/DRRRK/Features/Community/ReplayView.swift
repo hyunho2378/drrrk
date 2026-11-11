@@ -22,6 +22,9 @@ enum ReplayData {
         ("구경하는 스툴3", "가죽소파님 목소리 너무 차분해서 더 슬픔"),
         ("폭신한 방석20", "그 친구 원래 그런 스타일이야?"),
     ]
+    /// 글 상세에서 연 글의 제목과 댓글 두 줄(11. 12. 03:13 사용자 지시). 표(CommunityData.scripts)에 없으면 사진보정 원문이다. 웹 ReplayScreen.jsx와 같다.
+    static var openedTitle: String { CommunityData.script(for: CommunityData.openedTitle)?.title ?? title }
+    static var openedComments: [(name: String, text: String)] { CommunityData.script(for: CommunityData.openedTitle)?.replay ?? comments }
     /// 피그마 "06:12 / 12:32". 진행 바 169 / 342 = 372 / 752.
     static let start: Double = 6 * 60 + 12
     static let total: Double = 12 * 60 + 32
@@ -144,7 +147,7 @@ struct ReplayView: View {
 
     private var concern: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(ReplayData.title).suit(21, .bold, lineHeight: 28.4).foregroundStyle(DS.Palette.textPrimary)
+            Text(ReplayData.openedTitle).suit(21, .bold, lineHeight: 28.4).foregroundStyle(DS.Palette.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
@@ -184,7 +187,7 @@ struct ReplayView: View {
 
     private var commentsList: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(ReplayData.comments, id: \.name) { c in
+            ForEach(ReplayData.openedComments, id: \.name) { c in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(c.name).suit(11, .medium, tracking: -0.22, lineHeight: 15.4).foregroundStyle(DS.Palette.textTertiary)
                         .frame(height: 15)

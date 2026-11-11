@@ -6,10 +6,13 @@
 // 두 버튼 아이콘은 겹쳐 두고 opacity와 scale(0.9에서 1)을 180ms 표준 곡선으로 바꿔 교차한다. 피그마에 프로토타입 연결과 스마트 애니메이트 값은 없다.
 // 10초 버튼은 시간을 10초 옮기고, 배속 칩은 1.0x, 1.5x, 2.0x 순서로 돌며 흐르는 빠르기를 바꾼다. 12:32에 닿으면 멈춘다.
 // 댓글 말풍선은 피그마에 순서 단서가 없어 처음부터 프레임 그대로 보인다.
+// 제목과 댓글 두 줄은 글 상세에서 연 글을 따른다(11. 12. 03:13 사용자 지시). 목록에서 누른 제목이 postScripts.js 표에 있으면 그 글 제목과 댓글이고, 없으면 사진보정 원문(replayData.js)이다. 장면과 의자 그림, 시간은 그대로다.
 // 휴대폰 높이 맞춤(mobileFit.js)이 읽을 수 있게 맨 바깥 칸의 자식은 모두 피그마 좌표의 absolute 칸이다.
 import { useEffect, useRef, useState } from 'react';
 import { motion } from '../tokens.js';
 import { REPLAY } from './replayData.js';
+import { pickedPostTitle } from './community.js';
+import { scriptFor } from './postScripts.js';
 
 const C = { bg: '#121415', card: '#222628', chip: '#33383D', text: '#F8F8F8', sub: '#9AA1A6', faint: '#6E767C', brand: '#36D2FF' };
 const SUIT = "'SUIT', system-ui, sans-serif";
@@ -80,6 +83,7 @@ function Btn({ label, onPress, style, children, figma }) {
 
 export default function ReplayScreen() {
   const rootRef = useRef(null);
+  const [copy] = useState(() => { const sc = scriptFor(pickedPostTitle()); return sc ? { title: sc.title, comments: sc.replay } : { title: REPLAY.title, comments: REPLAY.comments }; });
   const pos = useRef(REPLAY.start);
   const rateRef = useRef(1);
   const playRef = useRef(true);
@@ -170,7 +174,7 @@ export default function ReplayScreen() {
       </div>
 
       <div data-figma="고민" data-node="2322:12288" style={{ position: 'absolute', left: 24, top: 321, width: 342, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <p style={t(21, 700, C.text, { lineHeight: '28.4px', height: 56 })}>{REPLAY.title}</p>
+        <p style={t(21, 700, C.text, { lineHeight: '28.4px', height: 56 })}>{copy.title}</p>
         <div data-figma="대화 중인 의자" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div data-figma="Header" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 18 }}>
             {icon.wave}
@@ -195,7 +199,7 @@ export default function ReplayScreen() {
       <p data-figma="댓글 안내" data-node="2322:12357" style={t(11, 400, C.faint, { position: 'absolute', left: 136, top: 512, lineHeight: '16px' })}>{REPLAY.note}</p>
 
       <div data-figma="댓글 (라이브 채팅)" data-node="2322:12315" style={{ position: 'absolute', left: 24, top: 540, width: 342, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
-        {REPLAY.comments.map((c) => (
+        {copy.comments.map((c) => (
           <div key={c.name} data-figma={'댓글 ' + c.name} style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-start' }}>
             <p style={t(11, 500, C.faint, { lineHeight: '15.4px', letterSpacing: '-0.04em', height: 15 })}>{c.name}</p>
             <div data-figma="bubble" style={{ display: 'flex', alignItems: 'center', height: 32, boxSizing: 'border-box', padding: '7px 12px', borderRadius: 14, background: C.card }}>

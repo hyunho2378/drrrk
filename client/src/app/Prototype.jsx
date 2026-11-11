@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useNavigationType, useParams } from 'react-router-dom';
-import { SCREEN_BY_N, loadScreen } from './screens.js';
+import { SCREEN_BY_N, loadScreen, MOVED } from './screens.js';
 import { LINKS, AUTO, START } from './flow.js';
 import { motion, mobile as MOB } from '../tokens.js';
 import Hotspots from './Hotspots.jsx';
@@ -182,7 +182,8 @@ export default function Prototype() {
     loadScreen(n).then((Comp) => {
       if (!alive) return;
       if (!Comp) {
-        navigate('/s/' + START, { replace: true });
+        // 지운 화면(나의 편의점 53)은 옮겨 간 화면(마이 36)으로, 그 밖의 없는 번호는 시작 화면으로 보낸다.
+        navigate('/s/' + (MOVED[n] || START), { replace: true });
         return;
       }
       const s = SCREEN_BY_N[n];

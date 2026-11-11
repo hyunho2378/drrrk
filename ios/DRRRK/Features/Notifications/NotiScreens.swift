@@ -252,13 +252,13 @@ struct NotiActivityView: View {
         }
     }
 
-    /// 알림 종류별 갈 곳: 엉따지수는 마이, 댓글은 글 상세, 업적 편의점은 나의 편의점, 의자 꾸미기는 의자 꾸미기
+    /// 알림 종류별 갈 곳: 엉따지수는 마이, 댓글은 글 상세, 업적 편의점은 마이(업적 편의점 격자, 나의 편의점 시트는 11/12 지웠다), 의자 꾸미기는 의자 꾸미기
     private func destination(_ a: ActivityItem) -> (() -> Void)? {
         guard a.link else { return nil }
         return switch a.kind {
         case "엉따지수": { router.select(.my) }
         case "댓글": { router.push(.communityDetail) }
-        case "업적 편의점": { router.push(.myShelf) }
+        case "업적 편의점": { router.select(.my) }
         case "의자꾸미기": {
                 ChairStore.shared.openStudio(fresh: false)
                 router.push(.chairStudio)

@@ -5,9 +5,9 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { BottomNavigation } from '../figma/components/BottomNavigation';
 import { getSaved, subscribe, big, KINDS } from './chairs.js';
-import { pickItem, itemFrom, pickedSlot, pickedName, chairGetSeen, markChairGetSeen, crossRatio, CHAIR_GET } from './my.js';
+import { pickItem, pickedSlot, chairGetSeen, markChairGetSeen, crossRatio, CHAIR_GET } from './my.js';
 import { cameFrom } from './lastScreen.js';
-import { ITEM_COPY, LOCKED_COPY, itemChips, keyOf } from './itemCopy.js';
+import { ITEM_COPY, LOCKED_COPY, itemChips } from './itemCopy.js';
 import { playItem, preloadItemSounds } from './sfx.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
@@ -42,8 +42,9 @@ const CSS = `
 .mh-nav p[data-figma="MY"]{font-weight:700!important}
 `;
 
-// 마이 안의 화면(나의 편의점 53, 아이템 상세 54, 스킨 팝업 19, 의자 꾸미기 20)에서 돌아오면 엉따 막대를 다시 채우지 않는다.
-const INSIDE = [36, 53, 54, 19, 20];
+// 마이 안의 화면(아이템 상세 54, 스킨 팝업 19, 의자 꾸미기 20)에서 돌아오면 엉따 막대를 다시 채우지 않는다.
+// 나의 편의점 시트 펼침(53)은 사용자 11/12 03:30 지시로 지웠다. 마이 업적 편의점 격자가 이미 8칸 전부를 보여 주고, 칸을 누르면 아이템 상세 시트(54)가 열린다.
+const INSIDE = [36, 54, 19, 20];
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function go(to, t = 'fade') {
@@ -66,7 +67,6 @@ function Title({ text }) {
 // 시트는 처음부터 끝까지 불투명 단색이다. 올라올 때와 내려갈 때 모두 translateY로만 움직이고, 뒤 딤 덮개만 투명도로 나타나고 사라진다.
 // 화면 전환(페이드)이 시트를 반투명으로 섞지 않게 36과 54 사이는 전환 없이 바로 바꾸고, 시트가 스스로 올라오고 내려간다.
 function sheetKey(slot) {
-  if (itemFrom() === 53) return keyOf(pickedName());
   const it = ITEMS[slot] || ITEMS[0];
   return it.locked ? 'locked' : it.key;
 }
@@ -87,8 +87,8 @@ function ItemSheet({ slot }) {
     if (closing.current) return;
     closing.current = true;
     const sh = sheetRef.current, dm = dimRef.current;
-    const back = itemFrom() === 53 ? 53 : 36;
-    const t = back === 36 ? 'none' : 'fade';
+    const back = 36;
+    const t = 'none';
     if (!sh || !dm) { go(back, t); return; }
     const r = reducedMotion();
     const from = getComputedStyle(sh).transform;
@@ -293,11 +293,8 @@ export default function MyHome({ item, still }) {
       {/* 업적 편의점 머리줄(24, 498) */}
       <div style={{ position: 'absolute', left: 24, top: 498, width: 342, height: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title text="업적 편의점" />
-        <button className="mh-btn" aria-label="나의 편의점 전체 8종 보기" onClick={() => go(53)}
-          style={{ display: 'flex', alignItems: 'center', gap: 2, height: 44, marginRight: 0, paddingLeft: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, lineHeight: '18px', color: '#9AA1A6' }}>전체 8</span>
-          <img alt="" src={A + 'chev.png'} style={{ width: 16, height: 16 }} />
-        </button>
+        {/* "전체 8"은 나의 편의점 시트(53)로 가던 링크였다. 53을 지워 누름 동작과 화살표를 빼고 개수 글만 둔다(아래 격자가 8칸 전부다). */}
+        <span style={{ display: 'flex', alignItems: 'center', height: 44, fontSize: 13, fontWeight: 500, lineHeight: '18px', color: '#9AA1A6' }}>전체 8</span>
       </div>
 
       {/* 업적 편의점 격자(24, 534, 342 x 198): 칸 76 x 93, 줄 간격 105 */}

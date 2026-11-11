@@ -21,7 +21,8 @@ enum Route: String, Hashable, CaseIterable, Identifiable {
     // 탭: 커뮤니티
     case community, communityDetail, replay
     // 탭: 마이
-    case my, mySkin, chairStudio, myShelf, myItem
+    // 나의 편의점 시트 펼침(myShelf, 피그마 1790:10756, 웹 53)은 사용자 11/12 03:30 지시로 지웠다.
+    case my, mySkin, chairStudio, myItem
     // 알림
     case notiActivity, notiKeyword, notiKeywordSettings
 }
@@ -80,7 +81,7 @@ final class Router {
     /// 화면마다 아래 탭을 보일지. 온보딩은 어둡게 깔린 채로 보인다.
     static func navMode(for r: Route) -> NavMode {
         switch r {
-        case .home, .homeEmpty, .worryInput, .live, .community, .my, .mySkin, .myShelf, .myItem: .normal
+        case .home, .homeEmpty, .worryInput, .live, .community, .my, .mySkin, .myItem: .normal
         // 온보딩은 방 위에 겹쳐 뜨므로(2026. 11. 9.) 방과 같이 아래 탭을 보이지 않는다.
         case .onboardingTogether, .onboardingSolo: .none
         default: .none
@@ -135,7 +136,7 @@ final class Router {
         switch r {
         case .live, .liveWatch: .live
         case .community, .communityDetail, .replay: .community
-        case .my, .mySkin, .chairStudio, .myShelf, .myItem: .my
+        case .my, .mySkin, .chairStudio, .myItem: .my
         default: .home
         }
     }

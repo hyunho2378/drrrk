@@ -90,11 +90,17 @@ export function attachSort(root, n, first) {
   const hit = document.createElement('span');
   Object.assign(hit.style, { position: 'absolute', left: '-14px', right: '-14px', top: '-12px', bottom: '-12px' });
   btn.appendChild(hit);
-  let sheet = null, dim = null, busy = false;
+  btn.addEventListener('click', (e) => { e.stopPropagation(); openSortSheet(root, mode, (m) => { mode = m; applySort(root, n, true); }); });
+}
+
+// 정렬 시트. 라이브 목록(10, 48~52)과 커뮤니티 목록(39, 탭 다섯, communityTabs.js)이 같은 시트를 쓴다.
+// cur 는 지금 고른 방식(popular, new, match), onPick 은 시트가 내려가기 시작한 뒤 고른 방식으로 불린다.
+export function openSortSheet(root, cur, onPick) {
+  let sheet = null, dim = null;
   const close = (after) => {
     if (!sheet) return;
     const s = sheet, d = dim;
-    sheet = null; dim = null;
+    sheet = null; dim = null; root.__sortSheet = null;
     s.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(100%)' }], { duration: motion.sheetOut, easing: motion.emphasizedAccel, fill: 'forwards' });
     const a = d.animate([{ opacity: 1 }, { opacity: 0 }], { duration: motion.sheetOut, easing: motion.standard, fill: 'forwards' });
     a.onfinish = () => { s.remove(); d.remove(); };
@@ -104,7 +110,7 @@ export function attachSort(root, n, first) {
   //   덮개 #000 60%(아래 탭까지 덮음), 시트 390 x 289 #121415 위 모서리 24, 손잡이 40 x 4 #6E767C(x175, 위 14)
   //   줄 342 x 69(x24, 첫 줄 위 34, 줄 사이 4), 제목 15 Bold 자간 -2% 행간 145%, 설명 12 Regular #6E767C, 고른 줄 오른쪽 체크 20
   const open = () => {
-    if (sheet || busy || !root.isConnected) return;
+    if (root.__sortSheet || !root.isConnected) return;
     const H = root.getBoundingClientRect().height / scaleOf(root);
     const mk = (tag, st, html) => { const e = document.createElement(tag); Object.assign(e.style, st); if (html != null) e.innerHTML = html; return e; };
     const stop = (e) => e.stopPropagation();
@@ -116,7 +122,7 @@ export function attachSort(root, n, first) {
     const DESC = { 인기순: '보는 사람과 공감이 많은 방부터', 최신순: '방금 의자를 꺼낸 방부터', 맞춤순: '내 고민이랑 비슷한 이야기부터' };
     const CHECK = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3.5 10L7.75 14L16.5 5.5" stroke="' + ON_COLOR + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     KEYS.forEach((k, i) => {
-      const on = MODE_BY_KEY[k] === mode;
+      const on = MODE_BY_KEY[k] === cur;
       const row = mk('div', { position: 'absolute', left: '24px', top: 34 + i * 73 + 'px', width: '342px', height: '69px', cursor: 'pointer' });
       row.dataset.figma = k;
       row.setAttribute('role', 'button');
@@ -126,8 +132,8 @@ export function attachSort(root, n, first) {
       if (on) row.appendChild(mk('div', { position: 'absolute', left: '322px', top: '25px', width: '20px', height: '20px' }, CHECK));
       row.addEventListener('click', (e) => {
         e.stopPropagation();
-        mode = MODE_BY_KEY[k];
-        close(() => applySort(root, n, true));
+        const m = MODE_BY_KEY[k];
+        close(() => onPick(m));
       });
       s.appendChild(row);
     });
@@ -136,9 +142,9 @@ export function attachSort(root, n, first) {
     d.addEventListener('click', (e) => { e.stopPropagation(); close(); });
     root.appendChild(d);
     root.appendChild(s);
-    dim = d; sheet = s;
+    dim = d; sheet = s; root.__sortSheet = close;
     d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: motion.sheetIn, easing: motion.standard });
     s.animate([{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], { duration: motion.sheetIn + 40, easing: motion.emphasizedDecel });
   };
-  btn.addEventListener('click', (e) => { e.stopPropagation(); open(); });
+  open();
 }

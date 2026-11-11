@@ -3,6 +3,7 @@
 // 종류를 누르면 그 종류의 의자가, 스타일을 누르면 큰 그림 하나만 바뀐다(화면 전체는 움직이지 않는다).
 // 리클라이너는 엉따 40.0°가 될 때까지 잠겨 있어 고를 수는 있지만 저장할 수 없다.
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { dragScroll } from './rowDrag.js';
 import { KINDS, LOCK, isLocked, big, thumb, getDraft, subscribe, pickKind, pickColor, lastColor } from './chairs.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
@@ -21,6 +22,7 @@ const CSS = `
 .cs-text{animation:csText 240ms ${EASE} both}
 .cs-btn{border:0;padding:0;margin:0;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transition:transform 120ms cubic-bezier(.2,0,0,1),background-color 160ms cubic-bezier(.2,0,0,1),box-shadow 160ms cubic-bezier(.2,0,0,1)}
 .cs-btn:active{transform:scale(.96)}
+.cs-row[data-dragging] .cs-btn:active{transform:none}
 .cs-btn:focus-visible{outline:2px solid #F8F8F8;outline-offset:2px}
 .cs-row{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .cs-row::-webkit-scrollbar{display:none}
@@ -80,6 +82,8 @@ export function ChairStudio(props) {
   const locked = isLocked(sel.k);
   const lock = LOCK[kind.id];
   const rowRef = useRef(null);
+  // 스타일 줄은 손가락과 마우스 끌기, 트랙패드로 옆으로 민다. 6px 넘게 끌면 색 누름이 취소된다(rowDrag.js, 2026. 11. 12. 03:45 사용자 지시).
+  useEffect(() => { dragScroll(rowRef.current); }, []);
   const [note, setNote] = useState('');
   // 잠긴 의자로 저장하려고 하면 이유를 알려 준다(링크가 막히면 live.js가 이 신호를 보낸다).
   useEffect(() => {

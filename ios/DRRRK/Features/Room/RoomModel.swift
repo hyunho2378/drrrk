@@ -342,15 +342,7 @@ final class RoomModel {
         m.topicShort = "오늘 친구랑 인생네컷을 찍었는데, 글쎄 친구가…"
         m.topicBody = "오늘 친구랑 인생네컷을 찍었는데, 글쎄 친구가 인스타 게시글에 자기 얼굴만 보정을 해서 올렸더라고.. 다들 엄청 이쁘다고 비교된다는 식으로 댓글 달리는데 너무 속상해..."
         m.topicTags = ["#친구관계", "#외모고민"]
-        m.snacks = [
-            .init(id: "shrimp", name: "새우깡", asset: "snack-shrimp", count: 5),
-            .init(id: "soju", name: "소주", asset: "snack-soju", count: 2),
-            .init(id: "peanut", name: "오징어땅콩", asset: "snack-peanut", count: 3),
-            .init(id: "nogari", name: "노가리", asset: "snack-nogari", count: 1),
-            .init(id: "drrra", name: "DRRRA", asset: "snack-drrra", count: 4),
-            .init(id: "squid", name: "오징어", asset: "snack-squid", count: 2),
-            .init(id: "monster", name: "몬스타", asset: "snack-monster", count: 1),
-        ]
+        // 주전부리는 함께 방과 같은 일곱 칸(snacks 기본값)이다. 혼자 방도 개수 배지와 개수 제한이 없다(사용자 11/12 03:25, 웹 quickSlot.js).
         // 혼자 방 장면(B-field-scene)의 흰 테이블 윗면, 피그마 화면 좌표
         m.landRect = CGRect(x: 120, y: 492, width: 130, height: 26)
         return m
@@ -401,8 +393,9 @@ final class RoomModel {
         return max(0, min(1, until.timeIntervalSince(date) / Self.throwCooldownSeconds))
     }
 
+    /// 주전부리는 개수 제한 없이 계속 던질 수 있고, 던진 칸만 쿨타임(3초) 동안 쉰다(사용자 11/12 03:25, 웹 throw.js와 같다).
     func canThrow(_ snack: Snack, at date: Date = .now) -> Bool {
-        snack.count > 0 && !isCooling(snack.id, at: date)
+        !isCooling(snack.id, at: date)
     }
 
     private func startCooldown(_ id: String) {
@@ -418,8 +411,7 @@ final class RoomModel {
     }
 
     func throwSnack(_ id: String) -> Landed? {
-        guard !isCooling(id), let i = snacks.firstIndex(where: { $0.id == id }), snacks[i].count > 0 else { return nil }
-        snacks[i].count -= 1
+        guard !isCooling(id), let i = snacks.firstIndex(where: { $0.id == id }) else { return nil }
         startCooldown(id)
         let r = landRect
         let p = CGPoint(x: .random(in: r.minX ... r.maxX), y: .random(in: r.minY ... r.maxY))

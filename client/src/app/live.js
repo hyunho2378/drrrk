@@ -15,7 +15,7 @@ import { attachRoom } from './room.js';
 import { attachThrow } from './throw.js';
 import { voiceOnBubble, voiceOnScreen } from './roomVoice.js';
 import { roomChatPrepare, roomChatAttach, roomChatLeave } from './roomChat.js';
-import { attachQuickSlot } from './quickSlot.js';
+import { attachQuickSlot, prepareQuickSlot } from './quickSlot.js';
 import { attachTaps } from './taps.js';
 import { prepGauge, animateGauge, fillItem, pickItem, itemFrom } from './my.js';
 import { prepLoveDot, attachLoveDot } from './loveDots.js';
@@ -480,7 +480,8 @@ function scrollerOf(layer, root, n) {
   const hot = q(layer, '[data-hotspot]').filter((b) => {
     const t = parseFloat(b.style.top);
     // 종료(1)의 아래 버튼(y1590, 1640)은 창 아래(844 넘어)에 있다가 스크롤로 올라온다. 누르는 자리도 같이 움직인다.
-    const below = isEndScreen(n) && t >= LIVE.screenH;
+    // 커뮤니티 목록(39)의 목록 카드 4, 5 누름 자리(y 772, 904)도 탭바 아래에 있다가 스크롤로 올라온다(11. 12. COMMPOST 확인: 전에는 따라 움직이지 않아 카드 4, 5를 누를 수 없었다).
+    const below = (isEndScreen(n) && t >= LIVE.screenH) || (n === 39 && t >= bottom);
     return ((t >= top - 0.5 && t < bottom) || below) && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
   });
   const clipNeeded = !box;
@@ -849,6 +850,8 @@ export async function prepare(layer, n, prevN) {
   patchSolo(root, n);
   // 혼자 방 해 뜨는 단계(66): 퀵슬롯 펼친 목록을 숨기고 접힌 알약을 넣는다. 퀵슬롯 짝 묶기(attachQuickSlot)보다 먼저 한다.
   await prepareSoloSunrise(root, n);
+  // 퀵슬롯: 혼자 방 목록을 함께 방 목록(개수 배지 없음)으로 바꾸고, 같은 방 안에서 넘어왔으면 앞 화면의 펼침 상태를 이어 둔다(quickSlot.js).
+  await prepareQuickSlot(root, n, !!sceneOf(n) && sceneOf(prevN) === sceneOf(n), (el) => swapAssets(el, 28));
   // 혼자 드르륵 종료 리포트(65): 화면 스크롤(attachDrag)이 내용 끝을 재기 전에 빠진 덩어리를 지우고 버튼 묶음 자리를 옮긴다.
   prepSoloReport(root, n);
   applyAvatars(root, n);
@@ -875,7 +878,7 @@ export async function prepare(layer, n, prevN) {
   patchLounge(root, n);
   patchWatchSeats(root, n);
   prepareWatchChat(root, n);
-  if ([19, 36, 53, 54].includes(n)) patchMyChair(root);
+  if ([19, 36, 54].includes(n)) patchMyChair(root);
   attachPost(root);
   patchPill(root, n);
   patchReport(root, n);

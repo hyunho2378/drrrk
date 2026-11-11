@@ -8,7 +8,17 @@ import { relRect, scaleOf } from './dom.js';
 const PANEL = '[data-figma="주전부리 퀵슬롯"]';
 const PILL = '[data-figma="퀵슬롯 · 접힘"]';
 // 66은 혼자 방 해 뜨는 단계(피그마 2351:34553). 접힌 알약과 숨겨 둔 41 목록(solo.js prepareSoloSunrise)을 짝으로 쓴다.
-const ROOMS = [28, 29, 30, 31, 40, 66];
+// 혼자 방(46, 43, 41, 42, 66)도 함께 방과 같은 퀵슬롯이다(사용자 11/12 03:25). 접힌 알약을 누르면 다른 화면(41)으로 가지 않고 제자리에서 펼쳐지고,
+// 목록은 함께 방 목록(28, 개수 배지 없음)을 쓴다. 그래서 개수 제한도 없고 모든 주전부리를 계속 던질 수 있다(쿨타임 3초만 같다).
+const SOLO = [46, 43, 41, 42, 66];
+const ROOMS = [28, 29, 30, 31, 40, ...SOLO];
+const groupOf = (n) => (SOLO.includes(n) ? 'C' : 'B');
+// 펼침 상태는 같은 방 안 화면 전환(혼자 방 46에서 41로 넘어가는 자동 전환, 안내 창 42, 해 뜨는 단계 66, 함께 방 29에서 40)에서 이어진다.
+// 새 화면은 보이기 전(prepareQuickSlot)에 같은 상태로 만들어 둔다. 다른 방이나 방 밖에서 들어오면 피그마 프레임 그대로 시작한다.
+let carry = null;
+const setCarry = (st) => { carry = { g: st.g, open: st.open }; };
+// 접기 핸들 바탕(피그마 1979:27597, 검정 45%). 함께 방 28 화면은 scene.js가 칠한다. 복제해 온 목록도 같은 모양이 되게 한다.
+const dress = (panel) => { const h = panel.querySelector(':scope > [data-figma="접기 핸들"]'); if (h) h.style.background = 'rgba(0, 0, 0, 0.45)'; return panel; };
 const CLOSED_H = 86;
 const HEAD_H = 34;
 const EASE = 'cubic-bezier(0.2, 0, 0, 1)';
@@ -58,6 +68,7 @@ async function expand(root, st) {
     panel = await cloneOf(28, PANEL);
     if (!panel || !root.isConnected) { st.busy = false; return; }
     if (st.fix) st.fix(panel);
+    dress(panel);
     const top = st.pill ? baseTop(st.pill) : 192;
     Object.assign(panel.style, { top: top + 'px', zIndex: '20' });
     follow(panel, st.pill);
@@ -84,6 +95,7 @@ async function expand(root, st) {
     f.onfinish = () => { hide(p); f.cancel(); };
   }
   st.open = true;
+  setCarry(st);
   a.onfinish = () => { st.busy = false; };
   window.setTimeout(() => { st.busy = false; }, OPEN_MS + 40);
 }
@@ -110,6 +122,7 @@ async function collapse(root, st) {
     { duration: CLOSE_MS, easing: EASE_IN, fill: 'forwards' },
   );
   st.open = false;
+  setCarry(st);
   a.onfinish = () => { hide(panel); a.cancel(); st.busy = false; };
 }
 
@@ -118,9 +131,70 @@ export function attachQuickSlot(root, n, fix) {
   const pill = root.querySelector(PILL);
   const panel = root.querySelector(PANEL);
   if (!pill && !panel) return;
-  const st = { pill, panel, open: !!panel && panel.style.visibility !== 'hidden', busy: false, fix: fix ? (el) => fix(el) : null };
+  const st = { pill, panel, g: groupOf(n), open: !!panel && panel.style.visibility !== 'hidden', busy: false, fix: fix ? (el) => fix(el) : null };
   root.__qs = st;
+  setCarry(st);
   bindPill(root, st);
   bindPanel(root, st);
   warm([28, 29]);
+}
+
+// 보이기 전(live.js prepare)에 부른다. sameRoom은 앞 화면이 같은 방(live.js ROOMS 묶음)이었는지다.
+// 1) 혼자 방 화면의 목록(41 생성 화면, 칸마다 개수 배지)은 함께 방 목록(28)으로 바꾼다. 자리와 보임 상태는 그대로 둔다.
+// 2) 안내 창(42) 생성 화면에는 퀵슬롯이 없다. 뒤에 깔린 방이 그대로 보이게 같은 자리(324, 192)에 퀵슬롯을 둔다(안내 창 판 아래).
+// 3) 같은 방 안에서 넘어왔으면 앞 화면의 펼침 상태를 그대로 만든다(움직임 없이).
+export async function prepareQuickSlot(root, n, sameRoom, fix) {
+  if (!ROOMS.includes(n) || !root || root.dataset.qsPrep) return;
+  root.dataset.qsPrep = '1';
+  const g = groupOf(n);
+  if (!sameRoom || !carry || carry.g !== g) carry = null;
+  let panel = root.querySelector(':scope > ' + PANEL);
+  let pill = root.querySelector(':scope > ' + PILL);
+  if (g === 'C' && panel && !panel.dataset.qs28) {
+    const np = await cloneOf(28, PANEL);
+    if (!np || !root.isConnected) return;
+    np.dataset.qs28 = '1';
+    if (fix) fix(np);
+    dress(np);
+    ['left', 'top', 'visibility', 'zIndex'].forEach((k) => { np.style[k] = panel.style[k]; });
+    panel.replaceWith(np);
+    panel = np;
+  }
+  if (g === 'C' && !panel && !pill) {
+    const want = carry ? carry.open : false;
+    const el = want ? await cloneOf(28, PANEL) : await cloneOf(46, PILL);
+    if (!el || !root.isConnected) return;
+    if (want) { el.dataset.qs28 = '1'; if (fix) fix(el); dress(el); }
+    Object.assign(el.style, { left: want ? '' : '324px', top: '192px' });
+    const modal = root.querySelector(':scope > [data-figma^="모달"]');
+    const dim = modal && modal.previousElementSibling && modal.previousElementSibling.dataset.figma === 'scene dim' ? modal.previousElementSibling : modal;
+    if (dim) dim.before(el); else root.appendChild(el);
+    if (want) panel = el; else pill = el;
+  }
+  if (!carry) return;
+  const isOpen = !!panel && panel.style.visibility !== 'hidden';
+  if (carry.open && !isOpen) {
+    if (!panel) {
+      panel = await cloneOf(28, PANEL);
+      if (!panel || !root.isConnected) return;
+      panel.dataset.qs28 = '1';
+      if (fix) fix(panel);
+      dress(panel);
+      panel.style.top = (pill ? baseTop(pill) : 192) + 'px';
+      if (pill) pill.before(panel); else root.appendChild(panel);
+    }
+    follow(panel, pill);
+    show(panel);
+    if (pill) hide(pill);
+  } else if (!carry.open && isOpen) {
+    if (!pill) {
+      pill = await cloneOf(g === 'C' ? 46 : 29, PILL);
+      if (!pill || !root.isConnected) return;
+      pill.style.top = baseTop(panel) + 'px';
+      panel.before(pill);
+    }
+    follow(pill, panel);
+    show(pill);
+    hide(panel);
+  }
 }

@@ -6,12 +6,29 @@
 // 전환: 밑줄은 기존처럼 transform으로 옮기고(motion.tab, 표준 곡선), 목록 칸은 180ms 동안 앞 목록과 새 목록이 겹쳐 옅어지고 짙어진다(opacity만).
 // 목록은 화면 스크롤(live.js scrollerOf)의 일부라서 탭 줄이 보이는 동안에는 첫 카드도 이미 보인다. 탭을 눌러도 스크롤 값을 바꾸지 않아 머리와 탭 줄과 탭바가 제자리에 있다.
 // 고른 탭은 글 상세(38)에 갔다가 뒤로 왔을 때만 이어진다(sessionStorage drrrk-comm-tab). 다른 화면에서 들어오거나 새로 열면 전체에서 시작한다.
+// 정렬(사용자 결정 2026. 11. 12. 03:00): "인기순" 버튼을 누르면 라이브 정렬 시트(sort.js openSortSheet, 최종 2340:27661)가 올라오고,
+// 고른 방식으로 목록 카드 5장이 다시 놓이며 버튼 글이 고른 이름으로 바뀐다. 기준은 iOS CommunityView 와 같다.
+//   인기순: 따봉 수가 많은 글부터, 최신순: 피그마 순서를 거꾸로, 맞춤순: 피그마 순서 그대로
+// 처음 모습은 피그마 프레임 순서(인기순 표시)이고, 고른 정렬은 탭을 바꿔도 이어진다. 글 상세(38)에서 뒤로 오면 탭과 함께 이어진다(drrrk-comm-sort).
 import { motion } from '../tokens.js';
 import { setText } from './dom.js';
 import { pressable } from './taps.js';
 import { cameFrom } from './lastScreen.js';
+import { openSortSheet } from './sort.js';
+import { preloadPostAvatars } from './postScripts.js';
 
 const KEY = 'drrrk-comm-tab';
+const SORT_KEY = 'drrrk-comm-sort';
+const SORT_LABEL = { popular: '인기순', new: '최신순', match: '맞춤순' };
+const IDENT = [0, 1, 2, 3, 4];
+// 고른 방식으로 놓을 카드 순서(각 자리에 들어갈 원래 카드 번호, 0부터). sorted 가 false 면 피그마 순서 그대로다.
+function orderFor(tab, mode, sorted) {
+  if (!sorted || mode === 'match') return IDENT;
+  if (mode === 'new') return IDENT.slice().reverse();
+  const rows = TAB_POSTS[tab];
+  return IDENT.slice().sort((a, b) => rows[b][1] - rows[a][1] || a - b);
+}
+const sameOrder = (o) => o.every((v, i) => v === i);
 const TABS = ['전체', '친구', '연애', '가족', '학교', '진로'];
 const FADE_MS = 180;
 // 피그마 탭 글자 x(모두 폭 27)와 밑줄 폭(전체 27, 나머지 28). 밑줄은 전체 자리(24, 폭 27)를 기준으로 옮기고 늘인다.
@@ -91,6 +108,8 @@ export const TAB_POSTS = {
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const readTab = () => { try { return window.sessionStorage.getItem(KEY); } catch (e) { return null; } };
+const readSort = () => { try { return window.sessionStorage.getItem(SORT_KEY); } catch (e) { return null; } };
+const writeSort = (m) => { try { if (!m) window.sessionStorage.removeItem(SORT_KEY); else window.sessionStorage.setItem(SORT_KEY, m); } catch (e) { /* 저장이 막힌 창에서는 이어지지 않는다 */ } };
 const writeTab = (t) => { try { if (t === '전체') window.sessionStorage.removeItem(KEY); else window.sessionStorage.setItem(KEY, t); } catch (e) { /* 저장이 막힌 창에서는 이어지지 않는다 */ } };
 
 const listOf = (root) => root.querySelector('[data-node="1953:20001"]') || root.querySelector('[data-figma="Frame 2147249309"]');
@@ -117,18 +136,18 @@ function restore(el, k) {
   el.style.webkitTextFillColor = k.fill;
 }
 
-function fill(cards, tab, saved, firstThumb) {
+function fill(cards, tab, saved, firstThumb, order = IDENT) {
   cards.forEach((card, i) => {
     if (!card) return;
     const p = partsOf(card);
-    if (tab === '전체') {
+    if (tab === '전체' && sameOrder(order)) {
       restore(p.title, saved[i].title);
       restore(p.like, saved[i].like);
       restore(p.comment, saved[i].comment);
       if (p.thumb) p.thumb.style.background = saved[i].thumb;
       return;
     }
-    const [title, likes, comments, thumb, likeW, commentW] = TAB_POSTS[tab][i];
+    const [title, likes, comments, thumb, likeW, commentW] = TAB_POSTS[tab][order[i]];
     setText(p.title, title);
     // 숫자 칸 폭은 피그마 탭 프레임의 글자 칸 폭 그대로다(따봉 16, 숫자, 댓글 16, 숫자를 간격 4로 잇는다).
     [[p.like, likes, likeW], [p.comment, comments, commentW]].forEach(([el, v, w]) => { if (!el) return; setText(el, String(v)); el.style.width = w + 'px'; });
@@ -181,6 +200,8 @@ export function attachCommunityTabs(root) {
   const tabEls = TABS.map((t) => tabsBox.querySelector(':scope > [data-figma="Tab / ' + t + '"]'));
   if (tabEls.some((el) => !el)) return;
   root.dataset.commTabs = '1';
+  // 글 상세(38) 작성자와 댓글 의자 그림(postScripts.js)도 미리 받아 둔다.
+  preloadPostAvatars();
   // 탭 그림은 탭을 누르기 전에 미리 받아 디코드해 둔다(누른 뒤 빈 칸이나 예전 그림이 보이지 않게).
   Object.values(THUMB).forEach((f) => { if (!f) return; const im = new Image(); im.src = BASE + f; if (im.decode) im.decode().catch(() => {}); });
   const line = tabsBox.querySelector('[data-figma="Tab Underline"]');
@@ -190,13 +211,55 @@ export function attachCommunityTabs(root) {
   tabEls.forEach((el, i) => setText(el, TABS[i]));
 
   const stored = readTab();
-  let sel = cameFrom(39) === 38 && TABS.includes(stored) ? stored : '전체';
+  const back = cameFrom(39) === 38;
+  let sel = back && TABS.includes(stored) ? stored : '전체';
   if (sel === '전체') writeTab('전체');
+  // 정렬: 글 상세에서 뒤로 왔을 때만 고른 정렬이 이어진다(탭과 같은 규칙).
+  const storedSort = readSort();
+  let mode = back && SORT_LABEL[storedSort] ? storedSort : 'popular';
+  let sorted = back && !!SORT_LABEL[storedSort];
+  if (!sorted) writeSort(null);
+  const order = () => orderFor(sel, mode, sorted);
   paintTabs(tabEls, sel, false);
   moveLine(line, sel, false);
-  if (sel !== '전체') fill(cards, sel, saved, firstThumb);
+  if (sel !== '전체' || !sameOrder(order())) fill(cards, sel, saved, firstThumb, order());
   root.dataset.commTab = sel;
-  root.__commRefill = () => { if (sel !== '전체') fill(cards, sel, saved, firstThumb); };
+  root.dataset.commSort = mode;
+  root.__commRefill = () => { if (sel !== '전체' || !sameOrder(order())) fill(cards, sel, saved, firstThumb, order()); };
+
+  const sortBtn = root.querySelector('[data-figma="정렬 · 인기순"]');
+  const sortLabel = sortBtn && sortBtn.querySelector('p');
+  const paintSort = () => {
+    if (!sortLabel || sortLabel.textContent.trim() === SORT_LABEL[mode]) return;
+    setText(sortLabel, SORT_LABEL[mode]);
+    sortLabel.style.width = 'auto';
+    sortLabel.style.whiteSpace = 'nowrap';
+  };
+  paintSort();
+  if (sortBtn && !sortBtn.dataset.live) {
+    sortBtn.dataset.live = 'comm-sort';
+    sortBtn.style.cursor = 'pointer';
+    sortBtn.setAttribute('role', 'button');
+    if (getComputedStyle(sortBtn).position === 'static') sortBtn.style.position = 'relative';
+    // 누르는 자리를 넓힌다(라이브 정렬 버튼과 같다).
+    const sortHit = document.createElement('span');
+    Object.assign(sortHit.style, { position: 'absolute', left: '-14px', right: '-14px', top: '-12px', bottom: '-12px' });
+    sortBtn.appendChild(sortHit);
+    sortBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSortSheet(root, mode, (m) => {
+        const before = order();
+        mode = m;
+        sorted = true;
+        root.dataset.commSort = mode;
+        writeSort(mode);
+        paintSort();
+        const after = order();
+        if (before.every((v, i) => v === after[i])) return;
+        crossFade(list, () => fill(cards, sel, saved, firstThumb, after));
+      });
+    });
+  }
 
   tabEls.forEach((el, i) => {
     const hit = document.createElement('span');
@@ -211,7 +274,7 @@ export function attachCommunityTabs(root) {
       writeTab(sel);
       paintTabs(tabEls, sel, true);
       moveLine(line, sel, true);
-      crossFade(list, () => fill(cards, sel, saved, firstThumb));
+      crossFade(list, () => fill(cards, sel, saved, firstThumb, order()));
     });
   });
 }

@@ -33,7 +33,6 @@ enum ScreenRegistry {
         case .my: MyView()
         case .mySkin: MySkinView()
         case .chairStudio: ChairStudioView()
-        case .myShelf: MyShelfView()
         case .myItem: MyItemView()
         case .notiActivity: NotiActivityView()
         case .notiKeyword: NotiKeywordView()
