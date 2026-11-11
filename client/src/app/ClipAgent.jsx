@@ -8,7 +8,8 @@ const CSS = `
 @keyframes caPop{0%{opacity:0;transform:translateX(64px) scale(.7)}55%{opacity:1;transform:translateX(-9px) scale(1.07)}78%{transform:translateX(3px) scale(.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
 @keyframes caFloat{0%,100%{transform:translateY(6px)}50%{transform:translateY(-6px)}}
 .ca-pop{animation:caPop 640ms cubic-bezier(.2,.9,.3,1) both}
-.ca-float{animation:caFloat 3200ms cubic-bezier(.45,0,.55,1) infinite}
+/* 나타남(caPop)은 위치 0에서 끝난다. 떠다님 첫 값이 6px면 그 순간 한 프레임에 6px 뚝 내려가므로(11/11 확인), 값이 0인 사이클 1/4 지점(800ms)부터 돌린다. */
+.ca-float{animation:caFloat 3200ms cubic-bezier(.45,0,.55,1) -800ms infinite}
 .ca-btn{border:0;padding:0;margin:0;background:none;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
 .ca-btn:active .ca-face{transform:scale(.94)}
 .ca-btn:focus-visible{outline:2px solid #36D2FF;outline-offset:3px;border-radius:15px}
