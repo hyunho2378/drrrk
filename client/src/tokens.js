@@ -62,14 +62,17 @@ export const mobile = { scrollOnly: ['2023:30658'], maxWidth: 600, crop: 48, hea
 // 함께 드르륵 방(B)과 방 구경(W): 해뜨기 영상까지 합쳐 실제 30초(11/11 사용자 전달 "함께 드르륵 실제 체감 시간 30초로").
 //   20:00에서 01:12까지 실제 24.6초(이야기 구간, 1초에 (1200 - 72) / 24.6 = 45.85초씩), 01:12에서 00:00까지 실제 5.4초(해뜨기 구간, 1초에 72 / 5.4 = 13.33초씩).
 //   iOS RoomModel.storyRealSeconds, sunriseRealSeconds와 같다.
-// 혼자 드르륵 방(C)과 옛 방(A): 예전처럼 20분이 실제 1분 30초(90초), 1초에 13.33초씩(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로"). iOS RoomModel.realSeconds와 같다.
-//   혼자 방은 온보딩을 닫은 뒤 10초짜리 AI 대화와 비슷한 고민 안내 창(42)이 이어지므로 30초로 줄이지 않는다.
+// 혼자 드르륵 방(C): 모두 합쳐 실제 90초(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로")를 함께 방처럼 두 구간으로 나눈다(탁빛나 11/12 2351:34553 "아침해 뜨는거 반영 필요").
+//   20:00에서 01:12까지 실제 84.6초(이야기 구간, 1초에 1128 / 84.6 = 13.33초씩), 01:12에서 00:00까지 실제 5.4초(해뜨기 구간, 함께 방과 같은 빠르기, 해뜨기 영상 5.07초가 잘리지 않는다).
+//   혼자 방은 온보딩을 닫은 뒤 10초짜리 AI 대화와 비슷한 고민 안내 창(42)이 이어지므로 30초로 줄이지 않는다. iOS RoomModel.soloStoryRealSeconds와 같다.
+// 옛 방(A): 예전처럼 20분이 실제 1분 30초(90초) 한 구간, 1초에 13.33초씩. iOS RoomModel.realSeconds와 같다.
 const ROOM_REAL_SECONDS = 90;
 const ROOM_TIME_SCALE = 1200 / ROOM_REAL_SECONDS;
 // 해 뜨는 단계(40)가 시작하는 화면 시계 값. 피그마 "해 뜨기까지 01:12". 01:12에서 0까지 실제 5.4초라 해뜨기 영상(5.17초)과 맞는다. iOS RoomModel.lastMinuteShown과 같다.
 const SUNRISE_AT = 72;
 const ROOM_STORY_REAL_SECONDS = 24.6;
 const ROOM_SUNRISE_REAL_SECONDS = 5.4;
+const SOLO_STORY_REAL_SECONDS = ROOM_REAL_SECONDS - ROOM_SUNRISE_REAL_SECONDS;
 const ROOM_SUNRISE_SCALE = SUNRISE_AT / ROOM_SUNRISE_REAL_SECONDS;
 // 시계가 0이 된 뒤 영상 마지막 장면(해 뜬 아침)에 머무는 실제 시간(ms). 예전 해 뜬 순간(35)이 종료로 넘어가던 시간(flow.js AUTO 35, 3000)과 같다.
 const SUN_HOLD_MS = 3000;
@@ -82,15 +85,18 @@ export const live = {
   timeScale: ROOM_TIME_SCALE,
   // 함께 드르륵 방 두 구간 시계(roomClock.js). storyReal 이야기 구간 실제 초, sunriseReal 해뜨기 구간 실제 초.
   clock: { storyReal: ROOM_STORY_REAL_SECONDS, sunriseReal: ROOM_SUNRISE_REAL_SECONDS, storyScale: (1200 - SUNRISE_AT) / ROOM_STORY_REAL_SECONDS, sunriseScale: ROOM_SUNRISE_SCALE },
+  // 혼자 드르륵 방(C) 두 구간 시계. 이야기 구간 84.6초, 해뜨기 구간 5.4초, 합쳐 90초.
+  soloClock: { storyReal: SOLO_STORY_REAL_SECONDS, sunriseReal: ROOM_SUNRISE_REAL_SECONDS, storyScale: (1200 - SUNRISE_AT) / SOLO_STORY_REAL_SECONDS, sunriseScale: ROOM_SUNRISE_SCALE },
   roomSeconds: 1200,
   defaultLeft: 180,
   sunriseAt: SUNRISE_AT,
   sunHoldMs: SUN_HOLD_MS,
   // 해 뜨는 단계 배경 영상(sunriseVideo.js). 이야기마다 하나. 첫 장면이 그려지면 장면 그림이 이 시간(ms) 동안 옅어진다.
-  sunriseVideo: { ssang: 'sunrise/sunrise-ssang.mp4', photo: 'sunrise/sunrise-photo.mp4' },
+  // solo는 혼자 드르륵 방 해 뜨는 단계(66, 피그마 2351:34553 배경 영상 채우기 1ea98ad75a9a)다. 640 x 1148, 24fps, 5.07초.
+  sunriseVideo: { ssang: 'sunrise/sunrise-ssang.mp4', photo: 'sunrise/sunrise-photo.mp4', solo: 'sunrise/sunrise-solo.mp4' },
   sunriseFadeMs: 120,
   // 해뜨기 영상 첫 장면(영상 첫 프레임 그대로 뽑은 jpg). 40이 보이기 전에 장면 칸 그림을 이 그림으로 바꾸고 video poster로도 준다(덧씌움 대신 대체).
-  sunrisePoster: { ssang: 'sunrise/sunrise-ssang-first.jpg', photo: 'sunrise/sunrise-photo-first.jpg' },
+  sunrisePoster: { ssang: 'sunrise/sunrise-ssang-first.jpg', photo: 'sunrise/sunrise-photo-first.jpg', solo: 'sunrise/sunrise-solo-first.jpg' },
   // 함께 드르륵 방 입장 영상(roomEnterVideo.js, 피그마 댓글 1807:23214 "영상으로 반영"). 3.08초 한 번 재생하고, 끝나면 이 시간(ms) 동안 옅어지며 방 사진으로 이어진다.
   // 영상 소리 음량(0에서 1). 0이면 소리를 끈다. iOS RoomEnterPlayer.volume과 같다.
   // solo는 혼자 드르륵 방 첫 화면(46, 피그마 1647:25199 "영상" 배경의 영상 채우기 1f03a2fd48b1, 11. 12. 팀 댓글 "영상 반영")이다. 640 x 1148, 30fps, 3.0초, 소리 있음.
@@ -112,8 +118,9 @@ export const live = {
   rooms: {
     A: [{ at: SUNRISE_AT, to: 40 }, { at: 0, to: 1 }],
     B: [{ at: SUNRISE_AT, to: 40 }, { at: -(SUN_HOLD_MS / 1000) * ROOM_SUNRISE_SCALE, to: 1 }],
-    // C 혼자 드르륵 방(46, 41, 42, 43, 64): 0(실제 90초, 아침)이 되면 혼자 드르륵 종료 리포트(65, 피그마 2337:15695)로 간다(탁빛나 11/12 "아침이 밝아오면 리포트 추가").
-    C: [{ at: 0, to: 65 }],
+    // C 혼자 드르륵 방(46, 41, 42, 43, 64, 66): 01:12(실제 84.6초)에 혼자 방 해 뜨는 단계(66, 피그마 2351:34553, 해뜨기 영상)로 가고(탁빛나 11/12 "아침해 뜨는거 반영 필요"),
+    //   0이 된 뒤 영상 마지막 장면(해 뜬 아침)에 3초 머물고 혼자 드르륵 종료 리포트(65, 피그마 2337:15695)로 간다(탁빛나 11/12 "아침이 밝아오면 리포트 추가"). 입장 뒤 84.6초에 66, 90초에 00:00, 93초에 65.
+    C: [{ at: SUNRISE_AT, to: 66 }, { at: -(SUN_HOLD_MS / 1000) * ROOM_SUNRISE_SCALE, to: 65 }],
   },
   // 입력칸으로 살릴 안내 글(이 글이 있는 칸만 실제로 쓸 수 있게 한다).
   inputHint: /한마디|댓글|메시지/,
@@ -124,14 +131,15 @@ export const live = {
   // 위아래로 움직이는 화면(라이브 10, 라운지 카테고리 48~52, 글 상세 38, 커뮤니티 39). 머리말 아래(112)부터 움직이고, 맨 끝 내용 아래로 여백을 둔다.
   // 종료(1)도 화면 크기(390 x 844) 창 안에서 움직인다(의정 1647:26726 "스크롤 화면 크기로 수정", 11. 11.).
   // 혼자 드르륵 종료 리포트(65)도 종료(1)와 같다.
-  scrollScreens: [1, 10, 38, 39, 48, 49, 50, 51, 52, 65],
+  // 아침(2)도 종료(1)와 같은 1708 틀(MorningReport.jsx)이라 같이 움직인다.
+  scrollScreens: [1, 2, 10, 38, 39, 48, 49, 50, 51, 52, 65],
   // 스크롤하지 않고 제자리에 두는 요소(글 상세의 댓글 입력줄).
   pinNames: { 38: ['input'] },
   scrollTop: 112,
   scrollPad: 24,
   // 화면별 맨 끝 여백. 종료(1)는 아래 버튼 묶음이 창 바닥에 붙어 있어(reportMotion.js pinEndBar) 스크롤 내용 끝(Report 1548)에서 버튼 묶음 윗선(1590)까지 42를 둔다(피그마 1708 프레임 값).
   // 혼자 드르륵 종료 리포트(65)는 Report 끝 932에서 묶음 윗선 974까지 42다(피그마 1092 프레임 값).
-  scrollPadBy: { 1: 42, 65: 42 },
+  scrollPadBy: { 1: 42, 2: 42, 65: 42 },
   chatFirst: 350,
   chatGap: 900,
   chatSpacing: 12,

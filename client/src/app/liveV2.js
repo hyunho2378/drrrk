@@ -269,6 +269,7 @@ function soonText(state, left) {
 // 방 구경(37, 피그마 1943:12838) "대화 중 3" 줄. 생성 화면은 흰 바탕이 붙은 원본 그림을 납작하게 구운 그림이라 원 바깥에 흰 테가 보였다.
 // 투명판 그림으로 바꾸고 원 바탕을 #222628로 칠한다(iOS LiveWatchView와 같은 값: 원 54, 그림은 원 안에 꽉 채워 둥글게 자름).
 const WATCH = { '리클라이너21': C.convBlue, '나무스툴12': C.stoolOak, '가죽소파19': C.sofaBrown };
+const WATCH_SEAT = { '리클라이너21': '3ab7dfb2602df8c0d82aa5a0372d6fea572af0c1', '나무스툴12': '6977f0a432c84a681ba24727c6cf90be17ca73b3', '가죽소파19': '24a5f181f6780ce4f26219b8a54ffece8c11c38c' };
 function patchWatchTitle(root) {
   if (root.dataset.watchTitle) return;
   root.dataset.watchTitle = '1';
@@ -300,9 +301,11 @@ export function patchWatchSeats(root, n) {
   root.dataset.watchSeats = '1';
   imgs.forEach((img) => {
     const seat = img.parentElement && img.parentElement.dataset.figma ? img.parentElement.dataset.figma.replace('Seat / ', '') : '';
-    const file = WATCH[seat];
+    // 최종 드르륵 방 구경 2340:26264(11/12): 자리 아바타(2340:26281, 26284, 26287, 54 원, 모서리 27)는 흰 바탕 의자 그림 채우기(FIT)다.
+    // 그림은 피그마 채우기 그대로(assets/images, 37번 미리 받기 목록 screenAssets.js에 이미 있음).
+    const file = WATCH_SEAT[seat];
     if (!file) return;
-    img.src = BASE + file + '.png';
+    img.src = (import.meta.env.BASE_URL || '/') + 'assets/images/' + file + '.webp';
     Object.assign(img.style, { background: '#222628', borderRadius: '50%', objectFit: 'cover', boxSizing: 'border-box' });
   });
 }

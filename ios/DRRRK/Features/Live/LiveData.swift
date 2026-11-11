@@ -97,7 +97,8 @@ enum LiveData {
         "연애": [
             .init(title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-f77c03c1bf", ring: false), .chair(278, 46, 48, "D2-chair-25629e6f", ring: true), .speaking(312, 81)]),
             .init(title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", viewers: "22", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-4fdd18ce8a", ring: false), .chair(253, 62, 32, "D-chairt-450692c4db", ring: false), .chair(275, 46, 48, "D-chairt-6bfc511e24", ring: true), .speaking(309, 81)]),
-            .init(title: "친구 전남친이랑 썸 타는 중… \n괜찮음?", viewers: "22", meta: "03:00 남음", metaBlue: false, els: [.timer(269, 16, "03:00"), .more(212, 65, "+3"), .chair(231, 62, 32, "D-chairt-d7b0bb5005", ring: false), .chair(253, 62, 32, "D-chairt-6e90eda49e", ring: false), .chair(275, 46, 48, "D-chairt-3ff806dcf7", ring: true), .speaking(309, 81)]),
+            // 연애 탭의 같은 방은 피그마(1943:11783, 새 섹션 2340:26318)에서 보는 수 32, 남은 시간 03:32 다(전체 탭은 22, 03:00).
+            .init(title: "친구 전남친이랑 썸 타는 중… \n괜찮음?", viewers: "32", meta: "03:32 남음", metaBlue: false, els: [.timer(269, 16, "03:32"), .more(212, 65, "+3"), .chair(231, 62, 32, "D-chairt-d7b0bb5005", ring: false), .chair(253, 62, 32, "D-chairt-6e90eda49e", ring: false), .chair(275, 46, 48, "D-chairt-3ff806dcf7", ring: true), .speaking(309, 81)]),
         ],
         "가족": [
             .init(title: "동생이 내 옷 말없이\n입고 나감. 개열받는다", viewers: "4", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-801d8aedde", ring: false), .chair(253, 62, 32, "D-chairt-bbab91fe74", ring: false), .chair(275, 46, 48, "D-chairt-b5c25c4cae", ring: true), .speaking(309, 81)]),

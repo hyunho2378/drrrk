@@ -28,13 +28,14 @@ import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chai
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
 import { fixWraps } from './wrapFix.js';
-import { patchSolo } from './solo.js';
+import { patchSolo, prepareSoloSunrise } from './solo.js';
 import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
 import { patchReportStory, patchMorningBar } from './reportPatch.js';
 import { prepReportMotion, attachReportMotion, endFloor, pinEndBar, isEndScreen } from './reportMotion.js';
 import { prepSoloReport } from './soloReport.js';
-import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
+import { setStory, setConcern } from './story.js';
+import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding, resetSoloSunrise } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 import { prepareNormalPager, attachNormalPager } from './normalPager.js';
 import { prepareSoloGrid, attachSoloGrid, soloGridRoute } from './soloGrid.js';
@@ -45,7 +46,10 @@ export { setText };
 
 // 방마다 묶은 화면. W는 라운지에서 구경하는 방(시계만 흐르고 화면은 넘기지 않는다).
 // 해 뜨는 단계(40)는 함께 드르륵 방(B)에 둔다. 그래서 29에서 40으로 넘어가도 같은 방 시계가 이어진다(11/10 해뜨기 영상).
-export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23], B: [29, 28, 30, 31, 32, 33, 35, 40], C: [46, 43, 41, 42, 64], W: [37] };
+// 혼자 방 해 뜨는 단계(66, 피그마 2351:34553)는 혼자 드르륵 방(C)에 둔다. 41이나 그리드(64)에서 66으로 넘어가도 같은 방 시계와 채팅, 받아쓰기가 이어진다.
+export const ROOMS = { A: [9, 5, 6, 7, 8, 22, 23], B: [29, 28, 30, 31, 32, 33, 35, 40], C: [46, 43, 41, 42, 64, 66], W: [37] };
+// 해 뜨는 단계 화면(함께 방 40, 혼자 방 66). 시계는 01:12부터 세고, 해뜨기 영상이 끝나고 마지막 장면이 머문 뒤에 종료로 넘어간다.
+const SUN_SCREENS = [40, 66];
 export const sceneOf = (n) => Object.keys(ROOMS).find((k) => ROOMS[k].includes(n)) || null;
 
 const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
@@ -70,6 +74,9 @@ export function resolveTo(l) {
     try { sessionStorage.setItem('drrrk-room-from', l.from === 37 ? 'live' : 'home'); } catch (e) { /* 기본값 home */ }
     // 방 구경에서 앉는 순간의 시계 값을 방 시계로 넘긴다(roomClockHandoff.js).
     if (l.from === 37 && room.scene === 'W') handOff(remaining());
+    // 혼자 방 알림(42)의 "함께 드르륵 앉기"는 혼자 방과 같은 고민(오늘 친구랑 인생네컷을 찍었는데)의 함께 방, 사진보정 이야기로 간다.
+    // 탁빛나 11/12 02:00 2340:24916 "라이브-2 이동": 최종 페이지 라벨 "라이브- 2"(2366:35291) 아래 프레임이 "영상"(2340:29947, 소파 장면 입장 영상)이다. iOS RoomSoloView와 같다.
+    if (l.from === 42) { setStory('photo'); setConcern(null); }
     // 함께 드르륵을 한 판 한 뒤에는 홈으로 가는 길이 모두 빈 홈(25)으로 간다(11/11 23:18 팀 흐름 변경).
     setClipDone(true);
   }
@@ -828,7 +835,7 @@ function prepareRoomClock(root, n) {
   if (!sc) return;
   const same = room.scene === sc && room.kind === timerKind(root);
   const raw = same ? remaining() : n === 37 ? watchStart() : handoffNow(LIVE.roomSeconds);
-  const txt = fmtMMSS(n === 40 ? Math.min(raw, LIVE.sunriseAt) : raw);
+  const txt = fmtMMSS(SUN_SCREENS.includes(n) ? Math.min(raw, LIVE.sunriseAt) : raw);
   timerTexts(root).forEach((p) => { if (p.textContent !== txt) setText(p, txt); });
 }
 
@@ -840,6 +847,8 @@ export async function prepare(layer, n, prevN) {
   fixWraps(root);
   swapScene(root, n);
   patchSolo(root, n);
+  // 혼자 방 해 뜨는 단계(66): 퀵슬롯 펼친 목록을 숨기고 접힌 알약을 넣는다. 퀵슬롯 짝 묶기(attachQuickSlot)보다 먼저 한다.
+  await prepareSoloSunrise(root, n);
   // 혼자 드르륵 종료 리포트(65): 화면 스크롤(attachDrag)이 내용 끝을 재기 전에 빠진 덩어리를 지우고 버튼 묶음 자리를 옮긴다.
   prepSoloReport(root, n);
   applyAvatars(root, n);
@@ -870,7 +879,7 @@ export async function prepare(layer, n, prevN) {
   attachPost(root);
   patchPill(root, n);
   patchReport(root, n);
-  patchReportStory(root, n);
+  await patchReportStory(root, n);
   patchMorningBar(root, n);
   prepReportMotion(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
@@ -930,6 +939,8 @@ export function attach(layer, n, go, prevN) {
   // 해뜨기 영상: 방(B)과 방 구경(W)에 들어오면 미리 받고, 해 뜨는 단계(40)에서 재생한다. 다른 화면이면 멈추고 뺀다(sunriseVideo.js).
   if (sc === 'B' || sc === 'W') prefetchSunrise();
   attachSunrise(root, n);
+  // 혼자 방(C)은 혼자 방 해뜨기 영상(66)을 미리 받는다. 혼자 방을 나가면(멈춘 자리를 적은 뒤에) 이어 틀 자리를 지운다.
+  if (sc === 'C') prefetchSunrise(true); else resetSoloSunrise();
   // 방 입장 영상: 새로 들어온 방이면 한 번 재생하고, 같은 방 안 전환이면 이어 가거나 멈춘다(roomEnterVideo.js). room.scene이 바뀌기 전에 부른다.
   attachRoomEnter(root, n, !!sc && room.scene !== sc);
   attachSoloGrid(layer, root, n);
@@ -946,8 +957,8 @@ export function attach(layer, n, go, prevN) {
       room.entered = performance.now();
       room.stepAt = 0;
     }
-    // 해 뜨기 1분 전(40)은 피그마처럼 01:12에서 센다. 더 많이 남은 시계로 들어오면 01:12로 맞춘다.
-    if (n === 40 && remaining() > LIVE.sunriseAt) {
+    // 해 뜨기 1분 전(40, 혼자 방 66)은 피그마처럼 01:12에서 센다. 더 많이 남은 시계로 들어오면 01:12로 맞춘다.
+    if (SUN_SCREENS.includes(n) && remaining() > LIVE.sunriseAt) {
       room.left = LIVE.sunriseAt;
       room.at = performance.now();
     }
@@ -964,9 +975,10 @@ function tick() {
   tickClock();
   if (!room.scene || !current.layer) return;
   // 함께 방(B)은 실제 30초라(11/11 시연 요청) 방 온보딩 덮개가 떠 있는 동안 방 시계를 멈춘다. 덮개가 닫히면 멈춘 자리부터 흐른다.
+  // 혼자 방(C)도 같다. 덮개 뒤에서 시계가 흐르면 덮개를 닫기 전에 해 뜨는 단계(66)가 와 버린다(11/12 확인: 덮개를 띄운 채 84.8초에 66).
   // 한 번에 미는 시간은 tick 두 번(500ms)까지라, 다른 화면에 있다 돌아와도 시계가 되감기지 않는다.
   const tickNow = performance.now();
-  if (room.scene === 'B' && document.querySelector('[data-figma="방 온보딩"]')) room.at += Math.min(500, Math.max(0, tickNow - (room.lastTick || tickNow)));
+  if ((room.scene === 'B' || room.scene === 'C') && document.querySelector('[data-figma="방 온보딩"]')) room.at += Math.min(500, Math.max(0, tickNow - (room.lastTick || tickNow)));
   room.lastTick = tickNow;
   // 화면을 옮기는 중(주소가 이미 다음 화면)이면 이전 방 시계로 화면을 넘기지 않는다.
   if (hashN() !== current.n) return;
@@ -982,8 +994,8 @@ function tick() {
     if (step.to === current.n) room.fired[step.at] = true;
     // 방에 들어온 직후와 앞 단계 직후 3초는 다음 단계로 넘기지 않는다(이어받은 시계가 이미 짧을 때, roomClockHandoff.js).
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n && !stepReady(room)) break;
-    // 해 뜨는 단계(40)에서는 해뜨기 영상이 끝나고 마지막 장면이 머문 뒤에 종료로 넘긴다(sunriseVideo.js).
-    if (left <= step.at && !room.fired[step.at] && step.to !== current.n && current.n === 40 && sunriseHolding()) break;
+    // 해 뜨는 단계(40, 혼자 방 66)에서는 해뜨기 영상이 끝나고 마지막 장면이 머문 뒤에 종료로 넘긴다(sunriseVideo.js).
+    if (left <= step.at && !room.fired[step.at] && step.to !== current.n && SUN_SCREENS.includes(current.n) && sunriseHolding()) break;
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
       room.fired[step.at] = true;
       room.stepAt = performance.now();

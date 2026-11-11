@@ -12,7 +12,7 @@ export const SCREENS = [
   "n": 2,
   "id": "1647:26876",
   "name": "DRRRK / 아침",
-  "file": "Screen1647_26876",
+  "file": "MorningReport",
   "h": 844
  },
  {
@@ -420,6 +420,13 @@ export const SCREENS = [
   "name": "종료",
   "file": "SoloReport",
   "h": 844
+ },
+ {
+  "n": 66,
+  "id": "2351:34553",
+  "name": "DRRRK · 드르륵 · 현장 모드",
+  "file": "SoloSunrise",
+  "h": 844
  }
 ];
 
@@ -521,6 +528,9 @@ const modules = {
   'HomeClipOpen': () => import('./HomeClipOpen.jsx'),
   'SoloGrid': () => import('./SoloGrid.jsx'),
   'SoloReport': () => import('./SoloReport.jsx'),
+  // 아침(2): 최종 2340:23266, 2369:4202는 종료 리포트 위쪽과 같은 짜임이라 종료 생성 화면을 그대로 그린다(MorningReport.jsx).
+  'MorningReport': () => import('./MorningReport.jsx'),
+  'SoloSunrise': () => import('./SoloSunrise.jsx'),
 };
 
 export async function loadScreen(n) {

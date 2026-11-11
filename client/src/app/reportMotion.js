@@ -10,7 +10,10 @@ import { q, relRect } from './dom.js';
 import { SOLO_REPORT, SOLO_REPORT_H } from './soloReport.js';
 
 // 아래 버튼 묶음이 창 바닥에 붙는 종료 화면: 함께 방 종료(1, 1708 프레임)와 혼자 드르륵 종료 리포트(65, 1092 프레임, soloReport.js)
-export const isEndScreen = (n) => n === 1 || n === SOLO_REPORT;
+// 아침(2)도 최종 2340:23266, 2369:4202에서 종료 리포트 위쪽과 같은 짜임(종료 생성 화면, MorningReport.jsx)이라 같은 고정 묶음과 스크롤을 쓴다.
+// 아침은 엉따 막대만 차고 덩어리 펼침은 하지 않는다(의정 1647:26876 막대 댓글, 펼침 댓글은 종료 1647:26726에만).
+export const isEndScreen = (n) => n === 1 || n === 2 || n === SOLO_REPORT;
+const rises = (n) => isEndScreen(n) && n !== 2;
 
 const R = LIVE.reportMotion;
 const EMPTY = 'inset(0 100% 0 0 round 99px)';
@@ -102,7 +105,7 @@ export function prepReportMotion(root, n) {
   if (isEndScreen(n)) endFloor(root);
   if (reduced()) return;
   bars(root).forEach((b) => (b.style.clipPath = EMPTY));
-  if (isEndScreen(n)) blocksOf(root).forEach((bk) => bk.rows.forEach((r) => Object.assign(r.style, { opacity: '0', translate: '0 ' + R.dy + 'px' })));
+  if (rises(n)) blocksOf(root).forEach((bk) => bk.rows.forEach((r) => Object.assign(r.style, { opacity: '0', translate: '0 ' + R.dy + 'px' })));
 }
 
 function fill(bar, delay) {
@@ -122,7 +125,7 @@ export function attachReportMotion(root, n) {
   if (reduced()) return;
   const t0 = performance.now();
   let gauges = bars(root);
-  let blocks = isEndScreen(n) ? blocksOf(root) : [];
+  let blocks = rises(n) ? blocksOf(root) : [];
   let nextAt = 0;
   const loop = () => {
     if (!root.isConnected) return;

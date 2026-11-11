@@ -18,7 +18,7 @@ export const TOGETHER = [
   { img: 'ob-2.png', title: '말하기 부담되면\n이모지로 반응해요', sub: '+ 버튼을 눌러 이모지를 날려요' },
   { img: 'ob-3.png', title: '주전부리를 던지면\n가운데 테이블에 올라가요', sub: '오른쪽 퀵슬롯에서 주전부리를 눌러 던져요' },
   { img: 'ob-4.png', title: '대화는 20분 뒤\n저장되지 않고 사라져요', sub: '해 뜨기 타이머가 끝나면 대화방이 종료돼요' },
-  { img: 'ob-5.png', title: '대화가 끝나면\n리포트가 도착해요', sub: '공감과 추천을 받으면 엉따 온도가 올라가요' },
+  { img: 'ob-5.png', title: '대화가 끝나면\n리포트가 도착해요', sub: '추천을 받으면 엉따 온도가 올라가요' },
 ];
 export const SOLO = [
   { img: 'solo-1.png', title: '매칭될 사람이 없으면\nAI와 먼저 대화해요', sub: '기다리지 않고 바로 고민을 털어놓아요' },

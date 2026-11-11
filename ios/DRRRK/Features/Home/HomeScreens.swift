@@ -602,7 +602,7 @@ enum OnboardingPages {
         .init(visual: .together2, title: "말하기 부담되면\n이모지로 반응해요", sub: "+ 버튼을 눌러 이모지를 날려요"),
         .init(visual: .together3, title: "주전부리를 던지면\n가운데 테이블에 올라가요", sub: "오른쪽 퀵슬롯에서 주전부리를 눌러 던져요"),
         .init(visual: .together4, title: "대화는 20분 뒤\n저장되지 않고 사라져요", sub: "해 뜨기 타이머가 끝나면 대화방이 종료돼요"),
-        .init(visual: .together5, title: "대화가 끝나면\n리포트가 도착해요", sub: "공감과 추천을 받으면 엉따 온도가 올라가요"),
+        .init(visual: .together5, title: "대화가 끝나면\n리포트가 도착해요", sub: "추천을 받으면 엉따 온도가 올라가요"),
     ]
 
     /// 팀 피그마 1647:22976, 1647:23028 문구

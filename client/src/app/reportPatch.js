@@ -15,35 +15,85 @@ const SKY = '#36D2FF';
 const OFF = '#F8F8F8';
 const IMG = (h) => 'url(assets/images/' + h + '.webp)';
 
-// 두 이야기 모두 의자 넷이 같다(2096:22945~22955와 2096:23057, 2100 프레임도 같은 이름과 그림).
+// 쌍밍아웃 의자 넷(2096:22945~22955와 2096:23057, 최종 2340:28973, 2340:29088 첫 쪽과 같은 이름과 그림).
 const CHAIRS = [
   { key: 'lime', name: '진실의\n의자10', img: IMG('33871c043e7c4e9145ae99a02d9e4f55d741e136') },
   { key: 'swivel', name: '새벽2시\n피시방', img: IMG('f77c03c1bf89bd6ce2986f11ecd9d7660e2d2ad0') },
   { key: 'stool', name: '딱딱한\n나무 스툴12', img: IMG('51be0a544b5f3bf3d8e5aeb89fd60564f8dd6017') },
   { key: 'white', name: '차가운\n새벽의자92', img: IMG('b5c25c4caef8e3119474b09c31d38f8143882196') },
 ];
+// 사진보정 의자 넷(huisu 11/12 02:15 "리포트3 추가", 최종 종료 2369:4086 첫 쪽과 2369:16173 둘째 쪽, 아침 2369:4202, 오늘 나눈 대화 2369:4316).
+// 첫 쪽은 폭신폭신 소파38(sofa_05 2369:16143), 바퀴달린 의자26(wheeled_chair_05 2369:16148, 56 x 47을 원 안 8, 12에), 보라돌이 의자71(convenience_chair_05 2369:16153),
+// 둘째 쪽은 편의점 드르륵71(convenience_chair_01 2369:16315) 하나를 가운데에 둔다. 첫 쪽은 바퀴달린 의자26이 추천된 모습(Ellipse 36 하늘색 선, 이름 #36D2FF)이다.
+const PHOTO_CHAIRS = [
+  { key: 'sofa', name: '폭신폭신\n소파38', img: IMG('66dbe89daeb432881bb2caf2cfd9e219ed206076') },
+  { key: 'wheel', name: '바퀴달린\n의자26', img: IMG('ad12677ce6f516292c08fad678792b25e98e881d'), box: [8, 12, 56, 47] },
+  { key: 'purple', name: '보라돌이\n의자71', img: IMG('6bfc511e24bfba71de51c7d08b74fd3d6d5d404b') },
+  { key: 'store', name: '편의점\n드르륵71', img: IMG('4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee') },
+];
 const PAGES = [[0, 1, 2], [3]];
 const FIRST_PICK = ['swivel'];
+const PHOTO_FIRST_PICK = ['wheel'];
+const storyChairs = () => (getStory() === 'photo' ? PHOTO_CHAIRS : CHAIRS);
 
-// 사진보정 글(생성 화면)과 쌍밍아웃 글(2096:22857)
+// 사진보정 글(생성 화면)과 쌍밍아웃 글. 쌍밍아웃 글은 최종 드르륵 페이지 종료 2340:28973, 2340:29088(huisu 11/12 01:48 "리포트1 수정완",
+// 탁빛나 01:58 "리포트1 내용 수정되어서 반영부탁드려요")의 지금 글이다. 오늘의 고민, 1단계와 2단계, 3단계 설명, 둘째 카드 말이 바뀌었고
+// 추천 설명은 "좋은 이야기를 나눠준 유저를 추천해주세요"(생성 글과 같음)로 돌아갔다. 의자 이름 "따딱한"은 피그마 오타라 앞서 정한 대로 "딱딱한"으로 둔다.
+// 1단계와 2단계, 3단계 설명은 사진보정 최종(2369:4086, 2369:16173, 2369:4202, 2369:4316)도 쌍밍아웃과 같은 글이 되었다(huisu 11/12 02:15 "리포트3 추가").
+const STEP_TEXT = {
+  '"이거 일부러야?"로 이야기가 시작됐어요': '"내가 예민한거야?"로 이야기가 시작됐어요',
+  '서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요.': '서로 비슷했던 경험을 이야기 하며, 고의였을지 토론했어요',
+  '다음엔 한번 직접 말해보기로 했어요': '한번 직접 물어보기로 했어요',
+};
 const SSANG_TEXT = {
-  '둘이 찍은 사진, 자기만 보정한 친구': '썸남 앞에서 내 쌍수를 말해버린 친구',
-  '"이거 일부러야?"로 이야기가 시작됐어요': '"걔 완전 미친 거 아니야?"로 이야기가 시작됐어요',
+  ...STEP_TEXT,
+  '둘이 찍은 사진, 자기만 보정한 친구': '친구가 썸남 앞에서 내 쌍밍아웃함.',
   '따딱한 나무 스툴12': '딱딱한 나무 스툴12',
-  '다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ': '다음엔 ‘그 얘길 왜 해?’ 하고 물어봐봐 ㅋ',
-  '좋은 이야기를 나눠준 유저를 추천해주세요': '좋은 이야기를 나눠준 유저를 누르면 추천, 다시 누르면 취소돼요',
+  '다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ': '엥 그걸 거기서 왜 말하지?',
+};
+// 사진보정 오늘의 드르륵 대화들 카드 셋(2369:4086 Comment List): 이름, 말, 의자 프로필 그림(28.477 칸, 피그마 STRETCH 자르기 값 그대로).
+// 카드 순서는 피그마 위에서 아래(편의점 드르륵71, 보라돌이 의자71, 폭신폭신 소파38)다. 오늘의 고민 줄은 생성 글과 같다.
+const PHOTO_CARDS = [
+  { name: '편의점 드르륵71', line: '지만 쏙 빼고 보정한건 진짜 선넘는다', hash: '4fdd18ce8a29808bfd7f5ea576d5d32be7ecf5ee', tf: [1.405815601348877, -0.17877066135406494, -0.1968735158443451] },
+  { name: '보라돌이 의자71', line: '그건 서운할 만하지 ㅠㅠ', hash: '6bfc511e24bfba71de51c7d08b74fd3d6d5d404b', tf: [1.4777050018310547, -0.2302054911851883, -0.21845699846744537] },
+  { name: '폭신폭신 소파38', line: '맞아여 앞으로 그런 애한테 신경쓰지 마요', hash: 'ad4a14569046edce3d326ee86ce00f27fcf1916c', tf: [1.4436248540878296, -0.21152786910533905, -0.23209701478481293] },
+];
+const AVATAR = 28.477;
+// 생성 코드의 CROP 그림과 같은 식: 크기 100 / 배율 %, 자리 -이동 / 배율 x 칸 크기
+const cropBg = (c) => 'url(assets/images/' + c.hash + '.webp) ' + (-c.tf[1] / c.tf[0] * AVATAR).toFixed(3) + 'px ' + (-c.tf[2] / c.tf[0] * AVATAR).toFixed(3) + 'px / ' + (100 / c.tf[0]).toFixed(3) + '% ' + (100 / c.tf[0]).toFixed(3) + '% no-repeat';
+
+const fitLine = (p, next) => {
+  setText(p, next);
+  // 글이 길어진 줄은 생성 화면의 고정 폭에서 줄이 바뀌지 않게 폭을 글에 맞춘다(피그마는 한 줄).
+  p.style.width = 'max-content';
+  p.style.whiteSpace = 'nowrap';
 };
 
 function storyText(root) {
-  if (getStory() !== 'ssang') return;
+  const photo = getStory() === 'photo';
+  const map = photo ? STEP_TEXT : SSANG_TEXT;
   q(root, 'p').forEach((p) => {
-    const next = SSANG_TEXT[p.textContent.trim()];
-    if (!next) return;
-    setText(p, next);
-    // 글이 길어진 줄은 생성 화면의 고정 폭에서 줄이 바뀌지 않게 폭을 글에 맞춘다(피그마는 한 줄).
-    p.style.width = 'max-content';
-    p.style.whiteSpace = 'nowrap';
+    const next = map[p.textContent.trim()];
+    if (next) fitLine(p, next);
   });
+  if (!photo) return;
+  q(root, '[data-figma="베스트 댓글 카드"]').forEach((card, i) => {
+    const c = PHOTO_CARDS[i];
+    if (!c) return;
+    const nm = card.querySelector('p[data-figma="이름 · DRRRK/C1 Bold"]');
+    const ln = card.querySelector('p[data-figma="댓글 · DRRRK/B2 Medium"]');
+    if (nm && nm.textContent.trim() !== c.name) fitLine(nm, c.name);
+    if (ln && ln.textContent.trim() !== c.line) fitLine(ln, c.line);
+    const pic = card.querySelector('[data-figma="의자 프로필"] > [data-figma]');
+    if (pic) { pic.style.background = cropBg(c); pic.removeAttribute('data-img'); }
+  });
+}
+// 바꾼 그림은 보이기 전에 받아 둔다(보인 뒤 늦게 뜨는 그림 0건).
+const urlsOf = () => (getStory() === 'photo' ? [...PHOTO_CARDS.map((c) => 'assets/images/' + c.hash + '.webp'), ...PHOTO_CHAIRS.map((c) => c.img.slice(4, -1))] : []);
+function decodeAll(urls) {
+  if (typeof Image === 'undefined' || !urls.length) return Promise.resolve();
+  const one = (u) => new Promise((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = u; if (im.decode) im.decode().then(res, res); });
+  return Promise.race([Promise.all(urls.map(one)), new Promise((res) => window.setTimeout(res, 1500))]);
 }
 
 // 추천 따봉(의정, 탁빛나 2026. 11. 11. 종료 1647:26726 댓글): 의자를 추천하는 순간 따봉이 아바타 위에서 떠올라 옅어지며 사라진다.
@@ -94,13 +144,17 @@ function picker(root) {
   // 떠오르는 따봉이 줄 위로 나가므로 줄(생성 화면 overflow hidden)의 자르기를 푼다. 줄 안 내용은 줄 크기 안에 있어 보이는 모양은 같다.
   list.style.overflow = 'visible';
 
-  const picked = new Set(FIRST_PICK);
-  const cells = CHAIRS.map((ch) => {
+  const photo = getStory() === 'photo';
+  const picked = new Set(photo ? PHOTO_FIRST_PICK : FIRST_PICK);
+  const cells = storyChairs().map((ch) => {
     const c = tpl.cloneNode(true);
     q(c, '[data-tap]').forEach((e) => delete e.dataset.tap);
     const pic = imgOf(c);
     pic.style.backgroundImage = ch.img;
-    Object.assign(pic.style, { left: '8px', top: '8px' });
+    pic.removeAttribute('data-img');
+    // 그림 칸: 기본 56 x 56을 원 안 8, 8에. 바퀴달린 의자26은 피그마 그대로 56 x 47을 8, 12에 둔다.
+    const b = ch.box || [8, 8, 56, 56];
+    Object.assign(pic.style, { left: b[0] + 'px', top: b[1] + 'px', width: b[2] + 'px', height: b[3] + 'px', aspectRatio: 'auto' });
     const nm = nameOf(c);
     setText(nm, ch.name);
     Object.assign(nm.style, { width: 'auto', whiteSpace: 'pre', transition: 'color ' + motion.stateIn + 'ms ' + motion.standard });
@@ -178,11 +232,14 @@ function picker(root) {
 }
 
 // 혼자 드르륵 종료 리포트(65, soloReport.js)도 같은 글을 쓴다. 도움이 된 유저 칸이 없어 picker는 할 일이 없다.
+// 아침(2)은 최종 2340:23266, 2369:4202가 종료 리포트 윗부분과 같은 짜임이라 종료 생성 화면을 그대로 그리고(MorningReport.jsx) 같은 글과 의자 칸을 쓴다.
+// 바꾼 그림을 받을 때까지 기다리는 약속을 돌려준다(live.js prepare가 기다린다).
 export function patchReportStory(root, n) {
-  if ((n !== 1 && n !== 3 && n !== 65) || !root || root.dataset.reportStory) return;
+  if ((n !== 1 && n !== 2 && n !== 3 && n !== 65) || !root || root.dataset.reportStory) return Promise.resolve();
   root.dataset.reportStory = '1';
   storyText(root);
   picker(root);
+  return decodeAll(urlsOf());
 }
 
 // 아침(2)과 오늘 나눈 대화(3)의 아래 막대(피그마 새 섹션 2340:23399, 2340:29284 "Frame 2147249293", 342 x 78, 세로 제약 BOTTOM).
@@ -195,6 +252,23 @@ export function patchMorningBar(root, n) {
   const bar = root.querySelector('[data-figma="Frame 2147249293"]');
   if (!bar) return;
   root.dataset.morningBar = '1';
+  // 아침(2)은 종료 생성 화면(하늘색 btn div)을 쓴다. 최종 2369:4202 btn(2369:4208)은 회색 #222628, 글 #9AA1A6(SUIT Bold 16, 행간 22.4, 자간 -0.64)이고
+  // 묶음 뒤에 검은 그라데이션(Rectangle 1954141374 2369:4205, -1, 632, 392 x 212, 투명에서 73.24% 검정, 세로 제약 BOTTOM)이 깔린다.
+  // 그라데이션은 묶음(창 바닥에 붙음, reportMotion.js pinEndBar)의 맨 아래 층으로 넣어 스크롤해도 묶음과 함께 제자리에 있다. 묶음 윗선 726에서 94 위가 632다.
+  const live = bar.querySelector(':scope > div[data-figma="btn"]');
+  if (n === 2 && live) {
+    live.style.background = MORNING_BAR.bg;
+    const lp = live.querySelector('p');
+    if (lp) { lp.style.color = MORNING_BAR.fg; lp.style.lineHeight = '22.4px'; setText(lp, MORNING_BAR.primary); }
+    if (!bar.querySelector(':scope > [data-figma="Rectangle 1954141374"]')) {
+      const sc = document.createElement('div');
+      sc.setAttribute('aria-hidden', 'true');
+      sc.dataset.figma = 'Rectangle 1954141374';
+      Object.assign(sc.style, { position: 'absolute', left: '-25px', top: '-94px', width: '392px', height: '212px', pointerEvents: 'none', zIndex: '-1', background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000 73.24%)' });
+      Object.assign(bar.style, { overflow: 'visible', isolation: 'isolate' });
+      bar.prepend(sc);
+    }
+  }
   const img = bar.querySelector(':scope > img[data-figma="btn"]');
   if (img) {
     const btn = document.createElement('div');

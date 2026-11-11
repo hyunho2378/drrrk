@@ -590,7 +590,8 @@ struct RoomHeader: View {
             Spacer()
             TimelineView(.periodic(from: .now, by: 0.25)) { ctx in
                 HStack(spacing: 8) {
-                    SunClock(progress: 1 - model.remaining(at: ctx.date) / RoomModel.shownSeconds)
+                    SunClock(progress: 1 - model.remaining(at: ctx.date) / RoomModel.shownSeconds,
+                             tint: lastMinute ? DS.Palette.danger : DS.Palette.brandPrimary)
                         .frame(width: 16, height: 16)
                     Text("해 뜨기까지").suit(12, .medium, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
                     Text(model.clockText(at: ctx.date)).suit(12, .bold, tracking: -0.48).monospacedDigit()
@@ -620,12 +621,14 @@ struct RoomHeader: View {
 }
 
 /// 해 뜨기 시계 아이콘: 지난 시간만큼 원이 채워진다.
+/// 해 뜨는 단계(빨강 시계)에는 아이콘도 빨강(#FF4D6A)이다(피그마 2351:34553, 2340:24687, 2340:30019 timer 선과 조각 모두 #FF4D6A, 웹과 같다).
 private struct SunClock: View {
     let progress: Double
+    var tint: Color = DS.Palette.brandPrimary
     var body: some View {
         ZStack {
-            Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 1.5)
-            PieSlice(progress: progress).fill(DS.Palette.brandPrimary).padding(3)
+            Circle().strokeBorder(tint, lineWidth: 1.5)
+            PieSlice(progress: progress).fill(tint).padding(3)
         }
     }
 }

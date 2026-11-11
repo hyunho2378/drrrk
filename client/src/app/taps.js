@@ -396,7 +396,7 @@ export function attachTaps(root, n, go, prevN) {
   if (!root) return;
   // 1번은 의자 한 개씩 넘기는 구조(2023:30658), 2번과 3번은 의자 3칸 줄(3번 칸 이름은 "의자 셀"과 "cell / sofa")이다.
   // 1번과 3번(종료, 오늘 나눈 대화)의 도움이 된 유저는 reportPatch.js가 맡는다(3개씩 한 쪽, 개수 제한 없음, 따봉 없음). 2번 아침만 옛 줄과 따봉을 쓴다.
-  if (n === 2) { chairPicker(root); thumbs(root); }
+  // 아침(2)은 최종 2340:23266, 2369:4202에서 종료와 같은 짜임(MorningReport.jsx)이라 도움이 된 유저도 reportPatch.js가 맡는다. 옛 줄과 따봉(chairPicker, thumbs)은 쓰지 않는다.
   if (n === 7) {
     reasons(root);
     detailInput(root);

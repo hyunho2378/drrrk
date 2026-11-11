@@ -292,42 +292,39 @@ struct ObEmojiTrail: View {
     }
 }
 
-// MARK: - 함께 드르륵 3(1829:11275): 테이블, 테이블 위 주전부리, 날아가는 새우깡, 퀵슬롯(펼침)
+// MARK: - 함께 드르륵 3(11/12 최종 2340:25795 "주전부리 (접힌 슬롯)"): 테이블, 테이블 위 주전부리, 날아가는 DRRRA, 퀵슬롯(접힘)
 
 struct ObTogetherSnack: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var on = false
-    @State private var selected = 0
     @State private var thrown: [ObThrow] = []
     @State private var nextID = 0
-    /// slot / 새우깡, 소주, 오징어땅콩
-    private let slots = ["D-snack-shrimp", "D-snack-soju", "D-snack-peanut"]
-    private let slotY: [CGFloat] = [20, 64, 108]
+    /// slot / 새우깡, DRRRA, 소주(접힌 퀵슬롯 162, 30, 59 x 115 안 9.8, y 자리 원 39.2, 25.2 간격으로 겹침)
+    private let slots = ["D-snack-shrimp", "D-snack-drrra", "D-snack-soju"]
+    private let slotY: [CGFloat] = [12.6, 37.8, 63]
     /// 던진 주전부리가 앉는 테이블 윗면 자리(패널 기준 왼쪽 위)
-    private let landing: [CGPoint] = [CGPoint(x: 58, y: 62), CGPoint(x: 84, y: 58), CGPoint(x: 108, y: 64)]
+    private let landing: [CGPoint] = [CGPoint(x: 52, y: 62), CGPoint(x: 78, y: 58), CGPoint(x: 102, y: 64)]
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             ObPanel(shadow: false) {
-                // 테이블(그림자, 받침, 기둥, 두께, 윗면, 윗면 빛을 피그마에서 한 장으로 내보냄), 10, 68, 148 x 102
-                Image("N-ob-table").resizable().frame(width: 148, height: 102)
-                    .offset(x: 10, y: 68)
+                table
                     .obEnter(on, 0.18, dy: 10)
-                snack("D-snack-nogari", x: 34, y: 44, w: 34, h: 38, rot: 14, delay: 0.42)
-                snack("D-snack-peanut", x: 70, y: 38, w: 32, h: 36, rot: -6, delay: 0.5)
-                snack("D-snack-soju", x: 104, y: 32, w: 22, h: 46, rot: -16, delay: 0.58)
-                // 날아가는 새우깡(126, 41, 26 x 30, 회전 -24): 퀵슬롯 새우깡 칸에서 포물선으로 날아와 멈춘다.
-                Image("D-snack-shrimp").resizable().scaledToFit().frame(width: 26, height: 30)
+                snack("D-snack-shrimp", x: 30, y: 48.65, w: 35.84, h: 40.05, rot: 14, delay: 0.42)
+                snack("D-snack-peanut", x: 67.95, y: 42.32, w: 33.73, h: 37.95, rot: -6, delay: 0.5)
+                snack("D-snack-soju", x: 103.78, y: 36, w: 23.19, h: 48.49, rot: -16, delay: 0.58)
+                // 날아가는 DRRRA(126.02, 19, 22 x 32, 회전 -24): 퀵슬롯 DRRRA 칸에서 포물선으로 날아와 멈춘다.
+                Image("D-snack-drrra").resizable().scaledToFit().frame(width: 22, height: 32)
                     .shadow(color: DS.Palette.bgSurface.opacity(0.18), radius: 4, x: 0, y: 4)
                     .rotationEffect(.degrees(24), anchor: .topLeading)
-                    .offset(x: 126, y: 41)
-                    .modifier(ObArc(t: on ? 1 : 0, dx: 59, dy: -3, lift: 26))
+                    .offset(x: 126.02, y: 19)
+                    .modifier(ObArc(t: on ? 1 : 0, dx: 62, dy: 49, lift: 26))
                     .opacity(on ? 1 : 0)
                     .animation(reduceMotion ? nil : ObMotion.standard(0.5).delay(0.95), value: on)
                 ForEach(thrown) { item in
                     ObThrownSnack(item: item)
                 }
-                quickSlot.offset(x: 178, y: 12)
+                quickSlot.offset(x: 162, y: 30)
             }
             .offset(x: 48, y: 44)
             .obEnter(on, 0, dy: 16)
@@ -339,6 +336,26 @@ struct ObTogetherSnack: View {
         }
     }
 
+    /// 테이블(그림자 16, 148, 124 x 16 / 받침 48, 140, 60 x 12 / 기둥 71, 93, 14 x 52 / 두께 14, 75, 128 x 42 / 윗면 14, 68, 128 x 42 / 윗면 빛 28, 73, 88 x 12)
+    private var table: some View {
+        ZStack(alignment: .topLeading) {
+            Ellipse().fill(Color(hex: 0x121415, alpha: 0.14)).frame(width: 124, height: 16).blur(radius: 3)
+                .offset(x: 16, y: 148)
+            Ellipse().fill(LinearGradient(colors: [Color(hex: 0xD9DDE0), Color(hex: 0xB4BBC0)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 60, height: 12).offset(x: 48, y: 140)
+            RoundedRectangle(cornerRadius: 3).fill(LinearGradient(stops: [.init(color: Color(hex: 0xB4BBC0), location: 0), .init(color: Color(hex: 0xE6E9EB), location: 0.45), .init(color: Color(hex: 0xAEB5BA), location: 1)], startPoint: .leading, endPoint: .trailing))
+                .frame(width: 14, height: 52).offset(x: 71, y: 93)
+            Ellipse().fill(LinearGradient(colors: [Color(hex: 0xC9CED2), Color(hex: 0xA9B0B5)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 128, height: 42).offset(x: 14, y: 75)
+            Ellipse().fill(LinearGradient(colors: [Color(hex: 0xFFFFFF), Color(hex: 0xE4E7EA)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 128, height: 42).offset(x: 14, y: 68)
+            Ellipse().fill(Color.white.opacity(0.7)).frame(width: 88, height: 12).blur(radius: 2)
+                .offset(x: 28, y: 73)
+        }
+        .frame(width: 230, height: 200, alignment: .topLeading)
+        .allowsHitTesting(false)
+    }
+
     private func snack(_ asset: String, x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat, rot: Double, delay: Double) -> some View {
         Image(asset).resizable().scaledToFit().frame(width: w, height: h)
             .rotationEffect(.degrees(-rot), anchor: .topLeading)
@@ -346,45 +363,35 @@ struct ObTogetherSnack: View {
             .obEnter(on, delay, dy: -10)
     }
 
-    /// 주전부리 퀵슬롯(펼침) 40 x 146: 접기 핸들, 칸 셋. 위에서 아래로 50ms씩 펼쳐진다.
+    /// 주전부리 퀵슬롯(접힘) 59 x 115(#121415 55%, 반경 28): 원 칸 셋(39.2, #121415, 안쪽 검정 선 2.8, 그림 28). 위에서 아래로 50ms씩 나타난다.
     private var quickSlot: some View {
         ZStack(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 8).fill(DS.Palette.bgSurface)
-                .frame(width: 40, height: 14)
-                .overlay(alignment: .topLeading) {
-                    RoundedRectangle(cornerRadius: 2).fill(DS.Palette.textPrimary.opacity(0.6))
-                        .frame(width: 14, height: 3)
-                        .offset(x: 13, y: 6)
-                }
+            RoundedRectangle(cornerRadius: 28).fill(Color(hex: 0x121415, alpha: 0.55))
+                .frame(width: 59, height: 115)
                 .obEnter(on, 0.3, dy: -6)
             ForEach(slots.indices, id: \.self) { i in
                 Button {
-                    selected = i
                     throwSnack(i)
                 } label: {
-                    Image(slots[i]).resizable().scaledToFit().frame(width: 26, height: 26)
-                        .frame(width: 38, height: 38)
-                        .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 12))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 12).strokeBorder(DS.Palette.brandPrimary, lineWidth: 2)
-                                .opacity(selected == i ? 1 : 0)
-                                .animation(reduceMotion ? nil : ObMotion.quick, value: selected)
-                        }
+                    Image(slots[i]).resizable().scaledToFit().frame(width: 28, height: 28)
+                        .frame(width: 39.2, height: 39.2)
+                        .background(DS.Palette.bgSurface, in: Circle())
+                        .overlay { Circle().strokeBorder(Color.black, lineWidth: 2.8) }
                 }
                 .buttonStyle(PressStyle())
-                .offset(x: 1, y: slotY[i])
+                .offset(x: 9.8, y: slotY[i])
                 .obEnter(on, 0.38 + Double(i) * 0.05, dy: -10)
             }
         }
-        .frame(width: 40, height: 146, alignment: .topLeading)
+        .frame(width: 59, height: 115, alignment: .topLeading)
     }
 
     private func throwSnack(_ slot: Int) {
         guard !reduceMotion else { return }
         nextID += 1
         let to = landing[nextID % landing.count]
-        // 칸 그림의 왼쪽 위(패널 기준 178 + 1 + 6, 12 + y + 6)
-        let from = CGPoint(x: 185, y: 18 + slotY[slot])
+        // 칸 그림의 왼쪽 위(패널 기준 162 + 9.8 + 5.6, 30 + y + 5.6)
+        let from = CGPoint(x: 177.4, y: 35.6 + slotY[slot])
         thrown.append(ObThrow(id: nextID, asset: slots[slot], to: to, dx: from.x - to.x, dy: from.y - to.y))
         if thrown.count > 5 { thrown.removeFirst(thrown.count - 5) }
     }
@@ -446,8 +453,8 @@ struct ObTogetherSunrise: View {
             }
             .offset(x: 48, y: 44)
             .obEnter(on, 0, dy: 16)
-            // 칩 해가 떴어요(20, 150, 110 x 34): 00:00이 되면 아래에서 떠오른다.
-            ObChip(label: "해가 떴어요", fontSize: 13, dark: false, width: 110, height: 34) {
+            // 칩 해가 떴어요(20, 150, 108 x 34, 11/12 최종 2340:25722): 00:00이 되면 아래에서 떠오른다.
+            ObChip(label: "해가 떴어요", fontSize: 13, dark: false, width: 108, height: 34) {
                 Image("N-ob-icon-sun").resizable().frame(width: 18, height: 18)
                     .rotationEffect(.degrees(sunUp ? 0 : -40))
                     .offset(y: sunUp ? 0 : 6)
@@ -462,7 +469,7 @@ struct ObTogetherSunrise: View {
         .task(id: round) { await play() }
     }
 
-    /// Timer Pill 142 x 32: timer 14, 해 뜨기까지, 시간
+    /// Timer Pill 137 x 32(11/12 최종 2340:25717): timer 14, 해 뜨기까지, 시간
     private var timerPill: some View {
         HStack(spacing: 6) {
             Image("N-ob-icon-timer").resizable().frame(width: 14, height: 14)
@@ -471,7 +478,7 @@ struct ObTogetherSunrise: View {
             ObClockText(seconds: seconds)
         }
         .padding(.leading, 12)
-        .frame(width: 142, height: 32, alignment: .leading)
+        .frame(width: 137, height: 32, alignment: .leading)
         .background(DS.Palette.bgSurface, in: RoundedRectangle(cornerRadius: 20))
     }
 
@@ -561,14 +568,15 @@ struct ObTogetherReport: View {
     /// 엉따 온도 카드 198 x 76(#121415 5%, 반경 14)
     private var tempCard: some View {
         ZStack(alignment: .topLeading) {
-            Text("오늘 대화로 엉따 온도가").suit(11, .bold, tracking: -0.22)
+            // 11/12 최종 2340:25775 문구 1, 문구 2("1.1°C"만 SUIT ExtraBold 하늘색)
+            Text("오늘 대화에서 의자가").suit(11, .bold, tracking: -0.22)
                 .foregroundStyle(DS.Palette.bgSurface).fixedSize()
                 .frame(height: 15)
                 .offset(x: 8, y: 9)
             HStack(spacing: 0) {
-                Text("1.1°C ").suit(11, .bold, tracking: -0.22).foregroundStyle(DS.Palette.brandPrimary).fixedSize()
+                Text("1.1°C ").suit(11, .extrabold, tracking: -0.22).foregroundStyle(DS.Palette.brandPrimary).fixedSize()
                     .obBounce(bump, peak: 1.18, up: 0.12, down: 0.16)
-                Text("올랐어요").suit(11, .bold, tracking: -0.22).foregroundStyle(DS.Palette.bgSurface).fixedSize()
+                Text("더 뜨끈해졌어요").suit(11, .bold, tracking: -0.22).foregroundStyle(DS.Palette.bgSurface).fixedSize()
             }
             .frame(height: 15)
             .offset(x: 8, y: 24)

@@ -100,8 +100,33 @@ function replayBand(root) {
   card.appendChild(band);
 }
 
+// 7 신고 사유 선택(최종 2340:23517): 피그마는 "않아요." 뒤 두 칸 띄어 쓴 자리에서 줄을 바꿔 "바로 대화를 끊고 싶다면 차단도 함께 해주세요."를 둘째 줄에 둔다.
+// 웹은 두 칸이 한 칸으로 줄어 "바로"가 첫 줄 끝에 붙으므로 같은 자리에서 줄을 바꾼다(fixWraps 뒤, 보이기 전 prepare).
+const POLICY_HEAD = '신고해도 통화는 그대로 유지되고, 상대에게 알리지 않아요.';
+function policyBreak(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+    const v = t.nodeValue || '';
+    if (!v.startsWith(POLICY_HEAD + ' ')) continue;
+    const rest = v.slice(POLICY_HEAD.length).trim();
+    t.nodeValue = POLICY_HEAD;
+    t.parentNode.insertBefore(document.createElement('br'), t.nextSibling);
+    t.parentNode.insertBefore(document.createTextNode(rest), t.nextSibling.nextSibling);
+    return;
+  }
+}
+
+// 8 차단 확인(최종 2340:23617 Button / Secondary): 취소 버튼은 차단하기(2340:23618)와 같은 133 x 46이다. 생성 화면은 옛 높이 52였다.
+function blockCancel(root) {
+  const label = [...root.querySelectorAll('[data-figma="버튼"]')].find((e) => e.textContent.trim() === '취소');
+  const btn = label && label.parentElement;
+  if (btn) btn.style.height = '46px';
+}
+
 export function patchRest(root, n) {
   if (!root) return;
+  if (n === 7) policyBreak(root);
+  if (n === 8) blockCancel(root);
   if (n === 16 || n === 17) soloOnboarding(root, n);
   if (n === 38) { commentProfiles(root); replayBand(root); }
 }

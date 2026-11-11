@@ -7,6 +7,8 @@
 //  5) 작성자 줄(2298:22031)은 "의자 프로필" 32 원(바탕 #33383D, sofa_05)과 "푹신한 가죽 소파12"다. 아래 검은 판은 y 708, 높이 136(2298:22208)이다.
 // 내용은 피그마 사진보정 글이다. 목록에서 다른 글(쌍밍아웃 등)을 열면 제목만 그 글 제목으로 바꾸고 나머지는 지금 앱과 같다.
 // 한글 줄바꿈은 피그마처럼 글자 단위로 끊는다(word-break: break-all, 댓글 "기억이 나네/요" 자리가 피그마와 같다).
+// 11. 12. 최종 2340:28134 대조: 본문 첫 줄이 피그마는 "내 얼굴은 그"에서 끊기는데 앱은 "그대"까지 들어갔다(앱 줄 폭 341.8, 칸 342). 칸을 341.5로 줄여 같은 자리에서 끊는다.
+//  입력창 안 "댓글 달기"는 x 45, 보내기 버튼은 x 309다(피그마 2340:28315, 앞뒤 안쪽 여백 21과 9). 앞은 44, 308이었다.
 // 휴대폰 높이 맞춤(mobileFit.js)이 읽을 수 있게 맨 바깥 칸의 자식은 모두 피그마 좌표의 absolute 칸이다.
 import { useEffect, useRef, useState } from 'react';
 import { motion, live as LIVE } from '../tokens.js';
@@ -158,7 +160,7 @@ export default function CommunityPost() {
           <div style={{ height: 16 }} />
           <p style={t(20, 700, C.text, { lineHeight: '28px' })}>{title}</p>
           <div style={{ height: 12 }} />
-          <p style={t(15, 400, C.body, { lineHeight: '24px', whiteSpace: 'pre-wrap', wordBreak: 'break-all', width: 342 })}>{POST.body}</p>
+          <p style={t(15, 400, C.body, { lineHeight: '24px', whiteSpace: 'pre-wrap', wordBreak: 'break-all', width: 341.5 })}>{POST.body}</p>
           <div style={{ height: 24 }} />
           <div data-figma="대화 다시보기" data-node="2298:22040" role="button" tabIndex={0} aria-label="라이브 다시보기" onClick={(e) => { e.stopPropagation(); openReplay(); }} onKeyDown={(e) => { if (e.key === 'Enter') openReplay(); }} {...pressProps()} style={{ position: 'relative', width: 342, height: 176, borderRadius: 16, overflow: 'hidden', background: '#1F2226', flexShrink: 0, cursor: 'pointer' }}>
             {/* 장면: 피그마 fade(2298:22042, 342 x 150)가 scene(2298:22041)을 모두 덮은 모습 그대로다(예전 카드와 같은 그림). */}
@@ -209,7 +211,7 @@ export default function CommunityPost() {
         <div data-figma="chevron-left" style={{ position: 'absolute', left: 24, top: 79, width: 24, height: 24 }}>{icon.chevron}</div>
       </div>
       <div data-figma="Rectangle 1954141374" data-node="2298:22208" style={{ position: 'absolute', left: -1, top: 708, width: 392, height: 136, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, #000000 73.24%)' }} />
-      <div data-figma="input" data-node="2100:23469" style={{ position: 'absolute', left: 24, top: 754, width: 342, height: 66, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 8px 8px 20px', borderRadius: 32, background: C.card }}>
+      <div data-figma="input" data-node="2100:23469" style={{ position: 'absolute', left: 24, top: 754, width: 342, height: 66, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 9px 8px 21px', borderRadius: 32, background: C.card }}>
         <div data-figma="댓글 입력칸" style={{ position: 'relative', width: 256, height: 48, display: 'flex', alignItems: 'center', paddingRight: 16, boxSizing: 'border-box', flexShrink: 0 }} onClick={() => inputRef.current && inputRef.current.focus()}>
           <p aria-hidden="true" style={t(14, 400, C.sub, { lineHeight: '19.6px', letterSpacing: '-0.04em', opacity: draft ? 0 : 1, pointerEvents: 'none' })}>댓글 달기</p>
           <input

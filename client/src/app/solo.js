@@ -2,9 +2,14 @@
 // 1647:25199(영상), 1647:25052(배너 펼침), 1647:24874(퀵슬롯 펼침), 1804:12770(사람을 찾았다는 알림).
 // 옛 프레임에 있던 가운데 "AI 드르륵 의자" 이름표와 소리 막대는 새 프레임에 없어 숨긴다.
 // 옛 41, 42의 빨간 시계(곧 끝)는 새 프레임에서 기본 시계(#222628, 하늘색 시간)다.
+// 66은 혼자 방 해 뜨는 단계(피그마 2351:34553, 탁빛나 11/12 "아침해 뜨는거 반영 필요")다. 41 생성 화면을 바탕으로 쓰고,
+// 시계 칸은 41 생성 화면에 남은 빨간 시계(빨강 18% 바탕, 빨강 1 선, 빨강 시계 아이콘과 시간)가 새 프레임 값과 같아 그대로 둔다.
+import { cloneOf } from './donor.js';
+
 const q = (r, s) => [...r.querySelectorAll(s)];
 // 64는 혼자 방 그리드(soloGrid.js)다. 46 생성 화면을 바탕으로 쓰므로 시계 칸과 옛 이름표를 같이 고친다.
-export const SOLO_SCREENS = [46, 43, 41, 42, 64];
+export const SOLO_SCREENS = [46, 43, 41, 42, 64, 66];
+export const SOLO_SUNRISE = 66;
 // 방 움직임(room.js)이 나중에 display를 되돌려도 숨김이 유지되게 속성 규칙으로 숨긴다.
 if (typeof document !== 'undefined' && !document.getElementById('solo-hide')) {
   const st = document.createElement('style');
@@ -33,6 +38,7 @@ export function patchSolo(root, n) {
     if (top < 520 && h < 60) c.setAttribute('data-solo-hide', '');
   });
   q(root, '[data-figma^="Timer Pill"]').forEach((pill) => {
+    if (n === SOLO_SUNRISE) return;
     Object.assign(pill.style, { background: '#222628', borderColor: 'transparent', boxShadow: 'none' });
     // 옛 빨간 테두리는 시계 칸 맨 아래에 깔린 그림이다.
     q(pill, ':scope > span').forEach((sp) => { if (/ff4d6a/i.test(sp.innerHTML)) sp.style.display = 'none'; });
@@ -50,4 +56,18 @@ export function patchSolo(root, n) {
     const w = b.offsetWidth;
     if (w > 0) b.style.left = 366 - w + 'px';
   });
+}
+
+// 혼자 방 해 뜨는 단계(66): 피그마 2351:34553 은 퀵슬롯이 접힌 알약(324, 192, 42 x 82, 새우깡과 DRRRA, 소주)이다.
+// 41 생성 화면의 펼친 목록은 숨겨 두고(펼치면 이 목록이 나온다, quickSlot.js) 46 생성 화면의 같은 알약을 복제해 같은 자리에 넣는다. 보이기 전(live.js prepare)에 한다.
+export async function prepareSoloSunrise(root, n) {
+  if (n !== SOLO_SUNRISE || !root || root.dataset.soloSun) return;
+  root.dataset.soloSun = '1';
+  const panel = root.querySelector(':scope > [data-figma="주전부리 퀵슬롯"]');
+  if (!panel || root.querySelector(':scope > [data-figma="퀵슬롯 · 접힘"]')) return;
+  const pill = await cloneOf(46, '[data-figma="퀵슬롯 · 접힘"]');
+  if (!pill || !root.isConnected) return;
+  Object.assign(pill.style, { left: '324px', top: '192px' });
+  panel.style.visibility = 'hidden';
+  panel.before(pill);
 }

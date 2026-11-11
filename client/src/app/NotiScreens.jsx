@@ -14,6 +14,7 @@ import { pressable } from './taps.js';
 import { NOTI_TABS, NOTI_SVG } from './notiTabs.js';
 import { fixSubpixel } from '../figma/subpixel.js';
 import { motion } from '../tokens.js';
+import { unifyTracking } from './tracking.js';
 
 // ---------- 활동 알림 분류 칩(11/11 피그마 활동 알림 1 1952:14673과 분류 화면 네 장) ----------
 // 칩(전체, 엉따지수, 댓글, 업적 편의점, 의자꾸미기)을 누르면 목록만 그 분류 프레임의 목록으로 바뀐다. 머리말, 탭, 칩 줄은 제자리다.
@@ -31,6 +32,9 @@ const keepOrReset = () => {
 };
 const LIST_TOP = 221;
 const FADE = 180;
+// 최종 드르륵 활동 알림 다섯 장(전체 2340:28316, 엉따지수 2340:28551, 댓글 2340:28502, 업적 편의점 2340:28607, 의자꾸미기 2340:28453)의 칩 글 칸 폭.
+// 자간 -4% 로 칩 폭이 52, 76, 52, 90, 87(자리 24, 84, 168, 228, 326)이 됐다. 칩 글은 실제 글자(tracking.js)라 고른 칩은 #121415 600, 나머지는 #F8F8F8 500 이다(엉따지수 장의 전체 칩만 피그마대로 600, iOS chipSemibold 와 같다).
+const ACT_CHIP_W = [24, 48, 24, 62, 59];
 
 function setGlyphs(p, t) {
   if (!p || !t) return;
@@ -89,8 +93,13 @@ function activityChips(root) {
       el.setAttribute('aria-pressed', c.on ? 'true' : 'false');
       const art = el.querySelector('p > span[aria-hidden]');
       if (art) art.innerHTML = NOTI_SVG[c.svg] || '';
+      const cp = el.querySelector(':scope > p');
+      if (cp) { cp.style.color = c.on ? '#121415' : '#F8F8F8'; cp.style.fontWeight = c.on || (i === 0 && tab.key === 'heat') ? '600' : '500'; if (ACT_CHIP_W[i]) cp.style.width = ACT_CHIP_W[i] + 'px'; }
     });
     list.replaceChildren(...tab.items.filter((it) => tpls[it.tpl]).map((it) => makeRow(tpls[it.tpl], it)));
+    // 새로 복제한 줄의 글도 첫 그리기와 같이 -4% 실제 글자로 바꾼다(이전에는 분류를 바꾸면 옛 자간 윤곽이 보여 줄바꿈이 피그마와 달랐다).
+    unifyTracking(row);
+    unifyTracking(list);
     list.style.height = tab.listH + 'px';
     if (content) content.style.height = Math.max(844, LIST_TOP + tab.listH) + 'px';
     list.setAttribute('data-tab', tab.key);
@@ -139,12 +148,33 @@ let kwKey = 'all';
 const KW_TOP = 162;
 const kwText = (el) => ((el && el.querySelector(':scope > span:not([aria-hidden])')) || {}).textContent || '';
 const kwNorm = (s) => s.replace(/\s+/g, '');
+// 새 섹션 "자간줄여" 키워드 알림 네 장(전체 2340:28704, #썸 2340:28917, #전남친 2340:28874, #남친 2340:28821)의 글 칸 폭.
+// 자간 -4% 로 글이 좁아져 칩 폭과 칩 자리(24, 84, 155, 247), "키워드 관리" 자리(281), 썸네일 시계 배지 폭(19:00 56, 14:12 53, 13:01 54)이 바뀌었다.
+// 생성 화면은 예전 폭(자간 0)을 글 칸에 고정해 두었으므로 보이기 전에 새 폭으로 바꾼다. 칩 글자 폭은 고른 모양과 아닌 모양이 다를 수 있어 KW_CHIP_W 에 둔다.
+const KW_W = { '알림 받는 키워드 3개': 142, '키워드 관리': 67, '오늘': 24, '어제': 24, '이번 주': 39 };
+const KW_TIME_W = { '19:00': 27, '14:12': 24, '13:01': 25, '12:32': 26 };
+// [고르지 않은 칩 글자 폭, 고른 칩 글자 폭]. 숫자 칸(8, 6)은 그대로다.
+const KW_CHIP_W = { '전체': [24, 24], '썸': [23, 23], '전남친': [46, 47], '남친': [35, 35] };
+function kwWidths(root) {
+  root.querySelectorAll('[data-figma="Keyword Summary"] p[data-figma], [data-figma="Keyword Alert Content"] > [data-figma^="Group /"] p[data-figma]').forEach((p) => {
+    const w = KW_W[kwText(p).trim() || p.getAttribute('data-figma')];
+    if (w) p.style.width = w + 'px';
+  });
+  root.querySelectorAll('[data-figma="Keyword Alert Content"] [data-figma="Timer Badge"]').forEach((b) => {
+    const p = b.querySelector(':scope > p[data-figma="time"]');
+    const w = p && KW_TIME_W[kwText(p).trim()];
+    if (!w) return;
+    p.style.width = w + 'px';
+    b.style.width = 'auto';
+  });
+}
 
 function keywordChips(root) {
   const box = root && root.querySelector('[data-figma="Keyword Alert Content"]');
   const row = box && box.querySelector(':scope > [data-figma="Keyword Chips"]');
   if (!box || !row || box.dataset.kwTabs) return;
   box.dataset.kwTabs = '1';
+  kwWidths(root);
   const sc = root.querySelector(':scope > [data-scroll]');
   const content = sc && sc.querySelector(':scope > [data-scroll-content]');
   const base = { box: box.style.height, content: content ? content.style.height : '' };
@@ -167,6 +197,7 @@ function keywordChips(root) {
       const nm = names[i];
       parts[i].forEach((x, k) => {
         const isAll = nm === '전체';
+        if (k === 0 && KW_CHIP_W[nm]) x.p.style.width = KW_CHIP_W[nm][on ? 1 : 0] + 'px';
         let html = gen[i][k];
         if (isAll && !on) html = KW_ALL_OFF;
         if (!isAll && on && KW_CHIP_ON[nm]) html = k === 0 ? KW_CHIP_ON[nm].label : KW_CHIP_ON[nm].count;
@@ -217,7 +248,8 @@ function keywordChips(root) {
   };
   chips.forEach((el, i) => pressable(el, () => pick((KW_TABS.find((t) => t.on === i) || KW_TABS[0]).key)));
   const start = KW_TABS.find((t) => t.key === kwKey) || KW_TABS[0];
-  if (start.key !== 'all') paint(start);
+  // 전체로 시작해도 칩 글자 폭을 새 값으로 칠하려고 항상 한 번 칠한다(보이기 전 useLayoutEffect).
+  paint(start);
 }
 
 // 스크롤 층의 윗선을 움직이는 묶음의 윗선에 맞춘다. 그 위(머리말, 탭)로 내용이 올라가 겹치지 않는다.
@@ -297,8 +329,19 @@ export function NotiKeyword58Screen() {
   return <div ref={ref} style={{ display: 'contents' }}><NotiKeyword /></div>;
 }
 
+// 최종 드르륵 키워드 알림 설정(2340:28646): 자간 -4% 로 최근 본 키워드 칩 글 칸 폭이 36, 24, 36, 24, 48, 24 가 되어
+// 칩 폭 80, 68, 80, 68, 92, 68(자리 24, 112, 188, 276 / 24, 124)이 됐다. 생성 화면은 예전 폭(37, 25, 49)을 고정해 두었으므로 보이기 전에 바꾼다.
+const SET_CHIP_W = { '짝사랑': 36, '용돈': 24, '단톡방': 36, '바람': 24, '고등학교': 48, '연애': 24 };
+function settingsWidths(root) {
+  if (!root) return;
+  root.querySelectorAll('[data-figma^="Chip / "] > p').forEach((p) => {
+    const w = SET_CHIP_W[kwText(p).trim()];
+    if (w) p.style.width = w + 'px';
+  });
+}
+
 export function NotiSettingsScreen() {
   const [ref, root] = useRoot();
-  useLayoutEffect(() => { showStrokes(root()); return keepOrReset; }, []);
+  useLayoutEffect(() => { showStrokes(root()); settingsWidths(root()); return keepOrReset; }, []);
   return <div ref={ref} style={{ display: 'contents' }}><Screen2100_24964 /></div>;
 }

@@ -15,12 +15,14 @@ const B = import.meta.env.BASE_URL || '/';
 const STEP = 330;
 export const LIVE_CAR_SCREENS = [10, 47, 48, 49, 50, 51, 52];
 // 피그마 x 순서. tw 는 제목 칸 폭, bw 와 tpw 는 시계 배지와 시계 글 폭, vw 와 vpw 는 보는 중 알약과 숫자 폭(피그마 값).
+// 폭은 새 섹션 "자간줄여" 라이브 탭 다섯 장(친구 2340:26873, 연애 2340:26318, 가족 2340:26462, 학교 2340:26595, 진로 2340:26742, 전체 2340:27679) 값이다.
+// 자간 -4% 로 글 폭이 줄어 배지와 제목 칸이 1~3 좁아졌다(탁빛나 11. 12. 01:35 "캐러셀 변경되어 반영 필요합니다"). 여섯 장 모두 카드, 그림, 순서가 같다.
 export const LIVE_CARDS = [
-  { name: 'Carousel / 1', node: '2340:22270', scene: 'assets/live2/scene-1.webp', title: '둘이 찍은 사진인데\n지만 보정해서 올린 여우', tw: 189, views: '22', vw: 53, vpw: 14, time: '04:30', bw: 75.25, tpw: 39, st: 'talk' },
-  { name: 'Carousel / 4', node: '2340:22274', scene: 'assets/hall5/hall-2.webp', title: '남친이 1주년 선물로\n다이소 틴트 사줌', tw: 158, views: '12', vw: 51, vpw: 12, time: '02:30', bw: 74.25, tpw: 38, st: 'soon' },
-  { name: 'Carousel / 3', node: '2340:22278', scene: 'assets/hall5/hall-3.webp', title: '남사친이 자꾸만\n좋아져서 고민이야', tw: 145, views: '66', vw: 54, vpw: 15, time: '10:31', bw: 69.25, tpw: 33, st: 'talk' },
-  { name: 'Carousel / 2', node: '2340:22282', scene: 'assets/hall5/hall-4.webp', title: '너네는 친구가 남미새면\n어떻게 할거야?', tw: 185, views: '13', vw: 51, vpw: 12, time: '06:43', bw: 74.25, tpw: 38, st: 'talk' },
-  { name: 'Carousel / 5', node: '2340:22286', scene: 'assets/hall5/hall-5.webp', title: '친친 스토리에 나만 빼고\n등록해둔 친구가 있어', tw: 189, views: '62', vw: 53, vpw: 14, time: '04:12', bw: 72.25, tpw: 36, st: 'talk' },
+  { name: 'Carousel / 1', node: '2340:22270', scene: 'assets/live2/scene-1.webp', title: '둘이 찍은 사진인데\n지만 보정해서 올린 여우', tw: 180, views: '22', vw: 53, vpw: 14, time: '04:30', bw: 73.25, tpw: 37, st: 'talk' },
+  { name: 'Carousel / 4', node: '2340:22274', scene: 'assets/hall5/hall-2.webp', title: '남친이 1주년 선물로\n다이소 틴트 사줌', tw: 150, views: '12', vw: 51, vpw: 12, time: '02:30', bw: 72.25, tpw: 36, st: 'soon' },
+  { name: 'Carousel / 3', node: '2340:22278', scene: 'assets/hall5/hall-3.webp', title: '남사친이 자꾸만\n좋아져서 고민이야', tw: 139, views: '66', vw: 53, vpw: 14, time: '10:31', bw: 67.25, tpw: 31, st: 'talk' },
+  { name: 'Carousel / 2', node: '2340:22282', scene: 'assets/hall5/hall-4.webp', title: '너네는 친구가 남미새면\n어떻게 할거야?', tw: 176, views: '13', vw: 51, vpw: 12, time: '06:43', bw: 72.25, tpw: 36, st: 'talk' },
+  { name: 'Carousel / 5', node: '2340:22286', scene: 'assets/hall5/hall-5.webp', title: '친친 스토리에 나만 빼고\n등록해둔 친구가 있어', tw: 180, views: '62', vw: 53, vpw: 14, time: '04:12', bw: 69.25, tpw: 33, st: 'talk' },
 ];
 // 방 구경(37)에 넘기는 카드 값(liveV2.js pickWatch 모양). 곧 끝 카드는 시계 배지 값에서 시작한다.
 export const featuredOf = (c) => ({ title: c.title, views: c.views, meta: c.time + ' 남음', st: c.st, timer: c.st === 'soon' ? c.time : undefined });

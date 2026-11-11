@@ -66,7 +66,7 @@ function Hero({ src }) {
     <>
       {layers.map((l) => (
         <img key={l.id} src={l.src} alt="" draggable={false} className={l.out ? 'cs-out' : l.anim ? 'cs-in' : undefined}
-          style={{ position: 'absolute', left: 100, top: 154, width: 190, height: 190, objectFit: 'contain', display: 'block', pointerEvents: 'none' }} />
+          style={{ position: 'absolute', left: 100, top: 151, width: 190, height: 190, objectFit: 'contain', display: 'block', pointerEvents: 'none' }} />
       ))}
     </>
   );
@@ -107,8 +107,8 @@ export function ChairStudio(props) {
         <span style={{ fontSize: 12, fontWeight: 700, lineHeight: '17px', letterSpacing: '-0.04em', color: '#FF9A4D', whiteSpace: 'pre' }}>엉따 39.2°</span>
       </div>
 
-      {/* 잠긴 의자는 큰 그림을 어둡게(밝기 50%, 채도 60%) 두고 가운데 자물쇠를 얹는다(피그마 1951:13839). */}
-      <div style={{ filter: locked ? 'brightness(0.5) saturate(0.6)' : 'none', transition: 'filter 200ms ' + EASE }}><Hero src={big(sel.k, sel.c)} /></div>
+      {/* 잠긴 의자는 큰 그림을 30%로 두고 가운데 자물쇠를 얹는다(최종 피그마 2340:24031 그림 채우기 불투명도 0.3, 자물쇠 2340:24032). */}
+      <div style={{ opacity: locked ? 0.3 : 1, transition: 'opacity 200ms ' + EASE }}><Hero src={big(sel.k, sel.c)} /></div>
       {locked ? (
         <div aria-hidden="true" className="cs-in" style={{ position: 'absolute', left: 167, top: 221, width: 56, height: 56, borderRadius: 28, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockIcon size={24} /></div>
       ) : null}

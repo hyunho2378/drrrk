@@ -14,7 +14,8 @@ import { q, scaleOf } from './dom.js';
 import { cloneOf } from './donor.js';
 
 export const SOLO_GRID = 64;
-const FIELD = [46, 41, 43];
+// 66(혼자 방 해 뜨는 단계)에서 들어오면 현장 모드 버튼은 66으로 돌아가고, 해뜨기 영상은 멈춘 자리부터 이어진다(sunriseVideo.js).
+const FIELD = [46, 41, 43, 66];
 const KEY = 'drrrk-solo-grid-from';
 const W = 390;
 const MS = 220;

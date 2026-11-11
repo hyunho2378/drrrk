@@ -50,7 +50,7 @@ export default function SkinPopup() {
           <img key={i} alt="" src={BASE + 'D2-sparkle-' + (i + 1) + '.svg'} style={{ position: 'absolute', left: x, top: y, width: s, height: s }} />
         ))}
         <div style={{ position: 'absolute', left: 0, top: 450, width: 390, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 92, height: 28, borderRadius: 14, background: 'rgba(0,0,0,.45)', boxShadow: 'inset 0 0 0 1px rgba(54,210,255,.7)', color: '#36D2FF', fontSize: 12, fontWeight: 700, lineHeight: '28px', textAlign: 'center' }}>새로운 디자인</span>
+          <span style={{ width: 89, height: 28, borderRadius: 14, background: 'rgba(0,0,0,.45)', boxShadow: 'inset 0 0 0 1px rgba(54,210,255,.7)', color: '#36D2FF', fontSize: 12, fontWeight: 700, lineHeight: '28px', textAlign: 'center' }}>새로운 디자인</span>
           <span style={{ height: 38, fontSize: 28, fontWeight: 700, lineHeight: '38px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>푹신한 가죽 소파</span>
         </div>
         <div style={{ position: 'absolute', left: 75, top: 542, width: 240, height: 50 }}>

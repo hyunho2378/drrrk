@@ -621,7 +621,8 @@ struct ReportView: View {
             HStack(alignment: .top, spacing: 8) {
                 Image("B2-icon-info").renderingMode(.template).resizable().frame(width: 16, height: 16)
                     .foregroundStyle(DS.Palette.brandPrimary)
-                Text("신고해도 통화는 그대로 유지되고, 상대에게 알리지 않아요.  바로 대화를 끊고 싶다면 차단도 함께 해주세요.")
+                // 피그마(최종 2340:23517)와 같이 "않아요." 뒤에서 줄을 바꾼다(웹 patchRest.js policyBreak와 같다).
+                Text("신고해도 통화는 그대로 유지되고, 상대에게 알리지 않아요.\n바로 대화를 끊고 싶다면 차단도 함께 해주세요.")
                     .rb(12, .regular, DS.Palette.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
@@ -785,6 +786,10 @@ struct RoomSoloView: View {
     @State private var entry: RoomEnterPlayer?
     /// 그리드(피그마 2340:21259, 2340:21344). 머리 오른쪽 버튼으로 열고 닫는다. 같은 방 안이라 시계와 채팅, 주전부리 상태가 이어진다.
     @State private var grid = false
+    /// 해 뜨는 단계(피그마 2351:34553, 웹 66). 시계가 01:12에 닿으면 시계가 빨개지고 퀵슬롯이 접히고 바닥이 해뜨기 영상으로 바뀐다.
+    @State private var lastMinute = false
+    /// 혼자 방 해뜨기 영상(SunriseVideo.swift, sunrise-solo.mp4). 방이 나타날 때 만들어 미리 받고, 해 뜨는 단계가 시작되면 한 번 재생한다.
+    @State private var sunrise: SunrisePlayer?
 
     init(forceOnboarding: Bool = false) {
         self.forceOnboarding = forceOnboarding
@@ -821,6 +826,18 @@ struct RoomSoloView: View {
                         .allowsHitTesting(false)
                         .transition(.opacity)
                 }
+                // 해 뜨는 단계: 바닥 그림이 현장 장면에서 해뜨기 영상 첫 장면 그림(같은 구도)으로 바뀌고, 영상이 같은 자리에서 첫 장면부터 흐른다(RoomView와 같은 방식).
+                if let sunrise, sunrise.active, let poster = sunrise.poster {
+                    Image(uiImage: poster).resizable().scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height).clipped()
+                        .transition(.opacity)
+                }
+                if let sunrise, sunrise.player != nil {
+                    SunriseVideoView(sunrise: sunrise)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .opacity(sunrise.active ? 1 : 0)
+                        .allowsHitTesting(false)
+                }
                 ForEach(model.landed) { item in
                     LandedSnack(asset: item.asset, angle: item.angle)
                         .position(map.point(item.point.x, item.point.y))
@@ -838,6 +855,9 @@ struct RoomSoloView: View {
                     FoundModal(
                         onStay: { withAnimation(DS.Motion.emphasizedAccel) { found = false } },
                         onJoin: {
+                            // 혼자 방과 같은 고민(인생네컷)의 함께 방, 사진보정 이야기로 간다(탁빛나 11/12 2340:24916 "라이브-2 이동", 프레임 2340:29947). 웹 live.js resolveTo와 같다.
+                            Story.current = .photo
+                            Story.concern = nil
                             router.pop()
                             router.push(.room)
                         }
@@ -859,6 +879,7 @@ struct RoomSoloView: View {
             }
         }
         .onAppear { OnboardingSeen.solo = true }
+        .onAppear { if sunrise == nil { sunrise = SunrisePlayer(named: SunrisePlayer.soloName) } }
         .onAppear {
             // 입장 영상: 처음 나타날 때만 만든다. 온보딩 덮개가 떠 있으면 첫 장면에 세워 두고 닫히면 재생한다.
             if entry == nil {
@@ -867,8 +888,10 @@ struct RoomSoloView: View {
                 if !showOnboarding { e.start() }
             }
         }
-        .onDisappear { entry?.stop() }
+        .onDisappear { entry?.stop(); sunrise?.stop() }
         .onChange(of: showOnboarding) { _, up in if !up { entry?.start() } }
+        // 온보딩 덮개가 떠 있는 동안 방 시계를 멈추고, 닫히면 멈춘 자리부터 흐른다(함께 방과 같다. 웹 live.js tick).
+        .onChange(of: showOnboarding) { _, up in if up { model.pauseClock() } else { model.resumeClock() } }
         .toolbar(.hidden, for: .navigationBar)
         .task(id: showOnboarding) { await play() }
         .task { await watchClock() }
@@ -877,7 +900,7 @@ struct RoomSoloView: View {
     private var chrome: some View {
         VStack(spacing: 0) {
             Color.clear.frame(height: max(roomTopInset(), 47))
-            RoomHeader(model: model, onBack: { router.pop() }, onToggle: openGrid)
+            RoomHeader(model: model, lastMinute: lastMinute, onBack: { router.pop() }, onToggle: openGrid)
             .frame(height: 56)
             TopicBanner(model: model)
                 .padding(.horizontal, 24)
@@ -967,6 +990,7 @@ struct RoomSoloView: View {
     private func openGrid() {
         UISelectionFeedbackGenerator().selectionChanged()
         entry?.pause()
+        sunrise?.stop()
         withAnimation(DS.Motion.standard) { grid = true }
     }
 
@@ -974,6 +998,7 @@ struct RoomSoloView: View {
         UISelectionFeedbackGenerator().selectionChanged()
         withAnimation(DS.Motion.standard) { grid = false }
         entry?.resume()
+        sunrise?.resume()
     }
 
     private func throwSnack(_ snack: RoomModel.Snack) {
@@ -999,15 +1024,30 @@ struct RoomSoloView: View {
         }
     }
 
-    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 RoomModel.realSeconds 90초). 0이 되면 혼자 드르륵 종료 리포트(피그마 2337:15695, 웹 65)로 넘어간다(탁빛나 11/12 "아침이 밝아오면 리포트 추가").
+    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 90초 두 구간). 01:12(실제 84.6초)에 해 뜨는 단계(피그마 2351:34553, 웹 66)가 시작되고,
+    /// 0이 된 뒤 영상 마지막 장면(해 뜬 아침)에 3초 머물고 혼자 드르륵 종료 리포트(피그마 2337:15695, 웹 65)로 넘어간다(탁빛나 11/12 "아침해 뜨는거 반영 필요", "아침이 밝아오면 리포트 추가").
+    /// 그리드나 안내 창을 보고 있으면 해 뜨는 단계가 시작될 때 현장 모드로 돌아온다(웹은 64, 42에서 66으로 넘어간다).
     private func watchClock() async {
+        var zeroAt: Date?
         while !Task.isCancelled {
-            if model.remaining(at: .now) <= 0 {
+            let left = model.remaining(at: .now)
+            if left <= RoomModel.lastMinuteShown, !lastMinute {
+                withAnimation(DS.Motion.emphasizedDecel) {
+                    lastMinute = true
+                    grid = false
+                    found = false
+                    model.dockOpen = false
+                }
+                entry?.stop()
+                sunrise?.start()
+            }
+            if left <= 0, zeroAt == nil { zeroAt = .now }
+            if let zeroAt, Date.now.timeIntervalSince(zeroAt) >= SunrisePlayer.holdSeconds, sunrise?.holding() != true {
                 Dictation.shared.end()
                 router.push(.roomSoloEnd)
                 return
             }
-            try? await Task.sleep(for: .seconds(0.5))
+            try? await Task.sleep(for: .seconds(0.25))
         }
     }
 }
@@ -1207,19 +1247,39 @@ private struct ReportText {
     let secondName: String
     let secondLine: String
     let recommendDesc: String
+    /// 2단계와 3단계 설명. 쌍밍아웃은 최종 드르륵 종료 2340:28973, 2340:29088(11/12 "리포트1 수정완") 글이다.
+    var secondStep = "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요."
+    var thirdStep = "다음엔 한번 직접 말해보기로 했어요"
 
     static var current: ReportText {
         Story.current == .ssang
-            ? ReportText(worry: "썸남 앞에서 내 쌍수를 말해버린 친구",
-                         firstStep: "\"걔 완전 미친 거 아니야?\"로 이야기가 시작됐어요",
+            ? ReportText(worry: "친구가 썸남 앞에서 내 쌍밍아웃함.",
+                         firstStep: "\"내가 예민한거야?\"로 이야기가 시작됐어요",
                          secondName: "딱딱한 나무 스툴12",
-                         secondLine: "다음엔 ‘그 얘길 왜 해?’ 하고 물어봐봐 ㅋ",
-                         recommendDesc: "좋은 이야기를 나눠준 유저를 누르면 추천, 다시 누르면 취소돼요")
+                         secondLine: "엥 그걸 거기서 왜 말하지?",
+                         recommendDesc: "좋은 이야기를 나눠준 유저를 추천해주세요",
+                         secondStep: "서로 비슷했던 경험을 이야기 하며, 고의였을지 토론했어요",
+                         thirdStep: "한번 직접 물어보기로 했어요")
+            // 사진보정: 최종 종료 2369:4086, 2369:16173, 아침 2369:4202, 오늘 나눈 대화 2369:4316(huisu 11/12 02:15 "리포트3 추가"). 단계 글은 쌍밍아웃과 같다.
             : ReportText(worry: "둘이 찍은 사진, 자기만 보정한 친구",
-                         firstStep: "\"이거 일부러야?\"로 이야기가 시작됐어요",
-                         secondName: "따딱한 나무 스툴12",
-                         secondLine: "다음엔 ‘엥 너 사진?’ 하고 물어봐봐 ㅋ",
-                         recommendDesc: "좋은 이야기를 나눠준 유저를 추천해주세요")
+                         firstStep: "\"내가 예민한거야?\"로 이야기가 시작됐어요",
+                         secondName: "보라돌이 의자71",
+                         secondLine: "그건 서운할 만하지 ㅠㅠ",
+                         recommendDesc: "좋은 이야기를 나눠준 유저를 추천해주세요",
+                         secondStep: "서로 비슷했던 경험을 이야기 하며, 고의였을지 토론했어요",
+                         thirdStep: "한번 직접 물어보기로 했어요")
+    }
+
+    /// 오늘의 드르륵 대화들 카드 셋(이름, 말, 의자 프로필 그림). 웹 reportPatch.js PHOTO_CARDS와 같다.
+    static var cards: [(name: String, line: String, asset: String)] {
+        let t = current
+        return Story.current == .ssang
+            ? [("진실의 의자10", "그 친구 인성 레전드인듯..ㅠ", "M-end-avatar-lime"),
+               (t.secondName, t.secondLine, "M-end-avatar-stool"),
+               ("새벽2시 피시방", "요즘 쌍수가 성형이냐", "M-end-avatar-swivel")]
+            : [("편의점 드르륵71", "지만 쏙 빼고 보정한건 진짜 선넘는다", "M-end-avatar-store"),
+               (t.secondName, t.secondLine, "M-end-avatar-purple"),
+               ("폭신폭신 소파38", "맞아여 앞으로 그런 애한테 신경쓰지 마요", "M-end-avatar-recl")]
     }
 }
 
@@ -1280,17 +1340,24 @@ private struct TalkTimeline: View {
     var gap: CGFloat
     /// 아침(1647:26923)만 3단계 설명이 "디엠으로"가 들어간 글이다. 종료(1647:26790)와 오늘 나눈 대화(1647:27059)는 같다.
     var morning = false
-    /// 종료와 오늘 나눈 대화는 이야기별 글(ReportText), 아침은 옛 사진보정 글이다.
+    /// 혼자 드르륵 종료 리포트(2337:15695, huisu 11/12 "리포트2 수정완")는 이야기와 상관없이 피그마 글 그대로다(웹 soloReport.js TALK과 같다).
+    var solo = false
+    /// 종료와 아침, 오늘 나눈 대화는 이야기별 글(ReportText)이다(아침도 최종 2340:23266, 2369:4202에서 종료와 같은 글).
     private var text: ReportText {
-        morning ? ReportText(worry: "둘이 찍은 사진, 자기만 보정한 친구", firstStep: "\"이거 일부러야?\"로 이야기가 시작됐어요",
-                             secondName: "", secondLine: "", recommendDesc: "") : ReportText.current
+        if solo {
+            return ReportText(worry: "둘이 찍은 사진, 자기만 보정한 친구", firstStep: "\"이거 일부러야?\"로 이야기가 시작됐어요",
+                              secondName: "", secondLine: "", recommendDesc: "",
+                              secondStep: "서운한 마음에 공감하며, 지난 일에 대해서도 이야기 했어요",
+                              thirdStep: "속상한 마음을 접고, 다음날에 집중하기로 했어요")
+        }
+        return ReportText.current
     }
 
     private var steps: [(String, String)] {
         [
             ("고민을 꺼냈어요", text.firstStep),
-            ("서로의 생각을 나눴어요", "서운한 마음에 공감하면서, 실수였을 가능성도 얘기했어요."),
-            ("다음 행동을 정했어요", morning ? "다음엔 한번 디엠으로 직접 말해보기로 했어요" : "다음엔 한번 직접 말해보기로 했어요"),
+            (solo ? "여러 이야기를 나눴어요" : "서로의 생각을 나눴어요", text.secondStep),
+            ("다음 행동을 정했어요", text.thirdStep),
         ]
     }
     var body: some View {
@@ -1549,16 +1616,21 @@ private struct RecommendPicker: View {
 /// 의자를 누르면 추천(72 원 안쪽 2 하늘색 링과 하늘색 이름, 2096:22952), 다시 누르면 취소. 개수 제한이 없고 쪽을 넘겨도 남는다.
 /// 피그마 첫 쪽처럼 새벽2시 피시방이 추천된 상태로 시작한다.
 /// 쪽 넘김은 웹 reportPatch.js와 같다: 지금 쪽이 24 밀리며 옅어지고(150ms), 새 쪽이 반대쪽 24에서 들어온다(150ms).
+/// 사진보정(2369:4086 첫 쪽, 2369:16173 둘째 쪽)은 폭신폭신 소파38, 바퀴달린 의자26(추천된 모습), 보라돌이 의자71과 둘째 쪽 편의점 드르륵71이다.
+/// 칸 그림은 피그마 72 원과 의자를 3배로 내보낸 M-end-pick 그림(바퀴달린 의자26은 의자 56 x 47을 원 안 8, 12에 합친 그림)이다.
 private struct PagedChairPicker: View {
-    private let chairs: [(key: String, name: String, asset: String)] = [
-        ("lime", "진실의\n의자10", "M-end-pick-lime"),
-        ("swivel", "새벽2시\n피시방", "M-end-pick-swivel"),
-        ("stool", "딱딱한\n나무 스툴12", "M-end-pick-stool"),
-        ("white", "차가운\n새벽의자92", "M-end-pick-white"),
-    ]
+    private let chairs: [(key: String, name: String, asset: String)] = Story.current == .ssang
+        ? [("lime", "진실의\n의자10", "M-end-pick-lime"),
+           ("swivel", "새벽2시\n피시방", "M-end-pick-swivel"),
+           ("stool", "딱딱한\n나무 스툴12", "M-end-pick-stool"),
+           ("white", "차가운\n새벽의자92", "M-end-pick-white")]
+        : [("sofa", "폭신폭신\n소파38", "M-end-pick-sofa"),
+           ("wheel", "바퀴달린\n의자26", "M-end-pick-wheel"),
+           ("purple", "보라돌이\n의자71", "M-end-pick-purple"),
+           ("store", "편의점\n드르륵71", "M-end-pick-store")]
     private let pages: [[Int]] = [[0, 1, 2], [3]]
     @State private var page = 0
-    @State private var picked: Set<String> = ["swivel"]
+    @State private var picked: Set<String> = [Story.current == .ssang ? "swivel" : "wheel"]
     @State private var shift: CGFloat = 0
     @State private var fade = 1.0
     @State private var busy = false
@@ -1700,40 +1772,30 @@ private struct ThumbFloat: View {
 /// 리포트 본문. 피그마 Report 묶음의 순서와 간격.
 /// 종료(2096:22857, 2100:24606): 엉따 카드, 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(머리와 줄 사이 24, 의자 3개씩 한 쪽), 묶음 사이 36.
 /// 오늘 나눈 대화(2023:30425): 오늘 나눈 대화(12), 오늘의 드르륵 대화들, 도움이 된 유저(24, 종료와 같은 줄), 묶음 사이 36.
-/// 아침(1647:26878): 엉따 카드, 오늘 나눈 대화(20), 오늘의 베스트 댓글, 도움이 된 의자(12, 선택 수, 의자 세 칸), 묶음 사이 40.
+/// 아침(최종 2340:23266, 사진보정 2369:4202): 종료와 같은 짜임(엉따 카드, 오늘 나눈 대화, 오늘의 드르륵 대화들, 도움이 된 유저, 묶음 사이 36)이고 아래 회색 버튼과 검은 그라데이션만 다르다.
 private struct ReportBody: View {
     let kind: ReportKind
     var body: some View {
-        VStack(alignment: .leading, spacing: kind == .morning ? 40 : 36) {
+        VStack(alignment: .leading, spacing: 36) {
             // 종료의 덩어리 번호(ReportMotion.swift): 0 제목, 1 해, 2 엉따 카드, 3 오늘 나눈 대화, 4 오늘의 드르륵 대화들, 5 도움이 된 유저, 6 버튼. 웹 reportMotion.js와 같은 줄 나눔이다.
             if kind != .summary { WarmthCard().endRow(2, 0).endBlock(2, rows: 1) }
-            TalkTimeline(gap: kind == .morning ? 20 : 12, morning: kind == .morning).endBlock(3, rows: 4)
+            TalkTimeline(gap: 12, morning: kind == .morning, solo: kind == .solo).endBlock(3, rows: 4)
             if kind == .solo {
                 // 혼자 드르륵 종료 리포트(2337:15695): Report는 00 엉따온도와 02 오늘 나눈 대화 두 덩어리(높이 480)다.
                 EmptyView()
-            } else if kind == .morning {
-                VStack(alignment: .leading, spacing: 12) {
-                    SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
-                    VStack(spacing: 8) {
-                        BestCard(name: "따뜻한 가죽소파29", text: "그 친구 외모정병 레전드인듯..ㅠ", likes: "24", asset: "B-chair-sofa", dark: false)
-                        BestCard(name: "새벽2시 택배상자", text: "다음 사진은 네가 먼저 보정해서 올려버려 ㅋㅋ", likes: "17", asset: "B-chair-box")
-                        BestCard(name: "딱딱한 나무 스툴12", text: "걍 물어보면 안됨? 나 저런 애들 이해가 안돼", likes: "11", asset: "B-chair-stool")
-                    }
-                }
-                VStack(alignment: .leading, spacing: 12) {
-                    SectionHead(title: "도움이 된 의자가 있었나요?", desc: "좋은 이야기를 나눠준 유저를 추천해주세요")
-                    RecommendPicker(cell: 80, showCount: true, compact: false)
-                }
             } else {
                 // 종료 2023:30711과 오늘 나눈 대화 2023:30475: 아바타는 연두 의자(33871c043e), 나무 스툴(51be0a544b), 회색 바퀴 의자(f77c03c1bf).
+                // 사진보정(2369:4086)은 파랑 편의점 의자(4fdd18ce8a), 보라 편의점 의자(6bfc511e24), 흰 리클라이너(ad4a145690)다(ReportText.cards).
+                // 아침(2340:23266, 2369:4202)도 종료와 같은 짜임이라 같은 카드와 의자 칸을 쓴다.
                 // 오늘의 드르륵 대화들 카드에는 따봉이 없다(피그마 2096:22857, 2100:24606 그대로).
                 let text = ReportText.current
+                let cards = ReportText.cards
                 VStack(alignment: .leading, spacing: 12) {
                     SectionHead(title: "오늘의 드르륵 대화들", desc: "유저들과 주로 이런 대화를 나눴어요").endRow(4, 0)
                     VStack(spacing: 8) {
-                        BestCard(name: "진실의 의자10", text: "그 친구 인성 레전드인듯..ㅠ", likes: nil, asset: "M-end-avatar-lime", exported: true).endRow(4, 1)
-                        BestCard(name: text.secondName, text: text.secondLine, likes: nil, asset: "M-end-avatar-stool", exported: true).endRow(4, 2)
-                        BestCard(name: "새벽2시 피시방", text: "요즘 쌍수가 성형이냐", likes: nil, asset: "M-end-avatar-swivel", exported: true).endRow(4, 3)
+                        ForEach(cards.indices, id: \.self) { i in
+                            BestCard(name: cards[i].name, text: cards[i].line, likes: nil, asset: cards[i].asset, exported: true).endRow(4, i + 1)
+                        }
                     }
                 }
                 .endBlock(4, rows: 4)
@@ -1810,7 +1872,8 @@ private struct ReportScreen: View {
             // 피그마에 묶음 뒤 판이나 그라데이션은 없다. 묶음 윗선 아래로 지나가는 본문은 바탕색(#121415) 위로 가려져 버튼과 겹치지 않는다(웹 live.js scrollerOf가 잘라 내는 모양과 같다).
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if pinned {
-                    buttons.endBlock(6, rows: 2).padding(.horizontal, 24).padding(.bottom, 40)
+                    // 혼자 드르륵 종료 리포트(2337:15695, 1094 프레임)는 묶음 아래선(1052)과 프레임 바닥 사이가 42다.
+                    buttons.endBlock(6, rows: 2).padding(.horizontal, 24).padding(.bottom, kind == .solo ? 42 : 40)
                         .background(DS.Palette.bgSurface)
                 }
             }

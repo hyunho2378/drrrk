@@ -178,6 +178,9 @@ export function patchCommunity(root, n) {
     // 따봉 16, 숫자, 댓글 아이콘 16, 숫자를 간격 4로만 잇는다. 생성 화면에 남은 4px 빈 칸(Frame)을 빼서 댓글 아이콘을 숫자 끝 + 4 자리로 당긴다.
     root.querySelectorAll('[data-figma="stats"] > [data-figma="Frame"]').forEach((el) => { el.style.display = 'none'; });
     // 카테고리 탭을 누르면 그 탭 프레임의 카드 내용으로 바뀐다(communityTabs.js, 피그마 2272:13452).
+    // 목록 카드 3~5의 숫자(48, 23, 75, 35, 64, 29)는 생성 화면 윤곽 그림이 칸 맨 위에 붙어 있어 따봉 아이콘보다 4px 위로 떠 보였다(11. 12. 최종 2340:28014 대조).
+    // 피그마는 숫자 칸 y가 아이콘 y와 같다. 목록 숫자 열 개를 모두 글자로 그려 카드 1, 2와 같은 자리에 둔다(탭 전환이 이 모습을 전체 탭 원본으로 기억한다).
+    root.querySelectorAll('[data-figma="Frame 2147249309"] [data-figma="stats"] > p').forEach((p) => { if (p.querySelector(':scope > span[aria-hidden]')) setText(p, p.textContent.trim()); });
     attachCommunityTabs(root);
   }
   if (n === 38) {
