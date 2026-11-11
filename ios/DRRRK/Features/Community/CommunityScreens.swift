@@ -213,34 +213,56 @@ struct CommunityDetailView: View {
                 .padding(.top, 16)
             Text(CommunityData.detailBody).suit(15, .regular, lineHeight: 24).foregroundStyle(Color(hex: 0xD9DBDE))
                 .padding(.top, 12)
-            // 대화 다시보기 카드 342 x 150, 모서리 16, #1F2226. 장면 그림은 피그마 fade(1953:12313, 편의점 장면)가 scene을 모두 덮은 모습 그대로다.
+            // 대화 다시보기 카드(2100:23307, 11. 11. 팀 수정본) 342 x 176, 모서리 16, #1F2226. 웹 CommunityPost.jsx와 같은 값.
+            // 장면 그림 150 높이는 피그마 fade(2100:23309)가 scene을 모두 덮은 모습 그대로다. 라벨은 글만(play-circle 숨김), 가운데 play 버튼(2302:12692),
+            // 아래 라이브 보기 바(2302:12695, 0 132 342 x 44, #222628). 누른 뒤 화면은 아직 없어서 play 버튼은 눌림 반응만 준다.
             ZStack(alignment: .topLeading) {
                 Image(CommunityData.detailScene).resizable().scaledToFill().frame(height: 150).frame(maxWidth: .infinity).clipped()
-                HStack(spacing: 6) {
-                    Image("C-play").renderingMode(.template).resizable().frame(width: 18, height: 18)
-                    Text("대화 다시보기 · 12:32").suit(12, .medium)
+                // 다시보기 라벨(2100:23310): 133 x 25, 안쪽 여백 좌우 10 위아래 4, 검정 55%
+                Text("대화 다시보기 · 12:32").suit(12, .medium, lineHeight: 17)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .frame(height: 25)
+                    .background(.black.opacity(0.55), in: Capsule())
+                    .offset(x: 12, y: 12)
+                // play 버튼(2302:12692): 48 원(흰색 92%)과 삼각형 #1F2226, 그림자 y 4 흐림 12 검정 35%
+                Button {} label: {
+                    Image("C-replay-play").resizable().frame(width: 48, height: 48)
+                        .shadow(color: .black.opacity(0.35), radius: 6, x: 0, y: 4)
                 }
-                .foregroundStyle(.white)
-                .padding(.leading, 6).padding(.trailing, 12).padding(.vertical, 4)
-                .background(.black.opacity(0.55), in: Capsule())
-                .padding(12)
-                HStack(spacing: 8) {
-                    HStack(spacing: -8) {
-                        ForEach(CommunityData.detailSeats, id: \.self) { img in
-                            Image(img).resizable().scaledToFit().frame(width: 30, height: 30)
-                                .background(DS.Palette.bgElevated, in: Circle()).clipShape(Circle())
-                                .overlay(Circle().strokeBorder(Color(hex: 0x1F2226), lineWidth: 2))
+                .buttonStyle(PressStyle())
+                .accessibilityHidden(true)
+                .offset(y: 42)
+                .frame(maxWidth: .infinity)  // 가운데(342 폭에서 x 147)
+                // 라이브 보기 바(2302:12695): 왼쪽 여백 12, 오른쪽 10, 양 끝 정렬
+                HStack(spacing: 0) {
+                    HStack(spacing: 8) {
+                        // avatars(2100:23314) 62 x 26: 26 원 셋, 겹침 -8, 안쪽 테두리 2 #222628
+                        HStack(spacing: -8) {
+                            ForEach(CommunityData.detailSeats, id: \.self) { img in
+                                Image(img).resizable().scaledToFit().frame(width: 26, height: 26)
+                                    .background(DS.Palette.bgElevated, in: Circle()).clipShape(Circle())
+                                    .overlay(Circle().strokeBorder(DS.Palette.bgElevated, lineWidth: 2))
+                            }
                         }
+                        Text("의자 3").suit(12, .medium, lineHeight: 16.8).foregroundStyle(DS.Palette.textPrimary)
                     }
-                    Text("의자 3").suit(12, .medium).foregroundStyle(DS.Palette.textPrimary)
+                    Spacer(minLength: 0)
+                    // 라이브 보기 CTA(2302:12696): 13 Bold #36D2FF, 사이 2, chevron 16
+                    HStack(spacing: 2) {
+                        Text("라이브 보기").suit(13, .bold, lineHeight: 15.6)
+                        Image("C-chevron-right-16").renderingMode(.template).resizable().frame(width: 16, height: 16)
+                    }
+                    .foregroundStyle(DS.Palette.brandPrimary)
                 }
-                .padding(.leading, 12).padding(.bottom, 12)
-                .frame(maxHeight: .infinity, alignment: .bottom)
-                // 피그마 1971:22954: 카드 아래 32 높이 #222628 판이 참여 의자 줄 위를 덮는다.
-                Rectangle().fill(DS.Palette.bgElevated).frame(height: 32)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                .padding(.leading, 12).padding(.trailing, 10)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(DS.Palette.bgElevated)
+                .offset(y: 132)
             }
-            .frame(height: 150)
+            .frame(maxWidth: .infinity)
+            .frame(height: 176, alignment: .topLeading)
             .background(Color(hex: 0x1F2226))
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .padding(.top, 24)

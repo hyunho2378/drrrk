@@ -32,6 +32,7 @@ import { patchReportStory } from './reportPatch.js';
 import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.js';
 import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
+import { prepareNormalPager, attachNormalPager } from './normalPager.js';
 
 export { setText };
 
@@ -66,6 +67,9 @@ export function resolveTo(l) {
     if (origin === 'live') return Object.assign({}, l, { to: 10 });
   }
   if (l.to === 20) openStudio(l.act === 'fresh');
+  // 활동 알림(57)의 의자 꾸미기 알림으로 연 의자 꾸미기는 뒤로와 저장하기 모두 알림으로 돌아간다(iOS router.pop과 같다. NotiScreens.jsx).
+  if (l.to === 20) { try { sessionStorage.setItem('drrrk-studio-from', l.from === 57 ? 'noti' : 'my'); } catch (e) { /* 기본값 마이 */ } }
+  if (l.from === 20 && l.to === 36 && l.t === 'back') { let o = 'my'; try { o = sessionStorage.getItem('drrrk-studio-from') || 'my'; } catch (e) { /* 기본값 마이 */ } if (o === 'noti') return Object.assign({}, l, { to: 57 }); }
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
   return l;
@@ -779,6 +783,8 @@ export async function prepare(layer, n, prevN) {
   attachThrow(root);
   attachQuickSlot(root, n, (el) => swapAssets(el, 28));
   attachSort(root, n, true);
+  // 일반 모드 참여자 칸 두 장 넘기기(normalPager.js): 칸을 넘기는 판으로 옮기고 둘째 장(피그마 "나" 2023:11805) 그림을 보이기 전에 받는다.
+  await prepareNormalPager(layer, root, n);
   // 라이브 목록(liveV2.js)을 먼저 깔아야 화면 스크롤(attachDrag)이 새 카드 목록 끝까지 잰다(11/10 전체 탭 스크롤 수정).
   patchLiveV2(root, n);
   attachDrag(layer, root, n);
@@ -832,6 +838,7 @@ export function attach(layer, n, go, prevN) {
   attachSort(root, n, false);
   patchLiveV2(root, n);
   attachDrag(layer, root, n);
+  attachNormalPager(layer, root, n);
   attachLoveDot(root, n);
   attachPost(root);
   fixIcons(root);

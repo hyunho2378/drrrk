@@ -1,12 +1,13 @@
 // 네이버 클립 콘텐츠 리스트(추천 탭). 팀 피그마 "클립 콘텐츠 리스트"(1843:40980)와 같은 값이다.
-// 모든 카드가 눌리고(영상 보기 56, 배너는 스플래시 뒤 드르륵 홈 25), 위 탭(구독, 추천, 내클립)과 아래 탭, 즐겨찾기, 검색이 반응한다.
+// 눌리는 것은 clipState.js CLIP_TOUCH.list 에 적힌 것뿐이다: 쌍밍아웃 영상 카드(영상 보기 56), 드르륵 배너(스플래시 뒤 드르륵 홈 25), 드르륵 에이전트 버튼.
+// 영상 없는 카드(혼술바, 느좋녀 패션템, 군자 카페)와 위 탭, 즐겨찾기, 검색, 아래 탭, 카드 아래 아바타와 이름은 같은 자리에 같은 모양으로 그리기만 하고 눌리지 않는다.
 // 피드는 세로로 스크롤되고 맨 위에서 아래로 당기면 80px까지 늘어났다가 돌아온다. 머리말과 아래 탭은 고정이다.
 // 드르륵 에이전트 버튼은 클립 모든 화면에서 같은 자리에 떠다닌다(ClipAgent.jsx).
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Item, Hit } from './ClipKit.jsx';
 import { LIST } from './ClipScenes.js';
 import { ClipAgent } from './ClipAgent.jsx';
-import { CLIPS, SUBS, clip, saveClip, clipPick, isFollow, isSaved, onClip } from './clipState.js';
+import { CLIPS, SUBS, clip, saveClip, clipPick, isFollow, isSaved, onClip, canTouch } from './clipState.js';
 import { videoOf, previewAt, reducedMotion } from './clipVideo.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
@@ -55,6 +56,11 @@ function layout(tab) {
   });
   return { cards, h: Math.max(...colY) + BOTTOM_PAD };
 }
+
+const T = (k) => canTouch('list', k);
+const cardKey = (c) => (c.banner ? 'banner' : 'card:' + CLIPS[c.clip].id);
+// 썸네일 밖(카드 아래 아바타와 이름)에 놓인 요소인지. 눌리는 카드는 썸네일 칸만 받고 나머지는 장식으로 그린다.
+const inLead = (lead, it) => it === lead || (it.x >= lead.x - 0.5 && it.y >= lead.y - 0.5 && it.x + (it.w || 0) <= lead.x + lead.w + 0.5 && bottomOf(it) <= lead.y + lead.h + 0.5);
 
 const go = (to, t) => window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t } }));
 // 끌어서 스크롤한 직후의 클릭은 카드 누름으로 보지 않는다.
@@ -137,12 +143,24 @@ function Feed({ tab, cls }) {
   };
   return (
     <div className={cls} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: '100%' }}>
-      {cards.map(({ c, at }) => (
-        <Hit key={c.banner ? 'banner' : c.clip} name={c.banner ? '배너 카드' : '카드 / ' + CLIPS[c.clip].card} box={c.box} at={at} items={c.items}
-          label={c.banner ? '드르륵 칵 일단 앉아' : CLIPS[c.clip].title} onTap={() => open(c)}>
-          {!c.banner && videoOf(CLIPS[c.clip]) ? <ThumbVideo c={CLIPS[c.clip]} w={c.items[0].w} h={c.items[0].h} r={c.items[0].r} /> : null}
-        </Hit>
-      ))}
+      {cards.map(({ c, at }) => {
+        const name = c.banner ? '배너 카드' : '카드 / ' + CLIPS[c.clip].card;
+        const label = c.banner ? '드르륵 칵 일단 앉아' : CLIPS[c.clip].title;
+        const vid = !c.banner && videoOf(CLIPS[c.clip]) ? <ThumbVideo c={CLIPS[c.clip]} w={c.items[0].w} h={c.items[0].h} r={c.items[0].r} /> : null;
+        if (!T(cardKey(c))) return <Hit key={c.banner ? 'banner' : c.clip} off name={name} box={c.box} at={at} items={c.items}>{vid}</Hit>;
+        // 눌리는 카드: 썸네일 칸(피그마 썸네일 자리 그대로)만 누름을 받고, 썸네일 밖의 아바타와 이름은 같은 자리에 장식으로 그린다.
+        const lead = c.items[0];
+        const top = c.items.filter((it) => inLead(lead, it));
+        const rest = c.items.filter((it) => !inLead(lead, it));
+        const dx = at[0] - c.box[0];
+        const dy = at[1] - c.box[1];
+        return (
+          <React.Fragment key={c.banner ? 'banner' : c.clip}>
+            <Hit name={name} box={[lead.x, lead.y, lead.w, lead.h]} at={[lead.x + dx, lead.y + dy]} items={top} label={label} onTap={() => open(c)}>{vid}</Hit>
+            {rest.length ? <Hit off name={name + ' 아래 줄'} box={[c.box[0], lead.y + lead.h, c.box[2], c.box[1] + c.box[3] - lead.y - lead.h]} at={[at[0], lead.y + lead.h + dy]} items={rest} /> : null}
+          </React.Fragment>
+        );
+      })}
       {tab === 'mine' && !cards.length ? (
         <p style={{ position: 'absolute', left: 0, top: 418, width: 390, margin: 0, textAlign: 'center', fontFamily: FONT, fontSize: 15, fontWeight: 500, lineHeight: '21px', letterSpacing: '-0.3px', color: '#9AA1A6' }}>저장한 클립이 없어요</p>
       ) : null}
@@ -151,9 +169,9 @@ function Feed({ tab, cls }) {
 }
 
 export function ClipList(props) {
-  const [tab, setTab] = useState(clip.tab || 'rec');
+  const [tab, setTab] = useState(T('tabs') ? clip.tab || 'rec' : 'rec');
   const [prev, setPrev] = useState(null);
-  const [fav, setFav] = useState(!!clip.fav);
+  const [fav, setFav] = useState(T('fav') ? !!clip.fav : false);
   const [hot, setHot] = useState('clip');
   const [, force] = useState(0);
   const [ul, setUl] = useState({ x: 0, s: 1 });
@@ -292,15 +310,15 @@ export function ClipList(props) {
         </div>
       </div>
       <div data-figma="머리말" style={{ position: 'absolute', left: 0, top: 0, width: 390, height: 100, background: '#131313', zIndex: 2 }}>
-        <Hit name="즐겨찾기" box={[8, 55, 41, 40]} label="즐겨찾기" pressed={fav} onTap={tapFav} items={[fav ? { ...head('Icon / 즐겨찾기'), svg: FAV_ON(head('Icon / 즐겨찾기').svg) } : head('Icon / 즐겨찾기')]} />
-        <Hit name="검색" box={[340, 54, 43, 41]} label="검색" onTap={() => {}} items={[head('Icon / 검색')]} />
+        <Hit off={!T('fav')} name="즐겨찾기" box={[8, 55, 41, 40]} label="즐겨찾기" pressed={fav} onTap={tapFav} items={[fav ? { ...head('Icon / 즐겨찾기'), svg: FAV_ON(head('Icon / 즐겨찾기').svg) } : head('Icon / 즐겨찾기')]} />
+        <Hit off={!T('search')} name="검색" box={[340, 54, 43, 41]} label="검색" onTap={() => {}} items={[head('Icon / 검색')]} />
         {['sub', 'rec', 'mine'].map((t) => {
           const it = head(TAB_N[t]);
           const w = t === 'mine' ? 54 : 38;
           return (
             <div key={t} ref={(el) => { tabRefs.current[t] = el; }} style={{ position: 'absolute', left: it.x - 4, top: 56, width: w + 8, height: 38 }}>
               <span style={{ position: 'absolute', left: 4, top: 0, fontFamily: FONT, fontSize: it.size, fontWeight: 700, letterSpacing: '-0.02em', whiteSpace: 'pre', visibility: 'hidden', pointerEvents: 'none' }}>{it.s}</span>
-              <Hit box={[it.x - 4, 56, w + 8, 38]} at={[0, 0]} label={it.s} pressed={t === tab} onTap={() => pick(t)} items={[tabItem(t)]} />
+              <Hit off={!T('tabs')} name={TAB_N[t]} box={[it.x - 4, 56, w + 8, 38]} at={[0, 0]} label={it.s} pressed={t === tab} onTap={() => pick(t)} items={[tabItem(t)]} />
             </div>
           );
         })}
@@ -313,7 +331,7 @@ export function ClipList(props) {
       <div data-figma="하단 바" style={{ position: 'absolute', left: 0, top: BAR_TOP, width: 390, height: BAR.h, borderRadius: '26px 26px 0 0', background: 'linear-gradient(180deg,#1A1A1A 0%,#2F2F2F 100%)', zIndex: 3 }}>
         <Item it={barKid['구분선']} pw={390} />
         {BOTTOM.map((b) => (
-          <Hit key={b.k} name={'아래 탭 ' + b.k} box={[b.x, 0, b.w, BAR.h]} label={barKid[b.label].s} pressed={hot === b.k} onTap={() => tapBottom(b.k)} items={[iconOf(b), labelOf(b)]} />
+          <Hit key={b.k} off={!T('bottom')} name={'아래 탭 ' + b.k} box={[b.x, 0, b.w, BAR.h]} label={barKid[b.label].s} pressed={hot === b.k} onTap={() => tapBottom(b.k)} items={[iconOf(b), labelOf(b)]} />
         ))}
       </div>
       <ClipAgent delay={700} />

@@ -1,13 +1,15 @@
 // 네이버 클립 영상 보기. 팀 피그마 "클립 영상 보기"(1843:40911)와 같은 값이고, 리스트에서 누른 카드(clipPick)의 장면과 글을 넣는다.
 // 영상을 한 번 누르면 재생과 일시정지, 두 번 빠르게 누르면 하트와 좋아요, 위아래로 쓸면 다음과 이전 클립(세로 슬라이드 300ms)이다.
 // 아래 진행 막대는 재생 중에 차고(38초 가정, 반복 재생이면 처음부터), 누르거나 끌면 그 자리로 간다.
-// 오른쪽 버튼과 댓글 말풍선은 모두 눌린다. 좋아요와 저장은 클립별로 기억하고, 팔로우는 리스트와 같은 상태다(clipState.js).
+// 눌리는 것은 clipState.js CLIP_TOUCH.player 에 적힌 것뿐이다(뒤로, 영상 한 번과 두 번 누름, 좋아요, 댓글, 저장, 더보기, 소리, 진행 막대, 시트, 에이전트).
+// 이벤트 배지, 댓글 말풍선, 아래 댓글 입력 줄, 캡션 더보기, 크리에이터 줄과 팔로우 알약은 그리기만 하고 눌리지 않으며, 그 자리를 눌러도 영상 재생이 바뀌지 않는다.
+// 위아래로 쓸어 다른 클립(영상 없는 가짜 장면)으로 넘어가는 손짓도 막혀 있어 영상 클립 한 장만 남는다. 좋아요와 저장은 클립별로 기억한다(clipState.js).
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Item, pic } from './ClipKit.jsx';
 import { PLAYER } from './ClipScenes.js';
 import { CSS, CommentSheet, MoreSheet, commentCount } from './ClipSheets.jsx';
 import { ClipAgent } from './ClipAgent.jsx';
-import { CLIPS, DURATION, clip, saveClip, setPick, isFollow, toggleFollow, isLiked, toggleLike, setLiked, isSaved, toggleSave, likeCount, fmt, onClip } from './clipState.js';
+import { CLIPS, DURATION, clip, saveClip, setPick, isFollow, toggleFollow, isLiked, toggleLike, setLiked, isSaved, toggleSave, likeCount, fmt, onClip, canTouch } from './clipState.js';
 import { videoOf, BUBBLE_AT, BUBBLE_RISE, BUBBLE_IN_MS, BUBBLE_OUT_MS } from './clipVideo.js';
 
 const FONT = "'SUIT', system-ui, sans-serif";
@@ -38,6 +40,18 @@ const P_CSS = `
 `;
 
 const commentsOf = (c) => commentCount(c);
+const T = (k) => canTouch('player', k);
+// 막힌 장식 요소의 자리(390 x 844 기준, 예전 누름 칸과 같은 값). 이 자리에는 보이지 않는 빈 칸(핸들러 없음, 화살표 커서)을 영상 위에 깔아
+// 눌러도 영상 한 번 누름과 두 번 누름으로 세지 않게 한다.
+const STILL = [
+  ['event', 333, 410, 52, 56],
+  ['bubble', 12, 580, 240, 38],
+  ['follow', 12, 622, 175, 44],
+  ['caption', 12, 664, 330, 28],
+  ['caption', 12, 696, 64, 38],
+].filter((z) => !T(z[0]));
+// 쓸어 넘기기가 막혀 있으면 영상이 있는 첫 클립 한 장만 보인다.
+const FIRST_VIDEO = Math.max(0, CLIPS.findIndex((k) => !!videoOf(k)));
 const capOf = (c) => {
   if (c.id === 's0') return null;
   const t = c.title.length > 20 ? c.title.slice(0, 19).trimEnd() : c.title;
@@ -63,6 +77,7 @@ function panelItems(c, fresh, onFollow) {
       const on = isFollow(c.creator);
       const items = it.items.filter((k) => c.badge || k.n !== '인증 배지').map((k) => {
         if (k.n === '크리에이터 이름') return { ...k, s: c.creator };
+        if (k.n === '팔로우 알약' && !T('follow')) return k;
         if (k.n === '팔로우 알약') return { ...k, text: { ...k.text, s: on ? '팔로잉' : '팔로우' }, f: on ? { c: '#000000', a: 0.28 } : k.f, on: onFollow, label: on ? '팔로잉' : '팔로우', pressed: on };
         return k;
       });
@@ -148,7 +163,7 @@ const PAUSE_SVG = <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF"
 const HEART = <svg width="96" height="96" viewBox="0 0 24 24" fill="#FF3B5C"><path d="M12 21C5.5 16 2 12.4 2 8.6C2 5.8 4.2 3.8 6.7 3.8C8.9 3.8 10.9 5.1 12 7.1C13.1 5.1 15.1 3.8 17.3 3.8C19.8 3.8 22 5.8 22 8.6C22 12.4 18.5 16 12 21Z" /></svg>;
 
 export function ClipPlayer(props) {
-  const [idx, setIdx] = useState(() => Math.max(0, Math.min(CLIPS.length - 1, clip.pick || 0)));
+  const [idx, setIdx] = useState(() => (T('swipe') ? Math.max(0, Math.min(CLIPS.length - 1, clip.pick || 0)) : FIRST_VIDEO));
   const [st, setSt] = useState({ sheet: null, imm: false, fresh: '', sheetOpen: false, info: false });
   const [, force] = useState(0);
   const [toast, setToast] = useState(null);
@@ -408,7 +423,7 @@ export function ClipPlayer(props) {
     const dy = (e.clientY - d.cy) / d.s;
     const dx = (e.clientX - d.cx) / d.s;
     if (!d.on && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) d.on = true;
-    if (!d.on) return;
+    if (!d.on || !T('swipe')) return;
     const now = performance.now();
     d.v = ((e.clientY - d.ly) / d.s) / Math.max(1, now - d.lt);
     d.lt = now; d.ly = e.clientY;
@@ -420,6 +435,7 @@ export function ClipPlayer(props) {
     const d = g.current;
     g.current = null;
     if (!d) return;
+    if (d.on && !T('swipe')) return;
     if (d.on) {
       const dir = d.dy < -90 || (d.dy < -24 && d.v < -0.45) ? 1 : d.dy > 90 || (d.dy > 24 && d.v > 0.45) ? -1 : 0;
       const to = idx + dir;
@@ -479,9 +495,9 @@ export function ClipPlayer(props) {
     if (tRef.current < DURATION && !playRef.current) setPlaying(true);
   };
 
-  const panels = [idx - 1, idx, idx + 1].filter((i) => i >= 0 && i < CLIPS.length);
+  const panels = (T('swipe') ? [idx - 1, idx, idx + 1] : [idx]).filter((i) => i >= 0 && i < CLIPS.length);
   const fixed = useMemo(() => FIXED_ITEMS.map((it) => (it.n === 'Icon / 소리' && clip.mute ? { ...it, svg: SOUND_OFF, key: 'mute' } : it)), [clip.mute]);
-  const btn = (label, x, y, w, h, onClick, r) => (
+  const btn = (label, x, y, w, h, onClick, r, key) => (key && !T(key) ? null :
     <button key={label} type="button" aria-label={label} className="cp-btn" onClick={(e) => { e.stopPropagation(); onClick(); }} style={{ left: x, top: y, width: w, height: h, borderRadius: r == null ? 12 : r }} />
   );
   const sheetOn = !!st.sheet;
@@ -505,15 +521,18 @@ export function ClipPlayer(props) {
           <div ref={bar} style={{ position: 'absolute', inset: 0, background: '#82CD4A', transformOrigin: '0 50%', transform: 'scaleX(' + (clip.time[c.id] || 0) / DURATION + ')' }} />
         </div>
       </div>
-      {btn('소리', 340, 53, 46, 44, flipMute, 22)}
-      {btn('이벤트 댓글 남기기', 333, 410, 52, 56, () => openSheet('comments'), 26)}
-      {btn('좋아요', 338, 483, 44, 62, flipLike)}
-      {btn('댓글', 338, 552, 44, 62, () => openSheet('comments'))}
-      {btn('저장', 338, 622, 44, 62, flipSave)}
-      {btn('더보기', 336, 696, 48, 32, () => openSheet('more'), 16)}
-      {!videoOf(c) || bub ? btn('댓글 미리보기', 12, 580, 240, 38, () => openSheet('comments'), 19) : null}
-      {btn('댓글 입력', 15, 759, 359, 47, () => openSheet('comments'), 24)}
-      {btn('캡션 더보기', 12, 664, 330, 28, () => openSheet('comments', true), 8)}
+      {btn('소리', 340, 53, 46, 44, flipMute, 22, 'sound')}
+      {btn('이벤트 댓글 남기기', 333, 410, 52, 56, () => openSheet('comments'), 26, 'event')}
+      {btn('좋아요', 338, 483, 44, 62, flipLike, null, 'like')}
+      {btn('댓글', 338, 552, 44, 62, () => openSheet('comments'), null, 'comments')}
+      {btn('저장', 338, 622, 44, 62, flipSave, null, 'save')}
+      {btn('더보기', 336, 696, 48, 32, () => openSheet('more'), 16, 'more')}
+      {!videoOf(c) || bub ? btn('댓글 미리보기', 12, 580, 240, 38, () => openSheet('comments'), 19, 'bubble') : null}
+      {btn('댓글 입력', 15, 759, 359, 47, () => openSheet('comments'), 24, 'input')}
+      {btn('캡션 더보기', 12, 664, 330, 28, () => openSheet('comments', true), 8, 'caption')}
+      {STILL.filter((z) => z[0] !== 'bubble' || !videoOf(c) || bub).map(([k, x, y, w, h], i) => (
+        <div key={'still' + i} data-still={k} aria-hidden="true" style={{ position: 'absolute', left: x, top: y, width: w, height: h, zIndex: 4, cursor: 'default' }} />
+      ))}
       {st.imm ? <button type="button" aria-label="화면 되돌리기" onClick={(e) => { e.stopPropagation(); setSt((s) => ({ ...s, imm: false })); }} style={{ position: 'absolute', left: 0, top: 0, width: 390, height: '100%', zIndex: 55, border: 0, padding: 0, background: 'transparent', cursor: 'pointer' }} /> : null}
       {st.sheet === 'comments' ? <CommentSheet clip={c} mirror={videoOf(c) ? vRef : null} info={st.info} open={st.sheetOpen} onClose={closeSheet} onCount={() => force((k) => k + 1)} say={say} onFollow={follow} following={isFollow(c.creator)} /> : null}
       {st.sheet === 'more' ? <MoreSheet open={st.sheetOpen} onClose={closeSheet} onAction={act} stats={{ like: fmt(likeCount(c)), comment: fmt(commentsOf(c)) }} liked={isLiked(c.id)} saved={isSaved(c.id)} loop={clip.loop} /> : null}

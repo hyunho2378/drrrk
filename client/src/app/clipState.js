@@ -20,6 +20,17 @@ export const CLIPS = [
   },
 ];
 
+// 누를 수 있는 요소 목록(11/11 팀 요청 "군자, 느좋녀 패션템, 혼술바 전부 터치 안되게"와 사용자 "쓸데없는 거 클릭 안 되게").
+// 이 목록에 있는 것만 눌리고, 없는 것은 핸들러와 눌림 모양, 손 모양 커서, 키보드 포커스가 모두 빠진다. 되돌리려면 이름을 목록에 다시 넣는다.
+// 리스트(55): card:<클립 id>(영상 보기로), banner(드르륵 배너), agent(드르륵 에이전트). 그 밖의 이름: tabs(구독 추천 내클립), fav, search, bottom(아래 탭), creator(카드 아래 아바타와 이름).
+// 영상 보기(56): back, video(한 번 누름 재생 정지, 두 번 누름 좋아요), like, comments, save, more, sound, progress, agent, sheet(시트 안 닫기와 팀 디자인 항목), immExit(몰입 모드 되돌리기).
+// 그 밖의 이름: event(이벤트 배지), bubble(댓글 말풍선), input(아래 댓글 입력 줄), caption(캡션 더보기), follow(팔로우 알약), swipe(위아래로 쓸어 다른 클립).
+export const CLIP_TOUCH = {
+  list: ['card:s0', 'banner', 'agent'],
+  player: ['back', 'video', 'like', 'comments', 'save', 'more', 'sound', 'progress', 'agent', 'sheet', 'immExit'],
+};
+export const canTouch = (where, key) => CLIP_TOUCH[where].includes(key);
+
 // 구독 탭에 늘 보이는 크리에이터(팀 지시: 흔한 웹드, 트민언니). 영상 보기에서 팔로우한 크리에이터도 더해진다.
 export const SUBS = ['흔한 웹드', '트민언니'];
 export const DURATION = 38;
