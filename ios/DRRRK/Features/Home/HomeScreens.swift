@@ -122,11 +122,17 @@ struct HomeView: View {
         screen.width / 390
     }
 
+    /// 클립이 붙은 홈(피그마 2296:20815 접힘, 2296:20794 펼침). 함께 드르륵 방에 앉기 전에는 이 홈, 앉은 뒤에는 빈 홈(1647:23475, 1647:23436)이다(Router.clipDone).
+    private var clip: Bool {
+        !router.clipDone
+    }
+
     /// 입력칸 자리(피그마 좌표). 접힘 2045:11658(24, 655), 펼침 1671:45255(20, 446)는 키보드(541) 위 29에 붙는다.
+    /// 클립이 붙은 홈은 펼침 입력칸 2296:21031이 x 24다.
     private var inputOrigin: CGPoint {
         guard open else { return CGPoint(x: 24, y: 655) }
         let top = keyboardTop ?? (Self.screen.height - lastKeyboardHeight)
-        return CGPoint(x: 20, y: top / Self.scale - 29 - 66)
+        return CGPoint(x: clip ? 24 : 20, y: top / Self.scale - 29 - 66)
     }
 
     private var motion: Animation? {
@@ -159,6 +165,13 @@ struct HomeView: View {
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHidden(!open)
             Canvas390(background: .clear) {
+                // 피그마 "input / 숏츠 첨부"(2332:10890, 2296:21025): 입력칸 위 142에서 시작하는 342 x 208 카드. 입력칸과 같이 올라간다.
+                if clip {
+                    clipCard
+                        .at(24, inputOrigin.y - 142)
+                        .animation(motion, value: open)
+                        .animation(motion, value: keyboardTop)
+                }
                 input
                     .at(inputOrigin.x, inputOrigin.y)
                     .animation(motion, value: open)
@@ -211,7 +224,7 @@ struct HomeView: View {
     private var input: some View {
         HStack(spacing: 8) {
             TextField("", text: $text, prompt: Text("편하게 고민을 꺼내보아요")
-                .font(.custom((open ? SUITWeight.bold : SUITWeight.regular).rawValue, fixedSize: 16))
+                .font(.custom((open || clip ? SUITWeight.bold : SUITWeight.regular).rawValue, fixedSize: 16))
                 .tracking(-0.64)
                 .foregroundStyle(DS.Palette.textSecondary))
                 .suit(16, .regular, tracking: -0.64)
@@ -241,6 +254,39 @@ struct HomeView: View {
         .onTapGesture { focused = true }
     }
 
+    // 피그마 2332:10890 카드(342 x 208, 반경 28, #222628) 안 위 12, 왼 12에 숏츠 2332:10892(92 x 124, 반경 14).
+    // 숏츠 그림 2332:10893은 92 x 177로 위로 18 올라가 잘린다. 첨부 삭제 2332:10894는 숏츠 안 (62, 6) 24 x 24, 반경 12, #14171A 80%, 닫기 16(선 1.33).
+    // 첨부 삭제는 피그마에 연결이 없어 누르는 자리로 만들지 않았다(웹 HomeScene과 같다). 카드를 누르면 입력칸을 누른 것과 같다.
+    private var clipCard: some View {
+        ZStack(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 28).fill(DS.Palette.bgElevated)
+            ZStack(alignment: .topLeading) {
+                Color.white
+                Image("L-home-clip-thumb").resizable()
+                    .frame(width: 92, height: 177)
+                    .offset(y: -18)
+                ZStack {
+                    Circle().fill(Color(red: 0.08, green: 0.09, blue: 0.10).opacity(0.8))
+                    Path { p in
+                        p.move(to: CGPoint(x: 4, y: 4)); p.addLine(to: CGPoint(x: 12, y: 12))
+                        p.move(to: CGPoint(x: 12, y: 4)); p.addLine(to: CGPoint(x: 4, y: 12))
+                    }
+                    .stroke(.white, style: StrokeStyle(lineWidth: 1.33333, lineCap: .round, lineJoin: .round))
+                    .frame(width: 16, height: 16)
+                }
+                .frame(width: 24, height: 24)
+                .offset(x: 62, y: 6)
+            }
+            .frame(width: 92, height: 124, alignment: .topLeading)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .offset(x: 12, y: 12)
+            .accessibilityLabel("첨부한 숏츠 쌍밍아웃 빌런썰 EP.1")
+        }
+        .frame(width: 342, height: 208, alignment: .topLeading)
+        .contentShape(RoundedRectangle(cornerRadius: 28))
+        .onTapGesture { focused = true }
+    }
+
     // 피그마 2045:11669(98, 729, 195 x 16): 정보 아이콘 16, 간격 4, SUIT Medium 12 자간 -4% 흰색
     private var infoLine: some View {
         HStack(spacing: 4) {
@@ -260,13 +306,14 @@ struct HomeView: View {
     }
 
     private func send() {
-        guard !sending, router.path.last != .analysis else { return }
+        guard !sending, router.path.last != .analysis, router.path.last != .noRoom else { return }
         sending = true
         close()
         // 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(App/Story.swift).
         Story.current = .ssang
         Story.concern = nil
-        router.push(.analysis)
+        // 클립이 붙은 홈은 고민 분석(26)으로, 빈 홈은 방을 찾지 못함(45)으로 바로 간다(11/11 23:18 팀 흐름 변경, 웹 HomeScene send와 같다).
+        router.push(clip ? .analysis : .noRoom)
     }
 }
 

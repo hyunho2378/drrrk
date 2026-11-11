@@ -123,10 +123,15 @@ struct RoomView: View {
                 .transition(.opacity)
             }
         }
-        .onAppear { OnboardingSeen.together = true }
+        .onAppear {
+            OnboardingSeen.together = true
+            // 함께 드르륵을 한 판 한 뒤에는 홈이 빈 홈이 된다(Router.clipDone, 웹 live.js resolveTo setClipDone).
+            router.clipDone = true
+        }
         // 대사 녹음(RoomVoice): 방에 들어오면 파일을 미리 열고, 내 말풍선이 새로 나타나면 같은 대사를 낸다. 방을 나가면 멈춘다.
         // 채팅 줄(RoomChat): 새 방이면 비운 채 시작하고, 일반 모드에서 돌아오면 이미 나온 줄이 남는다. 녹음도 같은 방이면 한 번 난 말풍선에 다시 나지 않는다.
         .onAppear {
+            if showOnboarding { model.pauseClock() }
             let fresh = RoomChat.shared.enter(model)
             RoomVoice.shared.enter(covered: showOnboarding, fresh: fresh)
             RoomVoice.shared.show(mineTexts)
@@ -156,6 +161,8 @@ struct RoomView: View {
         }
         .onChange(of: showOnboarding) { _, up in RoomVoice.shared.setCovered(up) }
         .onChange(of: showOnboarding) { _, up in if !up { entry?.start() } }
+        // 온보딩 덮개가 떠 있는 동안 방 시계를 멈추고, 닫히면 멈춘 자리부터 흐른다.
+        .onChange(of: showOnboarding) { _, up in if up { model.pauseClock() } else { model.resumeClock() } }
         // 해 뜨는 단계가 시작되면 입장 영상은 멈추고 뺀다(해뜨기 영상과 겹치지 않게). 웹은 40번 화면이 붙을 때 같은 일을 한다.
         .onChange(of: lastMinute) { _, on in if on { entry?.stop() } }
         .onChange(of: mineTexts) { _, texts in RoomVoice.shared.show(texts) }
@@ -233,7 +240,8 @@ struct RoomView: View {
     private func chrome(_ map: SceneMap) -> some View {
         VStack(spacing: 0) {
             Color.clear.frame(height: max(roomTopInset(), 47))
-            RoomHeader(model: model, lastMinute: lastMinute, onBack: { router.pop() }, onToggle: { router.push(.roomNormal) })
+            // 나가기: 웹 flow.js(29에서 25, 라이브에서 앉은 방은 10)와 같게 그 탭의 첫 화면으로 돌아간다(11/11 흐름 변경, 홈이면 빈 홈).
+            RoomHeader(model: model, lastMinute: lastMinute, onBack: { router.popToRoot() }, onToggle: { router.push(.roomNormal) })
                 .frame(height: 56)
             TopicBanner(model: model)
                 .padding(.horizontal, 24)

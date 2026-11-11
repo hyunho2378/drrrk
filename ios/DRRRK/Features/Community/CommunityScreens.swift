@@ -3,9 +3,14 @@ import SwiftUI
 // 커뮤니티 목록(피그마 1953:19406)과 글 상세(v5 2100:23295, 댓글 모음 2100:23497). 프로필 사진은 사람마다 다른 의자(Avatars)다.
 // 11. 10. 팀 메모 반영(웹 CommunityPost.jsx와 같은 값):
 //  상단 바는 뒤로가기만(공유는 아래 액션줄에만, 2100:23637). 액션줄은 좋아요 24와 숫자 16, 공유 24와 "공유" 16이고 댓글 수는 뺐다(2100:23633, Actions 2100:23321).
-//  댓글마다 의자 프로필(2100:23632). 대화 다시보기 카드는 모양만 맞추고 누른 뒤 화면은 만들지 않는다(2100:23495, 2100:23496).
+//  댓글마다 의자 프로필(2100:23632).
+// 11. 11. 23시 팀 수정본 글 상세 2298:22028(의정 "커뮤니티 상세 탭 이 화면으로 반영"): 작성자는 의자 프로필 32(푹신한 가죽 소파12),
+//  대화 다시보기 카드는 오른쪽 아래 "12:32" 칩과 "+1" 의자 셋 "의자 4", "라이브 다시보기"이고 누르면 대화 다시보기(ReplayView, 피그마 2322:12283)로 들어간다.
 
 extension CommunityData {
+    /// 글 상세 작성자(피그마 2298:22031): "의자 프로필" 32 원(#33383D, sofa_05)을 통째로 내본 그림과 이름. 웹 communityPostData.js와 같다.
+    static let postAuthor = "푹신한 가죽 소파12"
+    static let postAuthorAvatar = "C-author-sofa5"
     /// 목록에서 연 글 제목. 글 상세 제목에 쓴다(웹 community.js pickedPostTitle과 같은 규칙). 기본은 사진보정 글이고 본문과 댓글은 같다.
     nonisolated(unsafe) static var openedTitle = WatchPick.photoTitle
 }
@@ -48,7 +53,7 @@ struct CommunityView: View {
                         router.push(.communityDetail)
                     }
                         .padding(.top, 18)
-                    PageDots(count: 5, index: page).frame(maxWidth: .infinity).padding(.top, 12)
+                    PageDots(count: featured.count, index: page).frame(maxWidth: .infinity).padding(.top, 12)
                     CategoryTabs(selected: $category, showDot: !loveDots.communityLoveSeen).padding(.top, 18)
                         .onChange(of: category, initial: true) { _, new in
                             if new == "연애" { loveDots.markCommunity() }
@@ -188,9 +193,9 @@ struct CommunityDetailView: View {
                 .onChange(of: comments.count) { _, _ in withAnimation(DS.Motion.standard) { proxy.scrollTo(comments.last?.id, anchor: .bottom) } }
             }
         }
-            // 피그마: 아래 212 높이 검은 그라데이션 위에 입력창(342 x 66, 모서리 32), 화면 바닥에서 24
-            LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
-                .frame(height: 212).allowsHitTesting(false)
+            // 피그마 2298:22208: 아래 136 높이 검은 그라데이션(0%에서 투명, 73.24%에서 검정) 위에 입력창(342 x 66, 모서리 32), 화면 바닥에서 24
+            LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.7324)], startPoint: .top, endPoint: .bottom)
+                .frame(height: 136).allowsHitTesting(false)
             inputBar
         }
         .ignoresSafeArea(.container, edges: .bottom)
@@ -201,56 +206,42 @@ struct CommunityDetailView: View {
     private var post: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
-                // 피그마 1953:12302: 28 원, 바탕 #222628, 그림 FIT
-                Image(CommunityData.detailAuthorAvatar).resizable().scaledToFit()
-                    .frame(width: 28, height: 28)
-                    .background(DS.Palette.bgElevated, in: Circle())
-                    .clipShape(Circle())
-                Text(CommunityData.detailAuthor).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
+                // 피그마 2298:22032 "의자 프로필": 32 원, 바탕 #33383D, 안쪽 sofa_05 28.5
+                Image(CommunityData.postAuthorAvatar).resizable().frame(width: 32, height: 32)
+                Text(CommunityData.postAuthor).suit(13, .bold).foregroundStyle(DS.Palette.textPrimary)
                 Text("· 방금").suit(12, .medium).foregroundStyle(DS.Palette.textTertiary)
             }
             Text(title).suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary)
                 .padding(.top, 16)
             Text(CommunityData.detailBody).suit(15, .regular, lineHeight: 24).foregroundStyle(Color(hex: 0xD9DBDE))
                 .padding(.top, 12)
-            // 대화 다시보기 카드(2100:23307, 11. 11. 팀 수정본) 342 x 176, 모서리 16, #1F2226. 웹 CommunityPost.jsx와 같은 값.
-            // 장면 그림 150 높이는 피그마 fade(2100:23309)가 scene을 모두 덮은 모습 그대로다. 라벨은 글만(play-circle 숨김), 가운데 play 버튼(2302:12692),
-            // 아래 라이브 보기 바(2302:12695, 0 132 342 x 44, #222628). 누른 뒤 화면은 아직 없어서 play 버튼은 눌림 반응만 준다.
+            // 대화 다시보기 카드(2298:22040, 11. 11. 23시 팀 수정본) 342 x 176, 모서리 16, #1F2226. 웹 CommunityPost.jsx와 같은 값.
+            // 장면 그림 150 높이는 피그마 fade(2298:22042)가 scene을 모두 덮은 모습 그대로다. 오른쪽 아래 재생 시간 칩(2298:22043),
+            // play 버튼(2298:22047)은 피그마에서 안쪽 그림이 지워져 보이지 않아 그리지 않는다. 카드를 누르면 대화 다시보기로 들어간다.
+            Button { router.push(.replay) } label: {
             ZStack(alignment: .topLeading) {
                 Image(CommunityData.detailScene).resizable().scaledToFill().frame(height: 150).frame(maxWidth: .infinity).clipped()
-                // 다시보기 라벨(2100:23310): 133 x 25, 안쪽 여백 좌우 10 위아래 4, 검정 55%
-                Text("대화 다시보기 · 12:32").suit(12, .medium, lineHeight: 17)
+                // 재생 시간(2298:22043): 45 x 25, 카드 안 283, 97, 안쪽 여백 좌우 8 위아래 4, 검정 55%
+                Text("12:32").suit(12, .medium, lineHeight: 17)
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .padding(.horizontal, 8).padding(.vertical, 4)
                     .frame(height: 25)
                     .background(.black.opacity(0.55), in: Capsule())
-                    .offset(x: 12, y: 12)
-                // play 버튼(2302:12692): 48 원(흰색 92%)과 삼각형 #1F2226, 그림자 y 4 흐림 12 검정 35%
-                Button {} label: {
-                    Image("C-replay-play").resizable().frame(width: 48, height: 48)
-                        .shadow(color: .black.opacity(0.35), radius: 6, x: 0, y: 4)
-                }
-                .buttonStyle(PressStyle())
-                .accessibilityHidden(true)
-                .offset(y: 42)
-                .frame(maxWidth: .infinity)  // 가운데(342 폭에서 x 147)
-                // 라이브 보기 바(2302:12695): 왼쪽 여백 12, 오른쪽 10, 양 끝 정렬
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 14)
+                    .offset(y: 97)
+                // 라이브 보기 바(2298:22048): 왼쪽 여백 12, 오른쪽 10, 양 끝 정렬
                 HStack(spacing: 0) {
                     HStack(spacing: 8) {
-                        // avatars(2100:23314) 62 x 26: 26 원 셋, 겹침 -8, 안쪽 테두리 2 #222628
-                        HStack(spacing: -8) {
-                            ForEach(CommunityData.detailSeats, id: \.self) { img in
-                                Image(img).resizable().scaledToFit().frame(width: 26, height: 26)
-                                    .background(DS.Palette.bgElevated, in: Circle()).clipShape(Circle())
-                                    .overlay(Circle().strokeBorder(DS.Palette.bgElevated, lineWidth: 2))
-                            }
-                        }
-                        Text("의자 3").suit(12, .medium, lineHeight: 16.8).foregroundStyle(DS.Palette.textPrimary)
+                        // "+1"과 의자 프로필 셋(2298:22051, 97 x 32). 내보낸 그림은 양쪽 1씩 더 넓어(99) 왼쪽으로 1 당긴다.
+                        Image("C-replay-seats4").resizable().frame(width: 99, height: 32)
+                            .frame(width: 97, height: 32)
+                        Text("의자 4").suit(12, .medium, lineHeight: 16.8).foregroundStyle(DS.Palette.textPrimary)
                     }
                     Spacer(minLength: 0)
-                    // 라이브 보기 CTA(2302:12696): 13 Bold #36D2FF, 사이 2, chevron 16
+                    // 라이브 보기 CTA(2298:22059): 13 Bold #36D2FF, 사이 2, chevron 16
                     HStack(spacing: 2) {
-                        Text("라이브 보기").suit(13, .bold, lineHeight: 15.6)
+                        Text("라이브 다시보기").suit(13, .bold, lineHeight: 16.2)
                         Image("C-chevron-right-16").renderingMode(.template).resizable().frame(width: 16, height: 16)
                     }
                     .foregroundStyle(DS.Palette.brandPrimary)
@@ -265,6 +256,9 @@ struct CommunityDetailView: View {
             .frame(height: 176, alignment: .topLeading)
             .background(Color(hex: 0x1F2226))
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(PressStyle())
+            .accessibilityLabel("라이브 다시보기")
             .padding(.top, 24)
             // 피그마 Actions 2100:23321: 342 x 36. 좋아요(채운 엄지 24, 사이 8, 숫자 16 Bold 자간 -4%), 오른쪽 공유(아이콘 24, 사이 4, "공유" 16 Bold 자간 -4%). 색 #9AA1A6, 누르면 #36D2FF.
             HStack(spacing: 0) {

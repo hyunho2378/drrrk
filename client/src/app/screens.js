@@ -385,6 +385,27 @@ export const SCREENS = [
   "name": "키워드 알림 설정",
   "file": "NotiSettings1110",
   "h": 844
+ },
+ {
+  "n": 61,
+  "id": "2322:12283",
+  "name": "대화 다시보기 (재방송)",
+  "file": "Replay",
+  "h": 844
+ },
+ {
+  "n": 62,
+  "id": "2296:20815",
+  "name": "DRRRK · 홈 (Dark)",
+  "file": "HomeClip",
+  "h": 844
+ },
+ {
+  "n": 63,
+  "id": "2296:20794",
+  "name": "DRRRK · 홈 (Dark)",
+  "file": "HomeClipOpen",
+  "h": 844
  }
 ];
 
@@ -481,6 +502,9 @@ const modules = {
   'MY3': () => import('../figma/screens/MY3.jsx'),
   'ClipList': () => import('./ClipList.jsx'),
   'ClipPlayer': () => import('./ClipPlayer.jsx'),
+  'Replay': () => import('./ReplayScreen.jsx'),
+  'HomeClip': () => import('./HomeClip.jsx'),
+  'HomeClipOpen': () => import('./HomeClipOpen.jsx'),
 };
 
 export async function loadScreen(n) {

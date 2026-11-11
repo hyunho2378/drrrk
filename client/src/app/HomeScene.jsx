@@ -11,6 +11,7 @@ import { motion, live as LIVE } from '../tokens.js';
 import { INFO_SVG } from './homeInfo.js';
 import { setStory, setConcern } from './story.js';
 import { KEYS, shifted, addJamo, backJamo, isJamo } from './homeKeyboard.js';
+import { CLIP_CARD, CLIP_THUMB, CLIP_PLACEHOLDER_SVG, CLIP_CLOSE_SVG } from './clipHome.js';
 
 const cx = (...a) => a.filter(Boolean).join(' ');
 const OPEN_MS = 310;
@@ -27,9 +28,9 @@ function setHash(n) {
   const h = '#/s/' + n;
   if (window.location.hash !== h) window.history.replaceState(window.history.state, '', h);
 }
-// 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(story.js).
+// 홈에서 고민을 쓰고 들어가는 흐름은 쌍밍아웃 이야기다(story.js). 빈 홈에서 방을 찾지 못함(45)으로 가는 혼자 드르륵 흐름도 같은 이야기로 시작한다.
 const goTo = (to, t) => {
-  if (to === 26) { setStory('ssang'); setConcern(null); }
+  if (to === 26 || to === 45) { setStory('ssang'); setConcern(null); }
   window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to, t } }));
 };
 
@@ -47,7 +48,13 @@ function pressOff(el) {
   el.style.opacity = '';
 }
 
-export default function HomeScene({ startOpen = false, style, className }) {
+// clip: 클립이 붙은 홈(62 접힘 2296:20815, 63 펼침 2296:20794). 빈 홈(25, 24)과 장면은 같고 입력칸 위에 숏츠 첨부 카드가 붙는다.
+// 보내기는 클립이 붙은 홈이면 고민 분석(26), 빈 홈이면 방을 찾지 못함(45)으로 간다(11/11 23:18 팀 흐름 변경).
+export default function HomeScene({ startOpen = false, clip = false, style, className }) {
+  const HASH = clip ? { open: 63, shut: 62 } : { open: 24, shut: 25 };
+  // 펼친 입력칸 x: 빈 홈 1671:45255는 20, 클립이 붙은 홈 2296:21031은 24(피그마 값)
+  const openX = clip ? CLIP_CARD.x : OPEN.x;
+  const cardRef = React.useRef(null);
   const __root = React.useRef(null);
   useFigmaSubpixel(__root);
   const [open, setOpen] = React.useState(startOpen);
@@ -70,6 +77,7 @@ export default function HomeScene({ startOpen = false, style, className }) {
     host.querySelectorAll('[data-hotspot]').forEach((b) => { b.style.pointerEvents = open ? 'none' : ''; });
   });
 
+  const pressTarget = () => (clip ? cardRef.current : fieldRef.current);
   const refreshText = () => setHasText(!!(inputRef.current && inputRef.current.value));
 
   const expand = (e) => {
@@ -77,7 +85,7 @@ export default function HomeScene({ startOpen = false, style, className }) {
     if (open) return;
     anim.current = true;
     setOpen(true);
-    setHash(24);
+    setHash(HASH.open);
     const inp = inputRef.current;
     // 터치 기기는 누른 순간 진짜 입력칸에 포커스해야 키보드가 올라온다.
     if (inp) inp.focus({ preventScroll: true });
@@ -90,9 +98,9 @@ export default function HomeScene({ startOpen = false, style, className }) {
     setShift(false);
     setLift(null);
     setOpen(false);
-    setHash(25);
+    setHash(HASH.shut);
   };
-  // 보내기(화살표 버튼, 시스템 키보드 완료 키, 엔터, 화면 키보드 엔터). 글이 비어 있어도 바로 26으로 간다.
+  // 보내기(화살표 버튼, 시스템 키보드 완료 키, 엔터, 화면 키보드 엔터). 글이 비어 있어도 바로 간다(클립이 붙은 홈 26, 빈 홈 45).
   // 한 번 누름에 keydown, beforeinput, form submit이 함께 올 수 있어 한 번만 이동하게 막는다.
   const sentRef = React.useRef(false);
   const send = () => {
@@ -101,7 +109,7 @@ export default function HomeScene({ startOpen = false, style, className }) {
     window.setTimeout(() => { sentRef.current = false; }, 1500);
     const inp = inputRef.current;
     if (inp) inp.blur();
-    window.setTimeout(() => goTo(26, 'push'), motion.press);
+    window.setTimeout(() => goTo(clip ? 26 : 45, 'push'), motion.press);
   };
   // React의 onBeforeInput은 inputType을 주지 않아 진짜 beforeinput을 직접 듣는다(한글 조합 중 완료 키가 줄바꿈으로 올 때).
   React.useEffect(() => {
@@ -187,7 +195,8 @@ export default function HomeScene({ startOpen = false, style, className }) {
         const h = parseFloat(getComputedStyle(root).height) || 844;
         setKbTop(h - KB.h);
         // 24에서 시작하면 mobileFit이 키보드 위에 있는 입력칸과 정보 줄을 바닥 요소로 보고 내린다. 접힌 홈(25)과 같은 피그마 자리로 되돌린다.
-        if (fieldRef.current) fieldRef.current.style.top = SHUT.y + "px";
+        if (clip) { if (cardRef.current) cardRef.current.style.top = CLIP_CARD.y + "px"; }
+        else if (fieldRef.current) fieldRef.current.style.top = SHUT.y + "px";
         const info = root.querySelector("[data-node=\"2045:11669\"]");
         if (info) info.style.top = "729px";
       }
@@ -196,13 +205,13 @@ export default function HomeScene({ startOpen = false, style, className }) {
     return () => cancelAnimationFrame(id);
   }, []);
   const openY = kbTop - (KB.y - OPEN.y);
-  const inputPos = open ? { x: OPEN.x, y: lift != null ? lift : openY } : SHUT;
+  const inputPos = open ? { x: openX, y: lift != null ? lift : openY } : SHUT;
   const dur = open ? OPEN_MS : CLOSE_MS;
   const tr = (p) => p + ' ' + dur + 'ms ' + EASE;
   const tdur = settled ? null : 'none';
 
   return (
-    <div ref={__root} data-figma="DRRRK · 홈 (Dark)" data-node={startOpen ? '1647:23436' : '1647:23475'} className={cx('[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden] [user-select:none] [-webkit-user-select:none] [-webkit-touch-callout:none]', className)} style={style}>
+    <div ref={__root} data-figma="DRRRK · 홈 (Dark)" data-node={clip ? (startOpen ? '2296:20794' : '2296:20815') : (startOpen ? '1647:23436' : '1647:23475')} className={cx('[width:390px] [height:844px] [background:#121415] [position:relative] [overflow:hidden] [user-select:none] [-webkit-user-select:none] [-webkit-touch-callout:none]', className)} style={style}>
       <div data-figma="Rectangle 1954141366" data-node="1647:23476" className="[position:absolute] [width:390px] [height:761px] [left:0px] [top:0px] [display:block] [overflow:visible]"><img alt="" src={'./assets/home4/home-bg.webp'} className="[position:absolute] [left:0px] [top:0px] [width:390px] [height:761px] [display:block] [max-width:none]" /></div>
       <div data-figma="bottom_navigation" data-node="1620:43312" data-instance-of="bottom_navigation" className="[width:390px] [height:84px] [background:#121415] [position:absolute] [left:0px] [top:760px]">
         <div data-figma="top line" data-node="I1620:43312;1647:27183" className="[width:392px] [height:1px] [background:#222628] [position:absolute] [left:0px] [top:0px]" />
@@ -320,10 +329,19 @@ export default function HomeScene({ startOpen = false, style, className }) {
       </div>
       <div data-figma="Frame 2147249328" data-node="2045:11669" aria-label="자기 전 뒤척이게 만드는 친구의 한 마디" role="img" className="[position:absolute] [left:98px] [top:729px] [width:195px] [height:16px] [line-height:0]" style={{ opacity: open ? 0 : 1, transition: tdur || tr('opacity') }} dangerouslySetInnerHTML={{ __html: INFO_SVG }} />
       <div data-figma="dim" data-node="2047:14201" aria-hidden="true" onClick={collapse} className="[position:absolute] [left:0px] [top:-200px] [width:390px] [height:calc(100%+400px)] [background:rgba(0,0,0,0.6)]" style={{ opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: tdur || tr('opacity') }} />
-      <div ref={fieldRef} data-figma="input" data-node={startOpen ? '1671:45255' : '2045:11658'} data-instance-of="input" onClick={(e) => { e.stopPropagation(); if (!open) expand(e); else if (inputRef.current) inputRef.current.focus({ preventScroll: true }); }} onPointerDown={() => { if (!open) pressOn(fieldRef.current); }} onPointerUp={() => pressOff(fieldRef.current)} onPointerCancel={() => pressOff(fieldRef.current)} onPointerLeave={() => pressOff(fieldRef.current)} className="[display:flex] [width:342px] [padding:8px_8px_8px_20px] [align-items:center] [gap:8px] [border-radius:32px] [border:1px_solid_transparent] [position:absolute] [left:24px] [top:655px] [height:66px] [overflow:hidden] [isolation:isolate] [cursor:text] [touch-action:manipulation]" style={{ translate: (inputPos.x - SHUT.x) + 'px ' + (inputPos.y - SHUT.y) + 'px', transition: tdur || tr('translate') }}>
+      {clip ? (
+        // 피그마 "input / 숏츠 첨부"(2332:10890 접힘, 2296:21025 펼침). 카드와 입력칸이 한 덩어리로 올라가고 눌린다. 첨부 삭제(X)는 피그마에 연결이 없어 누르는 자리로 만들지 않았다.
+        <div ref={cardRef} data-figma="input / 숏츠 첨부" data-node={startOpen ? '2296:21025' : '2332:10890'} onClick={(e) => { e.stopPropagation(); if (!open) expand(e); else if (inputRef.current) inputRef.current.focus({ preventScroll: true }); }} onPointerDown={() => { if (!open) pressOn(cardRef.current); }} onPointerUp={() => pressOff(cardRef.current)} onPointerCancel={() => pressOff(cardRef.current)} onPointerLeave={() => pressOff(cardRef.current)} className="[position:absolute] [overflow:hidden] [cursor:text] [touch-action:manipulation]" style={{ left: CLIP_CARD.x, top: CLIP_CARD.y, width: CLIP_CARD.w, height: CLIP_CARD.h, borderRadius: CLIP_CARD.r, background: CLIP_CARD.bg, translate: (inputPos.x - SHUT.x) + 'px ' + (inputPos.y - SHUT.y) + 'px', transition: tdur || tr('translate') }}>
+          <div data-figma="숏츠 / 쌍밍아웃 빌런썰 EP.1" data-node="2332:10892" className="[position:absolute] [overflow:hidden] [background:#FFFFFF]" style={{ left: CLIP_CARD.thumb.x, top: CLIP_CARD.thumb.y, width: CLIP_CARD.thumb.w, height: CLIP_CARD.thumb.h, borderRadius: CLIP_CARD.thumb.r }}>
+            <img data-figma="영상 / 쌍밍아웃" data-node="2332:10893" alt="" src={CLIP_THUMB} draggable={false} className="[position:absolute] [left:0px] [display:block] [max-width:none] [pointer-events:none]" style={{ top: CLIP_CARD.thumb.imgY, width: CLIP_CARD.thumb.w, height: CLIP_CARD.thumb.imgH }} />
+            <div data-figma="첨부 삭제" data-node="2332:10894" aria-hidden="true" className="[position:absolute] [line-height:0]" style={{ left: CLIP_CARD.del.x, top: CLIP_CARD.del.y, width: CLIP_CARD.del.s, height: CLIP_CARD.del.s, borderRadius: CLIP_CARD.del.r, background: CLIP_CARD.del.bg }}>
+              <span style={{ position: 'absolute', left: CLIP_CARD.del.icon, top: CLIP_CARD.del.icon, width: 16, height: 16 }} dangerouslySetInnerHTML={{ __html: CLIP_CLOSE_SVG }} />
+            </div>
+          </div>
+      <div ref={fieldRef} data-figma="input" data-node={clip ? (startOpen ? '2296:21031' : '2296:20817') : (startOpen ? '1671:45255' : '2045:11658')} data-instance-of="input" onClick={(e) => { e.stopPropagation(); if (!open) expand(e); else if (inputRef.current) inputRef.current.focus({ preventScroll: true }); }} onPointerDown={() => { if (!open) pressOn(pressTarget()); }} onPointerUp={() => pressOff(pressTarget())} onPointerCancel={() => pressOff(pressTarget())} onPointerLeave={() => pressOff(pressTarget())} className="[display:flex] [width:342px] [padding:8px_8px_8px_20px] [align-items:center] [gap:8px] [border-radius:32px] [border:1px_solid_transparent] [position:absolute] [left:24px] [top:655px] [height:66px] [overflow:hidden] [isolation:isolate] [cursor:text] [touch-action:manipulation]" style={clip ? { left: 0, top: CLIP_CARD.h - 66 } : { translate: (inputPos.x - SHUT.x) + 'px ' + (inputPos.y - SHUT.y) + 'px', transition: tdur || tr('translate') }}>
         <span aria-hidden="true" style={{ position: 'absolute', left: '-1px', top: '-1px', width: 0, height: 0, overflow: 'visible', zIndex: -1, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: "<svg data-box=\"\" width=\"342\" height=\"66\" viewBox=\"0 0 342 66\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"342\" height=\"66\" rx=\"32\" style=\"fill:#222628\"/><defs><clipPath id=\"chome_input\"><rect width=\"342\" height=\"66\" rx=\"32\"/></clipPath></defs><g clip-path=\"url(#chome_input)\"><path d=\"M32 0 L32 1 L310 1 L310 0 L310 -1 L32 -1 L32 0 Z M342 32 L341 32 L341 34 L342 34 L343 34 L343 32 L342 32 Z M310 66 L310 65 L32 65 L32 66 L32 67 L310 67 L310 66 Z M0 34 L1 34 L1 32 L0 32 L-1 32 L-1 34 L0 34 Z M32 66 L32 65 C14.8792 65 1 51.1208 1 34 L0 34 L-1 34 C-1 52.2254 13.7746 67 32 67 L32 66 Z M342 34 L341 34 C341 51.1208 327.121 65 310 65 L310 66 L310 67 C328.225 67 343 52.2254 343 34 L342 34 Z M310 0 L310 1 C327.121 1 341 14.8792 341 32 L342 32 L343 32 C343 13.7746 328.225 -1 310 -1 L310 0 Z M32 0 L32 -1 C13.7746 -1 -1 13.7746 -1 32 L0 32 L1 32 C1 14.8792 14.8792 1 32 1 L32 0 Z\" fill-rule=\"nonzero\" style=\"fill:#222628\"/></g></svg>" }} />
         <div data-figma="채팅 입력" data-live="home" data-node="I2045:11658;1620:43934" className="[display:flex] [height:48px] [padding-right:16px] [align-items:center] [flex:1_0_0] [border-radius:24px] [overflow:hidden] [position:relative]">
-          <p data-figma="편하게 고민을 꺼내보아요" data-node="I2045:11658;1620:43935" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:22px] [letter-spacing:-0.64px] [flex-shrink:0] [width:154px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]" style={{ opacity: hasText ? 0 : 1 }}><span style={{ position: 'relative', top: '0.176px', left: '0px' }}>{"편하게 고민을 꺼내보아요"}</span><span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0, overflow: 'visible', lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: svg["I1671:45255;1620:43935"] }} /></p>
+          <p data-figma="편하게 고민을 꺼내보아요" data-node="I2045:11658;1620:43935" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:22px] [letter-spacing:-0.64px] [flex-shrink:0] [width:154px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]" style={{ opacity: hasText ? 0 : 1 }}><span style={{ position: 'relative', top: '0.176px', left: '0px' }}>{"편하게 고민을 꺼내보아요"}</span><span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0, overflow: 'visible', lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: clip ? CLIP_PLACEHOLDER_SVG : svg["I1671:45255;1620:43935"] }} /></p>
           <form action="" noValidate onSubmit={(e) => { e.preventDefault(); send(); }} style={{ display: 'contents' }}>
           <input
             ref={inputRef}
@@ -346,6 +364,35 @@ export default function HomeScene({ startOpen = false, style, className }) {
           <Icon data-figma="arrow-right" data-node="I2045:11658;1671:44260;1620:43796" name="arrow-right-1620-23215" color="#000000" className="[width:24px] [height:24px] [flex-shrink:0] [position:relative]" />
         </div>
       </div>
+        </div>
+      ) : (
+      <div ref={fieldRef} data-figma="input" data-node={clip ? (startOpen ? '2296:21031' : '2296:20817') : (startOpen ? '1671:45255' : '2045:11658')} data-instance-of="input" onClick={(e) => { e.stopPropagation(); if (!open) expand(e); else if (inputRef.current) inputRef.current.focus({ preventScroll: true }); }} onPointerDown={() => { if (!open) pressOn(pressTarget()); }} onPointerUp={() => pressOff(pressTarget())} onPointerCancel={() => pressOff(pressTarget())} onPointerLeave={() => pressOff(pressTarget())} className="[display:flex] [width:342px] [padding:8px_8px_8px_20px] [align-items:center] [gap:8px] [border-radius:32px] [border:1px_solid_transparent] [position:absolute] [left:24px] [top:655px] [height:66px] [overflow:hidden] [isolation:isolate] [cursor:text] [touch-action:manipulation]" style={clip ? { left: 0, top: CLIP_CARD.h - 66 } : { translate: (inputPos.x - SHUT.x) + 'px ' + (inputPos.y - SHUT.y) + 'px', transition: tdur || tr('translate') }}>
+        <span aria-hidden="true" style={{ position: 'absolute', left: '-1px', top: '-1px', width: 0, height: 0, overflow: 'visible', zIndex: -1, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: "<svg data-box=\"\" width=\"342\" height=\"66\" viewBox=\"0 0 342 66\" style=\"position:absolute;left:0;top:0;overflow:visible;z-index:-1;pointer-events:none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"342\" height=\"66\" rx=\"32\" style=\"fill:#222628\"/><defs><clipPath id=\"chome_input\"><rect width=\"342\" height=\"66\" rx=\"32\"/></clipPath></defs><g clip-path=\"url(#chome_input)\"><path d=\"M32 0 L32 1 L310 1 L310 0 L310 -1 L32 -1 L32 0 Z M342 32 L341 32 L341 34 L342 34 L343 34 L343 32 L342 32 Z M310 66 L310 65 L32 65 L32 66 L32 67 L310 67 L310 66 Z M0 34 L1 34 L1 32 L0 32 L-1 32 L-1 34 L0 34 Z M32 66 L32 65 C14.8792 65 1 51.1208 1 34 L0 34 L-1 34 C-1 52.2254 13.7746 67 32 67 L32 66 Z M342 34 L341 34 C341 51.1208 327.121 65 310 65 L310 66 L310 67 C328.225 67 343 52.2254 343 34 L342 34 Z M310 0 L310 1 C327.121 1 341 14.8792 341 32 L342 32 L343 32 C343 13.7746 328.225 -1 310 -1 L310 0 Z M32 0 L32 -1 C13.7746 -1 -1 13.7746 -1 32 L0 32 L1 32 C1 14.8792 14.8792 1 32 1 L32 0 Z\" fill-rule=\"nonzero\" style=\"fill:#222628\"/></g></svg>" }} />
+        <div data-figma="채팅 입력" data-live="home" data-node="I2045:11658;1620:43934" className="[display:flex] [height:48px] [padding-right:16px] [align-items:center] [flex:1_0_0] [border-radius:24px] [overflow:hidden] [position:relative]">
+          <p data-figma="편하게 고민을 꺼내보아요" data-node="I2045:11658;1620:43935" data-outline="" className="[color:#9AA1A6] [font-family:'SUIT',_system-ui,_sans-serif] [font-size:16px] [font-style:normal] [font-weight:400] [line-height:22px] [letter-spacing:-0.64px] [flex-shrink:0] [width:154px] [white-space:pre] [word-break:normal] [overflow-wrap:normal] [margin:0] [-webkit-text-fill-color:transparent] [position:relative]" style={{ opacity: hasText ? 0 : 1 }}><span style={{ position: 'relative', top: '0.176px', left: '0px' }}>{"편하게 고민을 꺼내보아요"}</span><span aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0, overflow: 'visible', lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: clip ? CLIP_PLACEHOLDER_SVG : svg["I1671:45255;1620:43935"] }} /></p>
+          <form action="" noValidate onSubmit={(e) => { e.preventDefault(); send(); }} style={{ display: 'contents' }}>
+          <input
+            ref={inputRef}
+            type="text"
+            enterKeyHint="done"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            aria-label="편하게 고민을 꺼내보아요"
+            className="live-input"
+            tabIndex={open ? 0 : -1}
+            readOnly={!open && fine}
+            style={{ ...LIVE.inputStyle, fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', letterSpacing: '-0.64px', lineHeight: '22px', pointerEvents: open ? 'auto' : 'none', userSelect: 'text', WebkitUserSelect: 'text' }}
+            onInput={() => { comp.current.on = false; refreshText(); }}
+            onKeyDown={(e) => { if (isEnter(e)) { e.preventDefault(); send(); } }}
+          />
+          </form>
+        </div>
+        <div ref={btnRef} data-figma="btn_전송" data-node="I2045:11658;1671:44260" data-instance-of="btn_전송" role="button" aria-label="보내기" onPointerDown={(e) => { e.stopPropagation(); pressOn(btnRef.current); }} onPointerUp={() => pressOff(btnRef.current)} onPointerCancel={() => pressOff(btnRef.current)} onPointerLeave={() => pressOff(btnRef.current)} onMouseDown={(e) => e.preventDefault()} onClick={(e) => { e.stopPropagation(); send(); }} className="[display:flex] [width:48px] [height:48px] [justify-content:center] [align-items:center] [flex-shrink:0] [border-radius:24px] [background:#36D2FF] [overflow:hidden] [cursor:pointer] [touch-action:manipulation]">
+          <Icon data-figma="arrow-right" data-node="I2045:11658;1671:44260;1620:43796" name="arrow-right-1620-23215" color="#000000" className="[width:24px] [height:24px] [flex-shrink:0] [position:relative]" />
+        </div>
+      </div>
+      )}
       {fine && (
         <div data-figma="Keyboard / KR / iOS" data-node="2047:14061" aria-hidden="true" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.preventDefault()} className="[position:absolute] [touch-action:manipulation]" style={{ left: KB.x, top: kbTop, width: KB.w, height: KB.h, transform: open ? 'translateY(0)' : 'translateY(' + KB.h + 'px)', visibility: open ? 'visible' : 'hidden', transition: tdur || (tr('transform') + ', visibility 0ms linear ' + (open ? 0 : dur) + 'ms') }}>
           <img alt="" src={'./assets/home4/keyboard.webp'} draggable={false} className="[position:absolute] [left:0px] [top:0px] [width:389px] [height:303px] [display:block] [max-width:none] [pointer-events:none]" />

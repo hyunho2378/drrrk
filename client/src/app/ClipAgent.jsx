@@ -18,7 +18,7 @@ const CSS = `
 `;
 
 function enter() {
-  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 25, t: 'enter', label: '드르륵 에이전트' } }));
+  window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { to: 62, t: 'enter', label: '드르륵 에이전트' } }));
 }
 
 export function ClipAgent({ delay = 900 }) {

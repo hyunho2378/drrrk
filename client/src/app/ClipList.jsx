@@ -137,7 +137,7 @@ function Feed({ tab, cls }) {
   const { cards } = layout(tab);
   const open = (c) => {
     if (dragged) return;
-    if (c.banner) { go(25, 'enter'); return; }
+    if (c.banner) { go(62, 'enter'); return; }
     clipPick(c.clip);
     go(56, 'push');
   };

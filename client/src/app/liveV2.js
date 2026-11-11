@@ -193,7 +193,7 @@ function cardOf(c) {
     pill.appendChild(el('span', null, c.timer || '03:00'));
     card.appendChild(pill);
   }
-  if (c.st === 'fresh') card.appendChild(el('span', { position: 'absolute', left: '8px', top: '24px', width: '6px', height: '6px', borderRadius: '50%', background: '#36D2FF' }));
+  // 막 열린 방 왼쪽 위 파란 점(6 x 6 #36D2FF)은 팀이 11. 11. 21:59 라이브 목록에서 지웠다(의정 "목록부분 표시되는거 바꿨습니다").
   card.addEventListener('click', () => openWatch(c));
   return card;
 }

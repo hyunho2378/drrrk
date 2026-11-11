@@ -144,16 +144,21 @@ function ItemSheet({ slot }) {
         onPointerUp={() => { if (dy > 120) close(); else setDy(0); setY0(null); }}
         style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: H, background: '#121415', borderRadius: '24px 24px 0 0', zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 24px 0', boxSizing: 'border-box', transform: !up ? 'translateY(100%)' : 'translateY(' + dy + 'px)', touchAction: 'none' }}>
         <span data-figma="handle" style={{ width: 40, height: 4, borderRadius: 2, background: '#6E767C', flex: 'none' }} />
-        <button type="button" className="mh-btn mh-hero" data-figma="item hero" aria-label={locked ? '잠긴 아이템 소리 듣기' : copy.name + ' 소리 듣기'}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => playItem(key)}
-          style={{ marginTop: 24, width: 132, height: 132, borderRadius: 28, background: 'rgba(255,255,255,.06)', display: 'grid', placeItems: 'center', flex: 'none' }}>
-          {locked
-            ? <img alt="" src={A3 + 'lock.svg'} style={{ width: 40, height: 40 }} />
-            : <img alt="" draggable={false} src={copy.img} style={{ width: 112, height: 112, objectFit: 'contain' }} />}
-        </button>
+        {/* 11. 11. 팀 댓글(2100:28388 "아이템 누를때 소리 날 수 있게 수정 필요", 2116:28581 "여기서도 아이템 누르면 소리나게"):
+            그림 칸을 누를 때마다 그 아이템 소리를 처음부터 다시 낸다(같은 통로라 앞 소리는 30ms 만에 끊긴다). 시트가 열릴 때는 내지 않는다.
+            미획득(???) 시트의 그림 칸은 누를 수 없는 칸이라 소리와 누름 반응이 없다. */}
+        {locked
+          ? <span data-figma="item hero" aria-hidden style={{ marginTop: 24, width: 132, height: 132, borderRadius: 28, background: 'rgba(255,255,255,.06)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+              <img alt="" src={A3 + 'lock.svg'} style={{ width: 40, height: 40 }} />
+            </span>
+          : <button type="button" className="mh-btn mh-hero" data-figma="item hero" aria-label={copy.name + ' 소리 듣기'}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => playItem(key)}
+              style={{ marginTop: 24, width: 132, height: 132, borderRadius: 28, background: 'rgba(255,255,255,.06)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+              <img alt="" draggable={false} src={copy.img} style={{ width: 112, height: 112, objectFit: 'contain' }} />
+            </button>}
         <span data-figma="item name" style={{ marginTop: 16, height: 28, fontSize: 20, fontWeight: 700, lineHeight: '28px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>{copy.name}</span>
-        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: locked ? 0 : '-0.56px', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
+        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: locked || key === 'byeollo' ? 0 : '-0.56px', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
         <span data-figma="정보 칩" style={{ marginTop: 16, display: 'flex', gap: 8 }}>
           {chips.map((c, i) => (
             <span key={i} data-figma={i === 0 ? 'chip 쿨타임' : 'chip 라이브 전용'} style={{ padding: '5px 10px', borderRadius: 8, background: 'rgba(255,255,255,.08)', fontSize: locked ? 14 : 12, fontWeight: locked ? 400 : 500, lineHeight: locked ? '21px' : '17px', color: '#CCD1D6', whiteSpace: 'nowrap' }}>{c}</span>

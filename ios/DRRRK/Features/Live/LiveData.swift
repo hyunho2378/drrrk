@@ -77,11 +77,11 @@ enum LiveData {
             .init(title: "둘이 찍은 사진인데\n지만 보정해서 올린 여우", viewers: "11", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-cf2670f44f", ring: false), .chair(253, 62, 32, "D-chairt-450692c4db", ring: false), .chair(275, 46, 48, "D2-chair-ad4a1456", ring: true), .speaking(309, 81)]),
             .init(title: "내 머리 끝부터 발끝까지\n따라하는 손민수 친구가 있어", viewers: "7", meta: "8:10 남음", metaBlue: false, els: [.chair(256, 67, 32, "D2-chair-25629e6f", ring: false), .chair(278, 51, 48, "D-chairt-6e90eda49e", ring: false)]),
             .init(title: "생일에 나만 선물\n안 챙겨준 베프", viewers: "10", meta: "첫 대화 상대를 기다려요", metaBlue: true, els: [.empty(256, 62), .chair(278, 46, 48, "D-chairt-51be0a544b", ring: false)]),
-            .init(title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-f77c03c1bf", ring: false), .chair(278, 46, 48, "D2-chair-25629e6f", ring: true), .speaking(312, 81), .fresh(8, 24)]),
+            .init(title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-f77c03c1bf", ring: false), .chair(278, 46, 48, "D2-chair-25629e6f", ring: true), .speaking(312, 81)]),
             .init(title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", viewers: "22", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-4fdd18ce8a", ring: false), .chair(253, 62, 32, "D-chairt-450692c4db", ring: false), .chair(275, 46, 48, "D-chairt-6bfc511e24", ring: true), .speaking(309, 81)]),
             .init(title: "친구 전남친이랑 썸 타는 중… \n괜찮음?", viewers: "22", meta: "03:00 남음", metaBlue: false, els: [.timer(269, 16, "03:00"), .more(212, 65, "+3"), .chair(231, 62, 32, "D-chairt-d7b0bb5005", ring: false), .chair(253, 62, 32, "D-chairt-6e90eda49e", ring: false), .chair(275, 46, 48, "D-chairt-3ff806dcf7", ring: true), .speaking(309, 81)]),
             .init(title: "동생이 내 옷 말없이\n입고 나감. 개열받는다", viewers: "4", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-801d8aedde", ring: false), .chair(253, 62, 32, "D-chairt-bbab91fe74", ring: false), .chair(275, 46, 48, "D-chairt-b5c25c4cae", ring: true), .speaking(309, 81)]),
-            .init(title: "오빠랑 아빠랑 \n심하게 싸워서 눈치보여", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-cf2670f44f", ring: false), .chair(278, 46, 48, "D-chairt-ef3d01c180", ring: true), .speaking(312, 81), .fresh(8, 24)]),
+            .init(title: "오빠랑 아빠랑 \n심하게 싸워서 눈치보여", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-cf2670f44f", ring: false), .chair(278, 46, 48, "D-chairt-ef3d01c180", ring: true), .speaking(312, 81)]),
             .init(title: "부모님 싸우는 소리에 \n잠을 못 자겠어", viewers: "4", meta: "8:10 남음", metaBlue: false, els: [.chair(256, 67, 32, "D-chairt-b5c25c4cae", ring: false), .chair(278, 51, 48, "D-chairt-801d8aedde", ring: false)]),
             .init(title: "조별과제 무임승차한 동기\n이름 빼버릴까?", viewers: "6", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-cf2670f44f", ring: false), .chair(253, 62, 32, "D-chairt-d7b0bb5005", ring: false), .chair(275, 46, 48, "D-chairt-33871c043e", ring: true), .speaking(309, 81)]),
             .init(title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", viewers: "7", meta: "03:00 남음", metaBlue: false, els: [.timer(269, 16, "03:00"), .more(212, 65, "+3"), .chair(231, 62, 32, "D-chairt-6e90eda49e", ring: false), .chair(253, 62, 32, "D-chairt-4fdd18ce8a", ring: false), .chair(275, 46, 48, "D2-chair-7c2f0480", ring: true), .speaking(309, 81)]),
@@ -93,13 +93,13 @@ enum LiveData {
             .init(title: "생일에 나만 선물\n안 챙겨준 베프", viewers: "10", meta: "첫 대화 상대를 기다려요", metaBlue: true, els: [.empty(256, 62), .chair(278, 46, 48, "D-chairt-51be0a544b", ring: false)]),
         ],
         "연애": [
-            .init(title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-f77c03c1bf", ring: false), .chair(278, 46, 48, "D2-chair-25629e6f", ring: true), .speaking(312, 81), .fresh(8, 24)]),
+            .init(title: "전 애인이랑 아직\n맞팔 중인 남친, 미친거아냐?", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-f77c03c1bf", ring: false), .chair(278, 46, 48, "D2-chair-25629e6f", ring: true), .speaking(312, 81)]),
             .init(title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", viewers: "22", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-4fdd18ce8a", ring: false), .chair(253, 62, 32, "D-chairt-450692c4db", ring: false), .chair(275, 46, 48, "D-chairt-6bfc511e24", ring: true), .speaking(309, 81)]),
             .init(title: "친구 전남친이랑 썸 타는 중… \n괜찮음?", viewers: "22", meta: "03:00 남음", metaBlue: false, els: [.timer(269, 16, "03:00"), .more(212, 65, "+3"), .chair(231, 62, 32, "D-chairt-d7b0bb5005", ring: false), .chair(253, 62, 32, "D-chairt-6e90eda49e", ring: false), .chair(275, 46, 48, "D-chairt-3ff806dcf7", ring: true), .speaking(309, 81)]),
         ],
         "가족": [
             .init(title: "동생이 내 옷 말없이\n입고 나감. 개열받는다", viewers: "4", meta: "12:32 남음", metaBlue: false, els: [.more(212, 65, "+1"), .chair(231, 62, 32, "D-chairt-801d8aedde", ring: false), .chair(253, 62, 32, "D-chairt-bbab91fe74", ring: false), .chair(275, 46, 48, "D-chairt-b5c25c4cae", ring: true), .speaking(309, 81)]),
-            .init(title: "오빠랑 아빠랑 \n심하게 싸워서 눈치보여", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-cf2670f44f", ring: false), .chair(278, 46, 48, "D-chairt-ef3d01c180", ring: true), .speaking(312, 81), .fresh(8, 24)]),
+            .init(title: "오빠랑 아빠랑 \n심하게 싸워서 눈치보여", viewers: "22", meta: "방금 열림", metaBlue: true, els: [.chair(256, 62, 32, "D-chairt-cf2670f44f", ring: false), .chair(278, 46, 48, "D-chairt-ef3d01c180", ring: true), .speaking(312, 81)]),
             .init(title: "부모님 싸우는 소리에 \n잠을 못 자겠어", viewers: "4", meta: "8:10 남음", metaBlue: false, els: [.chair(256, 67, 32, "D-chairt-b5c25c4cae", ring: false), .chair(278, 51, 48, "D-chairt-801d8aedde", ring: false)]),
         ],
         "학교": [
@@ -237,9 +237,16 @@ struct PostComment: Identifiable, Hashable {
 }
 
 enum CommunityData {
-    // 피그마 1953:19492(첫 장면, 라이브 목록 1943:12456과 같은 그림)와 1953:19497
-    static let scenes = ["D3-live-scene-1", "C-1d4163290693"]
-    static let featuredTitles = ["둘이 찍은 사진인데\n지만 보정해서 올린 여우", "남친이 1주년 선물로\n다이소 틴트 사줌"]
+    // 명예의 전당 카우셀 다섯 장(피그마 1953:19406 안 캐러셀 2298:20561, 왼쪽부터 Carousel / 1, 4, 3, 2, 5).
+    // 첫 장면은 라이브 목록 1943:12456과 같은 그림이고, 둘째부터 다섯째 장면은 피그마 Scene 노드를 2배로 내보낸 그림이다(웹 assets/hall5와 같다).
+    static let scenes = ["D3-live-scene-1", "C-hall-2", "C-hall-3", "C-hall-4", "C-hall-5"]
+    static let featuredTitles = [
+        "둘이 찍은 사진인데\n지만 보정해서 올린 여우",
+        "남친이 1주년 선물로\n다이소 틴트 사줌",
+        "남사친이 자꾸만\n좋아져서 고민이야",
+        "너네는 친구가 남미새면\n어떻게 할거야?",
+        "친친 스토리에 나만 빼고\n등록해둔 친구가 있어",
+    ]
     static let posts: [CommunityPost] = [
         .init(title: "친구가 썸남 앞에서\n내 쌍밍아웃함", likes: 128, comments: 52, thumb: "F-community-thumb-1"),
         .init(title: "화장실에서 혼자\n급식 먹다가 걸린 썰 푼다", likes: 31, comments: 17, thumb: "F-community-thumb-2"),

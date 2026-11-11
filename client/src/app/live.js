@@ -1,13 +1,14 @@
 // 화면 위에서 실제로 움직이는 것들. 피그마 생성물(src/figma)은 고치지 않고, 그려진 화면의 요소를 이름(data-figma)으로 찾아 덧붙인다.
 // 1) 상태바 시계: 왼쪽 시간을 실제 시각으로(강릉페이 리뉴얼과 같은 방식, 오른쪽 아이콘은 그대로).
-// 2) 방 시계: 해 뜨기까지 남은 시간을 tokens.js live.timeScale 빠르기로 줄이고, 01:12(해 뜨는 단계)과 0에서 다음 화면으로 넘긴다.
+// 2) 방 시계: 해 뜨기까지 남은 시간을 roomClock.js 변환(함께 방은 두 구간 30초, 혼자 방은 90초)으로 줄이고, 01:12(해 뜨는 단계)과 0에서 다음 화면으로 넘긴다.
 // 3) 채팅: 방에 처음 들어가면 대화가 하나씩 올라온다.
 // 4) 입력: 채팅과 댓글을 실제로 쓰고 보내면 화면에 붙는다.
 // 5) 고민 분석: 원이 0부터 차고 단계가 하나씩 체크된다.
 import { watchStart } from './liveV2.js';
+import { leftAfter } from './roomClock.js';
 import { motion, live as LIVE } from '../tokens.js';
 import { patchLiveV2, patchWatchSeats } from './liveV2.js';
-import { startWatchChat, prepareWatchChat } from './watchChat.js';
+import { startWatchChat, prepareWatchChat, styleMine, wireSend } from './watchChat.js';
 import { handOff, handoffNow, takeRoomStart, stepReady } from './roomClockHandoff.js';
 import { q, rootOf, scaleOf, relRect, setText } from './dom.js';
 import { attachRoom } from './room.js';
@@ -21,6 +22,7 @@ import { prepLoveDot, attachLoveDot } from './loveDots.js';
 import { warm, cloneOf } from './donor.js';
 import { applySync } from './sync.js';
 import { patchCommunity } from './community.js';
+import { prepareHall } from './hallOfFame.js';
 import { patchMyChair, mineRel, fixedRel, commitDraft, openStudio } from './chairs.js';
 import { attachPost } from './post.js';
 import { attachSort } from './sort.js';
@@ -34,6 +36,7 @@ import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from '
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 import { prepareNormalPager, attachNormalPager } from './normalPager.js';
 import { attachDictation, endDictation } from './dictation.js';
+import { isClipDone, setClipDone } from './clipHome.js';
 
 export { setText };
 
@@ -47,7 +50,9 @@ const hashN = () => Number((/\/s\/(\d+)/.exec(window.location.hash) || [])[1]);
 // 누른 자리가 가는 곳을 정한다. 아이템 상세를 닫으면 눌렀던 화면으로 돌아가고, 아이템을 누르면 어떤 아이템인지 적어 둔다.
 export function resolveTo(l) {
   // 네이버 클립에서 드르륵으로 들어가는 길: 스플래시를 띄우고 화면은 바로 바꾼다(스플래시가 덮고 있는 동안 홈이 그려진다).
+  // 클립에서 다시 들어오면 처음(클립이 붙은 홈 62)부터 다시 시연한다(clipHome.js).
   if (l.t === 'enter') {
+    setClipDone(false);
     window.dispatchEvent(new Event('drrrk:splash'));
     return Object.assign({}, l, { t: 'none' });
   }
@@ -61,6 +66,15 @@ export function resolveTo(l) {
     try { sessionStorage.setItem('drrrk-room-from', l.from === 37 ? 'live' : 'home'); } catch (e) { /* 기본값 home */ }
     // 방 구경에서 앉는 순간의 시계 값을 방 시계로 넘긴다(roomClockHandoff.js).
     if (l.from === 37 && room.scene === 'W') handOff(remaining());
+    // 함께 드르륵을 한 판 한 뒤에는 홈으로 가는 길이 모두 빈 홈(25)으로 간다(11/11 23:18 팀 흐름 변경).
+    setClipDone(true);
+  }
+  // 방을 찾지 못함(45)에 어디서 왔는지 적어 둔다. 뒤로는 추천 드르륵(27)에서 왔으면 27, 빈 홈에서 왔으면 빈 홈(25)이다.
+  if (l.to === 45 && l.t !== 'back') { try { sessionStorage.setItem('drrrk-noroom-from', l.from === 27 ? 'rec' : 'home'); } catch (e) { /* 기본값 home */ } }
+  if (l.from === 45 && l.to === 25 && l.t === 'back') {
+    let o = 'home';
+    try { o = sessionStorage.getItem('drrrk-noroom-from') || 'home'; } catch (e) { /* 기본값 home */ }
+    return o === 'rec' ? Object.assign({}, l, { to: 27 }) : l;
   }
   if (l.t === 'back' && l.to === 25 && [28, 29, 30, 31, 32, 40].includes(l.from)) {
     let origin = 'home';
@@ -71,8 +85,13 @@ export function resolveTo(l) {
   // 활동 알림(57)의 의자 꾸미기 알림으로 연 의자 꾸미기는 뒤로와 저장하기 모두 알림으로 돌아간다(iOS router.pop과 같다. NotiScreens.jsx).
   if (l.to === 20) { try { sessionStorage.setItem('drrrk-studio-from', l.from === 57 ? 'noti' : 'my'); } catch (e) { /* 기본값 마이 */ } }
   if (l.from === 20 && l.to === 36 && l.t === 'back') { let o = 'my'; try { o = sessionStorage.getItem('drrrk-studio-from') || 'my'; } catch (e) { /* 기본값 마이 */ } if (o === 'noti') return Object.assign({}, l, { to: 57 }); }
+  // 키워드 관리(60)는 연 화면(키워드 알림 58 또는 풀버전 59)으로 돌아간다. iOS router.pop과 같다.
+  if (l.to === 60) { const f = l.from || hashN(); try { sessionStorage.setItem('drrrk-kw-from', f === 58 ? '58' : '59'); } catch (e) { /* 기본값 59 */ } }
+  if ((l.from === 60 || hashN() === 60) && l.t === 'back' && l.to === 59) { let o = '59'; try { o = sessionStorage.getItem('drrrk-kw-from') || '59'; } catch (e) { /* 기본값 59 */ } if (o === '58') return Object.assign({}, l, { to: 58 }); }
   if (l.item) pickItem(l.item, l.from);
   if (l.to === 'item-from') return Object.assign({}, l, { to: itemFrom() });
+  // 함께 드르륵 방에 앉기 전에는 홈으로 가는 길(탭바, 알림 닫기, 뒤로)이 클립이 붙은 홈(62, 펼침 63)으로 간다.
+  if ((l.to === 25 || l.to === 24) && !isClipDone()) return Object.assign({}, l, { to: l.to === 25 ? 62 : 63 });
   return l;
 }
 
@@ -125,7 +144,7 @@ const fmtMMSS = (sec) => {
   return String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0');
 };
 const timerTexts = (root) => q(root, '[data-figma^="Timer Pill"] [data-figma="time"], [data-figma^="Timer Badge"] p[data-outline], [data-figma^="해 뜨기까지"] [data-figma="time"]').filter((p) => /\d:\d\d/.test(p.textContent));
-const remaining = () => room.left - ((performance.now() - room.at) / 1000) * LIVE.timeScale;
+const remaining = () => leftAfter(room.left, (performance.now() - room.at) / 1000, room.scene);
 
 // ---------- 3) 채팅이 하나씩 ----------
 const CHAT_SEL = '[data-figma^="row ·"], [data-figma^="내 채팅"], [data-figma^="Chat Bubble"]';
@@ -176,7 +195,7 @@ function postLiveComment(root, text) {
   delete node.dataset.watchTpl;
   node.dataset.watchRow = '1';
   setText(node.querySelector('p[data-outline]'), text);
-  q(node, '[data-figma="bubble"], p[data-outline]').forEach((el) => Object.assign(el.style, { width: 'auto' }));
+  styleMine(node);
   Object.assign(box.style, { justifyContent: 'flex-end', overflow: 'hidden' });
   box.appendChild(node);
   node.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: motion.stateIn + 100, easing: motion.emphasizedDecel });
@@ -236,11 +255,11 @@ function attachInputs(root, n, go) {
       const next = LIVE.afterSend[n];
       if (next) window.setTimeout(() => go({ to: next, t: 'fade' }), LIVE.afterSendMs);
     };
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); send(); } });
     // 받아쓰기(dictation.js)도 이 보내기를 그대로 쓴다.
     input.__send = send;
     const btn = field.parentElement && field.parentElement.querySelector('[data-figma^="btn_전송"]');
-    if (btn) { btn.style.cursor = 'pointer'; btn.addEventListener('click', send); }
+    // 엔터(한글 조합 중 엔터 포함)와 보내기 버튼(누름 반응, 눌러도 초점 유지)은 watchChat.js wireSend가 붙인다.
+    wireSend(input, btn, send);
   });
 }
 
@@ -804,6 +823,8 @@ export async function prepare(layer, n, prevN) {
   await prepareNormalPager(layer, root, n);
   // 라이브 목록(liveV2.js)을 먼저 깔아야 화면 스크롤(attachDrag)이 새 카드 목록 끝까지 잰다(11/10 전체 탭 스크롤 수정).
   patchLiveV2(root, n);
+  // 커뮤니티 명예의 전당 카우셀 다섯 장(hallOfFame.js): 카드 넘기기(attachDrag)가 다섯 장을 세도록 먼저 깐다.
+  await prepareHall(root, n);
   attachDrag(layer, root, n);
   prepLoveDot(root, n);
   fixIcons(root);
@@ -905,6 +926,11 @@ export function attach(layer, n, go, prevN) {
 function tick() {
   tickClock();
   if (!room.scene || !current.layer) return;
+  // 함께 방(B)은 실제 30초라(11/11 시연 요청) 방 온보딩 덮개가 떠 있는 동안 방 시계를 멈춘다. 덮개가 닫히면 멈춘 자리부터 흐른다.
+  // 한 번에 미는 시간은 tick 두 번(500ms)까지라, 다른 화면에 있다 돌아와도 시계가 되감기지 않는다.
+  const tickNow = performance.now();
+  if (room.scene === 'B' && document.querySelector('[data-figma="방 온보딩"]')) room.at += Math.min(500, Math.max(0, tickNow - (room.lastTick || tickNow)));
+  room.lastTick = tickNow;
   // 화면을 옮기는 중(주소가 이미 다음 화면)이면 이전 방 시계로 화면을 넘기지 않는다.
   if (hashN() !== current.n) return;
   const root = rootOf(current.layer);

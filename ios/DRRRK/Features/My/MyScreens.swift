@@ -587,29 +587,33 @@ private struct MyItemSheet: View {
     var body: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 24)
-            Button {
-                ItemSound.shared.play(isLocked ? "locked" : item.id)
-            } label: {
-                ZStack {
-                    if isLocked {
-                        Image("D-icon-lock").renderingMode(.template).resizable()
-                            .foregroundStyle(.white)
-                            .frame(width: 40, height: 40)
-                    } else {
-                        Image(item.asset).resizable().scaledToFit()
-                            .frame(width: 112, height: 112)
-                    }
+            // 11. 11. 팀 댓글(2100:28388 "아이템 누를때 소리 날 수 있게 수정 필요", 2116:28581 "여기서도 아이템 누르면 소리나게"):
+            // 그림 칸을 누를 때마다 그 아이템 소리를 처음부터 다시 낸다(같은 통로라 앞 소리는 줄여 끊는다). 시트가 열릴 때는 내지 않는다.
+            // 미획득(???) 시트의 그림 칸은 누를 수 없는 칸이라 소리와 누름 반응이 없다(웹 MyHome.jsx ItemSheet와 같다).
+            if isLocked {
+                Image("D-icon-lock").renderingMode(.template).resizable()
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .frame(width: 132, height: 132)
+                    .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28))
+                    .accessibilityHidden(true)
+            } else {
+                Button {
+                    ItemSound.shared.play(item.id)
+                } label: {
+                    Image(item.asset).resizable().scaledToFit()
+                        .frame(width: 112, height: 112)
+                        .frame(width: 132, height: 132)
+                        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28))
+                        .contentShape(RoundedRectangle(cornerRadius: 28))
                 }
-                .frame(width: 132, height: 132)
-                .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28))
-                .contentShape(RoundedRectangle(cornerRadius: 28))
+                .buttonStyle(PressStyle())
+                .accessibilityLabel("\(copy.name) 소리 듣기")
             }
-            .buttonStyle(PressStyle())
-            .accessibilityLabel(isLocked ? "잠긴 아이템 소리 듣기" : "\(copy.name) 소리 듣기")
             Spacer().frame(height: 16)
             Text(copy.name).suit(20, .bold, lineHeight: 28).foregroundStyle(DS.Palette.textPrimary).frame(height: 28)
             Spacer().frame(height: 18)
-            Text(copy.text).suit(14, .regular, tracking: isLocked ? 0 : -0.56, lineHeight: 21)
+            Text(copy.text).suit(14, .regular, tracking: isLocked || item.id == "byeollo" ? 0 : -0.56, lineHeight: 21)
                 .foregroundStyle(Color(hex: 0xCCD1D6))
                 .multilineTextAlignment(.center)
                 .fixedSize()

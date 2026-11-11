@@ -58,12 +58,19 @@ export const type = { item: ['15px', { lineHeight: '1.4' }], bar: ['14px', { lin
 // keep은 빈 띠마다 남기는 최소 높이, bgMin 이상 높이는 배경 그림으로 본다.
 export const mobile = { scrollOnly: ['2023:30658'], maxWidth: 600, crop: 48, head: 112, keep: 16, bgMin: 600, bgAnchor: 0.6, bottomSeed: 100, clusterMin: 300, clusterGap: 28, homeBar: [134, 5], pinZ: 3 };
 
-// 방 시계는 화면에 20:00에서 시작해 00:00까지 줄어들고, 이 20분이 실제로는 1분 30초(90초)에 지나간다(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로").
-// 그래서 시계는 1초에 13.33초씩 줄어든다(1200 / 90). 방 시계(live.js), 방 구경 시계(37), 이어받기(roomClockHandoff.js)가 모두 이 빠르기를 쓴다. iOS RoomModel.realSeconds와 같다.
+// 방 시계는 화면에 20:00에서 시작해 00:00까지 줄어든다. 시계 값과 실제 초 사이 변환은 roomClock.js 한 곳에서 한다.
+// 함께 드르륵 방(B)과 방 구경(W): 해뜨기 영상까지 합쳐 실제 30초(11/11 사용자 전달 "함께 드르륵 실제 체감 시간 30초로").
+//   20:00에서 01:12까지 실제 24.6초(이야기 구간, 1초에 (1200 - 72) / 24.6 = 45.85초씩), 01:12에서 00:00까지 실제 5.4초(해뜨기 구간, 1초에 72 / 5.4 = 13.33초씩).
+//   iOS RoomModel.storyRealSeconds, sunriseRealSeconds와 같다.
+// 혼자 드르륵 방(C)과 옛 방(A): 예전처럼 20분이 실제 1분 30초(90초), 1초에 13.33초씩(11/10 팀 요청 "해뜨기까지 시간 3분이잖아 1분30초로"). iOS RoomModel.realSeconds와 같다.
+//   혼자 방은 온보딩을 닫은 뒤 10초짜리 AI 대화와 비슷한 고민 안내 창(42)이 이어지므로 30초로 줄이지 않는다.
 const ROOM_REAL_SECONDS = 90;
 const ROOM_TIME_SCALE = 1200 / ROOM_REAL_SECONDS;
-// 해 뜨는 단계(40)가 시작하는 화면 시계 값. 피그마 "해 뜨기까지 01:12". 01:12에서 0까지 실제 72 / 13.33 = 5.4초라 해뜨기 영상(5.17초)과 맞는다. iOS RoomModel.lastMinuteShown과 같다.
+// 해 뜨는 단계(40)가 시작하는 화면 시계 값. 피그마 "해 뜨기까지 01:12". 01:12에서 0까지 실제 5.4초라 해뜨기 영상(5.17초)과 맞는다. iOS RoomModel.lastMinuteShown과 같다.
 const SUNRISE_AT = 72;
+const ROOM_STORY_REAL_SECONDS = 24.6;
+const ROOM_SUNRISE_REAL_SECONDS = 5.4;
+const ROOM_SUNRISE_SCALE = SUNRISE_AT / ROOM_SUNRISE_REAL_SECONDS;
 // 시계가 0이 된 뒤 영상 마지막 장면(해 뜬 아침)에 머무는 실제 시간(ms). 예전 해 뜬 순간(35)이 종료로 넘어가던 시간(flow.js AUTO 35, 3000)과 같다.
 const SUN_HOLD_MS = 3000;
 
@@ -73,6 +80,8 @@ export const live = {
   screenH: 844,
   realRoomSeconds: ROOM_REAL_SECONDS,
   timeScale: ROOM_TIME_SCALE,
+  // 함께 드르륵 방 두 구간 시계(roomClock.js). storyReal 이야기 구간 실제 초, sunriseReal 해뜨기 구간 실제 초.
+  clock: { storyReal: ROOM_STORY_REAL_SECONDS, sunriseReal: ROOM_SUNRISE_REAL_SECONDS, storyScale: (1200 - SUNRISE_AT) / ROOM_STORY_REAL_SECONDS, sunriseScale: ROOM_SUNRISE_SCALE },
   roomSeconds: 1200,
   defaultLeft: 180,
   sunriseAt: SUNRISE_AT,
@@ -95,10 +104,11 @@ export const live = {
   // A 옛 방(9): 01:12에 해 뜨는 단계(40), 0에 종료(1).
   // B 함께 드르륵 방(28, 29, 쌍밍아웃과 사진보정 둘 다): 01:12에 해 뜨는 단계(40, 해뜨기 영상), 0이 된 뒤 영상 마지막 장면에 3초 머물고 종료(1).
   //   예전 B는 0에 해 뜬 순간(35)으로 가서 40과 영상을 건너뛰었다. 이제 영상 마지막 장면이 35의 역할을 하므로 35를 거치지 않는다.
-  //   머무는 3초는 시계 값으로 0 아래 40초(3 x 13.33)다. 화면 시계는 00:00에 멈춰 보인다.
+  //   머무는 3초는 해뜨기 구간 빠르기로 시계 값 0 아래 40초(3 x 13.33)다. 화면 시계는 00:00에 멈춰 보인다.
+  //   그래서 홈에서 들어온 함께 방은 입장 뒤 24.6초에 40, 30초에 00:00, 33초에 종료(1)로 간다.
   rooms: {
     A: [{ at: SUNRISE_AT, to: 40 }, { at: 0, to: 1 }],
-    B: [{ at: SUNRISE_AT, to: 40 }, { at: -(SUN_HOLD_MS / 1000) * ROOM_TIME_SCALE, to: 1 }],
+    B: [{ at: SUNRISE_AT, to: 40 }, { at: -(SUN_HOLD_MS / 1000) * ROOM_SUNRISE_SCALE, to: 1 }],
   },
   // 입력칸으로 살릴 안내 글(이 글이 있는 칸만 실제로 쓸 수 있게 한다).
   inputHint: /한마디|댓글|메시지/,
