@@ -38,7 +38,8 @@ final class RoomVoice {
         micOff = false
         if fresh { shown = [] }
         pending = nil
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+        // 받아쓰기(Dictation.swift)가 녹음 세션을 쓰는 중이면 ambient 로 되돌리지 않는다.
+        if !DictationAudio.recording { try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers]) }
         for v in lines.values { _ = player(v.key) }
         FileSound.shared.preload(SoundFiles.snackKeys)
     }

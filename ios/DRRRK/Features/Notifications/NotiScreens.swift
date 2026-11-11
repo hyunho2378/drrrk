@@ -14,7 +14,7 @@ private struct ActivityItem: Identifiable {
     let body: String
     let more: String?
     let unread: Bool
-    /// 누르면 갈 화면이 있는 알림인지(새 기능 안내와 친구 초대 보상은 갈 화면이 없다)
+    /// 누르면 갈 화면이 있는 알림인지(지금 목록은 모두 true, 갈 곳은 destination에서 종류로 정한다)
     var link = true
 }
 
@@ -42,16 +42,24 @@ private struct KeywordHit: Identifiable {
 
 private enum NotiData {
     static let filters = ["전체", "엉따지수", "댓글", "업적 편의점", "의자꾸미기"]
+    /// 피그마 "활동 알림 1"(1952:14673, 11. 11.) 목록 순서와 글 그대로. 분류 칩을 누르면 kind가 같은 줄만 남고,
+    /// 그 결과가 분류 프레임 네 장(엉따지수 2308:19827, 댓글 2308:19983, 업적 편의점 2308:20115, 의자꾸미기 2296:19886)의 목록과 같다.
     static let activity: [ActivityItem] = [
-        .init(kind: "엉따지수", icon: "C-noti-0", title: "엉따지수", ago: "2일 전", body: "3이 연속 DRR에 입장해서 엉따 온도가 36.8°로 올랐어요.", more: "2건 더보기", unread: true),
+        .init(kind: "엉따지수", icon: "C-noti-0", title: "엉따지수", ago: "2일 전", body: "3일 연속 DRR에 입장해서 엉따 온도가 36.8°로 올랐어요.", more: "2건 더보기", unread: true),
+        .init(kind: "의자꾸미기", icon: "C-noti-4", title: "의자 꾸미기", ago: "6일 전", body: "새 의자 ‘푹신푹신 리클라이너’가 잠금 해제됐어요. 지금 앉아볼까요?", more: nil, unread: false),
         .init(kind: "댓글", icon: "C-noti-1", title: "댓글", ago: "7일 전", body: "‘3일째 읽씹하는 썸남’ 방에 새 댓글이 달렸어요. “나도 비슷한 일 있었음”", more: nil, unread: false),
+        .init(kind: "엉따지수", icon: "C-noti-0", title: "엉따지수", ago: "7일 전", body: "커뮤니티에 댓글을 10개 달아서 엉따 온도가 36.6°로 올랐어요.", more: "2건 더보기", unread: false),
         .init(kind: "업적 편의점", icon: "C-noti-2", title: "업적 편의점", ago: "17일 전", body: "‘새우깡’ 주전부리를 받았어요!", more: "1건 더보기", unread: false),
         .init(kind: "중요", icon: "C-noti-3", title: "신고 결과 · 중요 알림", ago: "20일 전", body: "신고해주신 ‘새벽2시 택배상자’님을 드르륵 운영정책에 따라 조치했어요. 신고해주셔서 감사해요 :)", more: nil, unread: false),
-        .init(kind: "의자꾸미기", icon: "C-noti-4", title: "의자 꾸미기", ago: "21일 전", body: "새 의자 ‘푹신푹신 리클라이너’가 잠금 해제됐어요. 지금 앉아볼까요?", more: nil, unread: false),
+        .init(kind: "의자꾸미기", icon: "C-noti-4", title: "의자 꾸미기", ago: "21일 전", body: "새 의자 ‘슝슝 바퀴달린 의자’가 잠금 해제됐어요. 지금 앉아볼까요?", more: nil, unread: false),
         .init(kind: "댓글", icon: "C-noti-5", title: "댓글", ago: "22일 전", body: "내 댓글에 따봉이 5개 달렸어요.", more: nil, unread: false),
-        .init(kind: "중요", icon: "C-noti-3", title: "새 기능 안내", ago: "23일 전", body: "드르륵에 새로 추가된 '테마 변경' 기능을 사용해보세요! 나만의 스타일로 꾸며보세요.", more: nil, unread: false, link: false),
-        .init(kind: "의자꾸미기", icon: "C-noti-4", title: "친구 초대 보상", ago: "24일 전", body: "친구를 초대하면 특별한 보상을 드려요! 지금 초대하고 선물을 받아가세요.", more: nil, unread: false, link: false),
     ]
+    /// 칩 글자 굵기: 고른 칩은 SemiBold, 나머지는 Medium. 엉따지수 프레임(2308:19827)만 고르지 않은 "전체"도 SemiBold로 그려져 있어 그대로 따른다(웹 notiTabs.js와 같다).
+    static func chipSemibold(_ chip: String, selected: String) -> Bool {
+        chip == selected || (chip == "전체" && selected == "엉따지수")
+    }
+    /// 분류 바꿈: 목록만 180ms 교차 페이드(opacity), 표준 곡선. 머리말과 탭, 칩 줄은 제자리다.
+    static let listFade = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.18)
     static let sections: [(String, [KeywordHit])] = [
         ("오늘", [
             .init(keyword: "썸", title: "3일째 읽씹하는 썸남\n내가 먼저 연락해도 될까?", meta: "연애 · 방금 전 · 4명 이야기 중", time: "19:00", thumb: "H-noti-thumb-1", unread: true),
@@ -153,10 +161,12 @@ private struct FilterChip: View {
     let title: String
     let on: Bool
     var count: Int?
+    /// 글자 굵기를 따로 정할 때(활동 알림 분류 칩). 없으면 고른 칩만 SemiBold
+    var semibold: Bool?
     var body: some View {
         // 피그마 Chip: 안쪽 7 / 14, 글자 14(고른 칩 SemiBold, 나머지 Medium, 행간 17, 자간 0), 숫자 13 Bold, 높이 31
         HStack(spacing: 4) {
-            Text(title).suit(14, on ? .semibold : .medium, lineHeight: 17)
+            Text(title).suit(14, (semibold ?? on) ? .semibold : .medium, lineHeight: 17)
             if let count {
                 Text("\(count)").suit(13, .bold, lineHeight: 16).foregroundStyle(DS.Palette.brandPrimary)
             }
@@ -204,7 +214,9 @@ struct NotiActivityView: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(NotiData.filters, id: \.self) { f in
-                        Button { withAnimation(DS.Motion.stateIn) { filter = f } } label: { FilterChip(title: f, on: f == filter) }
+                        Button { withAnimation(NotiData.listFade) { filter = f } } label: {
+                            FilterChip(title: f, on: f == filter, semibold: NotiData.chipSemibold(f, selected: filter))
+                        }
                             .buttonStyle(PressStyle())
                     }
                 }
@@ -212,25 +224,29 @@ struct NotiActivityView: View {
             .contentMargins(.horizontal, 24, for: .scrollContent)
             .scrollIndicators(.hidden)
             .padding(.top, 22)
+            // 분류가 바뀌면 목록 스크롤을 새로 만들어 맨 위에서 시작하고, 예전 목록은 옅어지며 새 목록이 옅게 나타난다(웹 NotiScreens.jsx와 같다).
+            ZStack(alignment: .top) {
             ScrollView {
-                // 피그마 Activity List(2100:24878): 칩 줄 아래 14에서 시작, 안쪽 위 8, 아래 24, 줄 사이 4
+                // 피그마 Activity List(1952:14673): 칩 줄 아래 12에서 시작, 안쪽 위 8, 아래 24, 줄 사이 4
                 VStack(spacing: 4) {
                     ForEach(NotiData.activity.filter { filter == "전체" || $0.kind == filter }) { a in
                         // 알림 줄과 "N건 더보기"를 누르면 그 알림이 가리키는 화면으로 간다. 신고 결과 알림은 갈 화면이 없어 줄만 보인다.
                         if let go = destination(a) {
                             Button(action: go) { activityRow(a) }
                                 .buttonStyle(PressStyle())
-                                .transition(.opacity)
                         } else {
-                            activityRow(a).transition(.opacity)
+                            activityRow(a)
                         }
                     }
                 }
                 .padding(.top, 22)
                 .padding(.bottom, 24)
-                .animation(DS.Motion.standard, value: filter)
             }
             .scrollIndicators(.hidden)
+            .id(filter)
+            .transition(.opacity)
+            }
+            .animation(NotiData.listFade, value: filter)
         }
     }
 

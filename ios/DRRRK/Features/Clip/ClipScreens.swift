@@ -249,7 +249,9 @@ struct ClipListView: View {
     var body: some View {
         let scene = ClipData.fresh().list
         ClipCanvas(items: [], background: Color(hex: 0x131313)) {
-            ClipFeed(tab: st.tab, st: st, toTop: toTop, open: openClip, openBanner: openBanner)
+            ClipFeed(tab: shownTab, st: st, toTop: toTop, open: openClip, openBanner: openBanner)
+            // 위 탭 영역(0 ~ 98)은 피드 위의 빈 판이 누름을 받아 아래로 밀려 올라간 카드가 눌리지 않게 한다(반응 없음).
+            Color.clear.frame(width: 390, height: 98).contentShape(Rectangle())
             header(scene)
             bottomBar(scene)
             ClipAgentButton()
@@ -270,8 +272,11 @@ struct ClipListView: View {
         }
     }
 
+    /// 위 탭이 막혀 있으면 언제나 추천 탭(피그마 1843:40980 그대로)을 보인다.
+    private var shownTab: ClipFeedTab { ClipTouch.can(.list, "tabs") ? st.tab : .rec }
+
     private func openClip(_ c: ClipInfo) {
-        st.pick = ClipInfo.all.firstIndex(of: c) ?? 0
+        st.pick = ClipTouch.can(.player, "swipe") ? (ClipInfo.all.firstIndex(of: c) ?? 0) : ClipTouch.firstVideo
         router.push(.clipPlayer)
     }
 
@@ -284,30 +289,31 @@ struct ClipListView: View {
     @ViewBuilder
     private func header(_ scene: [ClipItem]) -> some View {
         let fav = scene.filter { $0.n == "Icon / 즐겨찾기" }
-        let _ = (fav.first?.asset = st.favorite ? "J-clipsvg-fav-on" : "A-clipsvg-L-0")
-        ClipHit(label: st.favorite ? "즐겨찾기 해제" : "즐겨찾기", box: CGRect(x: 10, y: 57, width: 37, height: 36), radius: 18, items: fav) {
+        let favOn = ClipTouch.can(.list, "fav") && st.favorite
+        let _ = (fav.first?.asset = favOn ? "J-clipsvg-fav-on" : "A-clipsvg-L-0")
+        ClipHit(label: favOn ? "즐겨찾기 해제" : "즐겨찾기", box: CGRect(x: 10, y: 57, width: 37, height: 36), radius: 18, items: fav, on: ClipTouch.can(.list, "fav")) {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { st.favorite.toggle() }
         }
-        ClipHit(label: "검색", box: CGRect(x: 343, y: 56, width: 37, height: 37), radius: 18, items: scene.filter { $0.n == "Icon / 검색" }) {}
+        ClipHit(label: "검색", box: CGRect(x: 343, y: 56, width: 37, height: 37), radius: 18, items: scene.filter { $0.n == "Icon / 검색" }, on: ClipTouch.can(.list, "search")) {}
         ForEach(tabs, id: \.0) { tab, name in
             let it = scene.first { $0.n == name }
             if let it {
                 let x = it.x ?? 0
                 let w = Self.tabWidth(it.text ?? "")
-                let _ = (it.c = st.tab == tab ? "#FFFFFF" : "#B0B0B0")
-                ClipHit(label: it.text ?? "", box: CGRect(x: x - 6, y: 58, width: w + 12, height: 34), radius: 8, items: [it]) {
+                let _ = (it.c = shownTab == tab ? "#FFFFFF" : "#B0B0B0")
+                ClipHit(label: it.text ?? "", box: CGRect(x: x - 6, y: 58, width: w + 12, height: 34), radius: 8, items: [it], on: ClipTouch.can(.list, "tabs")) {
                     select(tab)
                 }
-                .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.3), value: st.tab)
+                .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.3), value: shownTab)
             }
         }
         // 탭 밑줄(피그마 172, 86.4, 33 x 2.4). 고른 탭 아래로 옮겨 간다.
-        let sel = scene.first { $0.n == tabs.first { $0.0 == st.tab }?.1 }
+        let sel = scene.first { $0.n == tabs.first { $0.0 == shownTab }?.1 }
         RoundedRectangle(cornerRadius: 1.2).fill(Color.white)
             .frame(width: Self.tabWidth(sel?.text ?? "추천"), height: 2.4)
             .offset(x: sel?.x ?? 172, y: 86.4)
-            .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.3), value: st.tab)
+            .animation(.timingCurve(0.2, 0, 0, 1, duration: 0.3), value: shownTab)
             .allowsHitTesting(false)
     }
 
@@ -351,7 +357,7 @@ struct ClipListView: View {
                             it.wt = label == selected ? 600 : 400
                         }
                     }
-                    ClipHit(label: String(label.dropFirst(3)), box: CGRect(x: cx - 31, y: 12, width: 62, height: 58), radius: 14, items: items) {
+                    ClipHit(label: String(label.dropFirst(3)), box: CGRect(x: cx - 31, y: 12, width: 62, height: 58), radius: 14, items: items, on: ClipTouch.can(.list, "bottom")) {
                         tapBottom(label)
                     }
                 }
@@ -475,32 +481,67 @@ private struct ClipFeed: View {
         }
     }
 
+    /// 썸네일 칸 안에 놓인 요소인지(썸네일과 그 위 알약). 카드 아래 아바타와 이름 줄은 밖이다(웹 ClipList.jsx inLead와 같다).
+    static func inLead(_ it: ClipItem, _ lead: CGRect) -> Bool {
+        guard let x = it.x, let y = it.y else { return false }
+        let r = CGRect(x: x, y: y, width: it.w ?? 0, height: it.h ?? 0)
+        return r.minX >= lead.minX - 0.5 && r.minY >= lead.minY - 0.5 && r.maxX <= lead.maxX + 0.5 && r.maxY <= lead.maxY + 0.5
+    }
+
+    @ViewBuilder
     private func card(_ p: Placed) -> some View {
         let names: Set<String> = p.clip.map { Set($0.parts) } ?? [ClipInfo.bannerPart]
         let items = ClipData.file.list.filter { names.contains($0.n) }
-        return ZStack(alignment: .topLeading) {
-            ClipItemsLayer(items: items).offset(x: -p.box.minX, y: -p.box.minY).allowsHitTesting(false)
+        let key = p.clip.map { "card:" + $0.id } ?? "banner"
+        if ClipTouch.can(.list, key) {
+            // 눌리는 카드: 썸네일 칸(피그마 썸네일 자리)만 누름을 받고 눌림 모양도 썸네일에만 보인다. 아래 아바타와 이름 줄은 같은 자리에 장식으로 그린다.
+            let leadName = p.clip?.parts.first ?? ClipInfo.bannerPart
+            let leadItem = items.first { $0.n == leadName }
+            let lead = leadItem.flatMap { it -> CGRect? in
+                guard let x = it.x, let y = it.y, let w = it.w, let h = it.h else { return nil }
+                return CGRect(x: x, y: y, width: w, height: h)
+            } ?? p.box
+            let dx = p.at.x - p.box.minX
+            let dy = p.at.y - p.box.minY
+            let rest = items.filter { $0 !== leadItem && !Self.inLead($0, lead) }
+            ZStack(alignment: .topLeading) {
+                ClipItemsLayer(items: rest).offset(x: dx, y: dy).allowsHitTesting(false)
+                cardBody(p, items: items.filter { it in !rest.contains { $0 === it } }, box: lead)
+                    .clipPressable {
+                        if let c = p.clip {
+                            open(c)
+                        } else {
+                            openBanner()
+                        }
+                    }
+                    .offset(x: lead.minX + dx, y: lead.minY + dy)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(p.clip?.title ?? "드르륵 칵! 일단 앉아")
+                    .accessibilityAddTraits(.isButton)
+            }
+            .frame(width: 390, height: 844, alignment: .topLeading)
+        } else {
+            // 영상 없는 카드(혼술바, 느좋녀 패션템, 군자 카페): 같은 자리에 같은 모양만 그리고 눌리지 않는다(눌림 모양 없음, 버튼 역할 없음).
+            cardBody(p, items: items, box: p.box)
+                .allowsHitTesting(false)
+                .offset(x: p.at.x, y: p.at.y)
+                .accessibilityElement(children: .combine)
+        }
+    }
+
+    private func cardBody(_ p: Placed, items: [ClipItem], box: CGRect) -> some View {
+        ZStack(alignment: .topLeading) {
+            ClipItemsLayer(items: items).offset(x: -box.minX, y: -box.minY).allowsHitTesting(false)
             // 영상 클립 썸네일(피그마 1843:40992, 183.4 x 326, 모서리 12): 무음 미리보기가 그림 위에서 반복된다. 아래 아바타와 이름 줄은 그대로 보인다.
             if p.clip?.hasVideo == true, let thumb = items.first(where: { $0.n == "썸네일 / 쌍밍아웃 영상" }), let preview = ClipPreviewPlayer.shared.player {
                 ClipVideoLayerView(player: preview)
                     .frame(width: CGFloat(thumb.w ?? 183.4), height: CGFloat(thumb.h ?? 326))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .offset(x: CGFloat(thumb.x ?? 7.6) - p.box.minX, y: CGFloat(thumb.y ?? 109) - p.box.minY)
+                    .offset(x: CGFloat(thumb.x ?? 7.6) - box.minX, y: CGFloat(thumb.y ?? 109) - box.minY)
                     .allowsHitTesting(false)
             }
         }
-        .frame(width: p.box.width, height: p.box.height, alignment: .topLeading)
-        .clipPressable {
-            if let c = p.clip {
-                open(c)
-            } else {
-                openBanner()
-            }
-        }
-        .offset(x: p.at.x, y: p.at.y)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(p.clip?.title ?? "드르륵 칵! 일단 앉아")
-        .accessibilityAddTraits(.isButton)
+        .frame(width: box.width, height: box.height, alignment: .topLeading)
     }
 }
 
@@ -560,7 +601,7 @@ struct ClipPlayerView: View {
                 router.pop()
             }
             if !bare {
-                ClipHit(label: "댓글 입력", box: CGRect(x: 15, y: 759, width: 359, height: 47), radius: 24, items: ClipPlayerScene.fixedInput) { open(.comments) }
+                ClipHit(label: "댓글 입력", box: CGRect(x: 15, y: 759, width: 359, height: 47), radius: 24, items: ClipPlayerScene.fixedInput, on: ClipTouch.can(.player, "input")) { open(.comments) }
             }
             if let flash {
                 Image(systemName: flash.playing ? "play.fill" : "pause.fill")
@@ -648,7 +689,8 @@ struct ClipPlayerView: View {
     @ViewBuilder
     private func pages(bare: Bool) -> some View {
         let all = ClipInfo.all
-        let near = reduce ? [st.pick] : [st.pick - 1, st.pick, st.pick + 1].filter { all.indices.contains($0) }
+        // 쓸어 넘기기가 막혀 있으면 지금 클립(영상 클립) 한 장만 그린다.
+        let near = (reduce || !ClipTouch.can(.player, "swipe")) ? [st.pick] : [st.pick - 1, st.pick, st.pick + 1].filter { all.indices.contains($0) }
         ZStack(alignment: .topLeading) {
             ForEach(near, id: \.self) { i in
                 page(all[i], current: i == st.pick, bare: bare)
@@ -709,13 +751,15 @@ struct ClipPlayerView: View {
     private var surface: some View {
         Color.clear.frame(width: 390, height: 750).contentShape(Rectangle())
             .gesture(DragGesture(minimumDistance: 12, coordinateSpace: .global).onChanged { v in
-                guard abs(v.translation.height) > abs(v.translation.width), !reduce else { return }
+                guard ClipTouch.can(.player, "swipe"), abs(v.translation.height) > abs(v.translation.width), !reduce else { return }
                 let dy = v.translation.height / scale
                 let atEdge = (dy > 0 && st.pick == 0) || (dy < 0 && st.pick == ClipInfo.all.count - 1)
                 drag = atEdge ? (dy > 0 ? 1 : -1) * 60 * (1 - exp(-abs(dy) / 120)) : dy
             }.onEnded { v in
                 let dy = v.translation.height / scale
                 let fling = v.predictedEndTranslation.height / scale
+                // 쓸어 넘기기가 막혀 있으면 끌어도 아무 일이 없다(다른 클립은 영상 없는 가짜 장면이다).
+                guard ClipTouch.can(.player, "swipe") else { return }
                 guard abs(v.translation.height) > abs(v.translation.width) else {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) { drag = 0 }
                     return
@@ -812,7 +856,7 @@ struct ClipPlayerView: View {
     @ViewBuilder
     private func hits(_ scene: ClipPlayerScene.Page, _ c: ClipInfo) -> some View {
         let named = { (names: Set<String>) in scene.items.filter { names.contains($0.n) } }
-        ClipHit(label: "이벤트 댓글 남기기", box: CGRect(x: 333, y: 410, width: 52, height: 56), radius: 26, items: scene.items.filter { ClipPlayerScene.isEvent($0.n) }) { open(.comments) }
+        ClipHit(label: "이벤트 댓글 남기기", box: CGRect(x: 333, y: 410, width: 52, height: 56), radius: 26, items: scene.items.filter { ClipPlayerScene.isEvent($0.n) }, on: ClipTouch.can(.player, "event")) { open(.comments) }
         ClipHit(label: st.like ? "좋아요 취소" : "좋아요", box: CGRect(x: 338, y: 483, width: 44, height: 62), items: named(ClipPlayerScene.like), pop: pop == "like" ? 1.18 : 1) { flip(\.like) }
         ClipHit(label: "댓글", box: CGRect(x: 338, y: 552, width: 44, height: 62), items: named(ClipPlayerScene.comment)) { open(.comments) }
         ClipHit(label: st.save ? "저장 취소" : "저장", box: CGRect(x: 338, y: 622, width: 44, height: 62), items: named(ClipPlayerScene.save), pop: pop == "save" ? 1.18 : 1) {
@@ -822,25 +866,44 @@ struct ClipPlayerView: View {
         ClipHit(label: "더보기", box: CGRect(x: 336, y: 696, width: 48, height: 32), radius: 16, items: named(ClipPlayerScene.more)) { open(.more) }
         if c.hasVideo {
             // 탁빛나 1843:40911 핀 (101,603): 처음에는 비어 있다가 1.2초 뒤 위로 올라온다. 줄인 움직임 설정이면 옅게만 나타난다.
-            ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble)) { open(.comments) }
+            ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble), on: ClipTouch.can(.player, "bubble")) { open(.comments) }
                 .opacity(bubbleOpacity)
                 .offset(y: (bubbleLifted || reduce) ? 0 : ClipVideoFiles.bubbleRise)
                 .allowsHitTesting(bubbleOpacity > 0.5)
         } else {
-            ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble)) { open(.comments) }
+            ClipHit(label: "댓글 미리보기", box: CGRect(x: 12, y: 580, width: 300, height: 38), radius: 19, items: named(ClipPlayerScene.bubble), on: ClipTouch.can(.player, "bubble")) { open(.comments) }
         }
-        ClipHit(label: "캡션 더보기", box: CGRect(x: 12, y: 664, width: 318, height: 28), radius: 8, items: named(ClipPlayerScene.caption)) { open(.info) }
+        ClipHit(label: "캡션 더보기", box: CGRect(x: 12, y: 664, width: 318, height: 28), radius: 8, items: named(ClipPlayerScene.caption), on: ClipTouch.can(.player, "caption")) { open(.info) }
         if let row = scene.row {
-            creatorRow(row, c, interactive: true)
+            creatorRow(row, c, interactive: ClipTouch.can(.player, "follow"))
+        }
+        // 막힌 장식 요소 자리(웹 ClipPlayer.jsx STILL과 같은 값): 영상 판 위의 빈 판이 누름을 받아 그 자리를 눌러도 재생과 좋아요가 바뀌지 않는다.
+        let zones = Self.still.filter { $0.key != "bubble" || !c.hasVideo || bubbleOpacity > 0.5 }.map(\.rect)
+        ForEach(Array(zones.enumerated()), id: \.offset) { _, r in
+            Color.clear.frame(width: r.width, height: r.height)
+                .contentShape(Rectangle())
+                .offset(x: r.minX, y: r.minY)
+                .accessibilityHidden(true)
         }
     }
+
+    static let still: [(key: String, rect: CGRect)] = [
+        ("event", CGRect(x: 333, y: 410, width: 52, height: 56)),
+        ("bubble", CGRect(x: 12, y: 580, width: 240, height: 38)),
+        ("follow", CGRect(x: 12, y: 622, width: 175, height: 44)),
+        ("caption", CGRect(x: 12, y: 664, width: 330, height: 28)),
+        ("caption", CGRect(x: 12, y: 696, width: 64, height: 38)),
+    ].filter { !ClipTouch.can(.player, $0.0) }
 
     /// 크리에이터 이름 줄(이름, 인증 배지, 팔로우 알약). 알약은 리스트 구독 탭과 같은 팔로우 상태를 켜고 끈다.
     private func creatorRow(_ row: ClipItem, _ c: ClipInfo, interactive: Bool) -> some View {
         let parts = row.items ?? []
         return HStack(spacing: 0) {
             ForEach(parts) { it in
-                if it.k == "pill" {
+                if it.k == "pill" && !interactive {
+                    // 팔로우 알약이 막혀 있으면 같은 모양만 그린다(버튼 역할 없음).
+                    ClipItemView(it: it, flow: true).allowsHitTesting(false)
+                } else if it.k == "pill" {
                     // 알약 왼쪽 간격(ml 6)은 ClipItemView가 안쪽에 넣는다.
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()

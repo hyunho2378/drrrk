@@ -9,6 +9,122 @@ import { Screen2100_25022 } from '../figma/screens/Screen2100_25022.jsx';
 import { Screen2100_24964 } from '../figma/screens/Screen2100_24964.jsx';
 import { openWatch } from './liveV2.js';
 import { pressable } from './taps.js';
+import { NOTI_TABS, NOTI_SVG } from './notiTabs.js';
+import { fixSubpixel } from '../figma/subpixel.js';
+import { motion } from '../tokens.js';
+
+// ---------- 활동 알림 분류 칩(11/11 피그마 활동 알림 1 1952:14673과 분류 화면 네 장) ----------
+// 칩(전체, 엉따지수, 댓글, 업적 편의점, 의자꾸미기)을 누르면 목록만 그 분류 프레임의 목록으로 바뀐다. 머리말, 탭, 칩 줄은 제자리다.
+// 목록은 생성 화면(2100:24856)의 같은 모양 줄을 복제해 글과 글자 윤곽만 피그마 값으로 바꾼다. 보이기 전(첫 그리기)에 전체 목록으로 만든다.
+// 고른 분류는 활동 알림 안(키워드 알림 탭 58, 59와 키워드 관리 60에 다녀오는 동안)에서만 남고, 다른 화면에서 새로 열면 전체에서 시작한다.
+let chipKey = 'all';
+const NOTI_PATH = /\/s\/(57|58|59|60)(\D|$)/;
+// 의자 꾸미기 알림으로 의자 꾸미기(20)에 다녀오는 동안도 분류를 남긴다(20에서 뒤로 가면 57로 돌아온다).
+let toStudio = false;
+const keepOrReset = () => {
+  // 주소는 해시 경로(#/s/57)다. 다른 배포 방식도 있으니 경로와 해시를 함께 본다.
+  const p = window.location.pathname + window.location.hash;
+  if (!NOTI_PATH.test(p) && !(toStudio && /\/s\/20(\D|$)/.test(p))) chipKey = 'all';
+  toStudio = false;
+};
+const LIST_TOP = 221;
+const FADE = 180;
+
+function setGlyphs(p, t) {
+  if (!p || !t) return;
+  p.setAttribute('data-node', t.id);
+  p.setAttribute('data-figma', t.text);
+  const label = p.querySelector(':scope > span:not([aria-hidden])');
+  if (label) label.textContent = t.text;
+  const art = p.querySelector(':scope > span[aria-hidden]');
+  if (art) art.innerHTML = NOTI_SVG[t.svg] || '';
+  if (t.role === 'body') {
+    // 본문은 피그마 상자 높이(한 줄 22, 두 줄 44, 세 줄 66) 그대로 둔다. 글자 모양은 윤곽 SVG가 그린다.
+    p.style.height = t.h + 'px';
+    p.style.whiteSpace = 'normal';
+  } else {
+    p.style.width = t.w + 'px';
+  }
+}
+
+function makeRow(tpl, it) {
+  const row = tpl.cloneNode(true);
+  row.setAttribute('data-node', it.node);
+  row.querySelectorAll('[data-node]').forEach((e) => e.setAttribute('data-node', it.node + ':' + e.getAttribute('data-node')));
+  setGlyphs(row.querySelector('[data-figma="title row"] > p'), it.title);
+  setGlyphs(row.querySelector('[data-figma="meta"] > p'), it.ago);
+  const dot = row.querySelector('[data-figma="meta"] > [data-figma="Ellipse"]');
+  if (dot && !it.dot) dot.remove();
+  setGlyphs(row.querySelector('[data-figma="content"] > p'), it.body);
+  setGlyphs(row.querySelector('[data-figma="더보기 버튼"] > p'), it.more);
+  // 의자 꾸미기 알림을 누르면 의자 꾸미기(20)로 간다. iOS도 같은 알림에서 의자 꾸미기를 연다(ChairStudioView, 뒤로 가면 알림으로).
+  if (it.tpl === '2100:24938') {
+    pressable(row, () => { toStudio = true; window.dispatchEvent(new CustomEvent('drrrk:go', { detail: { from: 57, to: 20, t: 'push' } })); });
+  }
+  return row;
+}
+
+function activityChips(root) {
+  const list = root && root.querySelector('[data-figma="Activity List"]');
+  const row = root && root.querySelector('[data-figma="Keyword Chips"]');
+  if (!list || !row || list.dataset.notiTabs) return;
+  list.dataset.notiTabs = '1';
+  const sc = root.querySelector(':scope > [data-scroll]');
+  const content = sc && sc.querySelector(':scope > [data-scroll-content]');
+  const tpls = {};
+  NOTI_TABS.forEach((t) => t.items.forEach((it) => {
+    if (!tpls[it.tpl]) { const e = list.querySelector(':scope > [data-node="' + it.tpl + '"]'); if (e) tpls[it.tpl] = e.cloneNode(true); }
+  }));
+  const chips = [...row.querySelectorAll(':scope > [data-figma^="Chip / "]')];
+  let ghost = null;
+  const paint = (tab) => {
+    tab.chips.forEach((c, i) => {
+      const el = chips[i];
+      if (!el) return;
+      el.style.background = c.bg;
+      el.setAttribute('aria-pressed', c.on ? 'true' : 'false');
+      const art = el.querySelector('p > span[aria-hidden]');
+      if (art) art.innerHTML = NOTI_SVG[c.svg] || '';
+    });
+    list.replaceChildren(...tab.items.filter((it) => tpls[it.tpl]).map((it) => makeRow(tpls[it.tpl], it)));
+    list.style.height = tab.listH + 'px';
+    if (content) content.style.height = Math.max(844, LIST_TOP + tab.listH) + 'px';
+    list.setAttribute('data-tab', tab.key);
+    fixSubpixel(row);
+    fixSubpixel(list);
+  };
+  const pick = (key) => {
+    if (key === chipKey) return;
+    const tab = NOTI_TABS.find((t) => t.key === key);
+    if (!tab) return;
+    chipKey = key;
+    if (ghost) { ghost.remove(); ghost = null; }
+    list.getAnimations().forEach((a) => a.cancel());
+    // 교차 페이드: 지금 목록의 사본을 보이는 자리 그대로 위에 두고 옅게 지우며, 새 목록은 맨 위(스크롤 0)에서 옅게 나타난다(opacity만, 180ms).
+    const top = sc ? sc.scrollTop : 0;
+    const g = list.cloneNode(true);
+    g.removeAttribute('data-figma');
+    g.setAttribute('data-noti-ghost', '');
+    g.setAttribute('aria-hidden', 'true');
+    g.querySelectorAll('[data-node]').forEach((e) => e.removeAttribute('data-node'));
+    g.removeAttribute('data-node');
+    Object.assign(g.style, { top: LIST_TOP - top + 'px', pointerEvents: 'none' });
+    list.insertAdjacentElement('afterend', g);
+    ghost = g;
+    if (sc) sc.scrollTop = 0;
+    paint(tab);
+    const o = { duration: FADE, easing: motion.standard, fill: 'both' };
+    const a = list.animate([{ opacity: 0 }, { opacity: 1 }], o);
+    a.onfinish = () => a.cancel();
+    const b = g.animate([{ opacity: 1 }, { opacity: 0 }], o);
+    const end = () => { g.remove(); if (ghost === g) ghost = null; };
+    b.onfinish = end;
+    window.setTimeout(end, FADE + 80);
+  };
+  chips.forEach((el, i) => pressable(el, () => pick(NOTI_TABS[i] ? NOTI_TABS[i].key : 'all')));
+  const start = NOTI_TABS.find((t) => t.key === chipKey) || NOTI_TABS[0];
+  paint(start);
+}
 
 // 스크롤 층의 윗선을 움직이는 묶음의 윗선에 맞춘다. 그 위(머리말, 탭)로 내용이 올라가 겹치지 않는다.
 function clipScroll(root, top) {
@@ -70,18 +186,18 @@ function useRoot() {
 
 export function NotiActivityScreen() {
   const [ref, root] = useRoot();
-  useLayoutEffect(() => { clipScroll(root(), 221); showStrokes(root()); }, []);
+  useLayoutEffect(() => { clipScroll(root(), 221); showStrokes(root()); activityChips(root()); return keepOrReset; }, []);
   return <div ref={ref} style={{ display: 'contents' }}><Screen2100_24856 /></div>;
 }
 
 export function NotiKeywordScreen() {
   const [ref, root] = useRoot();
-  useLayoutEffect(() => { const r = root(); clipScroll(r, 162); showStrokes(r); wireAlerts(r); }, []);
+  useLayoutEffect(() => { const r = root(); clipScroll(r, 162); showStrokes(r); wireAlerts(r); return keepOrReset; }, []);
   return <div ref={ref} style={{ display: 'contents' }}><Screen2100_25022 /></div>;
 }
 
 export function NotiSettingsScreen() {
   const [ref, root] = useRoot();
-  useLayoutEffect(() => { showStrokes(root()); }, []);
+  useLayoutEffect(() => { showStrokes(root()); return keepOrReset; }, []);
   return <div ref={ref} style={{ display: 'contents' }}><Screen2100_24964 /></div>;
 }

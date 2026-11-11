@@ -138,9 +138,20 @@ export function Item({ it, flow, pw }) {
 
 // 누르는 칸. box(부모 기준 x, y, w, h) 안에서만 눌리고, items는 부모 좌표 그대로 그린다. 눌림 반응은 칸 가운데를 기준으로 줄어든다.
 // at을 주면 칸을 그 자리(x, y)로 옮겨 그린다(구독, 내클립 탭에서 카드 다시 배치).
-export function Hit({ box, label, onTap, items = [], pressed, at, style, children, name }) {
+// off를 주면 같은 자리에 같은 모양만 그리고 눌리지 않는다(버튼 역할, 핸들러, 눌림 모양, 손 모양 커서, 키보드 포커스 없음). 글자는 화면 읽기에서 그대로 읽힌다.
+export function Hit({ box, label, onTap, items = [], pressed, at, style, children, name, off }) {
   const [x, y, w, h] = box;
   const [ox, oy] = at || [x, y];
+  if (off) {
+    return (
+      <div data-figma={name} data-still="" style={{ position: 'absolute', left: ox, top: oy, width: w, height: h, cursor: 'default', ...style }}>
+        <div style={{ position: 'absolute', left: -x, top: -y, width: 390, height: 0, pointerEvents: 'none' }}>
+          {items.map((it, i) => <Item key={it.key || i} it={it} pw={390} />)}
+        </div>
+        {children}
+      </div>
+    );
+  }
   return (
     <div data-figma={name} className="ck-press" role="button" tabIndex={0} aria-label={label} aria-pressed={pressed}
       onClick={(e) => { e.stopPropagation(); onTap(e); }} onKeyDown={(e) => { if (e.key === 'Enter') onTap(e); }}

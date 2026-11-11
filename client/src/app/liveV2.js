@@ -107,7 +107,8 @@ function metaRow(state, views, left) {
   eye.appendChild(el('span', { display: 'block', width: '16px', height: '16px' }, EYE));
   eye.appendChild(el('span', { fontSize: '12px', fontWeight: '700', color: '#6E767C', letterSpacing: '-0.48px' }, views));
   m.appendChild(eye);
-  if (state === 'soon') return { m, time: null };
+  // 곧 끝 카드(빨간 시계 배지 카드)도 보는 수 옆에 남은 시간을 쓴다(11/11 의정 댓글 1943:12022 핀 (88,699) "여기도 남은 시간 뜨게").
+  // 시간은 배지와 같은 값(카드 timer, 없으면 03:00)이고 글 모양은 말하는 중 카드의 "12:32 남음"과 같다(12 Medium #9AA1A6, 점 3, 간격 6).
   m.appendChild(el('span', { display: 'block', width: '3px', height: '3px', borderRadius: '50%', background: '#9AA1A6' }));
   const blue = state === 'alone' || state === 'fresh';
   const txt = state === 'alone' ? '첫 대화 상대를 기다려요' : state === 'fresh' ? '방금 열림' : left + ' 남음';
@@ -182,7 +183,7 @@ function cardOf(c) {
   card.setAttribute('aria-label', c.title.replace(/\n/g, ' '));
   const t = el('div', { position: 'absolute', left: '16px', top: '16px', width: '196px', fontSize: '16px', fontWeight: '700', lineHeight: '22px', letterSpacing: '-0.64px', color: '#F8F8F8', whiteSpace: 'pre' }, c.title.replace(/ \n/g, '\n'));
   card.appendChild(t);
-  const { m } = metaRow(c.st, c.views, c.meta.replace(' 남음', ''));
+  const { m } = metaRow(c.st, c.views, c.st === 'soon' ? (c.timer || '03:00') : c.meta.replace(' 남음', ''));
   card.appendChild(m);
   const smalls = c.small.map((h) => h);
   card.appendChild(cluster(c.st, smalls, c.big, c.more ? c.more.replace('+', '') : 0, c.talk));

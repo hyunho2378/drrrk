@@ -14,6 +14,7 @@ export const POST = {
   body: '유진이 얼굴만 잡티 하나 없이 보정해서 올렸어. 내 얼굴은 그대로… 이거 나만 서운한 거야?',
   replay: '대화 다시보기 · 12:32',
   seats: '의자 3',
+  liveCta: '라이브 보기',
   likes: 48,
   comments: 23,
 };

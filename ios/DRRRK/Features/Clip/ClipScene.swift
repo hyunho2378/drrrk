@@ -430,6 +430,21 @@ struct ClipInfo: Identifiable, Hashable {
 
 enum ClipFeedTab: String, CaseIterable { case subs, rec, mine }
 
+/// 누를 수 있는 요소 목록(웹 clipState.js CLIP_TOUCH와 같은 값). 11/11 팀 요청 "군자, 느좋녀 패션템, 혼술바 전부 터치 안되게"와 사용자 "쓸데없는 거 클릭 안 되게".
+/// 목록에 있는 것만 눌리고, 없는 것은 Button 대신 일반 뷰로 같은 자리에 같은 모양만 그린다(allowsHitTesting false, 눌림 스타일 없음). 되돌리려면 이름을 다시 넣는다.
+/// 리스트: card:<클립 id>, banner, agent. 막힘: tabs, fav, search, bottom, creator.
+/// 영상 보기: back, video, like, comments, save, more, sound, progress, agent, sheet, immExit. 막힘: event, bubble, input, caption, follow, swipe.
+enum ClipTouch {
+    enum Screen { case list, player }
+    static let list: Set<String> = ["card:s0", "banner", "agent"]
+    static let player: Set<String> = ["back", "video", "like", "comments", "save", "more", "sound", "progress", "agent", "sheet", "immExit"]
+    static func can(_ screen: Screen, _ key: String) -> Bool {
+        (screen == .list ? list : player).contains(key)
+    }
+    /// 쓸어 넘기기가 막혀 있으면 영상이 있는 첫 클립 한 장만 보인다.
+    static var firstVideo: Int { ClipInfo.all.firstIndex { $0.hasVideo } ?? 0 }
+}
+
 /// 화면을 나갔다 들어와도 켜 둔 상태가 남는다. 리스트와 영상 보기가 같은 저장소를 쓴다.
 @Observable
 final class ClipState {
@@ -616,9 +631,25 @@ struct ClipHit: View {
     var radius: CGFloat = 12
     var items: [ClipItem] = []
     var pop: CGFloat = 1
+    /// false면 같은 자리에 같은 모양만 그리고 눌리지 않는다(ClipTouch 목록에 없는 요소). 글자는 화면 읽기에서 그대로 읽힌다.
+    var on: Bool = true
     let action: () -> Void
 
     var body: some View {
+        if on {
+            pressable
+        } else {
+            ZStack(alignment: .topLeading) {
+                ClipItemsLayer(items: items)
+                    .offset(x: -box.minX, y: -box.minY)
+            }
+            .frame(width: box.width, height: box.height, alignment: .topLeading)
+            .allowsHitTesting(false)
+            .offset(x: box.minX, y: box.minY)
+        }
+    }
+
+    private var pressable: some View {
         Button(action: action) {
             ZStack(alignment: .topLeading) {
                 ClipItemsLayer(items: items)

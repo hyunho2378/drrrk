@@ -84,7 +84,8 @@ final class FileSound: NSObject, AVAudioPlayerDelegate {
     private func prepareSession() {
         guard !sessionReady else { return }
         do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+            // 받아쓰기(Dictation.swift)가 녹음 세션을 쓰는 중이면 ambient 로 되돌리지 않는다.
+            if !DictationAudio.recording { try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers]) }
             try AVAudioSession.sharedInstance().setActive(true)
             sessionReady = true
         } catch {}

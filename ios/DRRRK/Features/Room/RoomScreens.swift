@@ -93,6 +93,10 @@ struct RoomNormalView: View {
     @State private var emojiOpen = false
     @State private var flying: [FlyingEmoji] = []
     @State private var sent: [String] = []
+    /// 참여자 칸 장(0 첫 장, 1 둘째 장 "나")과 끄는 중인 가로 거리
+    @State private var tilePage = 0
+    @State private var tileDrag: CGFloat = 0
+    private static let pageMotion = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.22)
     private let people = RoomPeople.normal
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var chat: RoomChat { RoomChat.shared }
@@ -127,24 +131,59 @@ struct RoomNormalView: View {
             TopicBanner(model: model)
                 .padding(.horizontal, 24).padding(.top, 5)
 
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 14) {
-                ForEach(people) { p in
-                    Button { router.present(.miniProfile) } label: {
-                        ParticipantTile(person: p, speaking: p.name == speaker)
+            // 참여자 칸 두 장(팀 댓글 2023:11805 "나" 핀 (370,531) "슬라이드 넘어가게 수정"). 첫 장은 2 x 2 참여자 칸, 둘째 장은 피그마 "나" 프레임 그대로
+            // (왼쪽 위 내 칸, 나머지 세 칸은 불투명도 0.4 빈 칸). 가로로 끌면 손가락을 따라 움직이고, 놓을 때 장 폭의 25%를 넘겼으면 다음 장, 아니면 제자리(220ms 표준 곡선).
+            // 첫 장 앞과 둘째 장 뒤로는 1/3만 따라온다. 두 장을 처음부터 같이 그려서 둘째 장 그림이 넘길 때 비지 않는다. 웹 normalPager.js와 같은 값이다.
+            GeometryReader { geo in
+                let w = geo.size.width
+                HStack(alignment: .top, spacing: 0) {
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 14) {
+                        ForEach(people) { p in
+                            Button { router.present(.miniProfile) } label: {
+                                ParticipantTile(person: p, speaking: p.name == speaker)
+                            }
+                            .buttonStyle(RoomPressStyle())
+                            .disabled(p.isMe || tilePage != 0)
+                        }
                     }
-                    .buttonStyle(RoomPressStyle())
-                    .disabled(p.isMe)
+                    .padding(.horizontal, 24).padding(.top, 16)
+                    .frame(width: w)
+                    NormalPageTwo()
+                        .padding(.horizontal, 24).padding(.top, 16)
+                        .frame(width: w)
+                }
+                .offset(x: pagerOffset(w))
+                .frame(width: w, alignment: .leading)
+                .contentShape(Rectangle())
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 10)
+                        .onChanged { v in
+                            if abs(v.translation.width) > abs(v.translation.height) || tileDrag != 0 { tileDrag = v.translation.width }
+                        }
+                        .onEnded { v in
+                            guard tileDrag != 0 else { return }
+                            let dx = v.translation.width
+                            let dir = dx < -w * 0.25 ? 1 : dx > w * 0.25 ? -1 : 0
+                            withAnimation(reduceMotion ? nil : RoomNormalView.pageMotion) {
+                                tilePage = max(0, min(1, tilePage + dir))
+                                tileDrag = 0
+                            }
+                        }
+                )
+            }
+            .frame(height: 16 + 147 + 14 + 147)
+            .clipped()
+
+            // 피그마 Page Dots: 지금 칸 16 x 6 #F8F8F8, 다른 칸 6 #6E767C, 사이 6. 장이 바뀌면 긴 점이 그 자리로 옮겨 간다(220ms).
+            HStack(spacing: 6) {
+                ForEach(0 ..< 2, id: \.self) { i in
+                    Capsule().fill(i == tilePage ? DS.Palette.textPrimary : DS.Palette.textTertiary)
+                        .frame(width: i == tilePage ? 16 : 6, height: 6)
                 }
             }
-            .padding(.horizontal, 24).padding(.top, 16)
-
-            // 피그마 Page Dots: 지금 칸 16 x 6 #F8F8F8, 다른 칸 6 #6E767C, 사이 6
-            HStack(spacing: 6) {
-                Capsule().fill(DS.Palette.textPrimary).frame(width: 16, height: 6)
-                Circle().fill(DS.Palette.textTertiary).frame(width: 6, height: 6)
-            }
+            .animation(reduceMotion ? nil : RoomNormalView.pageMotion, value: tilePage)
             .frame(maxWidth: .infinity)
-            .padding(.top, 20)
+            .padding(.top, 27)
 
             Spacer(minLength: 0)
 
@@ -217,6 +256,46 @@ struct RoomNormalView: View {
     }
 }
 
+extension RoomNormalView {
+    /// 판의 x 위치. 끄는 거리만큼 따라가고, 첫 장 앞과 둘째 장 뒤로는 1/3만 따라간다.
+    fileprivate func pagerOffset(_ w: CGFloat) -> CGFloat {
+        let v = -CGFloat(tilePage) * w + tileDrag
+        if v > 0 { return v / 3 }
+        if v < -w { return -w + (v + w) / 3 }
+        return v
+    }
+}
+
+/// 일반 모드 둘째 장(피그마 "나" 2023:11805). 왼쪽 위 칸에 내 의자(원 72 #121415 안 그림 52, 피그마 그림 4fdd18ce8a)와
+/// 이름 칸("편의점 의자11 " #F8F8F8 + "(나)" #36D2FF, SUIT Bold 11 자간 -0.44, 검정 모서리 8, 위아래 3 좌우 8).
+/// 나머지 세 칸은 같은 칸(#222628, 모서리 16)에 불투명도 0.4다.
+private struct NormalPageTwo: View {
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 14) {
+            VStack(spacing: 13) {
+                Image("D-chairt-4fdd18ce8a").resizable().scaledToFill()
+                    .frame(width: 52, height: 52)
+                    .frame(width: 72, height: 72)
+                    .background(DS.Palette.bgSurface, in: Circle())
+                    .clipShape(Circle())
+                (Text("편의점 의자11 ").foregroundColor(DS.Palette.textPrimary) + Text("(나)").foregroundColor(DS.Palette.brandPrimary))
+                    .suit(11, .bold, tracking: -0.44)
+                    .lineLimit(1)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(.black, in: RoundedRectangle(cornerRadius: 8))
+            }
+            .frame(maxWidth: .infinity).frame(height: 147)
+            .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
+            ForEach(0 ..< 3, id: \.self) { _ in
+                RoundedRectangle(cornerRadius: DS.Radius.card).fill(DS.Palette.bgElevated)
+                    .frame(height: 147)
+                    .opacity(0.4)
+                    .accessibilityHidden(true)
+            }
+        }
+    }
+}
+
 private struct ParticipantTile: View {
     let person: RoomParticipant
     let speaking: Bool
@@ -226,10 +305,11 @@ private struct ParticipantTile: View {
                 .frame(width: 52, height: 52)
                 .frame(width: 72, height: 72)
                 .background(DS.Palette.bgSurface, in: Circle())
-            Text(person.name).suit(12, .bold, tracking: -0.48).foregroundStyle(DS.Palette.textPrimary)
+            // 이름 칸: 피그마 1647:23954와 "나" 2023:11805 값(SUIT Bold 11 자간 -0.44, 검정 모서리 8). 둘째 장(NormalPageTwo)과 같은 모양이다.
+            Text(person.name).suit(11, .bold, tracking: -0.44).foregroundStyle(DS.Palette.textPrimary)
                 .lineLimit(1)
                 .padding(.horizontal, 8).padding(.vertical, 3)
-                .background(.black, in: Capsule())
+                .background(.black, in: RoundedRectangle(cornerRadius: 8))
         }
         .frame(maxWidth: .infinity).frame(height: 147)
         .background(DS.Palette.bgElevated, in: RoundedRectangle(cornerRadius: DS.Radius.card))
@@ -875,6 +955,7 @@ struct RoomSoloView: View {
     private func watchClock() async {
         while !Task.isCancelled {
             if model.remaining(at: .now) <= 0 {
+                Dictation.shared.end()
                 router.push(.roomEnd)
                 return
             }
@@ -1302,11 +1383,16 @@ private struct PagedChairPicker: View {
     @State private var fade = 1.0
     @State private var busy = false
     @State private var bump: String?
+    /// 떠오르는 따봉(의자별 한 번의 비행 번호). 추천하는 순간 새 번호를 주고, 취소하거나 끝나거나 쪽을 넘기면 지운다.
+    @State private var fly: [String: Int] = [:]
+    @State private var flySeq = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private func go(_ dir: Int) {
         let next = page + dir
         guard !busy, pages.indices.contains(next) else { return }
         busy = true
+        fly = [:]
         UISelectionFeedbackGenerator().selectionChanged()
         let half = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
         withAnimation(half) { shift = CGFloat(-24 * dir); fade = 0 }
@@ -1326,7 +1412,16 @@ private struct PagedChairPicker: View {
             if picked.contains(key) { picked.remove(key) } else { picked.insert(key) }
         }
         UISelectionFeedbackGenerator().selectionChanged()
-        guard picked.contains(key) else { return }
+        guard picked.contains(key) else { fly[key] = nil; return }
+        if !reduceMotion {
+            flySeq += 1
+            let seq = flySeq
+            fly[key] = seq
+            Task {
+                try? await Task.sleep(for: .milliseconds(Int(ThumbFloat.ms * 1000) + 50))
+                if fly[key] == seq { fly[key] = nil }
+            }
+        }
         withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.15)) { bump = key }
         Task {
             try? await Task.sleep(for: .milliseconds(150))
@@ -1346,6 +1441,11 @@ private struct PagedChairPicker: View {
                             Image(chair.asset).resizable().frame(width: 72, height: 72)
                                 .overlay(Circle().strokeBorder(DS.Palette.brandPrimary, lineWidth: 2).opacity(on ? 1 : 0))
                                 .scaleEffect(bump == chair.key ? 1.06 : 1)
+                                .overlay(alignment: .topLeading) {
+                                    if let seq = fly[chair.key] {
+                                        ThumbFloat().id(seq).transition(.identity)
+                                    }
+                                }
                             Text(chair.name).fig(12, .medium, on ? DS.Palette.brandPrimary : DS.Palette.textPrimary)
                                 .multilineTextAlignment(.center).fixedSize()
                         }
@@ -1380,6 +1480,40 @@ private struct PagedChairPicker: View {
         .buttonStyle(PressStyle())
         .disabled(atEnd)
         .accessibilityLabel(left ? "이전 의자" : "다음 의자")
+    }
+}
+
+/// 추천 따봉(의정, 탁빛나 2026. 11. 11. 종료 1647:26726 댓글). 웹 reportPatch.js THUMB과 같은 값이다.
+/// 피그마 Icon / Line thumb-up 3개(2308:19637 16px 20%, 2308:19638 18px 45%, 2308:19639 22px 100%, #36D2FF)가 추천된 의자 가운데 위로 겹쳐 그린 떠오름 자취다.
+/// 22 아이콘을 72 원의 왼쪽 25, 위 21에 두고 36 올린다(끝 자리가 피그마 22px 아이콘 자리 원 위 -15). 700ms 표준 곡선, 크기 1에서 1.15,
+/// 옅어짐은 앞 35%(245ms)를 1로 두고 남은 455ms에 고르게 0. 선택 상태는 하늘색 링과 이름으로 남는다.
+private struct ThumbFloat: View {
+    static let size: CGFloat = 22
+    static let left: CGFloat = 25
+    static let top: CGFloat = 21
+    static let rise: CGFloat = 36
+    static let peak: CGFloat = 1.15
+    static let ms: Double = 0.7
+    static let hold: Double = 0.35
+    @State private var y: CGFloat = 0
+    @State private var s: CGFloat = 1
+    @State private var o = 1.0
+
+    var body: some View {
+        Image("C-thumb-up").renderingMode(.template).resizable()
+            .frame(width: Self.size, height: Self.size)
+            .foregroundStyle(DS.Palette.brandPrimary)
+            .scaleEffect(s)
+            .offset(x: Self.left, y: Self.top + y)
+            .opacity(o)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .onAppear {
+                withAnimation(.timingCurve(0.2, 0, 0, 1, duration: Self.ms)) { y = -Self.rise }
+                // 웹은 가운데 지점(곡선 진행 50%)에서 1.15에 닿는다. 표준 곡선은 약 0.2초에 50%에 이른다.
+                withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.2)) { s = Self.peak }
+                withAnimation(.linear(duration: Self.ms * (1 - Self.hold)).delay(Self.ms * Self.hold)) { o = 0 }
+            }
     }
 }
 
