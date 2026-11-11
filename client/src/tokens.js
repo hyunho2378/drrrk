@@ -153,6 +153,8 @@ export const live = {
   },
   // 마이크
   micThreshold: 0.07,
+  // 받아쓰기와 마이크를 켠 뒤 말이 없는 상태가 이만큼(초) 이어지면 받아쓰기를 멈추고 마이크를 놓는다(iOS Dictation.idleSeconds 와 같은 값).
+  dictIdleSec: 30,
   micOnText: '마이크가 켜졌어요',
   micMutedText: '마이크를 껐어요',
   micDeniedText: '마이크 사용을 허용해야 목소리가 전달돼요',

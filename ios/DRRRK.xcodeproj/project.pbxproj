@@ -21,6 +21,7 @@
 		2B4D99386681E340CDB6F331 /* LiveData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D150C196D9839A3AC05BC6 /* LiveData.swift */; };
 		2C2E11DA76D75D80E1850BBE /* snack-chips.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6CC4616163EFF5713ABE2E4C /* snack-chips.mp3 */; };
 		2E5A7D4A2F4691C314A86806 /* voice-museun-il.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4D30BE6685A6E7CBEA027AA7 /* voice-museun-il.mp3 */; };
+		33D07DE1A6578F3D4A79E60C /* Dictation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958D772C7680CF760FC1589F /* Dictation.swift */; };
 		35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8873B83148F8763D3B5E0993 /* HomeScreens.swift */; };
 		3860CFEDB8EE5FF8211E993F /* SunriseVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F9271AE4A903499C7D1C58 /* SunriseVideo.swift */; };
 		3AA9D92D641C4E6CE0012504 /* ReportMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */; };
@@ -106,6 +107,7 @@
 		8873B83148F8763D3B5E0993 /* HomeScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreens.swift; sourceTree = "<group>"; };
 		8B487C08A1B7EC0175936B1F /* RoomModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomModel.swift; sourceTree = "<group>"; };
 		91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomEnterVideo.swift; sourceTree = "<group>"; };
+		958D772C7680CF760FC1589F /* Dictation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dictation.swift; sourceTree = "<group>"; };
 		9D390999B1CC4FB625BD4D1F /* voice-naman-yemin.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "voice-naman-yemin.mp3"; sourceTree = "<group>"; };
 		9F99D7E82EC9E11C197E5C06 /* clip-scenes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clip-scenes.json"; sourceTree = "<group>"; };
 		A58B17C0F22880FD7E18C587 /* ClipSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipSheets.swift; sourceTree = "<group>"; };
@@ -338,6 +340,7 @@
 		EE3738FC29836FDBA9155398 /* Room */ = {
 			isa = PBXGroup;
 			children = (
+				958D772C7680CF760FC1589F /* Dictation.swift */,
 				ECFCB36C4C7EE57E156B383C /* ReportMotion.swift */,
 				05962FBA580675C788F4D5DF /* RoomChat.swift */,
 				91AD0C2F8F22548F6956C8BE /* RoomEnterVideo.swift */,
@@ -462,6 +465,7 @@
 				C5DEC66A62ED9ECE672FE108 /* CommunityScreens.swift in Sources */,
 				07E60C9A61A87945AEA85562 /* CommunityTabs.swift in Sources */,
 				5AE4CBC169CDA200AA9E51DB /* DRRRKApp.swift in Sources */,
+				33D07DE1A6578F3D4A79E60C /* Dictation.swift in Sources */,
 				35B8E35DD84DF9CD140C0546 /* HomeScreens.swift in Sources */,
 				D811BC96F15441A069092895 /* ItemCopy.swift in Sources */,
 				A854281C465947E88B00A76A /* ItemSound.swift in Sources */,

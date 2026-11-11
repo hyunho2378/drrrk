@@ -221,27 +221,46 @@ export function attachBanner(root) {
 }
 
 // ---------- 3) 마이크 ----------
-const mic = { stream: null, ctx: null, an: null, buf: null, live: false, muted: false, denied: false, level: 0, speaking: false, timer: 0 };
+// 마이크는 사용자가 방에서 마이크 버튼을 눌러야만 켠다(방에 들어오자마자 듣지 않는다). 첫 버튼 모양은 생성 화면(피그마) 그대로다.
+// 끌 때는 음소거(track.enabled)가 아니라 마이크를 완전히 놓는다(모든 track.stop, AudioContext close). 브라우저 주소창의 마이크 표시와
+// 아이폰 상태바 주황 점이 남지 않게 한다. 다시 누르면 getUserMedia 를 다시 부른다(이미 허용한 사이트는 다시 묻지 않는다).
+// 받아쓰기(dictation.js)가 마이크를 놓아야 할 때(방을 떠남, 페이지 숨김, 말 없음, 방 종료)도 releaseMic 을 부른다.
+const mic = { stream: null, ctx: null, an: null, buf: null, live: false, muted: false, denied: false, level: 0, speaking: false, timer: 0, viaDict: false, why: '' };
 export const micState = () => mic;
+// 받아쓰기가 마이크 입력을 혼자 맡는 환경인지(사파리). dictation.js 가 채운다. 사파리는 음성 인식을 누름 안에서 바로 시작해야 하고,
+// getUserMedia 스트림과 음성 인식이 같은 마이크를 함께 잡지 않게 스트림을 열지 않는다.
+export const micHooks = { ownsMic: () => false };
 const redOf = (el) => { const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(el).backgroundColor); return !!m && +m[1] > 200 && +m[2] < 140; };
+const dlog = (type, extra) => {
+  const list = window.__drrrkDictation || (window.__drrrkDictation = []);
+  list.push(Object.assign({ t: Math.round(performance.now()), type }, extra || {}));
+  if (list.length > 400) list.splice(0, list.length - 400);
+};
 
 async function startMic() {
   const md = navigator.mediaDevices;
   if (!md || !md.getUserMedia) throw new Error('unsupported');
-  mic.stream = await md.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  const stream = await md.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  // 권한을 묻는 사이에 방을 떠났거나 페이지가 숨겨졌으면 받은 마이크를 바로 놓는다.
+  if (mic.why === 'abandon') { stream.getTracks().forEach((t) => t.stop()); throw new Error('abandoned'); }
+  mic.stream = stream;
   const AC = window.AudioContext || window.webkitAudioContext;
-  mic.ctx = new AC();
-  const src = mic.ctx.createMediaStreamSource(mic.stream);
-  mic.an = mic.ctx.createAnalyser();
-  mic.an.fftSize = 512;
-  src.connect(mic.an);
-  mic.buf = new Uint8Array(mic.an.fftSize);
+  try {
+    mic.ctx = new AC();
+    const src = mic.ctx.createMediaStreamSource(mic.stream);
+    mic.an = mic.ctx.createAnalyser();
+    mic.an.fftSize = 512;
+    src.connect(mic.an);
+    mic.buf = new Uint8Array(mic.an.fftSize);
+  } catch (e) { mic.ctx = null; mic.an = null; }
   mic.live = true;
   mic.muted = false;
+  mic.denied = false;
+  mic.why = '';
   window.clearInterval(mic.timer);
   let hold = 0;
   mic.timer = window.setInterval(() => {
-    if (!mic.live || mic.muted) { mic.level = 0; mic.speaking = false; return; }
+    if (!mic.live || mic.muted || !mic.an) { mic.level = 0; mic.speaking = false; return; }
     mic.an.getByteTimeDomainData(mic.buf);
     let s = 0;
     for (let i = 0; i < mic.buf.length; i++) { const v = (mic.buf[i] - 128) / 128; s += v * v; }
@@ -250,6 +269,42 @@ async function startMic() {
     else if (hold > 0) hold--;
     mic.speaking = hold > 0;
   }, 80);
+}
+
+// 마이크를 완전히 놓는다. muted 가 true 면 버튼을 꺼짐(빨강)으로 바꾸고, false 면 방에 처음 들어온 상태로 되돌린다(방을 떠남, 방 종료).
+export function releaseMic(why, muted) {
+  const had = !!(mic.live || mic.stream);
+  const tracks = mic.stream ? mic.stream.getTracks() : [];
+  tracks.forEach((t) => { try { t.stop(); } catch (e) { /* 이미 멈춤 */ } });
+  if (mic.ctx) { try { mic.ctx.close(); } catch (e) { /* 이미 닫힘 */ } }
+  window.clearInterval(mic.timer);
+  Object.assign(mic, { stream: null, ctx: null, an: null, buf: null, live: false, viaDict: false, level: 0, speaking: false, timer: 0 });
+  mic.muted = !!muted;
+  if (!muted) mic.denied = false;
+  // 권한 창이 떠 있는 동안 놓으라는 신호가 오면 뒤늦게 받은 스트림도 놓는다(startMic).
+  mic.why = had ? why : 'abandon';
+  if (had || tracks.length) dlog('mic-release', { why, tracks: tracks.map((t) => t.readyState), muted: !!muted });
+  if (had || muted) window.dispatchEvent(new Event('drrrk:mic'));
+  return had;
+}
+
+// getUserMedia 로 마이크를 연다(사파리가 아닌 브라우저의 버튼 누름, 사파리에서 음성 인식이 처음부터 안 될 때 dictation.js).
+// 열리면 true. 거부와 미지원은 기존 안내 글을 띄우고 버튼을 꺼짐으로 둔다. withToast 가 false 면 켜짐 안내는 띄우지 않는다(이미 띄움).
+export async function openMic(root, withToast) {
+  mic.why = '';
+  try {
+    await startMic();
+    window.dispatchEvent(new Event('drrrk:mic'));
+    if (root && withToast !== false) toast(root, LIVE.micOnText);
+    return true;
+  } catch (err) {
+    if (err && err.message === 'abandoned') return false;
+    if (mic.live) releaseMic('denied', true);
+    mic.denied = true;
+    window.dispatchEvent(new Event('drrrk:mic'));
+    if (root) toast(root, err && err.message === 'unsupported' ? LIVE.micUnsupportedText : LIVE.micDeniedText);
+    return false;
+  }
 }
 
 export function attachMic(root) {
@@ -264,13 +319,22 @@ export function attachMic(root) {
     }
     return doners[kind];
   };
+  // 입력줄 버튼 위에 빨강 끔 버튼이 겹쳐 있는 화면(29, 31)과 달리 입력줄 버튼 하나만 있는 화면(일반 모드 22, 32, 해 뜨는 단계 40)은
+  // 끔 모양을 입력줄 버튼 자리에 직접 그린다: 31 화면 빨강 끔 버튼의 아이콘과 바탕(#FF4D6A), 입력줄 버튼의 배치 클래스.
+  const solo = btns.length === 1 && !!btns[0].closest(BAR);
   const show = async (kind) => {
     const src = await variant(kind);
     btns.forEach((b, i) => {
       const d = src[i] || src[0];
       if (!d || b.dataset.kind === kind) return;
-      b.className = d.className;
-      b.innerHTML = d.innerHTML;
+      // 혼자 방(41, 42)은 입력줄 버튼이 빨강 끔 버튼 위에 그려져 꺼져도 초록이 보였다(11/11 확인). 끔 때는 입력줄 버튼도 빨강 끔 모양으로 바꾼다.
+      if ((solo || b.closest(BAR)) && kind === 'off' && src[1]) {
+        b.className = d.className.replace('[background:#2EE59D]', '[background:#FF4D6A]');
+        b.innerHTML = src[1].innerHTML;
+      } else {
+        b.className = d.className;
+        b.innerHTML = d.innerHTML;
+      }
       b.dataset.kind = kind;
     });
   };
@@ -278,32 +342,32 @@ export function attachMic(root) {
     if (mic.live && !mic.muted) show('on');
     else if (mic.muted || mic.denied) show('off');
   };
+  // 마이크를 밖에서 놓았을 때(말 없음, 페이지 숨김, 사파리 재시작 실패) 이 화면 버튼도 꺼짐으로 바꾼다.
+  const onMic = () => { if (!root.isConnected) { window.removeEventListener('drrrk:mic', onMic); return; } paint(); };
+  window.addEventListener('drrrk:mic', onMic);
   btns.forEach((b) => {
     b.dataset.live = 'mic';
     b.dataset.kind = redOf(b) ? 'off' : 'on';
     b.style.cursor = 'pointer';
     b.addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (!mic.stream) {
-        try {
-          await startMic();
-          window.dispatchEvent(new Event('drrrk:mic'));
-          await show('on');
-          toast(root, LIVE.micOnText);
-        } catch (err) {
-          mic.denied = true;
-          window.dispatchEvent(new Event('drrrk:mic'));
-          await show('off');
-          toast(root, err && err.message === 'unsupported' ? LIVE.micUnsupportedText : LIVE.micDeniedText);
-        }
-      } else {
-        mic.muted = !mic.muted;
-        mic.stream.getAudioTracks().forEach((t) => (t.enabled = !mic.muted));
-        // 받아쓰기(dictation.js)가 마이크 켜짐과 꺼짐을 바로 따른다.
-        window.dispatchEvent(new Event('drrrk:mic'));
-        await show(mic.muted ? 'off' : 'on');
-        toast(root, mic.muted ? LIVE.micMutedText : LIVE.micOnText);
+      if (mic.live) {
+        // 끔: 받아쓰기(dictation.js)는 drrrk:mic 신호로 바로 멈추고, 마이크는 완전히 놓는다.
+        releaseMic('mic-off', true);
+        await show('off');
+        toast(root, LIVE.micMutedText);
+        return;
       }
+      if (micHooks.ownsMic()) {
+        // 사파리: 이 누름 안에서 바로 음성 인식을 시작한다(drrrk:mic 신호는 같은 호출 안에서 dictation.js 의 start 를 부른다).
+        Object.assign(mic, { live: true, muted: false, denied: false, viaDict: true, why: '' });
+        window.dispatchEvent(new Event('drrrk:mic'));
+        await show('on');
+        toast(root, LIVE.micOnText);
+        return;
+      }
+      const ok = await openMic(root, true);
+      if (root.isConnected && (ok || mic.denied)) await show(ok ? 'on' : 'off');
     });
   });
   paint();

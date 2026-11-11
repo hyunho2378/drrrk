@@ -955,6 +955,7 @@ struct RoomSoloView: View {
     private func watchClock() async {
         while !Task.isCancelled {
             if model.remaining(at: .now) <= 0 {
+                Dictation.shared.end()
                 router.push(.roomEnd)
                 return
             }

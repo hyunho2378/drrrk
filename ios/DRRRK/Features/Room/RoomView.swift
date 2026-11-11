@@ -394,6 +394,8 @@ struct RoomView: View {
             // 예전 해 뜬 순간 화면(웹 35, 3초 뒤 종료)의 역할을 영상 마지막 장면이 한다. 영상이 늦게 시작했으면 끝나고 3초 뒤까지 기다린다. 웹 tokens.js live.rooms.B와 sunriseHolding과 같다.
             if let zeroAt, lastMinute, Date.now.timeIntervalSince(stepAt) >= RoomClockHandoff.graceSeconds,
                Date.now.timeIntervalSince(zeroAt) >= SunrisePlayer.holdSeconds, sunrise?.holding() != true {
+                // 방 시간이 끝났다: 받아쓰기와 마이크를 바로 놓는다(웹 dictation.js room-end).
+                Dictation.shared.end()
                 router.push(.roomEnd)
                 return
             }
@@ -757,7 +759,11 @@ struct RoomInputBar: View {
     var onSend: (String) -> Void = { _ in }
     @State private var text = ""
     @FocusState private var typing: Bool
-    @State private var micOn = true
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(Router.self) private var router
+    /// 마이크 버튼 모양. 꺼짐(빨강)은 사용자가 끄거나 앱이 숨겨지거나 말이 없어 놓았을 때만이다. 처음은 웹 첫 상태처럼 초록이고 듣지는 않는다.
+    /// 상태는 Dictation.shared 하나가 들고 있어서 현장 모드와 일반 모드 입력줄이 같은 마이크를 본다.
+    private var micOn: Bool { !Dictation.shared.muted }
     /// 받아쓰기(Dictation.swift)가 이 입력칸에 마지막으로 쓴 글. 입력칸 글이 이것과 다르면 사용자가 직접 친 글이다.
     @State private var dictText = ""
     @State private var dictID = UUID()
@@ -791,8 +797,10 @@ struct RoomInputBar: View {
                 .onSubmit(send)
                 .frame(height: 48)
             Button {
-                withAnimation(DS.Motion.stateIn) { micOn.toggle() }
-                RoomVoice.shared.setMic(on: micOn)
+                // 누르면 그때 권한을 묻고 듣는다. 다시 누르면 마이크를 완전히 놓는다(웹 room.js 와 같은 안내 글).
+                var on = false
+                withAnimation(DS.Motion.stateIn) { on = Dictation.shared.toggleMic() }
+                RoomToastCenter.shared.show(on ? Dictation.micOnText : Dictation.micMutedText)
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
             } label: {
                 // 피그마 1979:27492: 끈 상태도 검정 아이콘, 바탕만 빨강
@@ -809,10 +817,16 @@ struct RoomInputBar: View {
         // 받아쓰기: 마이크가 켜져 있으면 말한 글이 입력칸에 채워지고 1초 뒤 이 입력줄의 보내기로 내 말풍선이 된다.
         .onAppear {
             Dictation.shared.attach(dictID) { sentence in sendDictated(sentence) }
-            Dictation.shared.setMic(on: micOn)
+            Dictation.shared.setCovered(router.modal != nil)
+            RoomVoice.shared.setMic(on: micOn)
         }
         .onDisappear { Dictation.shared.detach(dictID) }
-        .onChange(of: micOn) { _, on in Dictation.shared.setMic(on: on) }
+        // 대사 녹음(RoomVoice)은 버튼이 꺼짐(빨강)일 때 멈춘다. 말 없음과 숨김으로 꺼질 때도 따른다.
+        .onChange(of: micOn) { _, on in RoomVoice.shared.setMic(on: on) }
+        // 방 위 창(미니프로필, 신고, 차단)이 떠 있으면 받아쓰기만 잠시 멈춘다.
+        .onChange(of: router.modal) { _, m in Dictation.shared.setCovered(m != nil) }
+        // 앱이 뒤로 가거나 가려지면 바로 마이크를 놓는다. 돌아와도 저절로 켜지지 않는다.
+        .onChange(of: scenePhase) { _, phase in Dictation.shared.scene(phase) }
         .onChange(of: Dictation.shared.partial) { _, p in showDictated(p) }
         .onChange(of: text) { _, t in
             guard t != dictText else { return }

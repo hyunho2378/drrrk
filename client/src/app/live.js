@@ -33,7 +33,7 @@ import { prepReportMotion, attachReportMotion, endFloor } from './reportMotion.j
 import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 import { prepareNormalPager, attachNormalPager } from './normalPager.js';
-import { attachDictation } from './dictation.js';
+import { attachDictation, endDictation } from './dictation.js';
 
 export { setText };
 
@@ -924,6 +924,8 @@ function tick() {
     if (left <= step.at && !room.fired[step.at] && step.to !== current.n) {
       room.fired[step.at] = true;
       room.stepAt = performance.now();
+      // 방 시간이 끝나 방 밖(종료 1)으로 간다: 받아쓰기와 마이크를 바로 놓는다(dictation.js room-end).
+      if (!sceneOf(step.to)) endDictation('room-end');
       current.go({ to: step.to, t: 'fade' });
       break;
     }
