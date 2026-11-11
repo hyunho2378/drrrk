@@ -13,6 +13,8 @@ enum Route: String, Hashable, CaseIterable, Identifiable {
     case onboardingTogether, onboardingSolo
     // 방
     case room, roomNormal, roomSolo, roomEnd, roomMorning, roomSummary
+    /// 혼자 드르륵 종료 리포트(피그마 2337:15695, 웹 65). 혼자 방 시계가 0이 되면 들어온다.
+    case roomSoloEnd
     case miniProfile, report, block
     // 탭: 라이브
     case live, liveWatch

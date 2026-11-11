@@ -88,7 +88,7 @@ function cluster(state, smalls, big, more, talkFlag) {
   const list = state === 'alone' ? [] : smalls;
   let x = bigX - 22 * list.length;
   if (more) {
-    const m = el('div', { position: 'absolute', left: x - 19 + 'px', top: smallY + 3 + 'px', width: '26px', height: '26px', borderRadius: '50%', background: '#33383D', boxShadow: '0 0 0 2px #222628', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '6px', boxSizing: 'border-box', fontFamily: "'Noto Sans KR', " + FONT, fontSize: '9.72px', fontWeight: '700', lineHeight: '14px', letterSpacing: '-0.2px', color: '#D9DEE3', whiteSpace: 'nowrap' }, '+' + more);
+    const m = el('div', { position: 'absolute', left: x - 19 + 'px', top: smallY + 3 + 'px', width: '26px', height: '26px', borderRadius: '50%', background: '#33383D', boxShadow: '0 0 0 2px #222628', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '6px', boxSizing: 'border-box', fontFamily: "'Noto Sans KR', " + FONT, fontSize: '9.72px', fontWeight: '700', lineHeight: '14px', letterSpacing: '-0.04em', color: '#D9DEE3', whiteSpace: 'nowrap' }, '+' + more);
     g.appendChild(m);
   }
   list.forEach((f) => { g.appendChild(face(f, x, smallY, false, false)); x += 22; });
@@ -105,14 +105,14 @@ function metaRow(state, views, left) {
   const m = el('div', { position: 'absolute', left: '16px', top: '76px', height: '23px', display: 'flex', alignItems: 'center', gap: '6px', fontFamily: FONT, whiteSpace: 'nowrap' });
   const eye = el('div', { display: 'flex', alignItems: 'center', gap: '4px' });
   eye.appendChild(el('span', { display: 'block', width: '16px', height: '16px' }, EYE));
-  eye.appendChild(el('span', { fontSize: '12px', fontWeight: '700', color: '#6E767C', letterSpacing: '-0.48px' }, views));
+  eye.appendChild(el('span', { fontSize: '12px', fontWeight: '700', color: '#6E767C', letterSpacing: '-0.04em' }, views));
   m.appendChild(eye);
   // 곧 끝 카드(빨간 시계 배지 카드)도 보는 수 옆에 남은 시간을 쓴다(11/11 의정 댓글 1943:12022 핀 (88,699) "여기도 남은 시간 뜨게").
   // 시간은 배지와 같은 값(카드 timer, 없으면 03:00)이고 글 모양은 말하는 중 카드의 "12:32 남음"과 같다(12 Medium #9AA1A6, 점 3, 간격 6).
   m.appendChild(el('span', { display: 'block', width: '3px', height: '3px', borderRadius: '50%', background: '#9AA1A6' }));
   const blue = state === 'alone' || state === 'fresh';
   const txt = state === 'alone' ? '첫 대화 상대를 기다려요' : state === 'fresh' ? '방금 열림' : left + ' 남음';
-  const t = el('span', { fontSize: '12px', fontWeight: '500', color: blue ? '#36D2FF' : '#9AA1A6', letterSpacing: '-0.48px' }, txt);
+  const t = el('span', { fontSize: '12px', fontWeight: '500', color: blue ? '#36D2FF' : '#9AA1A6', letterSpacing: '-0.04em' }, txt);
   m.appendChild(t);
   return { m, time: blue ? null : t };
 }
@@ -182,14 +182,14 @@ function cardOf(c) {
   const card = el('button', { position: 'relative', display: 'block', width: '342px', height: '112px', flex: '0 0 auto', borderRadius: '16px', background: '#222628', border: '0', padding: '0', margin: '0', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', fontFamily: FONT });
   card.className = 'lv2-card';
   card.setAttribute('aria-label', c.title.replace(/\n/g, ' '));
-  const t = el('div', { position: 'absolute', left: '16px', top: '16px', width: '196px', fontSize: '16px', fontWeight: '700', lineHeight: '22px', letterSpacing: '-0.64px', color: '#F8F8F8', whiteSpace: 'pre' }, c.title.replace(/ \n/g, '\n'));
+  const t = el('div', { position: 'absolute', left: '16px', top: '16px', width: '196px', fontSize: '16px', fontWeight: '700', lineHeight: '22px', letterSpacing: '-0.04em', color: '#F8F8F8', whiteSpace: 'pre' }, c.title.replace(/ \n/g, '\n'));
   card.appendChild(t);
   const { m } = metaRow(c.st, c.views, c.st === 'soon' ? (c.timer || '03:00') : c.meta.replace(' 남음', ''));
   card.appendChild(m);
   const smalls = c.small.map((h) => h);
   card.appendChild(cluster(c.st, smalls, c.big, c.more ? c.more.replace('+', '') : 0, c.talk));
   if (c.st === 'soon') {
-    const pill = el('div', { position: 'absolute', left: '269px', top: '16px', height: '20px', padding: '0 7px 0 6px', borderRadius: '999px', background: '#FF4D6A', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: '700', color: '#000', letterSpacing: '-0.44px' });
+    const pill = el('div', { position: 'absolute', left: '269px', top: '16px', height: '20px', padding: '0 7px 0 6px', borderRadius: '999px', background: '#FF4D6A', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: '700', color: '#000', letterSpacing: '-0.04em' });
     pill.appendChild(el('span', { display: 'block', width: '13px', height: '13px' }, TIMER));
     pill.appendChild(el('span', null, c.timer || '03:00'));
     card.appendChild(pill);

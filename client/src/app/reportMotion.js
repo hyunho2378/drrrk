@@ -7,6 +7,10 @@
 // 움직임은 opacity와 translate(transform 속성의 한 갈래)만 쓴다. 화면 스크롤(live.js scrollerOf)이 덩어리에 transform을 쓰므로 겹치지 않게 translate로 움직인다.
 import { motion, live as LIVE } from '../tokens.js';
 import { q, relRect } from './dom.js';
+import { SOLO_REPORT, SOLO_REPORT_H } from './soloReport.js';
+
+// 아래 버튼 묶음이 창 바닥에 붙는 종료 화면: 함께 방 종료(1, 1708 프레임)와 혼자 드르륵 종료 리포트(65, 1092 프레임, soloReport.js)
+export const isEndScreen = (n) => n === 1 || n === SOLO_REPORT;
 
 const R = LIVE.reportMotion;
 const EMPTY = 'inset(0 100% 0 0 round 99px)';
@@ -35,7 +39,8 @@ export function pinEndBar(root, layer) {
   if (!bar) return null;
   if (!bar.dataset.y0) bar.dataset.y0 = String(parseFloat(bar.style.top) || relRect(root, bar).y);
   const y0 = +bar.dataset.y0;
-  const shift = y0 - (endFloor(root) - (END_H - y0));
+  const H = root.dataset.soloReport ? SOLO_REPORT_H : END_H;
+  const shift = y0 - (endFloor(root) - (H - y0));
   bar.style.top = y0 - shift + 'px';
   bar.style.zIndex = '3';
   if (layer) q(layer, '[data-hotspot]').forEach((b) => {
@@ -92,12 +97,12 @@ function viewBottom(root) {
 
 // 화면이 보이기 전(prepare): 막대를 비우고, 종료의 줄을 숨겨 둔다.
 export function prepReportMotion(root, n) {
-  if ((n !== 1 && n !== 2) || root.dataset.reportMotion) return;
+  if ((!isEndScreen(n) && n !== 2) || root.dataset.reportMotion) return;
   root.dataset.reportMotion = 'prep';
-  if (n === 1) endFloor(root);
+  if (isEndScreen(n)) endFloor(root);
   if (reduced()) return;
   bars(root).forEach((b) => (b.style.clipPath = EMPTY));
-  if (n === 1) blocksOf(root).forEach((bk) => bk.rows.forEach((r) => Object.assign(r.style, { opacity: '0', translate: '0 ' + R.dy + 'px' })));
+  if (isEndScreen(n)) blocksOf(root).forEach((bk) => bk.rows.forEach((r) => Object.assign(r.style, { opacity: '0', translate: '0 ' + R.dy + 'px' })));
 }
 
 function fill(bar, delay) {
@@ -112,12 +117,12 @@ function rise(row, delay) {
 
 // 화면이 자리를 잡은 뒤(attach): 매 프레임 보이는 자리를 재서 막대와 덩어리를 한 번씩만 시작한다.
 export function attachReportMotion(root, n) {
-  if ((n !== 1 && n !== 2) || root.dataset.reportMotion !== 'prep') return;
+  if ((!isEndScreen(n) && n !== 2) || root.dataset.reportMotion !== 'prep') return;
   root.dataset.reportMotion = 'on';
   if (reduced()) return;
   const t0 = performance.now();
   let gauges = bars(root);
-  let blocks = n === 1 ? blocksOf(root) : [];
+  let blocks = isEndScreen(n) ? blocksOf(root) : [];
   let nextAt = 0;
   const loop = () => {
     if (!root.isConnected) return;

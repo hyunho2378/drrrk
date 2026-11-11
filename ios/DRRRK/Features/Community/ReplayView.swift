@@ -194,6 +194,7 @@ struct ReplayView: View {
         HStack(spacing: 0) {
             (Text(ReplayData.mmss(pos)).font(.custom(SUITWeight.bold.rawValue, fixedSize: 12)).foregroundColor(DS.Palette.textPrimary)
                 + Text(" / " + ReplayData.mmss(ReplayData.total)).font(.custom(SUITWeight.medium.rawValue, fixedSize: 12)).foregroundColor(DS.Palette.textSecondary))
+                .tracking(SUITTracking.of(12))
                 .frame(width: 84, height: 32, alignment: .leading)
             Spacer(minLength: 0)
             HStack(spacing: 12) {

@@ -31,8 +31,9 @@ import { fixWraps } from './wrapFix.js';
 import { patchSolo } from './solo.js';
 import { swapScene, patchRoom2 } from './scene.js';
 import { applyAvatars } from './avatars.js';
-import { patchReportStory } from './reportPatch.js';
-import { prepReportMotion, attachReportMotion, endFloor, pinEndBar } from './reportMotion.js';
+import { patchReportStory, patchMorningBar } from './reportPatch.js';
+import { prepReportMotion, attachReportMotion, endFloor, pinEndBar, isEndScreen } from './reportMotion.js';
+import { prepSoloReport } from './soloReport.js';
 import { prefetchSunrise, prepareSunrise, attachSunrise, sunriseHolding } from './sunriseVideo.js';
 import { prepareRoomEnter, attachRoomEnter } from './roomEnterVideo.js';
 import { prepareNormalPager, attachNormalPager } from './normalPager.js';
@@ -441,10 +442,11 @@ function scrollerOf(layer, root, n) {
   const nav = root.querySelector(':scope > [data-figma="bottom_navigation"]');
   const named = (LIVE.pinNames[n] || []).map((nm) => root.querySelector(':scope > [data-figma="' + nm + '"]')).filter(Boolean);
   // 종료(1) 아래 버튼 묶음은 창 바닥에 붙여 두고 움직이지 않는다(reportMotion.js pinEndBar, 피그마 세로 제약 BOTTOM).
-  if (n === 1) { const eb = pinEndBar(root, layer); if (eb) named.push(eb); }
+  // 혼자 드르륵 종료 리포트(65, soloReport.js)도 같다.
+  if (isEndScreen(n)) { const eb = pinEndBar(root, layer); if (eb) named.push(eb); }
   const pins = [...(fit && fit.pinned.size ? [...fit.pinned] : nav ? [nav] : []), ...named];
   // 종료(1)는 바닥 요소가 없고, 휴대폰에서는 뿌리 칸이 보이는 창 바닥까지 늘어난다(mobileFit.js). 그 바닥까지 움직인다.
-  const floor = n === 1 ? endFloor(root) : LIVE.screenH;
+  const floor = isEndScreen(n) ? endFloor(root) : LIVE.screenH;
   const bottom = pins.length ? Math.min(...pins.map((p) => relRect(root, p).y)) : floor;
   const box = root.querySelector(':scope > [data-figma="Scroll"]');
   let items, top;
@@ -471,7 +473,7 @@ function scrollerOf(layer, root, n) {
   const hot = q(layer, '[data-hotspot]').filter((b) => {
     const t = parseFloat(b.style.top);
     // 종료(1)의 아래 버튼(y1590, 1640)은 창 아래(844 넘어)에 있다가 스크롤로 올라온다. 누르는 자리도 같이 움직인다.
-    const below = n === 1 && t >= LIVE.screenH;
+    const below = isEndScreen(n) && t >= LIVE.screenH;
     return ((t >= top - 0.5 && t < bottom) || below) && b.getAttribute('aria-label') !== '탭바' && !b.dataset.fitPinned;
   });
   const clipNeeded = !box;
@@ -838,6 +840,8 @@ export async function prepare(layer, n, prevN) {
   fixWraps(root);
   swapScene(root, n);
   patchSolo(root, n);
+  // 혼자 드르륵 종료 리포트(65): 화면 스크롤(attachDrag)이 내용 끝을 재기 전에 빠진 덩어리를 지우고 버튼 묶음 자리를 옮긴다.
+  prepSoloReport(root, n);
   applyAvatars(root, n);
   showEmptyOutlines(root);
   patchScene(root, n);
@@ -867,6 +871,7 @@ export async function prepare(layer, n, prevN) {
   patchPill(root, n);
   patchReport(root, n);
   patchReportStory(root, n);
+  patchMorningBar(root, n);
   prepReportMotion(root, n);
   if (LIVE.myScreens.includes(n) && !LIVE.myScreens.includes(prevN)) { root.dataset.gauge = '1'; prepGauge(root); }
   if (n === LIVE.itemScreen) await fillItem(root);

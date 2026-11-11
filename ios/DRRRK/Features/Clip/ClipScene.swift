@@ -182,7 +182,7 @@ struct ClipTextView: View {
         let lh = it.lh ?? (size * 1.4).rounded()
         Text(attributed)
             .font(.custom(suitWeight(it.wt).rawValue, fixedSize: size))
-            .tracking((it.ls ?? -2) / 100 * size)
+            .tracking(SUITTracking.of(CGFloat(size)))
             .lineSpacing(max(0, lh - size * 1.25))
             .foregroundStyle(clipColor(it.c, it.a))
             .shadow(color: .black.opacity(it.sh?[3] ?? 0), radius: (it.sh?[2] ?? 0) / 2, x: it.sh?[0] ?? 0, y: it.sh?[1] ?? 0)
@@ -281,7 +281,7 @@ struct ClipItemView: View {
         let t = it.pill
         let body = Text(t?.s ?? "")
             .font(.custom(suitWeight(t?.wt).rawValue, fixedSize: t?.size ?? 12))
-            .tracking(-0.02 * (t?.size ?? 12))
+            .tracking(SUITTracking.of(CGFloat(t?.size ?? 12)))
             .foregroundStyle(clipColor(t?.c))
             .padding(.horizontal, it.px ?? 0)
             .frame(height: it.h ?? 0)

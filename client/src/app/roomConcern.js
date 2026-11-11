@@ -65,7 +65,7 @@ export const bannerOpenHeight = (lines) => 14 + 18 + 12 + lines * BANNER_LH + BA
 // 상자 높이를 19.6으로 늘리고 아래 여백을 -2.6으로 두어 가운데 정렬 기준(17 상자, 위 11.5)은 그대로, 글자 아래가 잘리지 않게 한다.
 export function styleBannerLine(p) {
   if (!p) return;
-  Object.assign(p.style, { fontSize: '14px', lineHeight: BANNER_LH + 'px', letterSpacing: '-0.56px', height: BANNER_LH + 'px', marginBottom: (17 - BANNER_LH) + 'px' });
+  Object.assign(p.style, { fontSize: '14px', lineHeight: BANNER_LH + 'px', letterSpacing: '-0.04em', height: BANNER_LH + 'px', marginBottom: (17 - BANNER_LH) + 'px' });
 }
 
 // 펼친 본문: 행간 19.6, 높이는 줄 수대로. 박스 높이를 줄 수에 맞춰 다시 정하고 그 높이를 돌려준다.

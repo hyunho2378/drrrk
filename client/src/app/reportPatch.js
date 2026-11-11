@@ -177,9 +177,36 @@ function picker(root) {
   });
 }
 
+// 혼자 드르륵 종료 리포트(65, soloReport.js)도 같은 글을 쓴다. 도움이 된 유저 칸이 없어 picker는 할 일이 없다.
 export function patchReportStory(root, n) {
-  if ((n !== 1 && n !== 3) || !root || root.dataset.reportStory) return;
+  if ((n !== 1 && n !== 3 && n !== 65) || !root || root.dataset.reportStory) return;
   root.dataset.reportStory = '1';
   storyText(root);
   picker(root);
+}
+
+// 아침(2)과 오늘 나눈 대화(3)의 아래 막대(피그마 새 섹션 2340:23399, 2340:29284 "Frame 2147249293", 342 x 78, 세로 제약 BOTTOM).
+// 탁빛나 11/12 "하단바 내용 바뀌어서 반영 필요": 회색 버튼(btn 342 x 46, 모서리 28, #222628) 글이 "커뮤니티에 고민 올리기"(SUIT Bold 16, 행간 22.4, 자간 -0.64, #9AA1A6),
+// 아래 글이 "올리지 않고 홈으로"(SUIT Bold 14, 행간 19.6, 자간 -0.56, #9AA1A6)로 바뀌었다. 버튼 수(둘), 자리(726, 784), 뒤 검은 그라데이션(Rectangle 1954141374)은 그대로다.
+// 생성 화면은 옛 버튼 그림(assets/end2/r-1804-13228, end3/r-1804-13233 "함께 드르륵 앉기")과 "새 방 만들기" 글이라 보이기 전(live.js prepare)에 같은 자리 같은 크기로 바꾼다.
+export const MORNING_BAR = { primary: '커뮤니티에 고민 올리기', secondary: '올리지 않고 홈으로', bg: '#222628', fg: '#9AA1A6' };
+export function patchMorningBar(root, n) {
+  if ((n !== 2 && n !== 3) || !root || root.dataset.morningBar) return;
+  const bar = root.querySelector('[data-figma="Frame 2147249293"]');
+  if (!bar) return;
+  root.dataset.morningBar = '1';
+  const img = bar.querySelector(':scope > img[data-figma="btn"]');
+  if (img) {
+    const btn = document.createElement('div');
+    btn.dataset.figma = 'btn';
+    Object.assign(btn.style, { display: 'flex', height: '46px', justifyContent: 'center', alignItems: 'center', alignSelf: 'stretch', flexShrink: '0', borderRadius: '28px', background: MORNING_BAR.bg });
+    const p = document.createElement('p');
+    p.dataset.figma = MORNING_BAR.primary;
+    Object.assign(p.style, { margin: '0', color: MORNING_BAR.fg, textAlign: 'center', fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', fontWeight: '700', lineHeight: '22.4px', letterSpacing: '-0.64px', whiteSpace: 'pre' });
+    p.textContent = MORNING_BAR.primary;
+    btn.appendChild(p);
+    img.replaceWith(btn);
+  }
+  const sub = bar.querySelector(':scope > p');
+  if (sub) { setText(sub, MORNING_BAR.secondary); sub.dataset.figma = MORNING_BAR.secondary; }
 }

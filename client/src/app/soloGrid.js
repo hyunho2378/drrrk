@@ -71,7 +71,7 @@ function bigTile(p, i) {
   disc.appendChild(img);
   t.appendChild(disc);
   const name = el('div', { position: 'absolute', left: '171.5px', top: '218.9px', transform: 'translateX(-50%)', padding: '6px 16px', boxSizing: 'border-box', borderRadius: '16px', background: '#000', display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' });
-  name.appendChild(el('p', { margin: '0', fontFamily: SUIT, fontWeight: '700', fontSize: '20px', lineHeight: '24.96px', letterSpacing: '-0.8px', color: '#F8F8F8' }, p.name));
+  name.appendChild(el('p', { margin: '0', fontFamily: SUIT, fontWeight: '700', fontSize: '20px', lineHeight: '24.96px', letterSpacing: '-0.04em', color: '#F8F8F8' }, p.name));
   t.appendChild(name);
   page.appendChild(t);
   page.__img = img;
@@ -81,7 +81,7 @@ function bigTile(p, i) {
 function bubble(text, mine) {
   const b = el('div', { display: 'inline-flex', alignItems: 'center', padding: '8px 12px', borderRadius: '14px', background: mine ? '#36D2FF' : '#222628', boxSizing: 'border-box' });
   b.dataset.figma = 'Frame';
-  b.appendChild(el('p', { margin: '0', fontFamily: SUIT, fontWeight: '500', fontSize: '14px', lineHeight: '19.6px', letterSpacing: '-0.56px', color: mine ? '#000' : '#F8F8F8', whiteSpace: 'pre' }, text));
+  b.appendChild(el('p', { margin: '0', fontFamily: SUIT, fontWeight: '500', fontSize: '14px', lineHeight: '19.6px', letterSpacing: '-0.04em', color: mine ? '#000' : '#F8F8F8', whiteSpace: 'pre' }, text));
   return b;
 }
 

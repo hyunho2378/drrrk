@@ -185,12 +185,12 @@ export default function CommunityPost() {
           <div data-figma="Actions" data-node="2100:23321" style={{ display: 'flex', alignItems: 'center', width: 342, height: 36 }}>
             <div role="button" tabIndex={0} aria-label="좋아요" aria-pressed={liked} onClick={toggleLike} onKeyDown={(e) => { if (e.key === 'Enter') toggleLike(e); }} {...pressProps()} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 36, cursor: 'pointer', position: 'relative' }}>
               <span ref={thumbRef} style={{ display: 'block', width: 24, height: 24 }}>{icon.thumb(likeColor)}</span>
-              <p style={t(16, 700, likeColor, { lineHeight: '20px', letterSpacing: '-0.64px', transition: 'color 180ms ' + motion.standard })}>{count}</p>
+              <p style={t(16, 700, likeColor, { lineHeight: '20px', letterSpacing: '-0.04em', transition: 'color 180ms ' + motion.standard })}>{count}</p>
             </div>
             <div style={{ flex: 1 }} />
             <div role="button" tabIndex={0} aria-label="공유" onClick={(e) => { e.stopPropagation(); share(rootRef.current, title); }} onKeyDown={(e) => { if (e.key === 'Enter') share(rootRef.current, title); }} {...pressProps()} style={{ display: 'flex', alignItems: 'center', gap: 4, height: 36, cursor: 'pointer' }}>
               {icon.share}
-              <p style={t(16, 700, C.sub, { lineHeight: '20px', letterSpacing: '-0.64px', width: 28 })}>공유</p>
+              <p style={t(16, 700, C.sub, { lineHeight: '20px', letterSpacing: '-0.04em', width: 28 })}>공유</p>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function CommunityPost() {
       <div data-figma="Rectangle 1954141374" data-node="2298:22208" style={{ position: 'absolute', left: -1, top: 708, width: 392, height: 136, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, #000000 73.24%)' }} />
       <div data-figma="input" data-node="2100:23469" style={{ position: 'absolute', left: 24, top: 754, width: 342, height: 66, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 8px 8px 20px', borderRadius: 32, background: C.card }}>
         <div data-figma="댓글 입력칸" style={{ position: 'relative', width: 256, height: 48, display: 'flex', alignItems: 'center', paddingRight: 16, boxSizing: 'border-box', flexShrink: 0 }} onClick={() => inputRef.current && inputRef.current.focus()}>
-          <p aria-hidden="true" style={t(14, 400, C.sub, { lineHeight: '19.6px', letterSpacing: '-0.56px', opacity: draft ? 0 : 1, pointerEvents: 'none' })}>댓글 달기</p>
+          <p aria-hidden="true" style={t(14, 400, C.sub, { lineHeight: '19.6px', letterSpacing: '-0.04em', opacity: draft ? 0 : 1, pointerEvents: 'none' })}>댓글 달기</p>
           <input
             ref={inputRef}
             className="cp5-input"
@@ -221,7 +221,7 @@ export default function CommunityPost() {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, outline: 'none', background: 'transparent', color: C.text, caretColor: C.brand, padding: '0 16px 0 0', margin: 0, fontFamily: SUIT, fontSize: 14, letterSpacing: '-0.56px' }}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, outline: 'none', background: 'transparent', color: C.text, caretColor: C.brand, padding: '0 16px 0 0', margin: 0, fontFamily: SUIT, fontSize: 14, letterSpacing: '-0.04em' }}
           />
         </div>
         <div role="button" tabIndex={0} aria-label="보내기" data-figma="btn_전송 (글 상세)" onClick={send} onKeyDown={(e) => { if (e.key === 'Enter') send(); }} {...pressProps()} style={{ width: 48, height: 48, borderRadius: 24, background: C.brand, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>

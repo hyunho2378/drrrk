@@ -64,8 +64,8 @@ export default function SkinPopup() {
         <div style={{ position: 'absolute', left: 0, top: 600, width: 390, textAlign: 'center', fontSize: 13, fontWeight: 500, lineHeight: '18px', color: '#9AA1A6' }}>엉따 온도 39°에 도달해서 열렸어요</div>
       </div>
       <div style={{ position: 'absolute', left: 0, top: 668, width: 390, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, opacity: shown ? 1 : 0, ...fade(350) }}>
-        <button className="sk-btn" onClick={sit} style={{ width: 278, height: 46, borderRadius: 28, background: '#36D2FF', color: '#000', fontSize: 16, fontWeight: 700, letterSpacing: '-0.64px' }}>지금 앉아보기</button>
-        <button className="sk-btn" onClick={later} style={{ height: 34, padding: '0 20px', marginTop: -8, color: '#6E767C', fontSize: 13, fontWeight: 500, letterSpacing: '-0.52px' }}>나중에 할게요</button>
+        <button className="sk-btn" onClick={sit} style={{ width: 278, height: 46, borderRadius: 28, background: '#36D2FF', color: '#000', fontSize: 16, fontWeight: 700, letterSpacing: '-0.04em' }}>지금 앉아보기</button>
+        <button className="sk-btn" onClick={later} style={{ height: 34, padding: '0 20px', marginTop: -8, color: '#6E767C', fontSize: 13, fontWeight: 500, letterSpacing: '-0.04em' }}>나중에 할게요</button>
       </div>
     </div>
   );

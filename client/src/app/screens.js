@@ -413,6 +413,13 @@ export const SCREENS = [
   "name": "혼자 드르륵 · 그리드",
   "file": "SoloGrid",
   "h": 844
+ },
+ {
+  "n": 65,
+  "id": "2337:15695",
+  "name": "종료",
+  "file": "SoloReport",
+  "h": 844
  }
 ];
 
@@ -513,6 +520,7 @@ const modules = {
   'HomeClip': () => import('./HomeClip.jsx'),
   'HomeClipOpen': () => import('./HomeClipOpen.jsx'),
   'SoloGrid': () => import('./SoloGrid.jsx'),
+  'SoloReport': () => import('./SoloReport.jsx'),
 };
 
 export async function loadScreen(n) {

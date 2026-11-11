@@ -48,7 +48,7 @@ function go(to, t = 'fade') {
 function Title({ text }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: 20 }}>
-      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.28px', color: '#F8F8F8', lineHeight: '20px' }}>{text}</span>
+      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.04em', color: '#F8F8F8', lineHeight: '20px' }}>{text}</span>
       <img alt="" src={A + 'info.png'} style={{ width: 13, height: 13 }} />
     </div>
   );
@@ -158,7 +158,7 @@ function ItemSheet({ slot }) {
               <img alt="" draggable={false} src={copy.img} style={{ width: 112, height: 112, objectFit: 'contain' }} />
             </button>}
         <span data-figma="item name" style={{ marginTop: 16, height: 28, fontSize: 20, fontWeight: 700, lineHeight: '28px', color: '#F8F8F8', whiteSpace: 'nowrap' }}>{copy.name}</span>
-        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: locked || key === 'byeollo' ? 0 : '-0.56px', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
+        <span data-figma="item desc" style={{ marginTop: 18, fontSize: 14, fontWeight: 400, lineHeight: '21px', letterSpacing: '-0.04em', color: '#CCD1D6', textAlign: 'center', whiteSpace: 'pre' }}>{copy.lines.join('\n')}</span>
         <span data-figma="정보 칩" style={{ marginTop: 16, display: 'flex', gap: 8 }}>
           {chips.map((c, i) => (
             <span key={i} data-figma={i === 0 ? 'chip 쿨타임' : 'chip 라이브 전용'} style={{ padding: '5px 10px', borderRadius: 8, background: 'rgba(255,255,255,.08)', fontSize: locked ? 14 : 12, fontWeight: locked ? 400 : 500, lineHeight: locked ? '21px' : '17px', color: '#CCD1D6', whiteSpace: 'nowrap' }}>{c}</span>
@@ -261,12 +261,12 @@ export default function MyHome({ item, still }) {
       <div style={{ position: 'absolute', left: 24, top: 356, width: 342 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', height: 36 }}>
           <Title text="엉따 온도" />
-          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.52px', lineHeight: '36px', color: '#FF9A4D' }}>39.2°</span>
+          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: '36px', color: '#FF9A4D' }}>39.2°</span>
         </div>
         {/* 오늘 오른 온도 칩(팀 피그마 1980:28595): 화면 기준 237, 361. 칩 49 x 25, 모서리 11, #36D2FF, 안쪽 여백 9와 4,
             글자 SUIT Bold 11, 행간 150%, 자간 -4%, 검정. 오른쪽 꼬리(1980:28598)는 285, 369의 9.5 x 9 삼각형이다. */}
         <span aria-label="오늘 0.5도 올랐어요" data-figma="+ 0.5°" style={{ position: 'absolute', left: 213, top: 5, width: 58, height: 25, pointerEvents: 'none' }}>
-          <span style={{ position: 'absolute', left: 0, top: 0, width: 49, height: 25, borderRadius: 11, background: '#36D2FF', boxSizing: 'border-box', padding: '4px 9px', fontSize: 11, fontWeight: 700, lineHeight: '16.5px', letterSpacing: '-0.44px', color: '#000', whiteSpace: 'nowrap' }}>+ 0.5°</span>
+          <span style={{ position: 'absolute', left: 0, top: 0, width: 49, height: 25, borderRadius: 11, background: '#36D2FF', boxSizing: 'border-box', padding: '4px 9px', fontSize: 11, fontWeight: 700, lineHeight: '16.5px', letterSpacing: '-0.04em', color: '#000', whiteSpace: 'nowrap' }}>+ 0.5°</span>
           <svg aria-hidden width="58" height="25" viewBox="0 0 58 25" style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
             <path d="M55.5921 11.5962L48 8V17L55.5921 13.4037C56.3547 13.0425 56.3547 11.9574 55.5921 11.5962Z" fill="#36D2FF" />
           </svg>

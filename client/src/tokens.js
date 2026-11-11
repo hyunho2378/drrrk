@@ -103,7 +103,7 @@ export const live = {
   // 영상 첫 프레임이 준비될 때까지 화면을 보이지 않고 기다리는 최대 시간(ms). 넘으면 영상 없이 방 사진으로 보인다.
   videoReadyMaxMs: 1500,
   roomEnterVolume: 0.6,
-  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. C 혼자 드르륵과 W 라운지 구경 방은 시계만 흐른다.
+  // 방마다 남은 시간(초)이 이 값에 닿으면 넘어가는 화면. W 라운지 구경 방은 시계만 흐른다.
   // A 옛 방(9): 01:12에 해 뜨는 단계(40), 0에 종료(1).
   // B 함께 드르륵 방(28, 29, 쌍밍아웃과 사진보정 둘 다): 01:12에 해 뜨는 단계(40, 해뜨기 영상), 0이 된 뒤 영상 마지막 장면에 3초 머물고 종료(1).
   //   예전 B는 0에 해 뜬 순간(35)으로 가서 40과 영상을 건너뛰었다. 이제 영상 마지막 장면이 35의 역할을 하므로 35를 거치지 않는다.
@@ -112,6 +112,8 @@ export const live = {
   rooms: {
     A: [{ at: SUNRISE_AT, to: 40 }, { at: 0, to: 1 }],
     B: [{ at: SUNRISE_AT, to: 40 }, { at: -(SUN_HOLD_MS / 1000) * ROOM_SUNRISE_SCALE, to: 1 }],
+    // C 혼자 드르륵 방(46, 41, 42, 43, 64): 0(실제 90초, 아침)이 되면 혼자 드르륵 종료 리포트(65, 피그마 2337:15695)로 간다(탁빛나 11/12 "아침이 밝아오면 리포트 추가").
+    C: [{ at: 0, to: 65 }],
   },
   // 입력칸으로 살릴 안내 글(이 글이 있는 칸만 실제로 쓸 수 있게 한다).
   inputHint: /한마디|댓글|메시지/,
@@ -121,13 +123,15 @@ export const live = {
   dotGap: 6,
   // 위아래로 움직이는 화면(라이브 10, 라운지 카테고리 48~52, 글 상세 38, 커뮤니티 39). 머리말 아래(112)부터 움직이고, 맨 끝 내용 아래로 여백을 둔다.
   // 종료(1)도 화면 크기(390 x 844) 창 안에서 움직인다(의정 1647:26726 "스크롤 화면 크기로 수정", 11. 11.).
-  scrollScreens: [1, 10, 38, 39, 48, 49, 50, 51, 52],
+  // 혼자 드르륵 종료 리포트(65)도 종료(1)와 같다.
+  scrollScreens: [1, 10, 38, 39, 48, 49, 50, 51, 52, 65],
   // 스크롤하지 않고 제자리에 두는 요소(글 상세의 댓글 입력줄).
   pinNames: { 38: ['input'] },
   scrollTop: 112,
   scrollPad: 24,
   // 화면별 맨 끝 여백. 종료(1)는 아래 버튼 묶음이 창 바닥에 붙어 있어(reportMotion.js pinEndBar) 스크롤 내용 끝(Report 1548)에서 버튼 묶음 윗선(1590)까지 42를 둔다(피그마 1708 프레임 값).
-  scrollPadBy: { 1: 42 },
+  // 혼자 드르륵 종료 리포트(65)는 Report 끝 932에서 묶음 윗선 974까지 42다(피그마 1092 프레임 값).
+  scrollPadBy: { 1: 42, 65: 42 },
   chatFirst: 350,
   chatGap: 900,
   chatSpacing: 12,
@@ -142,7 +146,7 @@ export const live = {
   stepDim: 0.4,
   ringColor: 'var(--brand-primary)',
   // 상태바 시간: 피그마 Status Bar의 9:41 글자 값(SF Pro Text Semibold 17.075px, 행간 22.767px, 자간 -0.569px).
-  clockStyle: { display: 'block', width: '100%', height: '100%', textAlign: 'center', fontFamily: '-apple-system, "SF Pro Text", system-ui, sans-serif', fontSize: '17.075px', fontWeight: '600', lineHeight: '22.767px', letterSpacing: '-0.569px', color: 'var(--white)', transform: 'translateY(-0.5px)', whiteSpace: 'pre' },
+  clockStyle: { display: 'block', width: '100%', height: '100%', textAlign: 'center', fontFamily: '-apple-system, "SF Pro Text", system-ui, sans-serif', fontSize: '17.075px', fontWeight: '600', lineHeight: '22.767px', letterSpacing: '-0.04em', color: 'var(--white)', transform: 'translateY(-0.5px)', whiteSpace: 'pre' },
   inputStyle: { position: 'absolute', inset: '0', width: '100%', height: '100%', border: '0', outline: 'none', background: 'transparent', color: 'var(--text-primary)', caretColor: 'var(--brand-primary)', padding: '0', margin: '0' },
   // 라운지 카테고리: 연애(49)를 열면 빨간 점이 사라진다.
   loveScreen: 49,

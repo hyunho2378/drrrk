@@ -72,7 +72,7 @@ function Hero({ src }) {
   );
 }
 
-const label = { position: 'absolute', left: 24, margin: 0, fontFamily: FONT, fontSize: 15, fontWeight: 700, lineHeight: '21px', letterSpacing: '-0.6px', color: '#F8F8F8', whiteSpace: 'pre' };
+const label = { position: 'absolute', left: 24, margin: 0, fontFamily: FONT, fontSize: 15, fontWeight: 700, lineHeight: '21px', letterSpacing: '-0.04em', color: '#F8F8F8', whiteSpace: 'pre' };
 
 export function ChairStudio(props) {
   const sel = useSyncExternalStore(subscribe, getDraft, getDraft);
@@ -102,9 +102,9 @@ export function ChairStudio(props) {
           <path d="M16 4L8 12L16 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
-      <p data-figma="의자 꾸미기 제목" style={{ position: 'absolute', left: 0, top: 79, width: 390, margin: 0, textAlign: 'center', fontSize: 17, fontWeight: 700, lineHeight: '24px', letterSpacing: '-0.34px' }}>의자 꾸미기</p>
+      <p data-figma="의자 꾸미기 제목" style={{ position: 'absolute', left: 0, top: 79, width: 390, margin: 0, textAlign: 'center', fontSize: 17, fontWeight: 700, lineHeight: '24px', letterSpacing: '-0.04em' }}>의자 꾸미기</p>
       <div data-figma="내 엉따" style={{ position: 'absolute', left: 293, top: 79, height: 25, padding: '4px 10px', boxSizing: 'border-box', borderRadius: 999, background: 'rgba(255,154,77,0.15)', display: 'inline-flex', alignItems: 'center' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, lineHeight: '17px', letterSpacing: '-0.24px', color: '#FF9A4D', whiteSpace: 'pre' }}>엉따 39.2°</span>
+        <span style={{ fontSize: 12, fontWeight: 700, lineHeight: '17px', letterSpacing: '-0.04em', color: '#FF9A4D', whiteSpace: 'pre' }}>엉따 39.2°</span>
       </div>
 
       {/* 잠긴 의자는 큰 그림을 어둡게(밝기 50%, 채도 60%) 두고 가운데 자물쇠를 얹는다(피그마 1951:13839). */}
@@ -113,8 +113,8 @@ export function ChairStudio(props) {
         <div aria-hidden="true" className="cs-in" style={{ position: 'absolute', left: 167, top: 221, width: 56, height: 56, borderRadius: 28, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockIcon size={24} /></div>
       ) : null}
       <div key={sel.k + '-' + sel.c} className="cs-text" style={{ position: 'absolute', left: 0, top: 349, width: 390, textAlign: 'center' }}>
-        <p style={{ margin: 0, fontSize: 19, fontWeight: 700, lineHeight: '27px', letterSpacing: '-0.38px' }}>{kind.name}</p>
-        <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: 500, lineHeight: '18px', letterSpacing: '-0.26px', color: locked ? '#FF9A4D' : SECONDARY }}>{locked ? lock.need : kind.colors[sel.c]}</p>
+        <p style={{ margin: 0, fontSize: 19, fontWeight: 700, lineHeight: '27px', letterSpacing: '-0.04em' }}>{kind.name}</p>
+        <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: 500, lineHeight: '18px', letterSpacing: '-0.04em', color: locked ? '#FF9A4D' : SECONDARY }}>{locked ? lock.need : kind.colors[sel.c]}</p>
       </div>
 
       <p data-figma="의자" style={{ ...label, top: 430 }}>의자</p>
@@ -147,7 +147,7 @@ export function ChairStudio(props) {
                 style={{ position: 'relative', flex: '0 0 108px', width: 108, height: 116, borderRadius: 16, background: on && !locked ? SUBTLE : ELEVATED, boxShadow: on && !locked ? 'inset 0 0 0 2px ' + PRIMARY : 'inset 0 0 0 0 ' + PRIMARY }}>
                 <img src={thumb(sel.k, c)} alt="" draggable={false} style={{ position: 'absolute', left: 16, top: 8, width: 76, height: 76, objectFit: 'contain', display: 'block', opacity: locked ? 0.23 : 1 }} />
                 {locked ? <span aria-hidden="true" style={{ position: 'absolute', left: 42, top: 34, lineHeight: 0 }}><LockIcon size={24} /></span> : null}
-                <span style={{ position: 'absolute', left: 0, top: 88, width: 108, textAlign: 'center', fontSize: 12, fontWeight: on && !locked ? 700 : 500, lineHeight: '16.8px', letterSpacing: '-0.48px', color: on && !locked ? PRIMARY : SECONDARY, whiteSpace: 'pre' }}>{name}</span>
+                <span style={{ position: 'absolute', left: 0, top: 88, width: 108, textAlign: 'center', fontSize: 12, fontWeight: on && !locked ? 700 : 500, lineHeight: '16.8px', letterSpacing: '-0.04em', color: on && !locked ? PRIMARY : SECONDARY, whiteSpace: 'pre' }}>{name}</span>
               </button>
             );
           })}
@@ -155,10 +155,10 @@ export function ChairStudio(props) {
       </div>
 
       <div data-figma="CTA" style={{ position: 'absolute', left: 24, top: 764, width: 342, height: 56, borderRadius: 28, background: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 200ms ' + EASE }}>
-        <span style={{ fontSize: 16, fontWeight: 700, lineHeight: '22.4px', letterSpacing: '-0.32px', color: '#000' }}>저장하기</span>
+        <span style={{ fontSize: 16, fontWeight: 700, lineHeight: '22.4px', letterSpacing: '-0.04em', color: '#000' }}>저장하기</span>
       </div>
       {note ? (
-        <div role="status" className="cs-in" style={{ position: 'absolute', left: 24, top: 704, width: 342, height: 44, borderRadius: 14, background: 'rgba(44,44,46,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, letterSpacing: '-0.28px', color: '#FF9A4D' }}>{note}</div>
+        <div role="status" className="cs-in" style={{ position: 'absolute', left: 24, top: 704, width: 342, height: 44, borderRadius: 14, background: 'rgba(44,44,46,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, letterSpacing: '-0.04em', color: '#FF9A4D' }}>{note}</div>
       ) : null}
     </div>
   );

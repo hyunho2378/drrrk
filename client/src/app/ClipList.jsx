@@ -163,7 +163,7 @@ function Feed({ tab, cls }) {
         );
       })}
       {tab === 'mine' && !cards.length ? (
-        <p style={{ position: 'absolute', left: 0, top: 418, width: 390, margin: 0, textAlign: 'center', fontFamily: FONT, fontSize: 15, fontWeight: 500, lineHeight: '21px', letterSpacing: '-0.3px', color: '#9AA1A6' }}>저장한 클립이 없어요</p>
+        <p style={{ position: 'absolute', left: 0, top: 418, width: 390, margin: 0, textAlign: 'center', fontFamily: FONT, fontSize: 15, fontWeight: 500, lineHeight: '21px', letterSpacing: '-0.04em', color: '#9AA1A6' }}>저장한 클립이 없어요</p>
       ) : null}
     </div>
   );
@@ -318,7 +318,7 @@ export function ClipList(props) {
           const w = t === 'mine' ? 54 : 38;
           return (
             <div key={t} ref={(el) => { tabRefs.current[t] = el; }} style={{ position: 'absolute', left: it.x - 4, top: 56, width: w + 8, height: 38 }}>
-              <span style={{ position: 'absolute', left: 4, top: 0, fontFamily: FONT, fontSize: it.size, fontWeight: 700, letterSpacing: '-0.02em', whiteSpace: 'pre', visibility: 'hidden', pointerEvents: 'none' }}>{it.s}</span>
+              <span style={{ position: 'absolute', left: 4, top: 0, fontFamily: FONT, fontSize: it.size, fontWeight: 700, letterSpacing: '-0.04em', whiteSpace: 'pre', visibility: 'hidden', pointerEvents: 'none' }}>{it.s}</span>
               <Hit off={!T('tabs')} name={TAB_N[t]} box={[it.x - 4, 56, w + 8, 38]} at={[0, 0]} label={it.s} pressed={t === tab} onTap={() => pick(t)} items={[tabItem(t)]} />
             </div>
           );

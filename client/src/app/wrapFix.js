@@ -1,5 +1,6 @@
 import MAP from './wrapMap.js';
 import { SOLO_TEXT, SOLO_BODY_OLD, SOLO_BODY } from './soloText.js';
+import { unifyTracking } from './tracking.js';
 
 // 사용자가 쓴 글과 안내 글도 낱말 중간에서 줄이 바뀌지 않게 한다.
 if (typeof document !== 'undefined' && !document.getElementById('wrap-keep-all')) {
@@ -56,4 +57,6 @@ export function fixWraps(root) {
       el.querySelectorAll('span').forEach((s) => { if (!s.hasAttribute('aria-hidden')) s.style.whiteSpace = 'normal'; });
     }
   });
+  // 자간 -4% 통일: 생성 당시 자간이 -4% 가 아닌 윤곽 글자는 실제 글자로 보인다(tracking.js).
+  unifyTracking(root);
 }

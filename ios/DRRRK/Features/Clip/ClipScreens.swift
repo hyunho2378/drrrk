@@ -123,7 +123,7 @@ enum ClipPlayerScene {
     /// 캡션 한 줄(16 ~ 326)에 "... 더보기"까지 들어가게 제목을 줄인다.
     static func fitCaption(_ title: String, size: Double) -> String {
         let font = UIFont(name: SUITWeight.regular.rawValue, size: size) ?? .systemFont(ofSize: size)
-        let attrs: [NSAttributedString.Key: Any] = [.font: font, .kern: -0.02 * size]
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .kern: SUITTracking.of(CGFloat(size))]
         func width(_ s: String) -> CGFloat {
             (s as NSString).size(withAttributes: attrs).width
         }
@@ -330,7 +330,7 @@ struct ClipListView: View {
     /// 탭 글자 폭. 피그마 밑줄(추천 33)과 같은 비율로 다른 탭 글자 폭을 잰다.
     static func tabWidth(_ text: String) -> CGFloat {
         let font = UIFont(name: SUITWeight.bold.rawValue, size: 19) ?? .boldSystemFont(ofSize: 19)
-        let attrs: [NSAttributedString.Key: Any] = [.font: font, .kern: -0.38]
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .kern: SUITTracking.of(19)]
         let w = (text as NSString).size(withAttributes: attrs).width
         let base = ("추천" as NSString).size(withAttributes: attrs).width
         return base > 0 ? 33 * w / base : 33

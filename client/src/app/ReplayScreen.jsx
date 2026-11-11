@@ -131,7 +131,7 @@ export default function ReplayScreen() {
       </div>
       <div data-figma="보는 중" data-node="2322:12328" style={{ position: 'absolute', left: 313, top: 78, height: 27, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px 5px 9px', borderRadius: 999, background: 'rgba(0,0,0,0.7)' }}>
         {icon.view}
-        <p style={t(12, 700, C.text, { lineHeight: '17.4px', letterSpacing: '-0.24px' })}>{REPLAY.viewers}</p>
+        <p style={t(12, 700, C.text, { lineHeight: '17.4px', letterSpacing: '-0.04em' })}>{REPLAY.viewers}</p>
       </div>
 
       <div data-figma="고민" data-node="2322:12288" style={{ position: 'absolute', left: 24, top: 321, width: 342, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -162,9 +162,9 @@ export default function ReplayScreen() {
       <div data-figma="댓글 (라이브 채팅)" data-node="2322:12315" style={{ position: 'absolute', left: 24, top: 540, width: 342, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
         {REPLAY.comments.map((c) => (
           <div key={c.name} data-figma={'댓글 ' + c.name} style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-start' }}>
-            <p style={t(11, 500, C.faint, { lineHeight: '15.4px', letterSpacing: '-0.22px', height: 15 })}>{c.name}</p>
+            <p style={t(11, 500, C.faint, { lineHeight: '15.4px', letterSpacing: '-0.04em', height: 15 })}>{c.name}</p>
             <div data-figma="bubble" style={{ display: 'flex', alignItems: 'center', height: 32, boxSizing: 'border-box', padding: '7px 12px', borderRadius: 14, background: C.card }}>
-              <p style={t(13, 500, C.text, { lineHeight: '18.2px', letterSpacing: '-0.26px' })}>{c.text}</p>
+              <p style={t(13, 500, C.text, { lineHeight: '18.2px', letterSpacing: '-0.04em' })}>{c.text}</p>
             </div>
           </div>
         ))}

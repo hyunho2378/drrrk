@@ -354,7 +354,7 @@ export default function HomeScene({ startOpen = false, clip = false, style, clas
             className="live-input"
             tabIndex={open ? 0 : -1}
             readOnly={!open && fine}
-            style={{ ...LIVE.inputStyle, fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', letterSpacing: '-0.64px', lineHeight: '22px', pointerEvents: open ? 'auto' : 'none', userSelect: 'text', WebkitUserSelect: 'text' }}
+            style={{ ...LIVE.inputStyle, fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', letterSpacing: '-0.04em', lineHeight: '22px', pointerEvents: open ? 'auto' : 'none', userSelect: 'text', WebkitUserSelect: 'text' }}
             onInput={() => { comp.current.on = false; refreshText(); }}
             onKeyDown={(e) => { if (isEnter(e)) { e.preventDefault(); send(); } }}
           />
@@ -382,7 +382,7 @@ export default function HomeScene({ startOpen = false, clip = false, style, clas
             className="live-input"
             tabIndex={open ? 0 : -1}
             readOnly={!open && fine}
-            style={{ ...LIVE.inputStyle, fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', letterSpacing: '-0.64px', lineHeight: '22px', pointerEvents: open ? 'auto' : 'none', userSelect: 'text', WebkitUserSelect: 'text' }}
+            style={{ ...LIVE.inputStyle, fontFamily: "'SUIT', system-ui, sans-serif", fontSize: '16px', letterSpacing: '-0.04em', lineHeight: '22px', pointerEvents: open ? 'auto' : 'none', userSelect: 'text', WebkitUserSelect: 'text' }}
             onInput={() => { comp.current.on = false; refreshText(); }}
             onKeyDown={(e) => { if (isEnter(e)) { e.preventDefault(); send(); } }}
           />

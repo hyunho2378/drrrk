@@ -999,12 +999,12 @@ struct RoomSoloView: View {
         }
     }
 
-    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 RoomModel.realSeconds 90초). 0이 되면 종료 리포트(함께 방과 같은 화면)로 넘어간다.
+    /// 혼자 방도 해 뜨기 시계를 따른다(화면 20:00, 실제 RoomModel.realSeconds 90초). 0이 되면 혼자 드르륵 종료 리포트(피그마 2337:15695, 웹 65)로 넘어간다(탁빛나 11/12 "아침이 밝아오면 리포트 추가").
     private func watchClock() async {
         while !Task.isCancelled {
             if model.remaining(at: .now) <= 0 {
                 Dictation.shared.end()
-                router.push(.roomEnd)
+                router.push(.roomSoloEnd)
                 return
             }
             try? await Task.sleep(for: .seconds(0.5))
@@ -1196,7 +1196,8 @@ private extension View {
     }
 }
 
-private enum ReportKind { case end, morning, summary }
+/// solo: 혼자 드르륵 종료 리포트(피그마 새 섹션 2337:15695, 1092 프레임). 종료(end)에서 오늘의 드르륵 대화들과 도움이 된 유저가 빠지고, 머리 왼쪽이 닫기(close)다.
+private enum ReportKind { case end, morning, summary, solo }
 
 /// 두 이야기의 리포트 글. 사진보정은 2100:24606(옛 2023:30658과 같은 글), 쌍밍아웃은 2096:22857이다.
 /// 웹 client/src/app/reportPatch.js의 SSANG_TEXT와 같은 글이다. 아침(1647:26876)은 옛 글 그대로 둔다.
@@ -1707,7 +1708,10 @@ private struct ReportBody: View {
             // 종료의 덩어리 번호(ReportMotion.swift): 0 제목, 1 해, 2 엉따 카드, 3 오늘 나눈 대화, 4 오늘의 드르륵 대화들, 5 도움이 된 유저, 6 버튼. 웹 reportMotion.js와 같은 줄 나눔이다.
             if kind != .summary { WarmthCard().endRow(2, 0).endBlock(2, rows: 1) }
             TalkTimeline(gap: kind == .morning ? 20 : 12, morning: kind == .morning).endBlock(3, rows: 4)
-            if kind == .morning {
+            if kind == .solo {
+                // 혼자 드르륵 종료 리포트(2337:15695): Report는 00 엉따온도와 02 오늘 나눈 대화 두 덩어리(높이 480)다.
+                EmptyView()
+            } else if kind == .morning {
                 VStack(alignment: .leading, spacing: 12) {
                     SectionHead(title: "오늘의 베스트 댓글", desc: "의자들이 가장 많이 공감한 말이에요")
                     VStack(spacing: 8) {
@@ -1792,8 +1796,9 @@ private struct ReportScreen: View {
                         hero
                         ReportBody(kind: kind)
                     }
-                    if kind == .end {
+                    if pinned {
                         // 종료 버튼 묶음은 아래 safeAreaInset으로 창 바닥에 붙는다. 본문 끝(1548)과 묶음 윗선(1590) 사이 42를 둔다.
+                        // 혼자 드르륵 종료 리포트(1092 프레임)도 본문 끝 932와 묶음 윗선 974 사이 42다.
                         Color.clear.frame(height: 42)
                     } else {
                         Color.clear.frame(height: 212)
@@ -1804,7 +1809,7 @@ private struct ReportScreen: View {
             // 종료(피그마 1647:26726, 2023:30658)의 버튼 묶음(1804:13238, 2023:30766, 세로 제약 BOTTOM)은 스크롤해도 창 바닥에서 40 위에 붙어 따라온다(탁빛나 11/12 "하단바 따라오게").
             // 피그마에 묶음 뒤 판이나 그라데이션은 없다. 묶음 윗선 아래로 지나가는 본문은 바탕색(#121415) 위로 가려져 버튼과 겹치지 않는다(웹 live.js scrollerOf가 잘라 내는 모양과 같다).
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                if kind == .end {
+                if pinned {
                     buttons.endBlock(6, rows: 2).padding(.horizontal, 24).padding(.bottom, 40)
                         .background(DS.Palette.bgSurface)
                 }
@@ -1816,9 +1821,9 @@ private struct ReportScreen: View {
                     .onAppear { viewH = g.size.height }
                     .onChange(of: g.size.height) { _, h in viewH = h }
             })
-            .environment(\.endReveal, kind == .end ? reveal : nil)
+            .environment(\.endReveal, pinned ? reveal : nil)
             .environment(\.reportViewportHeight, viewH)
-            if kind != .end {
+            if !pinned {
                 ZStack(alignment: .bottom) {
                     LinearGradient(stops: [.init(color: .black.opacity(0), location: 0), .init(color: .black, location: 0.7324)],
                                    startPoint: .top, endPoint: .bottom)
@@ -1859,13 +1864,26 @@ private struct ReportScreen: View {
             .frame(height: 142).allowsHitTesting(false)
     }
 
-    private var backButton: some View {
-        Button { router.pop() } label: {
-            Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
-                .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
+    /// 아래 버튼 묶음이 창 바닥에 붙는 화면: 종료와 혼자 드르륵 종료 리포트(피그마 세로 제약 BOTTOM, 아래 여백 40)
+    private var pinned: Bool { kind == .end || kind == .solo }
+
+    @ViewBuilder private var backButton: some View {
+        if kind == .solo {
+            // 닫기(close 2337:15792, 24 안에 12 x 12 선 2, #F8F8F8). 피그마에 연결이 없어 "올리지 않고 홈으로"와 같이 홈으로 간다(웹 flow.js 65 닫기와 같다).
+            Button { router.select(.home) } label: {
+                Image("C-close").renderingMode(.template).resizable().frame(width: 24, height: 24)
+                    .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
+            }
+            .buttonStyle(PressStyle())
+            .accessibilityLabel("닫기")
+        } else {
+            Button { router.pop() } label: {
+                Image("icon-chevron-left").renderingMode(.template).resizable().frame(width: 24, height: 24)
+                    .foregroundStyle(DS.Palette.textPrimary).contentShape(Rectangle())
+            }
+            .buttonStyle(PressStyle())
+            .accessibilityLabel("뒤로")
         }
-        .buttonStyle(PressStyle())
-        .accessibilityLabel("뒤로")
     }
 
     /// 해 146 x 146 (122, 273), 엉따 카드는 452에서 시작. 아침(1951:20746)과 종료(2023:30769)가 같은 그림(해시 23749c04da)이다.
@@ -1875,14 +1893,11 @@ private struct ReportScreen: View {
             .frame(maxWidth: .infinity).padding(.top, 273 - 240).padding(.bottom, 452 - 419)
     }
 
+    /// 종료와 혼자 드르륵 종료 리포트는 하늘색 버튼, 아침과 오늘 나눈 대화는 회색 버튼(#222628, 글 #9AA1A6)이다.
+    /// 아침과 오늘 나눈 대화의 막대 글은 피그마 새 섹션(2340:23399, 2340:29284, 탁빛나 11/12 "하단바 내용 바뀌어서 반영 필요")에서 종료와 같은 두 줄로 바뀌었고, 가는 곳도 종료와 같다(웹 flow.js 2, 3).
     @ViewBuilder private var buttons: some View {
-        if kind == .end {
-            ReportButtons(primary: "커뮤니티에 고민 올리기", secondary: "올리지 않고 홈으로", filled: true,
-                          onPrimary: { router.select(.community) }, onSecondary: { router.select(.home) })
-        } else {
-            ReportButtons(primary: "함께 드르륵 앉기", secondary: "새 방 만들기", filled: false,
-                          onPrimary: { router.popToRoot(); router.push(.room) }, onSecondary: { router.popToRoot() })
-        }
+        ReportButtons(primary: "커뮤니티에 고민 올리기", secondary: "올리지 않고 홈으로", filled: pinned,
+                      onPrimary: { router.select(.community) }, onSecondary: { router.select(.home) })
     }
 }
 
@@ -1896,4 +1911,9 @@ struct RoomMorningView: View {
 
 struct RoomSummaryView: View {
     var body: some View { ReportScreen(kind: .summary) }
+}
+
+/// 혼자 드르륵 종료 리포트(피그마 2337:15695, 웹 65). 혼자 방 시계가 0이 되면 들어온다.
+struct RoomSoloEndView: View {
+    var body: some View { ReportScreen(kind: .solo) }
 }
